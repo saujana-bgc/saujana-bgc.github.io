@@ -30,18 +30,10 @@ Push-Location -LiteralPath $apiRoot
 try {
   Write-Host "Deploying tile-detect-api from $apiRoot" -ForegroundColor Cyan
 
-  $rootModel = Join-Path $apiRoot 'tile-detector.onnx'
-  $libModel = Join-Path $apiRoot 'lib\tile-detector.onnx'
-  if (!(Test-Path -LiteralPath $rootModel) -or !(Test-Path -LiteralPath $libModel)) {
-    throw 'Both tile-detector.onnx copies must exist before deployment.'
+  if (!(Test-Path -LiteralPath (Join-Path $apiRoot '.env.local')) -or
+      !(Select-String -LiteralPath (Join-Path $apiRoot '.env.local') -Pattern 'OLLAMA_API_KEY' -Quiet)) {
+    Write-Host 'OLLAMA_API_KEY not found in .env.local; the deployed function will fail its readiness check until the env var is set in the Vercel project.' -ForegroundColor Yellow
   }
-
-  $rootHash = (Get-FileHash -LiteralPath $rootModel -Algorithm SHA256).Hash
-  $libHash = (Get-FileHash -LiteralPath $libModel -Algorithm SHA256).Hash
-  if ($rootHash -ne $libHash) {
-    throw 'The root and lib copies of tile-detector.onnx do not match.'
-  }
-  Write-Host "Model verified: $rootHash" -ForegroundColor Green
 
   if (!$SkipInstall) {
     Write-Host 'Installing locked dependencies...' -ForegroundColor Cyan
@@ -51,7 +43,6 @@ try {
   if (!$SkipTests) {
     Write-Host 'Running detector regression tests...' -ForegroundColor Cyan
     Invoke-Checked npm test
-    Invoke-Checked npx --yes tsx test-final.mts
   }
 
   if (!(Test-Path -LiteralPath (Join-Path $apiRoot '.vercel\project.json'))) {

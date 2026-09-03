@@ -2,11 +2,14 @@
   "version": 2,
   "functions": {
     "api/detect.js": {
-      "memory": 2048,
+      "memory": 1024,
       "maxDuration": 60
     }
   },
   "rewrites": [
-    { "source": "/api/detect", "destination": "/api/detect.js" }
+    {
+      "source": "/api/detect",
+      "destination": "/api/detect.js"
+    }
   ]
 }

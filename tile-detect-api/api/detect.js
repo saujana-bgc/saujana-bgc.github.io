@@ -1,6 +1,7 @@
-import { detectTiles, warmUpDetector } from '../lib/detect.js';
+import { detectTilesLlm, warmUpLlm } from '../lib/llm-detect.js';
 import { parsePredictions } from '../lib/roboflow-parser.js';
 import { splitBySection } from '../lib/sections.js';
+import sharp from 'sharp';
 
 // Shared CORS config: the caller is the GitHub Pages site.
 const ALLOWED_ORIGINS = new Set([
@@ -37,7 +38,7 @@ export default async function handler(req, res) {
       return fail(res, 403, 'Origin not allowed');
     }
     try {
-      await warmUpDetector();
+      await warmUpLlm();
       return res.status(200).json({ ready: true });
     } catch (err) {
       console.error('warm-up failed:', err);
@@ -65,7 +66,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const predictions = await detectTiles(buffer);
+    // The LLM reports normalized coordinates; they are mapped onto the
+    // original image's pixel size so the guided-mode section boxes (which the
+    // client draws against this same size) align with detections.
+    const meta = await sharp(buffer).metadata();
+    const imgWidth = meta.width ?? 0;
+    const imgHeight = meta.height ?? 0;
+    if (!imgWidth || !imgHeight) {
+      throw new Error('Unreadable image dimensions');
+    }
+
+    const predictions = await detectTilesLlm(body.image, imgWidth, imgHeight);
 
     // Individual mode: a flat tile list (hand / dora scanning).
     // Guided mode: optional section boxes (normalized 0..1) split one frame
@@ -75,8 +86,8 @@ export default async function handler(req, res) {
       const split = splitBySection(
         predictions,
         body.sections,
-        Number(body.imageWidth) || 0,
-        Number(body.imageHeight) || 0,
+        imgWidth,
+        imgHeight,
       );
       return res.status(200).json({ mode: 'guided', ...split });
     }
