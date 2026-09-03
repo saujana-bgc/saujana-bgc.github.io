@@ -1,12 +1,12 @@
 <template>
-  <main class="calc-page">
+  <main class="calc-page" :class="{ 'has-mobile-score': !!result }">
     <header class="calc-hero fade-up">
       <p class="calc-kicker">Saujana Board Game Community</p>
       <h1 class="hero-title">Riichi Calculator</h1>
       <p class="calc-intro">
-        Score a riichi hand the way the league plays it: open tanyao allowed, no kiriage mangan,
-        and 13+ han counts as a counted yakuman. Scan your tiles from a photo or use the guided
-        camera, then correct anything manually.
+        Scan a photo or tap the tiles below to build your complete hand, then tap the tile you
+        won on. Add any calls and dora indicators, choose Ron or Tsumo, and set the winds and
+        win conditions — your score updates automatically.
       </p>
     </header>
 
@@ -39,9 +39,10 @@
         </span>
       </div>
       <p v-if="detectError" class="detect-error">{{ detectError }}</p>
+      <p v-else-if="scanFeedback" class="scan-feedback">{{ scanFeedback }}</p>
 
       <div class="picked-rows">
-        <div class="picked-row">
+        <div class="picked-row hand-row" :class="{ 'needs-winner': handNeedsWinner, ready: handReady }">
           <span class="row-label">Hand <em>{{ handProgress }}</em></span>
           <div class="row-tiles">
             <span
@@ -78,6 +79,8 @@
             </button>
             <span v-if="handTiles.length === 0" class="row-empty">No tiles yet — add tiles below</span>
           </div>
+          <p v-if="handNeedsWinner" class="hand-guidance">Hand complete — tap the tile you won on.</p>
+          <p v-else-if="handReady" class="hand-guidance ready">Ready to score.</p>
         </div>
 
         <div class="picked-row">
@@ -123,12 +126,24 @@
       </div>
       <p v-if="inputNote" class="input-note" :class="{ problem: inputNoteProblem }">{{ inputNote }}</p>
 
-      <div id="tile-picker" class="tile-picker" aria-label="Tile picker">
+      <button
+        v-if="!pickerExpanded && handTiles.length >= handTarget"
+        id="tile-picker-summary"
+        type="button"
+        class="picker-collapsed"
+        @click="aimPicker('hand')"
+      >
+        <span>Tile picker hidden</span>
+        <strong>Edit tiles</strong>
+      </button>
+
+      <div v-else id="tile-picker" class="tile-picker" aria-label="Tile picker">
         <p class="picker-mode-label">
           Adding to
           <button type="button" class="picker-mode-switch" @click="aimPicker('hand')" :aria-pressed="pickerMode === 'hand'">Hand</button>
           <span aria-hidden="true">/</span>
           <button type="button" class="picker-mode-switch" @click="aimPicker('dora')" :aria-pressed="pickerMode === 'dora'">Dora</button>
+          <button v-if="handTiles.length >= handTarget" type="button" class="picker-done" @click="pickerExpanded = false">Done</button>
         </p>
         <p v-if="pickerBlockedNote" class="picker-blocked-note">{{ pickerBlockedNote }}</p>
         <div v-for="row in pickerRows" :key="row.label" class="picker-row">
@@ -194,19 +209,60 @@
         </div>
       </div>
 
-      <div class="flag-grid">
+      <div class="condition-panel">
+        <div class="field declaration-field">
+          <span class="field-label">Declaration</span>
+          <div class="segmented-control declaration-control" role="radiogroup" aria-label="Riichi declaration">
+            <button
+              v-for="option in declarationOptions"
+              :key="option.value"
+              type="button"
+              role="radio"
+              :class="{ active: riichiDeclaration === option.value }"
+              :aria-checked="riichiDeclaration === option.value"
+              :disabled="!!declarationDisabledReason(option.value)"
+              :title="declarationDisabledReason(option.value) ?? ''"
+              @click="riichiDeclaration = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
         <label
-          v-for="flag in situationalFlags"
-          :key="flag.key"
           class="flag"
-          :class="{ disabled: !!flagDisabledReasons[flag.key], active: flags[flag.key] }"
-          :title="flagDisabledReasons[flag.key] ?? ''"
+          :class="{ disabled: !!flagDisabledReasons.ippatsu, active: flags.ippatsu }"
+          :title="flagDisabledReasons.ippatsu ?? ''"
         >
-          <input v-model="flags[flag.key]" type="checkbox" :disabled="!!flagDisabledReasons[flag.key]" />
-          {{ flag.label }}
+          <input v-model="flags.ippatsu" type="checkbox" :disabled="!!flagDisabledReasons.ippatsu" />
+          Ippatsu
         </label>
+
+        <button
+          type="button"
+          class="special-toggle"
+          :aria-expanded="specialOpen"
+          @click="specialOpen = !specialOpen"
+        >
+          Special win
+          <span v-if="activeSpecialCount">{{ activeSpecialCount }} selected</span>
+          <span aria-hidden="true">{{ specialOpen ? '−' : '+' }}</span>
+        </button>
+
+        <div v-if="specialOpen" class="flag-grid special-flags">
+          <label
+            v-for="flag in specialFlags"
+            :key="flag.key"
+            class="flag"
+            :class="{ disabled: !!flagDisabledReasons[flag.key], active: flags[flag.key] }"
+            :title="flagDisabledReasons[flag.key] ?? ''"
+          >
+            <input v-model="flags[flag.key]" type="checkbox" :disabled="!!flagDisabledReasons[flag.key]" />
+            {{ flag.label }}
+          </label>
+        </div>
       </div>
-<p v-if="activeFlagHint" class="flag-hint">{{ activeFlagHint }}</p>
+      <p v-if="activeFlagHint" class="flag-hint">{{ activeFlagHint }}</p>
     </section>
 
     <section class="content-card result-card fade-up" aria-labelledby="result-heading" aria-live="polite">
@@ -243,7 +299,7 @@
           <div class="result-block">
             <h3>Yaku ({{ result.totalHan }} han)</h3>
             <ul class="yaku-list">
-              <li v-for="yaku in result.yaku" :key="yaku.name">
+              <li v-for="(yaku, index) in result.yaku" :key="`${yaku.name}-${yaku.detail ?? index}`">
                 <span class="yaku-ja">{{ yaku.nameJa }}</span>
                 <span class="yaku-en">{{ yakuName(yaku.name, yaku.detail) }}</span>
                 <strong>{{ yaku.isYakuman ? 'yakuman' : `${yaku.han} han` }}</strong>
@@ -282,6 +338,14 @@
       <p v-else class="result-empty">Complete the hand (14 tiles, winner marked) to see the score.</p>
     </section>
 
+    <button v-if="result" type="button" class="mobile-score-bar" @click="scrollToResult">
+      <span>
+        <small>{{ resultHeading }}</small>
+        <strong>{{ scoreDisplay }}</strong>
+      </span>
+      <span>View score ↑</span>
+    </button>
+
     <section class="content-card rules-card fade-up" aria-labelledby="rules-heading">
       <div class="section-heading">
         <div>
@@ -311,11 +375,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import type { Hand, Meld, Tile, WindValue } from '~/utils/scoring/types'
 import { score } from '~/utils/scoring'
 import { sortTiles } from '~/utils/scoring/tiles'
-import { fillMissingHandWithHaku } from '~/utils/scoring/haku-fallback'
 import { tileFile, tileSrc } from '~/utils/tile-image'
 
 type FlagKey = 'riichi' | 'doubleRiichi' | 'ippatsu' | 'haitei' | 'houtei' | 'rinshan' | 'chankan'
@@ -386,15 +449,27 @@ const flags = reactive<Record<FlagKey, boolean>>({
   chankan: false,
 })
 
-const situationalFlags: { key: FlagKey; label: string }[] = [
-  { key: 'riichi', label: 'Riichi' },
-  { key: 'doubleRiichi', label: 'Double riichi' },
-  { key: 'ippatsu', label: 'Ippatsu' },
+const specialFlags: { key: FlagKey; label: string }[] = [
   { key: 'haitei', label: 'Haitei (win on last draw)' },
   { key: 'houtei', label: 'Houtei (win on last discard)' },
   { key: 'rinshan', label: 'Rinshan (after kan)' },
   { key: 'chankan', label: 'Chankan (rob a kan)' },
 ]
+
+type RiichiDeclaration = 'none' | 'riichi' | 'doubleRiichi'
+const declarationOptions: { label: string; value: RiichiDeclaration }[] = [
+  { label: 'None', value: 'none' },
+  { label: 'Riichi', value: 'riichi' },
+  { label: 'Double', value: 'doubleRiichi' },
+]
+
+const riichiDeclaration = computed<RiichiDeclaration>({
+  get: () => flags.doubleRiichi ? 'doubleRiichi' : flags.riichi ? 'riichi' : 'none',
+  set: (value) => {
+    flags.riichi = value === 'riichi'
+    flags.doubleRiichi = value === 'doubleRiichi'
+  },
+})
 
 // ─── Session persistence ──────────────────────────────────────────────────────
 // The whole sheet survives a refresh or a phone lock mid-game. Tiles are plain
@@ -473,6 +548,7 @@ function restoreSheet() {
     nukiDoraCount.value = clampNukiDora(sheet.nukiDoraCount)
     if (sheet.flags) {
       for (const key of Object.keys(flags) as FlagKey[]) flags[key] = !!sheet.flags[key]
+      if (flags.doubleRiichi) flags.riichi = false
     }
     return handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0
   } catch {
@@ -540,8 +616,10 @@ function toggleWinningTile(index: number) {
   setWinningTile(winningTileIndex.value === index ? null : index)
 }
 
-function aimPicker(mode: PickerMode) {
+async function aimPicker(mode: PickerMode) {
   pickerMode.value = mode
+  pickerExpanded.value = true
+  await nextTick()
   document.getElementById('tile-picker')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 }
 
@@ -636,7 +714,9 @@ function appendTile(code: string) {
   const tile = parseTile(code)
   if (!tile) return
   if (pickerMode.value === 'hand') {
+    const winner = winningTile.value
     handTiles.value = sortTiles([...handTiles.value, tile])
+    if (winner) winningTileIndex.value = handTiles.value.indexOf(winner)
   } else if (pickerMode.value === 'dora') {
     doraTiles.value = [...doraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
   }
@@ -679,10 +759,33 @@ function updateMelds(nextMelds: Meld[]) {
 
 const handProgress = computed(() => {
   const count = handTiles.value.length
-  return count === handTarget.value
-    ? `${count} tiles — tap the winner`
-    : `${count} / ${handTarget.value}`
+  const remaining = handTarget.value - count
+  if (remaining > 0) return `${remaining} tile${remaining === 1 ? '' : 's'} remaining`
+  if (remaining < 0) return `${Math.abs(remaining)} too many`
+  return winningTileIndex.value === null ? 'complete · tap winner' : 'ready'
 })
+
+const handNeedsWinner = computed(() =>
+  handTiles.value.length === handTarget.value && winningTileIndex.value === null)
+
+const handReady = computed(() =>
+  handTiles.value.length === handTarget.value && winningTileIndex.value !== null)
+
+watch(
+  () => [handTiles.value.length, handTarget.value] as const,
+  ([count, target], [previousCount]) => {
+    if (count < target) {
+      pickerExpanded.value = true
+      return
+    }
+    if (count === target && previousCount < target) {
+      pickerExpanded.value = false
+      nextTick(() => {
+        document.querySelector('.hand-row')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
+    }
+  },
+)
 
 const inputNoteProblem = computed(() =>
   error.value !== null && handComplete.value)
@@ -709,7 +812,10 @@ function clearHand() {
   nukiDoraCount.value = 0
   for (const key of Object.keys(flags) as FlagKey[]) flags[key] = false
   detectError.value = null
+  scanFeedback.value = null
   pickerMode.value = 'hand'
+  pickerExpanded.value = true
+  specialOpen.value = false
 }
 
 // ─── Smart flag validation ────────────────────────────────────────────────────
@@ -746,19 +852,16 @@ watch(flagDisabledReasons, (reasons) => {
   }
 })
 
-// Riichi and double riichi are alternative declarations, never additive.
-// Synchronous watchers make the most recently selected option win, including
-// when normalizing older saved sheets that may have stored both as true.
-watch(() => flags.riichi, (on) => {
-  if (on && flags.doubleRiichi) flags.doubleRiichi = false
-}, { flush: 'sync' })
+function declarationDisabledReason(value: RiichiDeclaration): string | undefined {
+  return value === 'none' ? undefined : flagDisabledReasons.value[value]
+}
 
-watch(() => flags.doubleRiichi, (on) => {
-  if (on && flags.riichi) flags.riichi = false
-}, { flush: 'sync' })
+const activeSpecialCount = computed(() =>
+  specialFlags.filter((flag) => flags[flag.key]).length)
 
 const activeFlagHint = computed(() => {
-  for (const flag of situationalFlags) {
+  const displayedFlags = [{ key: 'ippatsu' as const, label: 'Ippatsu' }, ...specialFlags]
+  for (const flag of displayedFlags) {
     if (flags[flag.key] && flagDisabledReasons.value[flag.key]) {
       return `${flag.label}: ${flagDisabledReasons.value[flag.key]}`
     }
@@ -772,7 +875,10 @@ const detectingHand = ref(false)
 const detectingDora = ref(false)
 const guidedOpen = ref(false)
 const detectError = ref<string | null>(null)
+const scanFeedback = ref<string | null>(null)
 const scanStatus = ref<'idle' | 'ready' | 'failed'>('idle')
+const pickerExpanded = ref(true)
+const specialOpen = ref(false)
 
 const warmupNote = computed(() => {
   if (scanStatus.value === 'ready') return 'Scanner ready'
@@ -860,9 +966,20 @@ async function detectOnServer(base64: string, expectedCount: number): Promise<Ti
   return data.tiles as Tile[]
 }
 
+function detectedHandMessage(count: number, target: number): string {
+  if (count === target) return `${count} tiles detected — review the hand and winning tile below.`
+  if (count < target) {
+    const missing = target - count
+    return `${count} of ${target} tiles detected — add ${missing} tile${missing === 1 ? '' : 's'} manually or scan again.`
+  }
+  const extra = count - target
+  return `${count} tiles detected — remove ${extra} extra tile${extra === 1 ? '' : 's'} before scoring.`
+}
+
 async function scanHand(base64: string) {
   detectingHand.value = true
   detectError.value = null
+  scanFeedback.value = null
   try {
     const tiles = await detectOnServer(base64, handTarget.value)
     if (tiles.length < 1) {
@@ -873,15 +990,14 @@ async function scanHand(base64: string) {
       detectError.value = 'Too many tiles detected. Crop the photo to the hand, or use Guided scan.'
       return
     }
-    // A gallery photo is assumed to be a complete 14-tile shot: all tiles go
-    // into the hand row and the last one is pre-marked as the winning tile.
-    // The haku fill tops the hand up when the detector drops a tile or two.
+    // A gallery photo is assumed to be a complete hand shot. Keep every tile
+    // the scanner actually found and surface any shortfall for manual review;
+    // never invent placeholder tiles for a missed detection.
     const winningTileScanned = tiles[tiles.length - 1]
-    const handScanned = tiles.slice(0, -1)
     const target = handTarget.value
-    const filled = sortTiles(fillMissingHandWithHaku(handScanned, target - 1))
-    handTiles.value = sortTiles([...filled, winningTileScanned])
+    handTiles.value = sortTiles(tiles)
     winningTileIndex.value = handTiles.value.indexOf(winningTileScanned)
+    scanFeedback.value = detectedHandMessage(tiles.length, target)
     scanStatus.value = 'ready'
   } catch (err) {
     scanStatus.value = 'failed'
@@ -900,6 +1016,7 @@ async function scanGuided(capture: GuidedCaptureData) {
   detectingHand.value = scansHand
   detectingDora.value = scansDora
   detectError.value = null
+  scanFeedback.value = null
 
   try {
     const data = await requestDetection({
@@ -926,21 +1043,23 @@ async function scanGuided(capture: GuidedCaptureData) {
     if (capture.sections.hand && Array.isArray(data.melds)) {
       melds.value = data.melds
     }
-    if (capture.sections.hand && data.hand.length > 0) {
-      const target = handTarget.value
+    if (scansHand && (data.hand.length > 0 || data.winningTile)) {
       const scannedHand = data.winningTile && capture.sections.winning
         ? [...data.hand, data.winningTile]
         : data.hand
-      const filled = fillMissingHandWithHaku(scannedHand, target - (data.winningTile ? 1 : 0))
-      handTiles.value = data.winningTile && capture.sections.winning
-        ? sortTiles([...filled, data.winningTile])
-        : sortTiles(filled)
+      handTiles.value = sortTiles(scannedHand)
       if (data.winningTile && capture.sections.winning) {
         winningTileIndex.value = handTiles.value.indexOf(data.winningTile)
+      } else {
+        winningTileIndex.value = null
       }
+      scanFeedback.value = detectedHandMessage(scannedHand.length, handTarget.value)
     }
     if (capture.sections.dora && data.dora.length > 0) {
       doraTiles.value = sortTiles(data.dora.slice(0, MAX_DORA_INDICATORS))
+      if (!scanFeedback.value) {
+        scanFeedback.value = `${doraTiles.value.length} dora indicator${doraTiles.value.length === 1 ? '' : 's'} detected — review below.`
+      }
     }
     scanStatus.value = 'ready'
   } catch (err) {
@@ -1135,6 +1254,10 @@ const tsumoOthersLabel = computed(() =>
   threePlayer.value ? 'Each other pays' : 'Each non-dealer pays',
 )
 
+function scrollToResult() {
+  document.querySelector('.result-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 function formatPoints(n: number): string {
   return n.toLocaleString('en-US')
 }
@@ -1147,11 +1270,16 @@ function yakuName(name: string, detail?: string): string {
 
 <style scoped>
 .calc-page {
-  width: min(100% - 24px, 1060px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: start;
+  gap: 0 24px;
+  width: min(100% - 24px, 1240px);
   padding: 0 0 36px;
 }
 
 .calc-hero {
+  grid-column: 1 / -1;
   width: 100%;
   padding: clamp(44px, 8vw, 78px) 16px 34px;
   text-align: center;
@@ -1190,6 +1318,19 @@ function yakuName(name: string, detail?: string): string {
   background:
     radial-gradient(circle at 92% 8%, rgba(212, 206, 223, 0.5), transparent 32%),
     linear-gradient(145deg, rgba(255, 253, 249, 0.98), rgba(246, 236, 231, 0.92));
+}
+
+.result-card {
+  position: sticky;
+  top: 86px;
+}
+
+.rules-card {
+  grid-column: 1 / -1;
+}
+
+.mobile-score-bar {
+  display: none;
 }
 
 .section-heading {
@@ -1304,6 +1445,17 @@ function yakuName(name: string, detail?: string): string {
   background: rgba(178, 58, 72, 0.08);
 }
 
+.scan-feedback {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  color: var(--matcha-leaf);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.5;
+  border-radius: 12px;
+  background: rgba(101, 119, 99, 0.08);
+}
+
 .picker-row {
   display: grid;
   grid-template-columns: 44px 1fr;
@@ -1381,6 +1533,26 @@ function yakuName(name: string, detail?: string): string {
   background: rgba(101, 119, 99, 0.06);
 }
 
+.picker-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px 16px;
+  color: var(--clay-text);
+  font: inherit;
+  font-size: 0.72rem;
+  border: 1px dashed rgba(101, 119, 99, 0.25);
+  border-radius: 14px;
+  background: rgba(101, 119, 99, 0.05);
+  cursor: pointer;
+}
+
+.picker-collapsed strong {
+  color: var(--matcha-leaf);
+}
+
 .picker-mode-label {
   display: flex;
   align-items: center;
@@ -1391,6 +1563,18 @@ function yakuName(name: string, detail?: string): string {
   letter-spacing: 1.2px;
   text-transform: uppercase;
   opacity: 0.75;
+}
+
+.picker-done {
+  margin-left: auto;
+  padding: 3px 10px;
+  color: var(--matcha-leaf);
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .picker-mode-switch {
@@ -1455,6 +1639,29 @@ function yakuName(name: string, detail?: string): string {
   padding: 4px;
   border-radius: 12px;
   background: rgba(101, 119, 99, 0.05);
+}
+
+.hand-row.needs-winner .row-tiles {
+  outline: 2px solid var(--gold-leaf);
+  outline-offset: 2px;
+  background: rgba(185, 139, 104, 0.08);
+}
+
+.hand-row.ready .row-tiles {
+  outline: 1px solid rgba(101, 119, 99, 0.45);
+  outline-offset: 2px;
+}
+
+.hand-guidance {
+  grid-column: 2;
+  margin: -4px 2px 0;
+  color: var(--gold-leaf);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.hand-guidance.ready {
+  color: var(--matcha-leaf);
 }
 
 .tile-btn {
@@ -1664,6 +1871,67 @@ function yakuName(name: string, detail?: string): string {
   background: var(--matcha-leaf);
 }
 
+.segmented-control button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.condition-panel {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.declaration-control button {
+  padding-inline: 8px;
+}
+
+.condition-panel > .flag {
+  margin: 0;
+}
+
+.special-toggle {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  color: var(--clay-text);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: left;
+  border: 1px solid rgba(101, 119, 99, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 253, 249, 0.6);
+  cursor: pointer;
+}
+
+.special-toggle span:first-of-type {
+  margin-left: auto;
+  font-size: 0.64rem;
+  font-weight: 400;
+  opacity: 0.65;
+}
+
+.special-toggle span:last-child {
+  margin-left: auto;
+  font-size: 1rem;
+}
+
+.special-toggle span + span {
+  margin-left: 0;
+}
+
+.special-flags {
+  grid-column: 1 / -1;
+  margin-top: 0;
+  padding: 4px 2px;
+}
+
 .flag-grid {
   display: flex;
   flex-wrap: wrap;
@@ -1853,7 +2121,22 @@ function yakuName(name: string, detail?: string): string {
   opacity: 0.8;
 }
 
+@media (max-width: 1000px) {
+  .calc-page {
+    display: block;
+    width: min(100% - 24px, 820px);
+  }
+
+  .result-card {
+    position: static;
+  }
+}
+
 @media (max-width: 760px) {
+  .calc-page.has-mobile-score {
+    padding-bottom: 104px;
+  }
+
   .capture-buttons {
     width: 100%;
   }
@@ -1882,6 +2165,62 @@ function yakuName(name: string, detail?: string): string {
   .picked-row {
     grid-template-columns: 1fr;
     gap: 4px;
+  }
+
+  .hand-guidance {
+    grid-column: 1;
+  }
+
+  .condition-panel {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .condition-panel > .flag {
+    justify-content: center;
+  }
+
+  .mobile-score-bar {
+    position: fixed;
+    right: 72px;
+    bottom: 12px;
+    left: 12px;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 13px 16px;
+    color: #fff;
+    font: inherit;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 16px;
+    background: rgba(85, 105, 82, 0.96);
+    box-shadow: 0 12px 32px rgba(55, 62, 52, 0.28);
+    cursor: pointer;
+  }
+
+  .mobile-score-bar small,
+  .mobile-score-bar strong {
+    display: block;
+  }
+
+  .mobile-score-bar small {
+    margin-bottom: 2px;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .mobile-score-bar strong {
+    font-size: 1rem;
+  }
+
+  .mobile-score-bar > span:last-child {
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
   }
 
   .row-label {
