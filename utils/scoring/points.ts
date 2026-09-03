@@ -69,8 +69,10 @@ export function calculatePoints(
     const each = roundUp100(basic * 2) + 100 * honba;
     return { total: each * (playerCount - 1), tsumo: { dealerPays: each, nonDealerPays: each } };
   } else {
-    // Non-dealer tsumo: dealer pays basic*2, each other non-dealer pays basic*1
-    const dealerPays = roundUp100(basic * 2) + 200 * honba;
+    // Non-dealer tsumo: dealer pays basic*2, each other non-dealer pays basic*1.
+    // Honba is 100 per paying player regardless of who they are — the dealer
+    // does not pay double honba on tsumo.
+    const dealerPays = roundUp100(basic * 2) + 100 * honba;
     const nonDealerPays = roundUp100(basic * 1) + 100 * honba;
     return {
       total: dealerPays + nonDealerPays * (playerCount - 2),
