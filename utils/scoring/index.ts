@@ -72,6 +72,7 @@ function scoreStandardInterpretations(
   doraCount: number,
   akaDoraCount: number,
   uraDoraCount: number,
+  nukiDoraCount: number,
   isDealer: boolean,
 ): ScoreResult | null {
   const { fu, yaku: rawYaku, han: rawStructuralHan } = bestInterpretation(interpretations, hand, rules);
@@ -84,7 +85,7 @@ function scoreStandardInterpretations(
   const allYaku = supersedeWithYakuman(rawYaku);
   const structuralHan = isYakuman ? allYaku.reduce((sum, y) => sum + y.han, 0) : rawStructuralHan;
 
-  const totalHan = structuralHan + doraCount + uraDoraCount;
+  const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
   const points = calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
@@ -98,6 +99,7 @@ function scoreStandardInterpretations(
     doraCount,
     akaDoraCount,
     uraDoraCount,
+    nukiDoraCount,
     points,
     handName: name,
   };
@@ -117,6 +119,9 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
     (hand.riichi || hand.doubleRiichi) && hand.uraDoraIndicators
       ? countDora(allTiles, hand.uraDoraIndicators)
       : 0;
+  const nukiDoraCount = (rules.playerCount ?? 4) === 3
+    ? Math.min(4, Math.max(0, Math.trunc(hand.nukiDoraCount ?? 0)))
+    : 0;
 
   const parsed = parseHand(hand.closedTiles, hand.melds, hand.winningTile);
 
@@ -131,6 +136,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
       doraCount,
       akaDoraCount,
       uraDoraCount,
+      nukiDoraCount,
       points: { total: 0 },
     };
   }
@@ -163,6 +169,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
       doraCount,
       akaDoraCount,
       uraDoraCount,
+      nukiDoraCount,
       points,
       handName: "yakuman",
     };
@@ -175,7 +182,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
     const allYaku = supersedeWithYakuman([...yakuList, ...yakumanList]);
 
     const structuralHan = allYaku.reduce((sum, y) => sum + y.han, 0);
-    const totalHan = structuralHan + doraCount + uraDoraCount;
+    const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
 
     const fuBreakdown = chiitoitsiFuBreakdown();
     const units = yakumanUnits(allYaku);
@@ -191,6 +198,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
       doraCount,
       akaDoraCount,
       uraDoraCount,
+      nukiDoraCount,
       points,
       handName: name,
     };
@@ -205,6 +213,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
         doraCount,
         akaDoraCount,
         uraDoraCount,
+        nukiDoraCount,
         isDealer,
       );
       if (standardResult && standardResult.points.total > chiitoitsuResult.points.total) {
@@ -237,6 +246,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
       doraCount,
       akaDoraCount,
       uraDoraCount,
+      nukiDoraCount,
       points: { total: 0 },
     };
   }
@@ -244,7 +254,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
   const allYaku = supersedeWithYakuman(rawYaku);
   const structuralHan = isYakuman ? allYaku.reduce((sum, y) => sum + y.han, 0) : rawStructuralHan;
 
-  const totalHan = structuralHan + doraCount + uraDoraCount;
+  const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
   const points = calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
@@ -258,6 +268,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
     doraCount,
     akaDoraCount,
     uraDoraCount,
+    nukiDoraCount,
     points,
     handName: name,
   };

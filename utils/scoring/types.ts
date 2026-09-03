@@ -54,6 +54,8 @@ export interface Hand {
 
   doraIndicators: Tile[];
   uraDoraIndicators?: Tile[]; // only revealed with riichi
+  /** North tiles declared as nuki dora in sanma (0-4). Ignored in yonma. */
+  nukiDoraCount?: number;
 
   // Situational flags
   riichi: boolean;
@@ -74,6 +76,7 @@ export interface Hand {
 export interface Yaku {
   name: string;      // English identifier, e.g. "riichi"
   nameJa: string;    // Japanese name, e.g. "立直"
+  detail?: string;   // specific value/role, e.g. "East (round wind)"
   han: number;       // closed han value; 0 for dora (counted separately)
   isYakuman: boolean;
 }
@@ -119,6 +122,7 @@ export interface ScoreResult {
   doraCount: number;     // indicator dora + aka dora combined (used for totalHan math)
   akaDoraCount: number;  // aka (red-five) portion of doraCount, shown separately in UI
   uraDoraCount: number;
+  nukiDoraCount: number;
 
   points: PointsBreakdown;
   handName?: HandName;

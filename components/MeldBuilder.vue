@@ -6,7 +6,7 @@
           <TileImage v-for="(tile, tileIndex) in meld.tiles" :key="tileIndex" :tile="tile" size="small" />
         </div>
         <span class="meld-type">{{ meldLabel(meld.type) }}</span>
-        <button type="button" class="meld-delete" :aria-label="`Remove ${meldLabel(meld.type)}`" @click="removeMeld(index)">×</button>
+        <button type="button" class="meld-delete" :aria-label="`Remove ${meldLabel(meld.type)} call`" @click="removeMeld(index)">×</button>
       </div>
     </div>
 
@@ -28,7 +28,7 @@
           :key="`select-${index}`"
           type="button"
           class="selectable-tile"
-          :aria-label="`Declare a meld using tile ${index + 1}`"
+          :aria-label="`Declare a call using tile ${index + 1}`"
           @click="selectedIndex = index"
         >
           <TileImage :tile="tile" />
@@ -39,7 +39,7 @@
 
     <div v-else class="builder-panel options-panel">
       <div class="selected-heading">
-        <span>Meld with</span>
+        <span>Call with</span>
         <TileImage v-if="selectedTile" :tile="selectedTile" size="small" />
         <button type="button" class="text-button" @click="selectedIndex = null">Change tile</button>
       </div>
@@ -79,7 +79,7 @@
       </button>
 
       <p v-if="noValidMelds" class="no-melds">
-        No valid melds for this tile.
+        No valid calls for this tile.
         <button type="button" class="text-button" @click="selectedIndex = null">Pick another</button>
       </p>
 

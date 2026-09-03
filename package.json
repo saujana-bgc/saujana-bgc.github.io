@@ -7,9 +7,13 @@
     "dev": "nuxt dev",
     "generate": "node -e \"require('fs').writeFileSync('public/version.json', JSON.stringify({v: Date.now()}))\" && nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "tsx --test tests/*.test.mts"
   },
   "dependencies": {
     "nuxt": "^4.5.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0"
   }
 }

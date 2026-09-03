@@ -81,7 +81,7 @@
         </div>
 
         <div class="picked-row">
-          <span class="row-label">Melds</span>
+          <span class="row-label">Calls</span>
           <MeldBuilder
             :hand-tiles="handTiles"
             :melds="parsedMelds"
@@ -188,6 +188,10 @@
           <label for="honba">Honba</label>
           <input id="honba" v-model.number="honba" type="number" min="0" max="20" inputmode="numeric" />
         </div>
+        <div v-if="threePlayer" class="field">
+          <label for="nuki-dora">Nuki dora (North)</label>
+          <input id="nuki-dora" v-model.number="nukiDoraCount" type="number" min="0" max="4" step="1" inputmode="numeric" />
+        </div>
       </div>
 
       <div class="flag-grid">
@@ -241,7 +245,7 @@
             <ul class="yaku-list">
               <li v-for="yaku in result.yaku" :key="yaku.name">
                 <span class="yaku-ja">{{ yaku.nameJa }}</span>
-                <span class="yaku-en">{{ yakuName(yaku.name) }}</span>
+                <span class="yaku-en">{{ yakuName(yaku.name, yaku.detail) }}</span>
                 <strong>{{ yaku.isYakuman ? 'yakuman' : `${yaku.han} han` }}</strong>
               </li>
               <li v-if="result.doraCount > 0">
@@ -254,6 +258,11 @@
                 <span class="yaku-en">Ura-dora</span>
                 <strong>{{ result.uraDoraCount }}</strong>
               </li>
+              <li v-if="result.nukiDoraCount > 0">
+                <span class="yaku-ja">抜きドラ</span>
+                <span class="yaku-en">Nuki dora</span>
+                <strong>{{ result.nukiDoraCount }}</strong>
+              </li>
             </ul>
           </div>
 
@@ -262,7 +271,7 @@
             <ul class="fu-list">
               <li v-if="result.fuBreakdown.base"><span>Base</span><strong>{{ result.fuBreakdown.base }}</strong></li>
               <li v-if="result.fuBreakdown.pairFu"><span>Pair</span><strong>{{ result.fuBreakdown.pairFu }}</strong></li>
-              <li v-if="result.fuBreakdown.meldFu"><span>Melds</span><strong>{{ result.fuBreakdown.meldFu }}</strong></li>
+              <li v-if="result.fuBreakdown.meldFu"><span>Sets / calls</span><strong>{{ result.fuBreakdown.meldFu }}</strong></li>
               <li v-if="result.fuBreakdown.waitFu"><span>Wait</span><strong>{{ result.fuBreakdown.waitFu }}</strong></li>
               <li v-if="result.fuBreakdown.tsumoFu"><span>Tsumo</span><strong>{{ result.fuBreakdown.tsumoFu }}</strong></li>
             </ul>
@@ -283,7 +292,7 @@
       <ul class="rules-list">
         <li>Open tanyao and atozuke are allowed.</li>
         <li>Three red fives on a four-player table, two on a three-player table.</li>
-        <li>Three-player tables use 1s/9s man only — 2–8 man are out of play.</li>
+        <li>Three-player tables use 1s/9s man only — 2–8 man are out of play, and up to four declared North tiles count as nuki dora.</li>
         <li>Kiriage mangan is off — mangan requires 5 han (or 4 han 40+ fu, 3 han 70+ fu).</li>
         <li>13+ han from ordinary yaku counts as a counted yakuman.</li>
         <li>Honba pay 300 all around on ron, 100 per paying player on tsumo.</li>
@@ -366,6 +375,7 @@ const seatWind = ref<WindValue>('south')
 const roundWind = ref<WindValue>('east')
 const honba = ref(0)
 const threePlayer = ref(false)
+const nukiDoraCount = ref(0)
 const flags = reactive<Record<FlagKey, boolean>>({
   riichi: false,
   doubleRiichi: false,
@@ -402,6 +412,7 @@ interface StoredSheet {
   roundWind: WindValue
   honba: number
   threePlayer: boolean
+  nukiDoraCount?: number
   flags: Record<FlagKey, boolean>
 }
 
@@ -417,6 +428,7 @@ function saveSheet() {
     roundWind: roundWind.value,
     honba: honba.value,
     threePlayer: threePlayer.value,
+    nukiDoraCount: nukiDoraCount.value,
     flags: { ...flags },
   }
   try {
@@ -458,6 +470,7 @@ function restoreSheet() {
     roundWind.value = sheet.roundWind ?? 'east'
     honba.value = Number(sheet.honba) || 0
     threePlayer.value = !!sheet.threePlayer
+    nukiDoraCount.value = clampNukiDora(sheet.nukiDoraCount)
     if (sheet.flags) {
       for (const key of Object.keys(flags) as FlagKey[]) flags[key] = !!sheet.flags[key]
     }
@@ -567,7 +580,7 @@ function blockedReasonFor(code: string): string | null {
       + countInMelds(tile)
       + doraTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
     if (used >= 4) {
-      return `All four ${code} are already in use (hand, melds and dora count together)`
+      return `All four ${code} are already in use (hand, calls and dora count together)`
     }
     return null
   }
@@ -592,7 +605,7 @@ function blockedReasonFor(code: string): string | null {
     }
   }
   if (handTiles.value.length >= handTarget.value) {
-    return `Hand is full (${handTarget.value} tiles) — remove a tile or declare a meld`
+    return `Hand is full (${handTarget.value} tiles) — remove a tile or declare a call`
   }
   return null
 }
@@ -693,6 +706,7 @@ function clearHand() {
   melds.value = []
   winType.value = 'ron'
   honba.value = 0
+  nukiDoraCount.value = 0
   for (const key of Object.keys(flags) as FlagKey[]) flags[key] = false
   detectError.value = null
   pickerMode.value = 'hand'
@@ -732,10 +746,16 @@ watch(flagDisabledReasons, (reasons) => {
   }
 })
 
-// Double riichi implies riichi.
+// Riichi and double riichi are alternative declarations, never additive.
+// Synchronous watchers make the most recently selected option win, including
+// when normalizing older saved sheets that may have stored both as true.
+watch(() => flags.riichi, (on) => {
+  if (on && flags.doubleRiichi) flags.doubleRiichi = false
+}, { flush: 'sync' })
+
 watch(() => flags.doubleRiichi, (on) => {
-  if (on) flags.riichi = true
-})
+  if (on && flags.riichi) flags.riichi = false
+}, { flush: 'sync' })
 
 const activeFlagHint = computed(() => {
   for (const flag of situationalFlags) {
@@ -794,6 +814,7 @@ watch(
     roundWind.value,
     honba.value,
     threePlayer.value,
+    nukiDoraCount.value,
     { ...flags },
   ],
   () => {
@@ -801,6 +822,15 @@ watch(
   },
   { deep: true },
 )
+
+function clampNukiDora(value: unknown): number {
+  return Math.min(4, Math.max(0, Math.trunc(Number(value) || 0)))
+}
+
+watch(nukiDoraCount, (count) => {
+  const clamped = clampNukiDora(count)
+  if (count !== clamped) nukiDoraCount.value = clamped
+})
 
 async function requestDetection(payload: Record<string, unknown>): Promise<Record<string, any>> {
   const res = await fetch(DETECT_URL, {
@@ -933,7 +963,7 @@ const YAKU_EN: Record<string, string> = {
   tsumo: 'Fully concealed hand',
   pinfu: 'Pinfu',
   tanyao: 'All simples',
-  yakuhai: 'Yakuhai (value triplet)',
+  yakuhai: 'Yakuhai',
   'sanshoku-doujun': 'Three coloured sequences',
   ittsu: 'Pure straight',
   toitoi: 'All triplets',
@@ -975,7 +1005,7 @@ interface ScoreState {
 
 // Physical-set validation the scoring engine can't know about: tile copy
 // limits and the sanma tile-set restrictions from the league rules.
-function validateTileSet(allTiles: Tile[]): string | null {
+function validateTileSet(allTiles: Tile[], nukiCount = 0): string | null {
   const counts = new Map<string, number>()
   const akaPerSuit = new Map<string, number>()
   let akaTotal = 0
@@ -992,6 +1022,9 @@ function validateTileSet(allTiles: Tile[]): string | null {
   }
   for (const count of counts.values()) {
     if (count > 4) return 'A tile appears more than 4 times — check the hand.'
+  }
+  if (threePlayer.value && (counts.get('honor:north') ?? 0) + nukiCount > 4) {
+    return 'Nuki dora and North tiles in the hand or indicators cannot exceed the four North tiles in the set.'
   }
   const akaMax = threePlayer.value ? 2 : 3
   if (akaTotal > akaMax) return `Only ${akaMax} red fives exist on this table.`
@@ -1037,8 +1070,9 @@ const scoreState = computed<ScoreState>(() => {
   const allTiles: Tile[] = [
     ...handTiles.value,
     ...melds.flatMap((m) => [...m.tiles]),
+    ...doraTiles.value,
   ]
-  const setProblem = validateTileSet(allTiles)
+  const setProblem = validateTileSet(allTiles, nukiDoraCount.value)
   if (setProblem) return { result: null, error: setProblem, notice: null }
 
   const hand: Hand = {
@@ -1057,6 +1091,7 @@ const scoreState = computed<ScoreState>(() => {
     rinshan: flags.rinshan,
     chankan: flags.chankan,
     honba: honba.value,
+    nukiDoraCount: threePlayer.value ? nukiDoraCount.value : 0,
   }
 
   const result = score(hand, {
@@ -1079,7 +1114,8 @@ const resultHeading = computed(() => {
   if (error.value) return 'Check the hand'
   const r = result.value
   if (!r) return 'Score'
-  return r.handName ? HAND_NAMES[r.handName] : `${r.totalHan} han · ${r.fu} fu`
+  const scoredHan = r.totalHan + r.doraCount + r.uraDoraCount + r.nukiDoraCount
+  return r.handName ? HAND_NAMES[r.handName] : `${scoredHan} han · ${r.fu} fu`
 })
 
 const scoreDisplay = computed(() => {
@@ -1103,8 +1139,9 @@ function formatPoints(n: number): string {
   return n.toLocaleString('en-US')
 }
 
-function yakuName(name: string): string {
-  return YAKU_EN[name] ?? name
+function yakuName(name: string, detail?: string): string {
+  const label = YAKU_EN[name] ?? name
+  return detail ? `${label} — ${detail}` : label
 }
 </script>
 
@@ -1592,7 +1629,7 @@ function yakuName(name: string): string {
 
 .option-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 14px;
   margin-top: 22px;
 }

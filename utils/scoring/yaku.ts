@@ -46,6 +46,47 @@ function yakuhai(tile: Tile, seatWind: WindValue, roundWind: WindValue): number 
   return 0;
 }
 
+function yakuhaiInfo(
+  tile: Tile,
+  seatWind: WindValue,
+  roundWind: WindValue,
+): { han: number; detail: string; nameJa: string } | null {
+  if (!isHonor(tile)) return null;
+
+  if (isDragon(tile)) {
+    const dragon = {
+      haku: { detail: "White dragon", nameJa: "役牌・白" },
+      hatsu: { detail: "Green dragon", nameJa: "役牌・發" },
+      chun: { detail: "Red dragon", nameJa: "役牌・中" },
+    }[tile.value];
+    return { han: 1, ...dragon };
+  }
+
+  if (!isWind(tile)) return null;
+  const windNames: Record<WindValue, { en: string; ja: string }> = {
+    east: { en: "East", ja: "東" },
+    south: { en: "South", ja: "南" },
+    west: { en: "West", ja: "西" },
+    north: { en: "North", ja: "北" },
+  };
+  const wind = windNames[tile.value];
+  const isSeat = tile.value === seatWind;
+  const isRound = tile.value === roundWind;
+  if (!isSeat && !isRound) return null;
+  if (isSeat && isRound) {
+    return {
+      han: 2,
+      detail: `${wind.en} (seat and round wind)`,
+      nameJa: `役牌・${wind.ja}（自風・場風）`,
+    };
+  }
+  return {
+    han: 1,
+    detail: `${wind.en} (${isSeat ? "seat" : "round"} wind)`,
+    nameJa: `役牌・${wind.ja}（${isSeat ? "自風" : "場風"}）`,
+  };
+}
+
 function suitSet(tiles: Tile[]): Set<string> {
   return new Set(tiles.filter(isSuited).map((t) => (t as SuitedTile).suit));
 }
@@ -190,9 +231,9 @@ export function detectYaku(
   }
   for (const triplet of allTriplets) {
     const rep = triplet[0];
-    const han = yakuhai(rep, hand.seatWind, hand.roundWind);
-    if (han > 0) {
-      yaku.push({ name: "yakuhai", nameJa: "役牌", han, isYakuman: false });
+    const info = yakuhaiInfo(rep, hand.seatWind, hand.roundWind);
+    if (info) {
+      yaku.push({ name: "yakuhai", ...info, isYakuman: false });
     }
   }
 
