@@ -113,6 +113,12 @@
       <p v-if="inputNote" class="input-note" :class="{ problem: inputNoteProblem }">{{ inputNote }}</p>
 
       <div id="tile-picker" class="tile-picker" aria-label="Tile picker">
+        <p class="picker-mode-label">
+          Adding to
+          <button type="button" class="picker-mode-switch" @click="aimPicker('hand')" :aria-pressed="pickerMode === 'hand'">Hand</button>
+          <span aria-hidden="true">/</span>
+          <button type="button" class="picker-mode-switch" @click="aimPicker('dora')" :aria-pressed="pickerMode === 'dora'">Dora</button>
+        </p>
         <p v-if="pickerBlockedNote" class="picker-blocked-note">{{ pickerBlockedNote }}</p>
         <div v-for="row in pickerRows" :key="row.label" class="picker-row">
           <span class="picker-row-label">{{ row.label }}</span>
@@ -1318,6 +1324,44 @@ function yakuName(name: string): string {
   background: rgba(101, 119, 99, 0.06);
 }
 
+.picker-mode-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--clay-text);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.picker-mode-switch {
+  padding: 3px 10px;
+  color: var(--clay-text);
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid rgba(101, 119, 99, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 253, 249, 0.85);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.picker-mode-switch[aria-pressed='true'] {
+  color: var(--matcha-leaf);
+  border-color: var(--matcha-leaf);
+  background: rgba(255, 253, 249, 1);
+}
+
+.picker-mode-switch:hover {
+  border-color: var(--gold-leaf);
+  color: var(--gold-leaf);
+}
+
 .picked-rows {
   display: grid;
   gap: 12px;
@@ -1389,8 +1433,8 @@ function yakuName(name: string): string {
 
 .win-mark {
   position: absolute;
-  top: -7px;
-  right: -7px;
+  bottom: -6px;
+  right: -6px;
   z-index: 2;
   display: grid;
   place-items: center;
