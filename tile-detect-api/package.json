@@ -11,6 +11,7 @@
   },
   "scripts": {
     "test": "tsx test-llm.mts",
+    "test:unit": "tsx --test test-dedup.mts",
     "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File ./deploy.ps1"
   },
   "devDependencies": {

@@ -10,9 +10,10 @@ import sharp from 'sharp';
 import { roboflowLabelToTile, type RawPrediction } from './roboflow-parser.js';
 
 const OLLAMA_CHAT_URL = process.env.OLLAMA_CHAT_URL ?? 'https://ollama.com/api/chat';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'glm-5.3-flash';
 const MAX_IMAGE_EDGE = 1536;
-const REQUEST_TIMEOUT_MS = 45_000;
+// Two corrective attempts must fit inside Vercel's 60-second function limit.
+const REQUEST_TIMEOUT_MS = 25_000;
+const MAX_DETECTION_ATTEMPTS = 2;
 
 // Rough per-tile size used for RawPrediction.width/height; nothing downstream
 // consumes it today (sections.ts matches on centers only) but the field is
@@ -45,7 +46,7 @@ Respond with ONLY a JSON object in exactly this schema — no prose, no markdown
 
 const USER_PROMPT = 'Identify every mahjong tile face in this image. Return the JSON object only.';
 
-interface LlmTile {
+export interface LlmTile {
   code?: unknown;
   aka?: unknown;
   x?: unknown;
@@ -97,6 +98,7 @@ export async function detectTilesLlm(
   imageBase64: string,
   imgWidth: number,
   imgHeight: number,
+  expectedCount?: number,
 ): Promise<RawPrediction[]> {
   const resized = await sharp(Buffer.from(imageBase64, 'base64'))
     .rotate() // honor EXIF orientation before measuring
@@ -104,35 +106,30 @@ export async function detectTilesLlm(
     .jpeg({ quality: 82 })
     .toBuffer();
 
-  const data = await chatWithImage(resized.toString('base64'));
-  const rawTiles = extractTiles(data);
+  const normalizedExpectedCount = typeof expectedCount === 'number' && Number.isInteger(expectedCount) && expectedCount > 0
+    ? expectedCount
+    : undefined;
+  let kept: LlmTile[] = [];
 
-  // Near-duplicate guard: the model occasionally double-reports one tile as
-  // spatial echoes — same face at slightly offset centers (e.g. the two
-  // halves of one tile, or a 2x2 echo around one physical tile). Real
-  // adjacent identical tiles sit a full tile pitch apart on the layout axis;
-  // echoes are offset by a fraction of a pitch on both axes at once. Merge
-  // same-face entries whose centers are within one estimated tile pitch on
-  // BOTH axes. Tile pitch is estimated as the median nonzero x-gap between
-  // detections (a row/stack of real tiles is at least one pitch apart).
-  const xs = rawTiles.map((t) => (t.x ?? 0) * imgWidth).sort((a, b) => a - b);
-  const gaps: number[] = [];
-  for (let i = 1; i < xs.length; i++) {
-    if (xs[i] > xs[i - 1]) gaps.push(xs[i] - xs[i - 1]);
-  }
-  gaps.sort((a, b) => a - b);
-  const medianGap = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 0;
-  const tilePx = medianGap > 0 ? medianGap : Math.min(imgWidth, imgHeight) * NOMINAL_TILE_FRACTION;
-  const kept: LlmTile[] = [];
-  for (const tile of rawTiles) {
-    const dup = kept.some(
-      (other) =>
-        other.code === tile.code &&
-        other.aka === tile.aka &&
-        Math.abs((other.x ?? 0) - (tile.x ?? 0)) * imgWidth < tilePx &&
-        Math.abs((other.y ?? 0) - (tile.y ?? 0)) * imgHeight < tilePx * 1.5,
-    );
-    if (!dup) kept.push(tile);
+  // Vision responses can occasionally stop after listing only the distinct
+  // faces (a seven-pairs hand then comes back as 7 instead of 14). When the
+  // caller knows how many physical tiles should be in the shot, tell the model
+  // explicitly and make one independent retry if the first count is wrong.
+  // Keep the closest result; on a tie prefer the fuller result because the UI
+  // can remove a false positive, while a missing tile loses information.
+  for (let attempt = 0; attempt < (normalizedExpectedCount ? MAX_DETECTION_ATTEMPTS : 1); attempt++) {
+    const data = await chatWithImage(resized.toString('base64'), normalizedExpectedCount, attempt);
+    const candidate = deduplicateSpatialEchoes(extractTiles(data), imgWidth, imgHeight);
+    if (
+      kept.length === 0 ||
+      normalizedExpectedCount && (
+        Math.abs(candidate.length - normalizedExpectedCount) < Math.abs(kept.length - normalizedExpectedCount) ||
+        Math.abs(candidate.length - normalizedExpectedCount) === Math.abs(kept.length - normalizedExpectedCount) && candidate.length > kept.length
+      )
+    ) {
+      kept = candidate;
+    }
+    if (!normalizedExpectedCount || kept.length === normalizedExpectedCount) break;
   }
 
   const nominalSize = Math.min(imgWidth, imgHeight) * NOMINAL_TILE_FRACTION;
@@ -154,7 +151,39 @@ export async function detectTilesLlm(
   return predictions;
 }
 
-async function chatWithImage(imageBase64: string): Promise<unknown> {
+/**
+ * Remove only near-identical spatial echoes. The old implementation used a
+ * whole estimated tile pitch as its threshold, which erased legitimate
+ * adjacent copies of the same face — most visibly all seven pairs in a
+ * chiitoitsu hand. An echo is much closer than the width of a physical tile,
+ * so use a deliberately small fixed fraction of the nominal tile size.
+ */
+export function deduplicateSpatialEchoes(
+  tiles: LlmTile[],
+  imgWidth: number,
+  imgHeight: number,
+): LlmTile[] {
+  const echoRadiusPx = Math.min(imgWidth, imgHeight) * NOMINAL_TILE_FRACTION * 0.2;
+  const kept: LlmTile[] = [];
+  for (const tile of tiles) {
+    const x = clamp01(tile.x) * imgWidth;
+    const y = clamp01(tile.y) * imgHeight;
+    const duplicate = kept.some((other) => {
+      if (other.code !== tile.code || other.aka !== tile.aka) return false;
+      const dx = clamp01(other.x) * imgWidth - x;
+      const dy = clamp01(other.y) * imgHeight - y;
+      return Math.hypot(dx, dy) < echoRadiusPx;
+    });
+    if (!duplicate) kept.push(tile);
+  }
+  return kept;
+}
+
+async function chatWithImage(
+  imageBase64: string,
+  expectedCount?: number,
+  attempt = 0,
+): Promise<unknown> {
   if (!isOllamaConfigured()) {
     throw new Error('OLLAMA_API_KEY is not configured');
   }
@@ -165,7 +194,13 @@ async function chatWithImage(imageBase64: string): Promise<unknown> {
       model: ollamaModel(),
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: USER_PROMPT, images: [imageBase64] },
+        {
+          role: 'user',
+          content: expectedCount
+            ? `${USER_PROMPT} This photo should contain exactly ${expectedCount} physical tiles. Count repeated faces separately and verify that the tiles array has ${expectedCount} entries.`
+            : USER_PROMPT,
+          images: [imageBase64],
+        },
       ],
       stream: false,
       format: 'json',
@@ -174,10 +209,9 @@ async function chatWithImage(imageBase64: string): Promise<unknown> {
       // reasoning pass into `content` as prose around the JSON, and think:
       // false returns raw reasoning text as the content entirely.
       think: 'low',
-      // Ollama Cloud samples nondeterministically across instances even at
-      // temperature 0 (identical requests returned 7 vs 14 tiles); a fixed
-      // seed pins it to the same completion for the same prompt.
-      options: { temperature: 0, seed: 42, num_predict: 4096 },
+      // Use a different deterministic seed for the corrective retry so a
+      // truncated first interpretation is not simply repeated.
+      options: { temperature: 0, seed: 42 + attempt, num_predict: 4096 },
     }),
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });

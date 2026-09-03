@@ -42,6 +42,7 @@ try {
 
   if (!$SkipTests) {
     Write-Host 'Running detector regression tests...' -ForegroundColor Cyan
+    Invoke-Checked npm run test:unit
     Invoke-Checked npm test
   }
 

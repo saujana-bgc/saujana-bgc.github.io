@@ -10,8 +10,8 @@ function via `onnxruntime-node` + `sharp`.
 `POST /api/detect` (JSON)
 
 ```jsonc
-// request
-{ "image": "<base64 JPEG/PNG>" }
+// request (expectedCount is optional, but recommended for a complete hand)
+{ "image": "<base64 JPEG/PNG>", "expectedCount": 14 }
 
 // response
 { "mode": "individual", "tiles": [{ "suit": "man", "value": 2 }, ...] }
@@ -31,6 +31,10 @@ Guided scans send normalized viewfinder boxes with the captured dimensions:
   }
 }
 ```
+
+When `expectedCount` is provided, it is included in the recognition prompt. If
+the model returns a different number of physical tiles, the API makes one
+corrective pass and returns whichever result is closest to the expected count.
 
 `GET /api/detect` loads the model and performs a throwaway inference. The
 calculator calls it on mount so the scanner is warm before the first capture.
@@ -53,8 +57,9 @@ restricted to the GitHub Pages origin and localhost dev ports.
 
 ```
 npm install
-npm test          # runs test-detect.mts (blank + synthetic strip sanity)
-npx tsx test-final.mts  # synthetic sequence + real-photo regression
+npm run test:unit # deterministic duplicate-removal regressions
+npm test          # runs test-llm.mts (blank + synthetic strip sanity)
+npx tsx test-llm.mts <photo...> # inspect one or more real-photo results
 ```
 
 `tsx` is a dev dependency so the TypeScript lib modules can run directly.

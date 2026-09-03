@@ -76,7 +76,10 @@ export default async function handler(req, res) {
       throw new Error('Unreadable image dimensions');
     }
 
-    const predictions = await detectTilesLlm(body.image, imgWidth, imgHeight);
+    const expectedCount = Number.isInteger(body.expectedCount) && body.expectedCount >= 1 && body.expectedCount <= 20
+      ? body.expectedCount
+      : undefined;
+    const predictions = await detectTilesLlm(body.image, imgWidth, imgHeight, expectedCount);
 
     // Individual mode: a flat tile list (hand / dora scanning).
     // Guided mode: optional section boxes (normalized 0..1) split one frame

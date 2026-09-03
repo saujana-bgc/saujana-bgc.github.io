@@ -822,8 +822,8 @@ async function requestDetection(payload: Record<string, unknown>): Promise<Recor
   return data
 }
 
-async function detectOnServer(base64: string): Promise<Tile[]> {
-  const data = await requestDetection({ image: base64 })
+async function detectOnServer(base64: string, expectedCount: number): Promise<Tile[]> {
+  const data = await requestDetection({ image: base64, expectedCount })
   if (!Array.isArray(data.tiles)) {
     throw new Error('Detection service returned no tile list')
   }
@@ -834,7 +834,7 @@ async function scanHand(base64: string) {
   detectingHand.value = true
   detectError.value = null
   try {
-    const tiles = await detectOnServer(base64)
+    const tiles = await detectOnServer(base64, handTarget.value)
     if (tiles.length < 1) {
       detectError.value = 'No tiles detected. Try better lighting or a closer shot.'
       return
