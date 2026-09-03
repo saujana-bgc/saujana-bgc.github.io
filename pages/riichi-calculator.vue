@@ -44,18 +44,29 @@
         <div class="picked-row">
           <span class="row-label">Hand <em>{{ handProgress }}</em></span>
           <div class="row-tiles">
-            <button
+            <span
               v-for="(tile, i) in handTiles"
               :key="`hand-${i}-${tileToText(tile)}`"
-              type="button"
-              class="tile-btn"
+              class="hand-tile"
               :class="{ 'winning-tile-btn': winningTileIndex === i }"
-              :title="winningTileIndex === i ? 'Winning tile — tap to unmark' : 'Tap to mark as winning tile'"
-              @click="toggleWinningTile(i)"
             >
-              <TileImage :tile="tile" />
+              <button
+                type="button"
+                class="tile-btn"
+                :title="winningTileIndex === i ? 'Winning tile — tap to unmark' : 'Tap to mark as winning tile'"
+                @click="toggleWinningTile(i)"
+              >
+                <TileImage :tile="tile" />
+              </button>
               <i v-if="winningTileIndex === i" class="win-mark" aria-hidden="true">勝</i>
-            </button>
+              <button
+                type="button"
+                class="tile-remove"
+                :title="`Remove ${tileToText(tile)}`"
+                :aria-label="`Remove ${tileToText(tile)}`"
+                @click.stop="removeHandTile(i)"
+              >×</button>
+            </span>
             <button
               type="button"
               class="row-add"
@@ -65,18 +76,7 @@
             >
               ＋
             </button>
-            <span v-if="handTiles.length === 0" class="row-empty">No tiles yet</span>
-          </div>
-        </div>
-
-        <div class="picked-row">
-          <span class="row-label">Winning tile</span>
-          <div class="row-tiles">
-            <template v-if="handTiles.length > 0">
-              <span v-if="winningTile" class="row-hint">Marked on the highlighted hand tile — tap it again to unmark.</span>
-              <span v-else class="row-hint">Tap one of the {{ handTiles.length }} hand tiles above to set the winner.</span>
-            </template>
-            <span v-else class="row-empty">Fill the hand first — the winner is one of those tiles</span>
+            <span v-if="handTiles.length === 0" class="row-empty">No tiles yet — add tiles below</span>
           </div>
         </div>
 
@@ -113,31 +113,23 @@
       <p v-if="inputNote" class="input-note" :class="{ problem: inputNoteProblem }">{{ inputNote }}</p>
 
       <div id="tile-picker" class="tile-picker" aria-label="Tile picker">
-        <div class="picker-target-line">
-          <span class="picker-mode-label">Adding to <strong>{{ activePickerLabel }}</strong></span>
-          <button v-if="handStarted" type="button" class="picker-collapse" @click="pickerCollapsed = !pickerCollapsed">
-            {{ pickerCollapsed ? 'Show picker' : 'Hide picker' }}
-          </button>
-        </div>
-        <div v-show="!pickerCollapsed">
-          <p v-if="pickerBlockedNote" class="picker-blocked-note">{{ pickerBlockedNote }}</p>
-          <div v-for="row in pickerRows" :key="row.label" class="picker-row">
-            <span class="picker-row-label">{{ row.label }}</span>
-            <div class="picker-row-tiles">
-              <button
-                v-for="code in row.codes"
-                :key="code"
-                type="button"
-                class="picker-tile"
-                :class="{ disabled: !canPickTile(code) }"
-                :disabled="!canPickTile(code)"
-                :title="pickerTileTitle(code)"
-                :aria-disabled="!canPickTile(code)"
-                @click="appendTile(code)"
-              >
-                <img :src="tileSrcForCode(code)" :alt="code" draggable="false" />
-              </button>
-            </div>
+        <p v-if="pickerBlockedNote" class="picker-blocked-note">{{ pickerBlockedNote }}</p>
+        <div v-for="row in pickerRows" :key="row.label" class="picker-row">
+          <span class="picker-row-label">{{ row.label }}</span>
+          <div class="picker-row-tiles">
+            <button
+              v-for="code in row.codes"
+              :key="code"
+              type="button"
+              class="picker-tile"
+              :class="{ disabled: !canPickTile(code) }"
+              :disabled="!canPickTile(code)"
+              :title="pickerTileTitle(code)"
+              :aria-disabled="!canPickTile(code)"
+              @click="appendTile(code)"
+            >
+              <img :src="tileSrcForCode(code)" :alt="code" draggable="false" />
+            </button>
           </div>
         </div>
       </div>
@@ -487,15 +479,11 @@ function windLabel(w: WindValue): string {
 }
 
 // ─── Tile picker ──────────────────────────────────────────────────────────────
+// One shared picker sits directly under the hand; the dora row's ＋ switches
+// it to indicator mode. No collapse/mode chrome — it's always visible.
 
 type PickerMode = 'hand' | 'dora'
 const pickerMode = ref<PickerMode>('hand')
-const pickerCollapsed = ref(true)
-const pickerModeLabels: Record<PickerMode, string> = {
-  hand: 'Hand',
-  dora: 'Dora indicators',
-}
-const activePickerLabel = computed(() => pickerModeLabels[pickerMode.value])
 
 // One row per suit; sanma drops the middle man tiles and the red man.
 const pickerRows = computed(() => {
@@ -519,7 +507,6 @@ function toggleWinningTile(index: number) {
 
 function aimPicker(mode: PickerMode) {
   pickerMode.value = mode
-  pickerCollapsed.value = false
   document.getElementById('tile-picker')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 }
 
@@ -605,7 +592,7 @@ const pickerBlockedNote = computed(() => {
 
 function pickerTileTitle(code: string): string {
   const reason = blockedReasonFor(code)
-  return reason ? reason : `Add ${code} to ${activePickerLabel.value}`
+  return reason ? reason : `Add ${code} to the ${pickerMode.value === 'dora' ? 'dora indicators' : 'hand'}`
 }
 
 function appendTile(code: string) {
@@ -655,9 +642,6 @@ function updateMelds(nextMelds: Meld[]) {
 // While the hand is still being assembled, say what's missing instead of
 // erroring. Only a *complete-looking* hand that can't score is a real error.
 
-const handStarted = computed(() =>
-  handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0)
-
 const handProgress = computed(() => {
   const count = handTiles.value.length
   return count === handTarget.value
@@ -690,7 +674,6 @@ function clearHand() {
   for (const key of Object.keys(flags) as FlagKey[]) flags[key] = false
   detectError.value = null
   pickerMode.value = 'hand'
-  pickerCollapsed.value = true
 }
 
 // ─── Smart flag validation ────────────────────────────────────────────────────
@@ -1335,46 +1318,6 @@ function yakuName(name: string): string {
   background: rgba(101, 119, 99, 0.06);
 }
 
-.picker-target-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.picker-mode-label {
-  color: var(--clay-text);
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-
-.picker-target-line strong {
-  letter-spacing: 0;
-  text-transform: none;
-  opacity: 1;
-}
-
-.picker-collapse {
-  padding: 4px 10px;
-  color: var(--clay-text);
-  font: inherit;
-  font-size: 0.68rem;
-  font-weight: 700;
-  border: 1px solid rgba(101, 119, 99, 0.16);
-  border-radius: 999px;
-  background: rgba(255, 253, 249, 0.8);
-  cursor: pointer;
-  min-height: 30px;
-}
-
-.picker-collapse:hover {
-  border-color: var(--gold-leaf);
-  color: var(--gold-leaf);
-}
-
 .picked-rows {
   display: grid;
   gap: 12px;
@@ -1430,8 +1373,15 @@ function yakuName(name: string): string {
   transform: translateY(-2px);
 }
 
+/* Hand tile wrapper: tile button + corner remove × */
+.hand-tile {
+  position: relative;
+  display: inline-flex;
+  line-height: 0;
+}
+
 /* The marked winning tile inside the hand row */
-.tile-btn.winning-tile-btn {
+.hand-tile.winning-tile-btn {
   outline: 2px solid var(--gold-leaf);
   outline-offset: 1px;
   border-radius: 7px;
@@ -1441,6 +1391,7 @@ function yakuName(name: string): string {
   position: absolute;
   top: -7px;
   right: -7px;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 18px;
@@ -1455,11 +1406,30 @@ function yakuName(name: string): string {
   box-shadow: 0 1px 4px rgba(74, 68, 61, 0.4);
 }
 
-.row-hint {
-  align-self: center;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  opacity: 0.6;
+.tile-remove {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 0;
+  border-radius: 50%;
+  background: #a34d4d;
+  box-shadow: 0 1px 4px rgba(74, 68, 61, 0.4);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.tile-remove:hover {
+  background: #8a3b3b;
 }
 
 .row-empty {
