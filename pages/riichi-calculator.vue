@@ -49,10 +49,12 @@
               :key="`hand-${i}-${tileToText(tile)}`"
               type="button"
               class="tile-btn"
-              title="Remove tile"
-              @click="removeHandTile(i)"
+              :class="{ 'winning-tile-btn': winningTileIndex === i }"
+              :title="winningTileIndex === i ? 'Winning tile — tap to unmark' : 'Tap to mark as winning tile'"
+              @click="toggleWinningTile(i)"
             >
               <TileImage :tile="tile" />
+              <i v-if="winningTileIndex === i" class="win-mark" aria-hidden="true">勝</i>
             </button>
             <button
               type="button"
@@ -70,13 +72,11 @@
         <div class="picked-row">
           <span class="row-label">Winning tile</span>
           <div class="row-tiles">
-            <button v-if="winningTile" type="button" class="tile-btn" title="Clear winning tile" @click="setWinningTile(null)">
-              <TileImage :tile="winningTile" />
-            </button>
-            <button type="button" class="row-add" title="Set the winning tile" aria-label="Add winning tile" @click="aimPicker('win')">
-              ＋
-            </button>
-            <span v-if="!winningTile" class="row-empty">Pick the winning tile</span>
+            <template v-if="handTiles.length > 0">
+              <span v-if="winningTile" class="row-hint">Marked on the highlighted hand tile — tap it again to unmark.</span>
+              <span v-else class="row-hint">Tap one of the {{ handTiles.length }} hand tiles above to set the winner.</span>
+            </template>
+            <span v-else class="row-empty">Fill the hand first — the winner is one of those tiles</span>
           </div>
         </div>
 
@@ -261,7 +261,7 @@
         </div>
       </template>
 
-      <p v-else class="result-empty">Complete the hand (13 tiles + winning tile, melds included) to see the score.</p>
+      <p v-else class="result-empty">Complete the hand (14 tiles, winner marked) to see the score.</p>
     </section>
 
     <section class="content-card rules-card fade-up" aria-labelledby="rules-heading">
@@ -319,12 +319,29 @@ interface GuidedDetectionResult {
 }
 
 // ─── Core hand state ──────────────────────────────────────────────────────────
-// The tile arrays are the single source of truth.
+// The hand row always holds the complete closed set INCLUDING the winning tile
+// (14 on an open hand, adjusted for melds/kans). The winning tile is not a
+// separate tile: it is one of the hand tiles, marked by index. The scoring
+// engine still wants (closedTiles, winningTile) split, computed on the fly.
 
 const handTiles = ref<Tile[]>([])
-const winningTile = ref<Tile | null>(null)
+const winningTileIndex = ref<number | null>(null)
 const doraTiles = ref<Tile[]>([])
 const melds = ref<Meld[]>([])
+
+const parsedMelds = computed(() => melds.value)
+
+const winningTile = computed<Tile | null>(() =>
+  winningTileIndex.value !== null ? handTiles.value[winningTileIndex.value] ?? null : null)
+
+/** Closed-set size including the winning tile: 14 minus 3 per called meld. */
+const handTarget = computed(() => 14 - 3 * parsedMelds.value.length)
+
+/** Hand tiles minus the winning-tile instance — what the scorer calls closedTiles. */
+const closedHandTiles = computed(() =>
+  winningTileIndex.value === null
+    ? handTiles.value
+    : handTiles.value.filter((_, i) => i !== winningTileIndex.value))
 
 const winType = ref<'ron' | 'tsumo'>('ron')
 const winTypeOptions: { label: string; value: 'ron' | 'tsumo' }[] = [
@@ -359,11 +376,11 @@ const situationalFlags: { key: FlagKey; label: string }[] = [
 // The whole sheet survives a refresh or a phone lock mid-game. Tiles are plain
 // { suit, value, isAka? } objects and serialize to JSON directly.
 
-const STORAGE_KEY = 'riichi-calculator-sheet-v2'
+const STORAGE_KEY = 'riichi-calculator-sheet-v3'
 
 interface StoredSheet {
   hand: Tile[]
-  win: Tile | null
+  winIndex: number | null
   dora: Tile[]
   melds: Meld[]
   winType: 'ron' | 'tsumo'
@@ -378,7 +395,7 @@ function saveSheet() {
   if (import.meta.server) return
   const sheet: StoredSheet = {
     hand: handTiles.value,
-    win: winningTile.value,
+    winIndex: winningTileIndex.value,
     dora: doraTiles.value,
     melds: melds.value,
     winType: winType.value,
@@ -389,7 +406,7 @@ function saveSheet() {
     flags: { ...flags },
   }
   try {
-    if (handTiles.value.length || melds.value.length || doraTiles.value.length || winningTile.value) {
+    if (handTiles.value.length || melds.value.length || doraTiles.value.length) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sheet))
     } else {
       localStorage.removeItem(STORAGE_KEY)
@@ -411,7 +428,15 @@ function restoreSheet() {
   try {
     const sheet = JSON.parse(raw) as StoredSheet
     handTiles.value = Array.isArray(sheet.hand) ? sortTiles(sheet.hand) : []
-    winningTile.value = sheet.win ?? null
+    // The winner is one of the restored hand tiles; the stored index points at
+    // the sorted hand as saved. Re-locate it by identity after re-sorting.
+    const restoredWinner = sheet.winIndex !== null && sheet.hand
+      ? sheet.hand[sheet.winIndex] ?? null
+      : null
+    winningTileIndex.value = restoredWinner
+      ? handTiles.value.findIndex((t) => tilesEqualValue(t, restoredWinner) && t.isAka === restoredWinner.isAka)
+      : null
+    if (winningTileIndex.value === -1) winningTileIndex.value = null
     doraTiles.value = Array.isArray(sheet.dora) ? sheet.dora.slice(0, 12) : []
     melds.value = Array.isArray(sheet.melds) ? sheet.melds : []
     winType.value = sheet.winType === 'tsumo' ? 'tsumo' : 'ron'
@@ -463,12 +488,11 @@ function windLabel(w: WindValue): string {
 
 // ─── Tile picker ──────────────────────────────────────────────────────────────
 
-type PickerMode = 'hand' | 'win' | 'dora'
+type PickerMode = 'hand' | 'dora'
 const pickerMode = ref<PickerMode>('hand')
 const pickerCollapsed = ref(true)
 const pickerModeLabels: Record<PickerMode, string> = {
   hand: 'Hand',
-  win: 'Winning tile',
   dora: 'Dora indicators',
 }
 const activePickerLabel = computed(() => pickerModeLabels[pickerMode.value])
@@ -489,6 +513,10 @@ function tileSrcForCode(code: string): string {
   return tile ? tileSrc(tile) : ''
 }
 
+function toggleWinningTile(index: number) {
+  setWinningTile(winningTileIndex.value === index ? null : index)
+}
+
 function aimPicker(mode: PickerMode) {
   pickerMode.value = mode
   pickerCollapsed.value = false
@@ -496,16 +524,17 @@ function aimPicker(mode: PickerMode) {
 }
 
 // ─── Picker validation ────────────────────────────────────────────────────────
-// Only physical-set rules are enforced: each face exists 4× in a set (one of
-// each 5 is red), and a hand row holds at most 13 + kan adjustments. Yaku or
-// hand-structure rules are deliberately not picker concerns — the scorer
-// reports those once the hand is complete.
+// Only physical-set rules are enforced: each face exists 4× in a set, fives of
+// a suit share one pool (3 ordinary + 1 red), dora indicators consume real
+// tiles too, and the hand row holds exactly the closed-set size (14 by
+// default). Yaku or hand-structure rules are deliberately not picker concerns
+// — the scorer reports those once the hand is complete.
 
 const MAX_DORA_INDICATORS = 12
 
-/** Red fives share their face with ordinary fives: only one red five per suit exists. */
-function isAkaFace(tile: Tile): boolean {
-  return tile.suit !== 'honor' && tile.value === 5 && !!tile.isAka
+/** True for any five of a suited tile, red or ordinary — they share a face. */
+function isFiveFace(tile: Tile): boolean {
+  return tile.suit !== 'honor' && tile.value === 5
 }
 
 function countInMelds(face: Tile): number {
@@ -519,42 +548,42 @@ function blockedReasonFor(code: string): string | null {
   const tile = parseTile(code)
   if (!tile) return null
 
-  if (pickerMode.value === 'win') {
-    if (winningTile.value && tilesEqualValue(winningTile.value, tile)) {
-      return 'Winning tile is already set — remove it first'
-    }
-    return null
-  }
-
+  // Dora indicators are real tiles taken from the wall: a face can appear at
+  // most 4 times across hand + winning tile + melds + dora combined.
   if (pickerMode.value === 'dora') {
     if (doraTiles.value.length >= MAX_DORA_INDICATORS) {
       return 'Dora indicator limit reached (12)'
     }
+    const used = handTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
+      + countInMelds(tile)
+      + doraTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
+    if (used >= 4) {
+      return `All four ${code} are already in use (hand, melds and dora count together)`
+    }
     return null
   }
 
-  // Hand mode: enforce physical-set counts across hand + melds + winning tile.
+  // Hand mode: enforce physical-set counts across hand + melds (doras included
+  // via the dora-mode rule above; the winning tile is one of the hand tiles).
   const inHand = handTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
   const inMelds = countInMelds(tile)
-  const inWin = winningTile.value && tilesEqualValue(winningTile.value, tile) ? 1 : 0
-  if (inHand + inMelds + inWin >= 4) {
+  if (inHand + inMelds >= 4) {
     return `All four ${code} are already in use`
   }
-  if (isAkaFace(tile)) {
-    const redInHand = handTiles.value.filter((t) => isAkaFace(t)).length
-    const redInMelds = melds.value.reduce(
-      (sum, meld) => sum + meld.tiles.filter((t) => isAkaFace(t)).length,
+  if (isFiveFace(tile)) {
+    // 3 ordinary fives + 1 red five = 4 tiles of that face; both codes draw
+    // from the same pool, so once 4 fives of a suit exist neither can be added.
+    const fivesInHand = handTiles.value.filter((t) => t.suit === tile.suit && isFiveFace(t)).length
+    const fivesInMelds = melds.value.reduce(
+      (sum, meld) => sum + meld.tiles.filter((t) => t.suit === tile.suit && isFiveFace(t)).length,
       0,
     )
-    const redInWin = winningTile.value && isAkaFace(winningTile.value) ? 1 : 0
-    if (redInHand + redInMelds + redInWin >= 1) {
-      return 'The red 5 is already in use'
+    if (fivesInHand + fivesInMelds >= 4) {
+      return `All four ${tile.suit === 'man' ? '5m' : tile.suit === 'pin' ? '5p' : '5s'} (including the red five) are already in use`
     }
   }
-  const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
-  const handCap = 13 - 3 * (parsedMelds.value.length - kans)
-  if (handTiles.value.length >= handCap) {
-    return `Hand is full (${handCap} tiles) — move tiles into melds or add the winning tile`
+  if (handTiles.value.length >= handTarget.value) {
+    return `Hand is full (${handTarget.value} tiles) — remove a tile or declare a meld`
   }
   return null
 }
@@ -586,31 +615,36 @@ function appendTile(code: string) {
   if (!tile) return
   if (pickerMode.value === 'hand') {
     handTiles.value = sortTiles([...handTiles.value, tile])
-  } else if (pickerMode.value === 'win') {
-    setWinningTile(tile)
-    // The winning row only ever holds one tile — done picking, close the picker.
-    pickerCollapsed.value = true
-  } else {
+  } else if (pickerMode.value === 'dora') {
     doraTiles.value = [...doraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
   }
 }
 
 function removeHandTile(index: number) {
   handTiles.value = handTiles.value.filter((_, i) => i !== index)
+  if (winningTileIndex.value !== null) {
+    if (index === winningTileIndex.value) winningTileIndex.value = null
+    else if (index < winningTileIndex.value) winningTileIndex.value--
+  }
 }
 
 function removeDoraTile(index: number) {
   doraTiles.value = doraTiles.value.filter((_, i) => i !== index)
 }
 
-function setWinningTile(tile: Tile | null) {
-  winningTile.value = tile
+/** Mark the hand tile at `index` as the winning tile (or clear the mark). */
+function setWinningTile(index: number | null) {
+  winningTileIndex.value = index
 }
-
-const parsedMelds = computed(() => melds.value)
 
 function updateMeldHandTiles(tiles: Tile[]) {
   handTiles.value = sortTiles(tiles)
+  // Re-point the winning mark at the same tile instance after re-sorting.
+  if (winningTileIndex.value !== null) {
+    const winner = handTiles.value[winningTileIndex.value]
+    const newIndex = winner ? handTiles.value.indexOf(winner) : -1
+    winningTileIndex.value = newIndex >= 0 ? newIndex : null
+  }
 }
 
 function updateMelds(nextMelds: Meld[]) {
@@ -622,15 +656,13 @@ function updateMelds(nextMelds: Meld[]) {
 // erroring. Only a *complete-looking* hand that can't score is a real error.
 
 const handStarted = computed(() =>
-  handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0 || !!winningTile.value)
+  handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0)
 
 const handProgress = computed(() => {
-  const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
-  const target = 13 + kans - parsedMelds.value.filter((m) => !m.type.startsWith('kan')).length * 3
   const count = handTiles.value.length
-  return melds.value.length > 0 || kans > 0
-    ? `${count} tiles${kans ? ` +${kans} kan` : ''}`
-    : `${count} / 13`
+  return count === handTarget.value
+    ? `${count} tiles — tap the winner`
+    : `${count} / ${handTarget.value}`
 })
 
 const inputNoteProblem = computed(() =>
@@ -643,17 +675,14 @@ const inputNote = computed(() => {
   return null
 })
 
-const handComplete = computed(() => {
-  const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
-  const totalTiles = handTiles.value.length + parsedMelds.value.reduce((sum, m) => sum + m.tiles.length, 0)
-  return totalTiles === 13 + kans && !!winningTile.value
-})
+const handComplete = computed(() =>
+  handTiles.value.length === handTarget.value && winningTileIndex.value !== null)
 
 // ─── New hand ─────────────────────────────────────────────────────────────────
 
 function clearHand() {
   handTiles.value = []
-  winningTile.value = null
+  winningTileIndex.value = null
   doraTiles.value = []
   melds.value = []
   winType.value = 'ron'
@@ -752,7 +781,7 @@ onMounted(() => {
 watch(
   () => [
     handTiles.value,
-    winningTile.value,
+    winningTileIndex.value,
     doraTiles.value,
     melds.value,
     winType.value,
@@ -809,14 +838,15 @@ async function scanHand(base64: string) {
       detectError.value = 'Too many tiles detected. Crop the photo to the hand, or use Guided scan.'
       return
     }
-    // A gallery photo is assumed to be a complete 14-tile shot: the last tile
-    // scanned is the winning tile, the rest form the concealed hand. The haku
-    // fill tops the hand up when the detector drops a tile or two.
+    // A gallery photo is assumed to be a complete 14-tile shot: all tiles go
+    // into the hand row and the last one is pre-marked as the winning tile.
+    // The haku fill tops the hand up when the detector drops a tile or two.
     const winningTileScanned = tiles[tiles.length - 1]
     const handScanned = tiles.slice(0, -1)
-    const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
-    handTiles.value = sortTiles(fillMissingHandWithHaku(handScanned, 13 - 3 * (parsedMelds.value.length - kans)))
-    winningTile.value = winningTileScanned
+    const target = 14 - 3 * parsedMelds.value.length
+    const filled = sortTiles(fillMissingHandWithHaku(handScanned, target - 1))
+    handTiles.value = sortTiles([...filled, winningTileScanned])
+    winningTileIndex.value = handTiles.value.indexOf(winningTileScanned)
     scanStatus.value = 'ready'
   } catch (err) {
     scanStatus.value = 'failed'
@@ -862,13 +892,17 @@ async function scanGuided(capture: GuidedCaptureData) {
       melds.value = data.melds
     }
     if (capture.sections.hand && data.hand.length > 0) {
-      const detectedMelds = Array.isArray(data.melds) ? data.melds : parsedMelds.value
-      const kans = detectedMelds.filter((meld) => meld.type.startsWith('kan')).length
-      const target = 13 - 3 * (detectedMelds.length - kans)
-      handTiles.value = sortTiles(fillMissingHandWithHaku(data.hand, target))
-    }
-    if (capture.sections.winning && data.winningTile) {
-      winningTile.value = data.winningTile
+      const target = 14 - 3 * parsedMelds.value.length
+      const scannedHand = data.winningTile && capture.sections.winning
+        ? [...data.hand, data.winningTile]
+        : data.hand
+      const filled = fillMissingHandWithHaku(scannedHand, target - (data.winningTile ? 1 : 0))
+      handTiles.value = data.winningTile && capture.sections.winning
+        ? sortTiles([...filled, data.winningTile])
+        : sortTiles(filled)
+      if (data.winningTile && capture.sections.winning) {
+        winningTileIndex.value = handTiles.value.indexOf(data.winningTile)
+      }
     }
     if (capture.sections.dora && data.dora.length > 0) {
       doraTiles.value = sortTiles(data.dora.slice(0, 12))
@@ -973,34 +1007,33 @@ const scoreState = computed<ScoreState>(() => {
     return {
       result: null,
       error: null,
-      notice: `Add the winning tile — tap ＋ on the winning row (now ${handProgress.value}).`,
+      notice: `Tap one of the ${handTiles.value.length || handTarget.value} hand tiles to mark the winning tile.`,
     }
   }
 
   const numKans = melds.filter((m) => m.type.startsWith('kan')).length
   const totalTiles = handTiles.value.length + melds.reduce((sum, m) => sum + m.tiles.length, 0)
-  if (totalTiles !== 13 + numKans) {
-    // Incomplete hands are progress, not errors. If the user picked the
+  if (totalTiles !== 14 + numKans) {
+    // Incomplete hands are progress, not errors. If the user marked the
     // winning tile but is mid-entry, nudge them back to the hand row.
     return {
       result: null,
       error: null,
-      notice: handTiles.value.length < 13 + numKans
-        ? `Hand holds ${totalTiles} of ${13 + numKans} tiles — add ${13 + numKans - totalTiles} more.`
-        : `Hand holds ${totalTiles} tiles — ${totalTiles - (13 + numKans)} too many. Remove some hand tiles.`,
+      notice: handTiles.value.length < 14 + numKans
+        ? `Hand holds ${totalTiles} of ${14 + numKans} tiles — add ${14 + numKans - totalTiles} more.`
+        : `Hand holds ${totalTiles} tiles — ${totalTiles - (14 + numKans)} too many. Remove some hand tiles.`,
     }
   }
 
   const allTiles: Tile[] = [
     ...handTiles.value,
-    winningTile.value,
     ...melds.flatMap((m) => [...m.tiles]),
   ]
   const setProblem = validateTileSet(allTiles)
   if (setProblem) return { result: null, error: setProblem, notice: null }
 
   const hand: Hand = {
-    closedTiles: handTiles.value,
+    closedTiles: closedHandTiles.value,
     melds,
     winningTile: winningTile.value,
     winType: winType.value,
@@ -1381,6 +1414,7 @@ function yakuName(name: string): string {
 }
 
 .tile-btn {
+  position: relative;
   padding: 0;
   border: 0;
   border-radius: 5px;
@@ -1394,6 +1428,38 @@ function yakuName(name: string): string {
 
 .tile-btn:hover {
   transform: translateY(-2px);
+}
+
+/* The marked winning tile inside the hand row */
+.tile-btn.winning-tile-btn {
+  outline: 2px solid var(--gold-leaf);
+  outline-offset: 1px;
+  border-radius: 7px;
+}
+
+.win-mark {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  font-size: 0.55rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 50%;
+  background: var(--gold-leaf);
+  box-shadow: 0 1px 4px rgba(74, 68, 61, 0.4);
+}
+
+.row-hint {
+  align-self: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0.6;
 }
 
 .row-empty {
