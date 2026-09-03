@@ -184,20 +184,36 @@
           </div>
         </div>
         <div class="field">
-          <label for="seat-wind">Seat wind</label>
-          <select id="seat-wind" v-model="seatWind">
-            <option value="east">East</option>
-            <option value="south">South</option>
-            <option value="west">West</option>
-            <option v-if="!threePlayer" value="north">North</option>
-          </select>
+          <span class="field-label">Seat wind</span>
+          <div class="segmented-control" role="radiogroup" aria-label="Seat wind">
+            <button
+              v-for="option in seatWindOptions"
+              :key="option.value"
+              type="button"
+              role="radio"
+              :class="{ active: seatWind === option.value }"
+              :aria-checked="seatWind === option.value"
+              @click="seatWind = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
         </div>
         <div class="field">
-          <label for="round-wind">Round wind</label>
-          <select id="round-wind" v-model="roundWind">
-            <option value="east">East</option>
-            <option value="south">South</option>
-          </select>
+          <span class="field-label">Round wind</span>
+          <div class="segmented-control" role="radiogroup" aria-label="Round wind">
+            <button
+              v-for="option in roundWindOptions"
+              :key="option.value"
+              type="button"
+              role="radio"
+              :class="{ active: roundWind === option.value }"
+              :aria-checked="roundWind === option.value"
+              @click="roundWind = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
         </div>
         <div class="field">
           <label for="honba">Honba</label>
@@ -436,6 +452,16 @@ const winTypeOptions: { label: string; value: 'ron' | 'tsumo' }[] = [
 ]
 const seatWind = ref<WindValue>('south')
 const roundWind = ref<WindValue>('east')
+const windOptions: { label: string; value: WindValue }[] = [
+  { label: 'East', value: 'east' },
+  { label: 'South', value: 'south' },
+  { label: 'West', value: 'west' },
+  { label: 'North', value: 'north' },
+]
+// Three-player tables have no North seat; the round is always East or South.
+const seatWindOptions = computed(() =>
+  threePlayer.value ? windOptions.filter((w) => w.value !== 'north') : windOptions)
+const roundWindOptions = windOptions.filter((w) => w.value === 'east' || w.value === 'south')
 const honba = ref(0)
 const threePlayer = ref(false)
 const nukiDoraCount = ref(0)
