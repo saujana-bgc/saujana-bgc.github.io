@@ -313,8 +313,11 @@ export function parseHand(
     if (kokushi) return kokushi;
   }
 
-  // Standard: need exactly 14 - 3*melds.length closed tiles
-  const expected = 14 - 3 * melds.length;
+  // Standard: need exactly 14 - 3*melds + kans closed tiles. A kan counts as
+  // one meld for the 3-tile reduction but adds a replacement draw, so each
+  // kan contributes +1 back (four kans top out at 18 closed tiles).
+  const numKans = melds.filter((m) => m.tiles.length === 4).length;
+  const expected = 14 - 3 * melds.length + numKans;
   if (allClosed.length !== expected) {
     return { type: "invalid", reason: `Expected ${expected} closed tiles, got ${allClosed.length}` };
   }

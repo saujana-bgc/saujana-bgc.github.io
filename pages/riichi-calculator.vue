@@ -93,16 +93,27 @@
         <div class="picked-row">
           <span class="row-label">Dora indicators</span>
           <div class="row-tiles">
-            <button
+            <span
               v-for="(tile, i) in doraTiles"
               :key="`dora-${i}-${tileToText(tile)}`"
-              type="button"
-              class="tile-btn"
-              title="Remove indicator"
-              @click="removeDoraTile(i)"
+              class="hand-tile"
             >
-              <TileImage :tile="tile" />
-            </button>
+              <button
+                type="button"
+                class="tile-btn"
+                :title="`Remove ${tileToText(tile)}`"
+                @click="removeDoraTile(i)"
+              >
+                <TileImage :tile="tile" />
+              </button>
+              <button
+                type="button"
+                class="tile-remove"
+                :title="`Remove ${tileToText(tile)}`"
+                :aria-label="`Remove dora indicator ${tileToText(tile)}`"
+                @click.stop="removeDoraTile(i)"
+              >×</button>
+            </span>
             <button type="button" class="row-add" title="Add dora indicators" aria-label="Add dora indicators" @click="aimPicker('dora')">
               ＋
             </button>
@@ -332,8 +343,13 @@ const parsedMelds = computed(() => melds.value)
 const winningTile = computed<Tile | null>(() =>
   winningTileIndex.value !== null ? handTiles.value[winningTileIndex.value] ?? null : null)
 
-/** Closed-set size including the winning tile: 14 minus 3 per called meld. */
-const handTarget = computed(() => 14 - 3 * parsedMelds.value.length)
+/** Closed-set size including the winning tile: 14 minus 3 per called meld,
+ * plus 1 per kan (a kan draws a replacement tile, so the concealed set grows
+ * from 11+kans×3 up to 18 with four kans). */
+const handTarget = computed(() => {
+  const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
+  return 14 - 3 * parsedMelds.value.length + kans
+})
 
 /** Hand tiles minus the winning-tile instance — what the scorer calls closedTiles. */
 const closedHandTiles = computed(() =>
@@ -832,7 +848,7 @@ async function scanHand(base64: string) {
     // The haku fill tops the hand up when the detector drops a tile or two.
     const winningTileScanned = tiles[tiles.length - 1]
     const handScanned = tiles.slice(0, -1)
-    const target = 14 - 3 * parsedMelds.value.length
+    const target = handTarget.value
     const filled = sortTiles(fillMissingHandWithHaku(handScanned, target - 1))
     handTiles.value = sortTiles([...filled, winningTileScanned])
     winningTileIndex.value = handTiles.value.indexOf(winningTileScanned)
@@ -881,7 +897,7 @@ async function scanGuided(capture: GuidedCaptureData) {
       melds.value = data.melds
     }
     if (capture.sections.hand && data.hand.length > 0) {
-      const target = 14 - 3 * parsedMelds.value.length
+      const target = handTarget.value
       const scannedHand = data.winningTile && capture.sections.winning
         ? [...data.hand, data.winningTile]
         : data.hand
@@ -1000,17 +1016,21 @@ const scoreState = computed<ScoreState>(() => {
     }
   }
 
+  const numMelds = melds.length
   const numKans = melds.filter((m) => m.type.startsWith('kan')).length
+  // Total tiles across the whole hand: closed set (14 - 3 per meld + 1 per
+  // kan) plus the meld tiles themselves. Four kans top out at 18 + 16 = 34.
+  const targetTotal = 14 + numKans
   const totalTiles = handTiles.value.length + melds.reduce((sum, m) => sum + m.tiles.length, 0)
-  if (totalTiles !== 14 + numKans) {
+  if (totalTiles !== targetTotal) {
     // Incomplete hands are progress, not errors. If the user marked the
     // winning tile but is mid-entry, nudge them back to the hand row.
     return {
       result: null,
       error: null,
-      notice: handTiles.value.length < 14 + numKans
-        ? `Hand holds ${totalTiles} of ${14 + numKans} tiles — add ${14 + numKans - totalTiles} more.`
-        : `Hand holds ${totalTiles} tiles — ${totalTiles - (14 + numKans)} too many. Remove some hand tiles.`,
+      notice: handTiles.value.length + 3 * numMelds - numKans < 14 + numKans
+        ? `Hand holds ${totalTiles} of ${targetTotal} tiles — add ${targetTotal - totalTiles} more.`
+        : `Hand holds ${totalTiles} tiles — ${totalTiles - targetTotal} too many. Remove some hand tiles.`,
     }
   }
 
