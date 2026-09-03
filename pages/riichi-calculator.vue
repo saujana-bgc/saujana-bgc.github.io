@@ -115,8 +115,8 @@
       <div id="tile-picker" class="tile-picker" aria-label="Tile picker">
         <div class="picker-target-line">
           <span class="picker-mode-label">Adding to <strong>{{ activePickerLabel }}</strong></span>
-          <button v-if="handStarted" type="button" class="picker-collapse" @click="pickerCollapsed = true">
-            Hide picker
+          <button v-if="handStarted" type="button" class="picker-collapse" @click="pickerCollapsed = !pickerCollapsed">
+            {{ pickerCollapsed ? 'Show picker' : 'Hide picker' }}
           </button>
         </div>
         <div v-show="!pickerCollapsed">
@@ -1254,6 +1254,8 @@ function yakuName(name: string): string {
   background: rgba(255, 253, 249, 0.95);
   cursor: pointer;
   line-height: 0;
+  /* Let rapid taps register instead of triggering double-tap zoom on mobile */
+  touch-action: manipulation;
   transition: transform 0.12s ease, border-color 0.12s ease;
 }
 
@@ -1372,6 +1374,8 @@ function yakuName(name: string): string {
   background: transparent;
   cursor: pointer;
   line-height: 0;
+  /* Let rapid taps register instead of triggering double-tap zoom on mobile */
+  touch-action: manipulation;
   transition: transform 0.12s ease;
 }
 
@@ -1394,6 +1398,7 @@ function yakuName(name: string): string {
   font: inherit;
   font-size: 1.15rem;
   line-height: 1;
+  touch-action: manipulation;
   border: 1px dashed rgba(101, 119, 99, 0.35);
   border-radius: 9px;
   background: rgba(255, 253, 249, 0.85);

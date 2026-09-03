@@ -39,8 +39,16 @@ export function roboflowLabelToTile(label: string): Tile {
 }
 
 export function parsePredictions(predictions: RawPrediction[]): Tile[] {
-  return predictions
-    .filter((p) => p.confidence >= MIN_CONFIDENCE)
-    .sort((a, b) => a.x - b.x)
+  const found = predictions.filter((p) => p.confidence >= MIN_CONFIDENCE);
+  // Order along the photo's dominant layout axis: a hand shot as a horizontal
+  // row reads left-to-right, a vertical stack reads top-to-bottom. Sorting by
+  // x alone scrambles vertical stacks (all x nearly equal), and the calculator
+  // relies on the order for "the last tile scanned is the winning tile".
+  const xSpan = Math.max(...found.map((p) => p.x)) - Math.min(...found.map((p) => p.x));
+  const ySpan = Math.max(...found.map((p) => p.y)) - Math.min(...found.map((p) => p.y));
+  const vertical = ySpan > xSpan;
+  return found
+    .sort((a, b) =>
+      vertical ? a.y - b.y || a.x - b.x : a.x - b.x || a.y - b.y)
     .map((p) => roboflowLabelToTile(p.class));
 }
