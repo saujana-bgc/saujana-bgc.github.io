@@ -1024,6 +1024,11 @@ async function scanGuided(capture: GuidedCaptureData) {
       sections: capture.sections,
       imageWidth: capture.imageWidth,
       imageHeight: capture.imageHeight,
+      // The hand region holds the closed set minus the separate winning tile;
+      // the API uses it as a count hint with one corrective retry.
+      handCount: capture.sections.hand
+        ? handTarget.value - (capture.sections.winning ? 1 : 0)
+        : undefined,
     }) as unknown as GuidedDetectionResult
 
     if (data.mode !== 'guided' || !Array.isArray(data.hand) || !Array.isArray(data.dora)) {
@@ -1053,7 +1058,9 @@ async function scanGuided(capture: GuidedCaptureData) {
       } else {
         winningTileIndex.value = null
       }
-      scanFeedback.value = detectedHandMessage(scannedHand.length, handTarget.value)
+      scanFeedback.value = data.winningTile
+        ? detectedHandMessage(scannedHand.length, handTarget.value)
+        : 'Hand scanned, but no winning tile was detected in its region — tap the tile you won on.'
     }
     if (capture.sections.dora && data.dora.length > 0) {
       doraTiles.value = sortTiles(data.dora.slice(0, MAX_DORA_INDICATORS))

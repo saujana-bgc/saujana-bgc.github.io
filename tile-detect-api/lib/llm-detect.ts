@@ -8,6 +8,7 @@
 // unchanged — the LLM is a drop-in replacement for the ONNX detector.
 import sharp from 'sharp';
 import { roboflowLabelToTile, type RawPrediction } from './roboflow-parser.js';
+import type { Tile } from './types.js';
 
 const OLLAMA_CHAT_URL = process.env.OLLAMA_CHAT_URL ?? 'https://ollama.com/api/chat';
 const MAX_IMAGE_EDGE = 1536;
@@ -45,6 +46,23 @@ Respond with ONLY a JSON object in exactly this schema — no prose, no markdown
 {"tiles":[{"code":"5m","aka":false,"x":0.42,"y":0.63}]}`;
 
 const USER_PROMPT = 'Identify every mahjong tile face in this image. Return the JSON object only.';
+
+// Focused single-tile pass: the caller crops the winning-tile region from the
+// full frame and this prompt reads just that crop, so the model decides the
+// face instead of relying on approximate full-frame coordinates landing
+// inside a small section box.
+const WINNER_SYSTEM_PROMPT = `You are a meticulous Japanese riichi mahjong tile recognizer. The image is a close-up crop of exactly one mahjong tile face (it may be slightly tilted or rotated, and neighbors may clip the edges).
+
+Tile code notation:
+${CODE_GUIDE}
+
+Rules:
+- Identify the tile face at the CENTER of the image. Anything partially visible at the very edge of the crop is a neighbor, not the answer — ignore it.
+- Tiles may be rotated sideways or upside down; recognize the face regardless of orientation.
+- If no mahjong tile face is recognizable at the center, return an empty tiles array.
+
+Respond with ONLY a JSON object in exactly this schema — no prose, no markdown, no reasoning steps:
+{"tiles":[{"code":"5m","aka":false,"x":0.5,"y":0.5}]}`;
 
 export interface LlmTile {
   code?: unknown;
@@ -99,6 +117,7 @@ export async function detectTilesLlm(
   imgWidth: number,
   imgHeight: number,
   expectedCount?: number,
+  handCountHint?: number,
 ): Promise<RawPrediction[]> {
   const resized = await sharp(Buffer.from(imageBase64, 'base64'))
     .rotate() // honor EXIF orientation before measuring
@@ -109,6 +128,9 @@ export async function detectTilesLlm(
   const normalizedExpectedCount = typeof expectedCount === 'number' && Number.isInteger(expectedCount) && expectedCount > 0
     ? expectedCount
     : undefined;
+  const normalizedHandCount = typeof handCountHint === 'number' && Number.isInteger(handCountHint) && handCountHint > 0
+    ? handCountHint
+    : undefined;
   let kept: LlmTile[] = [];
 
   // Vision responses can occasionally stop after listing only the distinct
@@ -118,7 +140,7 @@ export async function detectTilesLlm(
   // Keep the closest result; on a tie prefer the fuller result because the UI
   // can remove a false positive, while a missing tile loses information.
   for (let attempt = 0; attempt < (normalizedExpectedCount ? MAX_DETECTION_ATTEMPTS : 1); attempt++) {
-    const data = await chatWithImage(resized.toString('base64'), normalizedExpectedCount, attempt);
+    const data = await chatWithImage(resized.toString('base64'), normalizedExpectedCount, attempt, normalizedHandCount);
     const candidate = deduplicateSpatialEchoes(extractTiles(data), imgWidth, imgHeight);
     if (
       kept.length === 0 ||
@@ -183,9 +205,20 @@ async function chatWithImage(
   imageBase64: string,
   expectedCount?: number,
   attempt = 0,
+  handCountHint?: number,
 ): Promise<unknown> {
   if (!isOllamaConfigured()) {
     throw new Error('OLLAMA_API_KEY is not configured');
+  }
+  let userPrompt = USER_PROMPT;
+  if (expectedCount) {
+    userPrompt += ` This photo should contain exactly ${expectedCount} physical tiles. Count repeated faces separately and verify that the tiles array has ${expectedCount} entries.`;
+  } else if (handCountHint) {
+    // Guided scan: the frame holds several regions, so a whole-photo count
+    // would be wrong — instead tell the model how many tiles the long hand
+    // row should hold. The caller retries with a different seed if the
+    // resulting section count is off.
+    userPrompt += ` The photo shows a mahjong table with several regions. The long row of ${handCountHint} tiles is the player's hand — that row should contain exactly ${handCountHint} physical tiles, counted with repeated faces separately. Dora indicators and called melds may also be visible in other regions.`;
   }
   const res = await fetch(OLLAMA_CHAT_URL, {
     method: 'POST',
@@ -196,9 +229,7 @@ async function chatWithImage(
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: expectedCount
-            ? `${USER_PROMPT} This photo should contain exactly ${expectedCount} physical tiles. Count repeated faces separately and verify that the tiles array has ${expectedCount} entries.`
-            : USER_PROMPT,
+          content: userPrompt,
           images: [imageBase64],
         },
       ],
@@ -220,6 +251,59 @@ async function chatWithImage(
     throw new Error(`Ollama request failed (${res.status}): ${text.slice(0, 200)}`);
   }
   return res.json();
+}
+
+// Single-tile pass over a cropped close-up of the winning-tile region.
+// Returns the recognized tile, or null when nothing identifiable is at the
+// crop's center. Deliberately no retry: the caller falls back to the
+// full-frame section box if this comes back empty.
+export async function detectWinningTile(cropBase64: string): Promise<Tile | null> {
+  const resized = await sharp(Buffer.from(cropBase64, 'base64'))
+    .rotate()
+    .resize(MAX_IMAGE_EDGE, MAX_IMAGE_EDGE, { fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: 82 })
+    .toBuffer();
+
+  if (!isOllamaConfigured()) {
+    throw new Error('OLLAMA_API_KEY is not configured');
+  }
+  const res = await fetch(OLLAMA_CHAT_URL, {
+    method: 'POST',
+    headers: ollamaHeaders(),
+    body: JSON.stringify({
+      model: ollamaModel(),
+      messages: [
+        { role: 'system', content: WINNER_SYSTEM_PROMPT },
+        {
+          role: 'user',
+          content: 'Identify the mahjong tile face at the center of this crop. Return the JSON object only.',
+          images: [resized.toString('base64')],
+        },
+      ],
+      stream: false,
+      format: 'json',
+      think: 'low',
+      options: { temperature: 0, seed: 42, num_predict: 512 },
+    }),
+    // One tile is a much shorter completion than a full hand; keep a tighter
+    // ceiling so the guided scan's budget stays inside the function limit.
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Ollama request failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  const tiles = extractTiles(await res.json());
+  for (const tile of tiles) {
+    const label = tileToLabel(tile);
+    if (!label) continue;
+    try {
+      return roboflowLabelToTile(label);
+    } catch {
+      // Unreachable for labels produced by tileToLabel, but stay safe.
+    }
+  }
+  return null;
 }
 
 function extractTiles(data: unknown): LlmTile[] {
