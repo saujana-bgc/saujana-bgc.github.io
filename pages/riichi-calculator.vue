@@ -183,7 +183,7 @@
             </button>
           </div>
         </div>
-        <div class="field">
+        <div class="field seat-wind-field">
           <span class="field-label">Seat wind</span>
           <div class="segmented-control" role="radiogroup" aria-label="Seat wind">
             <button
@@ -1870,8 +1870,15 @@ function yakuName(name: string, detail?: string): string {
 .option-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-auto-flow: dense;
   gap: 14px;
   margin-top: 22px;
+}
+
+/* Four wind buttons don't fit a single ~160px grid column (the segmented
+   control clips its overflow), so the seat-wind control takes two columns. */
+.seat-wind-field {
+  grid-column: span 2;
 }
 
 .segmented-control {
