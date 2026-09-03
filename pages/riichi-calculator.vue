@@ -805,10 +805,14 @@ async function scanHand(base64: string) {
       detectError.value = 'Too many tiles detected. Crop the photo to the hand, or use Guided scan.'
       return
     }
-    // No slicing: a photo with called melds visible can legitimately find more
-    // than 13 tiles; show everything and let the user move extras into melds.
+    // A gallery photo is assumed to be a complete 14-tile shot: the last tile
+    // scanned is the winning tile, the rest form the concealed hand. The haku
+    // fill tops the hand up when the detector drops a tile or two.
+    const winningTileScanned = tiles[tiles.length - 1]
+    const handScanned = tiles.slice(0, -1)
     const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
-    handTiles.value = sortTiles(fillMissingHandWithHaku(tiles, 13 - 3 * (parsedMelds.value.length - kans)))
+    handTiles.value = sortTiles(fillMissingHandWithHaku(handScanned, 13 - 3 * (parsedMelds.value.length - kans)))
+    winningTile.value = winningTileScanned
     syncHandText()
     scanStatus.value = 'ready'
   } catch (err) {
