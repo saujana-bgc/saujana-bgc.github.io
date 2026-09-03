@@ -437,7 +437,7 @@ function restoreSheet() {
       ? handTiles.value.findIndex((t) => tilesEqualValue(t, restoredWinner) && t.isAka === restoredWinner.isAka)
       : null
     if (winningTileIndex.value === -1) winningTileIndex.value = null
-    doraTiles.value = Array.isArray(sheet.dora) ? sheet.dora.slice(0, 12) : []
+    doraTiles.value = Array.isArray(sheet.dora) ? sheet.dora.slice(0, MAX_DORA_INDICATORS) : []
     melds.value = Array.isArray(sheet.melds) ? sheet.melds : []
     winType.value = sheet.winType === 'tsumo' ? 'tsumo' : 'ron'
     seatWind.value = sheet.seatWind ?? 'south'
@@ -530,7 +530,7 @@ function aimPicker(mode: PickerMode) {
 // default). Yaku or hand-structure rules are deliberately not picker concerns
 // — the scorer reports those once the hand is complete.
 
-const MAX_DORA_INDICATORS = 12
+const MAX_DORA_INDICATORS = 10
 
 /** True for any five of a suited tile, red or ordinary — they share a face. */
 function isFiveFace(tile: Tile): boolean {
@@ -552,7 +552,7 @@ function blockedReasonFor(code: string): string | null {
   // most 4 times across hand + winning tile + melds + dora combined.
   if (pickerMode.value === 'dora') {
     if (doraTiles.value.length >= MAX_DORA_INDICATORS) {
-      return 'Dora indicator limit reached (12)'
+      return 'Dora indicator limit reached (10)'
     }
     const used = handTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
       + countInMelds(tile)
@@ -905,7 +905,7 @@ async function scanGuided(capture: GuidedCaptureData) {
       }
     }
     if (capture.sections.dora && data.dora.length > 0) {
-      doraTiles.value = sortTiles(data.dora.slice(0, 12))
+      doraTiles.value = sortTiles(data.dora.slice(0, MAX_DORA_INDICATORS))
     }
     scanStatus.value = 'ready'
   } catch (err) {
