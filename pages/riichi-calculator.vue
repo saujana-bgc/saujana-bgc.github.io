@@ -120,6 +120,7 @@
           </button>
         </div>
         <div v-show="!pickerCollapsed">
+          <p v-if="pickerBlockedNote" class="picker-blocked-note">{{ pickerBlockedNote }}</p>
           <div v-for="row in pickerRows" :key="row.label" class="picker-row">
             <span class="picker-row-label">{{ row.label }}</span>
             <div class="picker-row-tiles">
@@ -128,38 +129,16 @@
                 :key="code"
                 type="button"
                 class="picker-tile"
-                :title="`Add ${code} to ${activePickerLabel}`"
+                :class="{ disabled: !canPickTile(code) }"
+                :disabled="!canPickTile(code)"
+                :title="pickerTileTitle(code)"
+                :aria-disabled="!canPickTile(code)"
                 @click="appendTile(code)"
               >
                 <img :src="tileSrcForCode(code)" :alt="code" draggable="false" />
               </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="field-grid">
-        <div class="field field-wide">
-          <label for="hand-text">Hand notation (closed tiles + winning tile)</label>
-          <input
-            id="hand-text"
-            v-model="handText"
-            type="text"
-            spellcheck="false"
-            placeholder="e.g. 123m456p789s234s55s"
-            @input="applyHandText"
-          />
-          <p class="field-hint">Suit letters m / p / s / z, 0 = red five (aka). The 14th tile is the winning tile.</p>
-        </div>
-
-        <div class="field">
-          <label for="win-tile-text">Winning tile</label>
-          <input id="win-tile-text" v-model="winTileText" type="text" spellcheck="false" placeholder="e.g. 2z" @input="applyWinTileText" />
-        </div>
-
-        <div class="field">
-          <label for="dora-text">Dora indicators</label>
-          <input id="dora-text" v-model="doraText" type="text" spellcheck="false" placeholder="e.g. 1m 4z 0s" @input="applyDoraText" />
         </div>
       </div>
 
@@ -340,17 +319,13 @@ interface GuidedDetectionResult {
 }
 
 // ─── Core hand state ──────────────────────────────────────────────────────────
-// The tile arrays are the source of truth; the notation fields mirror them and
-// write back on input.
+// The tile arrays are the single source of truth.
 
 const handTiles = ref<Tile[]>([])
 const winningTile = ref<Tile | null>(null)
 const doraTiles = ref<Tile[]>([])
 const melds = ref<Meld[]>([])
 
-const handText = ref('')
-const doraText = ref('')
-const winTileText = ref('')
 const winType = ref<'ron' | 'tsumo'>('ron')
 const winTypeOptions: { label: string; value: 'ron' | 'tsumo' }[] = [
   { label: 'Ron', value: 'ron' },
@@ -381,15 +356,15 @@ const situationalFlags: { key: FlagKey; label: string }[] = [
 ]
 
 // ─── Session persistence ──────────────────────────────────────────────────────
-// The whole sheet survives a refresh or a phone lock mid-game. Tiles go through
-// their text notation so the stored shape stays trivially serializable.
+// The whole sheet survives a refresh or a phone lock mid-game. Tiles are plain
+// { suit, value, isAka? } objects and serialize to JSON directly.
 
-const STORAGE_KEY = 'riichi-calculator-sheet-v1'
+const STORAGE_KEY = 'riichi-calculator-sheet-v2'
 
 interface StoredSheet {
-  hand: string
-  win: string
-  dora: string
+  hand: Tile[]
+  win: Tile | null
+  dora: Tile[]
   melds: Meld[]
   winType: 'ron' | 'tsumo'
   seatWind: WindValue
@@ -402,9 +377,9 @@ interface StoredSheet {
 function saveSheet() {
   if (import.meta.server) return
   const sheet: StoredSheet = {
-    hand: handToText(),
-    win: winningTile.value ? tileToText(winningTile.value) : '',
-    dora: doraText.value,
+    hand: handTiles.value,
+    win: winningTile.value,
+    dora: doraTiles.value,
     melds: melds.value,
     winType: winType.value,
     seatWind: seatWind.value,
@@ -435,9 +410,9 @@ function restoreSheet() {
   if (!raw) return false
   try {
     const sheet = JSON.parse(raw) as StoredSheet
-    handTiles.value = sortTiles(parseTileList(sheet.hand ?? ''))
-    winningTile.value = sheet.win ? parseTile(sheet.win) : null
-    doraTiles.value = parseTileList(sheet.dora ?? '').slice(0, 12)
+    handTiles.value = Array.isArray(sheet.hand) ? sortTiles(sheet.hand) : []
+    winningTile.value = sheet.win ?? null
+    doraTiles.value = Array.isArray(sheet.dora) ? sheet.dora.slice(0, 12) : []
     melds.value = Array.isArray(sheet.melds) ? sheet.melds : []
     winType.value = sheet.winType === 'tsumo' ? 'tsumo' : 'ron'
     seatWind.value = sheet.seatWind ?? 'south'
@@ -447,8 +422,6 @@ function restoreSheet() {
     if (sheet.flags) {
       for (const key of Object.keys(flags) as FlagKey[]) flags[key] = !!sheet.flags[key]
     }
-    syncHandText()
-    syncDoraText()
     return handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0
   } catch {
     return false
@@ -484,55 +457,8 @@ function tilesEqualValue(a: Tile, b: Tile): boolean {
   return false
 }
 
-function parseTileList(text: string): Tile[] {
-  const tiles: Tile[] = []
-  // Runs of digits followed by a suit letter: 123m456p789s11z, 0 = red five
-  for (const [, digits, suit] of text.toLowerCase().matchAll(/([0-9]+)([mpsz])/g)) {
-    for (const digit of digits) {
-      const tile = parseTile(`${digit}${suit}`)
-      if (tile) tiles.push(tile)
-    }
-  }
-  return tiles
-}
-
 function windLabel(w: WindValue): string {
   return w.charAt(0).toUpperCase() + w.slice(1)
-}
-
-// ─── Text ↔ array sync ────────────────────────────────────────────────────────
-
-function handToText(): string {
-  return [...handTiles.value, ...(winningTile.value ? [winningTile.value] : [])].map(tileToText).join('')
-}
-
-function applyHandText() {
-  const tiles = parseTileList(handText.value)
-  if (tiles.length > 13) {
-    handTiles.value = sortTiles(tiles.slice(0, 13))
-    winningTile.value = tiles[13]
-  } else {
-    handTiles.value = sortTiles(tiles)
-    winningTile.value = null
-  }
-  winTileText.value = winningTile.value ? tileToText(winningTile.value) : ''
-}
-
-function applyDoraText() {
-  doraTiles.value = parseTileList(doraText.value).slice(0, 12)
-}
-
-function applyWinTileText() {
-  winningTile.value = winTileText.value.trim() ? parseTile(winTileText.value) : null
-}
-
-function syncHandText() {
-  handText.value = handToText()
-  winTileText.value = winningTile.value ? tileToText(winningTile.value) : ''
-}
-
-function syncDoraText() {
-  doraText.value = doraTiles.value.map(tileToText).join(' ')
 }
 
 // ─── Tile picker ──────────────────────────────────────────────────────────────
@@ -569,42 +495,122 @@ function aimPicker(mode: PickerMode) {
   document.getElementById('tile-picker')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 }
 
+// ─── Picker validation ────────────────────────────────────────────────────────
+// Only physical-set rules are enforced: each face exists 4× in a set (one of
+// each 5 is red), and a hand row holds at most 13 + kan adjustments. Yaku or
+// hand-structure rules are deliberately not picker concerns — the scorer
+// reports those once the hand is complete.
+
+const MAX_DORA_INDICATORS = 12
+
+/** Red fives share their face with ordinary fives: only one red five per suit exists. */
+function isAkaFace(tile: Tile): boolean {
+  return tile.suit !== 'honor' && tile.value === 5 && !!tile.isAka
+}
+
+function countInMelds(face: Tile): number {
+  return melds.value.reduce(
+    (sum, meld) => sum + meld.tiles.filter((t) => t.suit === face.suit && t.value === face.value).length,
+    0,
+  )
+}
+
+function blockedReasonFor(code: string): string | null {
+  const tile = parseTile(code)
+  if (!tile) return null
+
+  if (pickerMode.value === 'win') {
+    if (winningTile.value && tilesEqualValue(winningTile.value, tile)) {
+      return 'Winning tile is already set — remove it first'
+    }
+    return null
+  }
+
+  if (pickerMode.value === 'dora') {
+    if (doraTiles.value.length >= MAX_DORA_INDICATORS) {
+      return 'Dora indicator limit reached (12)'
+    }
+    return null
+  }
+
+  // Hand mode: enforce physical-set counts across hand + melds + winning tile.
+  const inHand = handTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
+  const inMelds = countInMelds(tile)
+  const inWin = winningTile.value && tilesEqualValue(winningTile.value, tile) ? 1 : 0
+  if (inHand + inMelds + inWin >= 4) {
+    return `All four ${code} are already in use`
+  }
+  if (isAkaFace(tile)) {
+    const redInHand = handTiles.value.filter((t) => isAkaFace(t)).length
+    const redInMelds = melds.value.reduce(
+      (sum, meld) => sum + meld.tiles.filter((t) => isAkaFace(t)).length,
+      0,
+    )
+    const redInWin = winningTile.value && isAkaFace(winningTile.value) ? 1 : 0
+    if (redInHand + redInMelds + redInWin >= 1) {
+      return 'The red 5 is already in use'
+    }
+  }
+  const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
+  const handCap = 13 - 3 * (parsedMelds.value.length - kans)
+  if (handTiles.value.length >= handCap) {
+    return `Hand is full (${handCap} tiles) — move tiles into melds or add the winning tile`
+  }
+  return null
+}
+
+function canPickTile(code: string): boolean {
+  return blockedReasonFor(code) === null
+}
+
+const pickerBlockedNote = computed(() => {
+  // Surface the first blocked reason so the disabled tiles explain themselves.
+  for (const row of pickerRows.value) {
+    for (const code of row.codes) {
+      const reason = blockedReasonFor(code)
+      if (reason) return reason
+    }
+  }
+  return null
+})
+
+function pickerTileTitle(code: string): string {
+  const reason = blockedReasonFor(code)
+  return reason ? reason : `Add ${code} to ${activePickerLabel.value}`
+}
+
 function appendTile(code: string) {
+  const reason = blockedReasonFor(code)
+  if (reason) return
   const tile = parseTile(code)
   if (!tile) return
   if (pickerMode.value === 'hand') {
     handTiles.value = sortTiles([...handTiles.value, tile])
-    syncHandText()
   } else if (pickerMode.value === 'win') {
     setWinningTile(tile)
     // The winning row only ever holds one tile — done picking, close the picker.
     pickerCollapsed.value = true
   } else {
-    doraTiles.value = [...doraTiles.value, tile].slice(0, 12)
-    syncDoraText()
+    doraTiles.value = [...doraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
   }
 }
 
 function removeHandTile(index: number) {
   handTiles.value = handTiles.value.filter((_, i) => i !== index)
-  syncHandText()
 }
 
 function removeDoraTile(index: number) {
   doraTiles.value = doraTiles.value.filter((_, i) => i !== index)
-  syncDoraText()
 }
 
 function setWinningTile(tile: Tile | null) {
   winningTile.value = tile
-  syncHandText()
 }
 
 const parsedMelds = computed(() => melds.value)
 
 function updateMeldHandTiles(tiles: Tile[]) {
   handTiles.value = sortTiles(tiles)
-  syncHandText()
 }
 
 function updateMelds(nextMelds: Meld[]) {
@@ -650,9 +656,6 @@ function clearHand() {
   winningTile.value = null
   doraTiles.value = []
   melds.value = []
-  handText.value = ''
-  winTileText.value = ''
-  doraText.value = ''
   winType.value = 'ron'
   honba.value = 0
   for (const key of Object.keys(flags) as FlagKey[]) flags[key] = false
@@ -731,8 +734,9 @@ const DETECT_URL = config.public.tileDetectUrl as string
 const restored = ref(false)
 
 onMounted(() => {
-  restored.value = restoreSheet()
-  if (restored.value) {
+  const hadSavedSheet = restoreSheet()
+  restored.value = true
+  if (hadSavedSheet) {
     // Re-validate restored flags against the restored hand (e.g. a stored open
     // hand can't keep riichi).
     for (const key of Object.keys(flags) as FlagKey[]) {
@@ -813,7 +817,6 @@ async function scanHand(base64: string) {
     const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
     handTiles.value = sortTiles(fillMissingHandWithHaku(handScanned, 13 - 3 * (parsedMelds.value.length - kans)))
     winningTile.value = winningTileScanned
-    syncHandText()
     scanStatus.value = 'ready'
   } catch (err) {
     scanStatus.value = 'failed'
@@ -863,15 +866,12 @@ async function scanGuided(capture: GuidedCaptureData) {
       const kans = detectedMelds.filter((meld) => meld.type.startsWith('kan')).length
       const target = 13 - 3 * (detectedMelds.length - kans)
       handTiles.value = sortTiles(fillMissingHandWithHaku(data.hand, target))
-      syncHandText()
     }
     if (capture.sections.winning && data.winningTile) {
       winningTile.value = data.winningTile
-      syncHandText()
     }
     if (capture.sections.dora && data.dora.length > 0) {
       doraTiles.value = sortTiles(data.dora.slice(0, 12))
-      syncDoraText()
     }
     scanStatus.value = 'ready'
   } catch (err) {
@@ -1259,13 +1259,26 @@ function yakuName(name: string): string {
   transition: transform 0.12s ease, border-color 0.12s ease;
 }
 
-.picker-tile:hover {
+.picker-tile:hover:not(:disabled) {
   transform: translateY(-2px);
   border-color: var(--gold-leaf);
 }
 
-.picker-tile:active {
+.picker-tile:active:not(:disabled) {
   transform: scale(0.95);
+}
+
+.picker-tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+  filter: grayscale(0.9);
+}
+
+.picker-blocked-note {
+  margin: 0 0 6px;
+  color: #8a3b3b;
+  font-size: 0.72rem;
+  line-height: 1.4;
 }
 
 .picker-tile img {
@@ -1443,17 +1456,6 @@ function yakuName(name: string): string {
   gap: 1px;
 }
 
-.field-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 20px;
-  margin-top: 22px;
-}
-
-.field-wide {
-  grid-column: 1 / -1;
-}
-
 .field label,
 .field-label {
   display: block;
@@ -1486,19 +1488,6 @@ function yakuName(name: string): string {
 .field textarea:focus,
 .field select:focus {
   border-color: var(--gold-leaf);
-}
-
-.field-hint {
-  margin: 6px 0 0;
-  font-size: 0.72rem;
-  line-height: 1.5;
-  opacity: 0.6;
-}
-
-.field-hint code {
-  padding: 1px 5px;
-  border-radius: 6px;
-  background: rgba(101, 119, 99, 0.1);
 }
 
 .option-grid {
@@ -1736,7 +1725,6 @@ function yakuName(name: string): string {
     flex: 1 1 45%;
   }
 
-  .field-grid,
   .result-columns,
   .score-banner {
     grid-template-columns: 1fr;
