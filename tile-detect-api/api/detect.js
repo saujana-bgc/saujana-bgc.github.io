@@ -1,0 +1,90 @@
+import { detectTiles, warmUpDetector } from '../lib/detect.js';
+import { parsePredictions } from '../lib/roboflow-parser.js';
+import { splitBySection } from '../lib/sections.js';
+
+// Shared CORS config: the caller is the GitHub Pages site.
+const ALLOWED_ORIGINS = new Set([
+  'https://saujana-bgc.github.io',
+  'http://localhost:3000',
+  'http://localhost:4173',
+  'http://localhost:4174',
+]);
+
+function cors(req, res) {
+  const origin = req.headers.origin ?? '';
+  if (!ALLOWED_ORIGINS.has(origin)) return false;
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');
+  return true;
+}
+
+const MAX_BODY_BYTES = 8 * 1024 * 1024; // ~8 MB base64 payload ceiling
+
+function fail(res, status, error) {
+  return res.status(status).json({ error });
+}
+
+export default async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    cors(req, res);
+    return res.status(204).end();
+  }
+  if (req.method === 'GET') {
+    if (!cors(req, res)) {
+      return fail(res, 403, 'Origin not allowed');
+    }
+    try {
+      await warmUpDetector();
+      return res.status(200).json({ ready: true });
+    } catch (err) {
+      console.error('warm-up failed:', err);
+      return fail(res, 500, 'Scanner warm-up failed');
+    }
+  }
+  if (req.method !== 'POST') {
+    return fail(res, 405, 'Method not allowed');
+  }
+  if (!cors(req, res)) {
+    return fail(res, 403, 'Origin not allowed');
+  }
+
+  const body = req.body ?? {};
+  if (!body.image || typeof body.image !== 'string') {
+    return fail(res, 400, 'Missing base64 "image" field');
+  }
+  if (body.image.length > MAX_BODY_BYTES) {
+    return fail(res, 413, 'Image too large');
+  }
+
+  const buffer = Buffer.from(body.image, 'base64');
+  if (buffer.length < 100) {
+    return fail(res, 400, 'Image payload too small');
+  }
+
+  try {
+    const predictions = await detectTiles(buffer);
+
+    // Individual mode: a flat tile list (hand / dora scanning).
+    // Guided mode: optional section boxes (normalized 0..1) split one frame
+    // into hand / winning / dora / meld groups; the image pixel size is
+    // passed through so splitBySection can map boxes back to pixels.
+    if (body.sections && Object.keys(body.sections).length > 0) {
+      const split = splitBySection(
+        predictions,
+        body.sections,
+        Number(body.imageWidth) || 0,
+        Number(body.imageHeight) || 0,
+      );
+      return res.status(200).json({ mode: 'guided', ...split });
+    }
+
+    const tiles = parsePredictions(predictions);
+    return res.status(200).json({ mode: 'individual', tiles });
+  } catch (err) {
+    console.error('detect failed:', err);
+    return fail(res, 500, 'Detection failed');
+  }
+}

@@ -1,0 +1,606 @@
+{
+  "schemaVersion": 1,
+  "league": {
+    "id": "saujana-riichi-league",
+    "name": "Saujana Riichi League",
+    "organizer": "Saujana Board Game Community"
+  },
+  "season": {
+    "id": "season-1",
+    "number": 1,
+    "name": "Saujana Riichi League — Season 1",
+    "startDate": "2026-08-01",
+    "endDate": "2026-10-31",
+    "status": "active",
+    "totalWeeks": 14,
+    "bestResultsCount": 8,
+    "hanchanPerRound": 1,
+    "supportedTableSizes": [
+      3,
+      4
+    ],
+    "admission": {
+      "amount": 0,
+      "currency": "MYR",
+      "display": "Free"
+    },
+    "prize": {
+      "title": "Mystery Prize",
+      "description": "Mystery prize for the overall season winner",
+      "sponsored": true
+    },
+    "scoring": {
+      "method": "placementPoints",
+      "threePlayer": {
+        "first": 9,
+        "second": 5,
+        "third": 0
+      },
+      "fourPlayer": {
+        "first": 10,
+        "second": 6,
+        "third": 3,
+        "fourth": 0
+      }
+    },
+    "tieBreakers": [
+      "moreLeagueSessions",
+      "moreFirstPlaceFinishes",
+      "moreSecondPlaceFinishes",
+      "higherSingleGameFinalScore",
+      "sharedPositionOrAgreedPlayoff"
+    ],
+    "resultCounting": "bestGamePerPlayerPerDay"
+  },
+  "players": [
+    { "id": "nick", "displayName": "Nick" },
+    { "id": "adam", "displayName": "Adam" },
+    { "id": "kah-hui", "displayName": "Kah Hui" },
+    { "id": "vincent", "displayName": "Vincent" },
+    { "id": "bena", "displayName": "Bena" },
+    { "id": "dice", "displayName": "Dice" },
+    { "id": "daus", "displayName": "Daus" },
+    { "id": "fatinah", "displayName": "Fatinah" },
+    { "id": "tom", "displayName": "Tom" },
+    { "id": "aaran", "displayName": "Aaran" },
+    { "id": "afif", "displayName": "Afif" },
+    { "id": "eric", "displayName": "Eric" },
+    { "id": "dennis", "displayName": "Dennis" },
+    { "id": "mun", "displayName": "Mun" },
+    { "id": "wilson", "displayName": "Wilson" },
+    { "id": "art", "displayName": "Art" },
+    { "id": "vafa", "displayName": "Vafa" },
+    { "id": "amir", "displayName": "Amir" },
+    { "id": "insyi", "displayName": "Insyi" },
+    { "id": "danny", "displayName": "Danny" },
+    { "id": "nicholas-lee", "displayName": "Nicholas Lee" },
+    { "id": "ben", "displayName": "Ben" },
+    { "id": "leek", "displayName": "Leek" },
+    { "id": "gina", "displayName": "Gina" },
+    { "id": "akabii", "displayName": "Akabii" }
+  ],
+  "weeks": [
+    {
+      "id": "season-1-week-01",
+      "weekNumber": 1,
+      "date": "2026-08-01",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "Starbucks Oasis Damansara, Ara Damansara",
+      "admissionDisplay": "Free",
+      "status": "completed",
+      "notes": "",
+      "tables": [
+        {
+          "id": "season-1-week-01-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "nick", "finalPoints": 27300, "placement": 3 },
+            { "playerId": "adam", "finalPoints": 30200, "placement": 2 },
+            { "playerId": "kah-hui", "finalPoints": 3200, "placement": 4 },
+            { "playerId": "vincent", "finalPoints": 39300, "placement": 1 }
+          ]
+        },
+        {
+          "id": "season-1-week-01-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "bena", "finalPoints": 16100, "placement": 3 },
+            { "playerId": "dice", "finalPoints": 30300, "placement": 2 },
+            { "playerId": "daus", "finalPoints": 58400, "placement": 1 },
+            { "playerId": "fatinah", "finalPoints": -4800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-01-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "tom", "finalPoints": 40900, "placement": 1 },
+            { "playerId": "kah-hui", "finalPoints": 26400, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 25800, "placement": 3 },
+            { "playerId": "adam", "finalPoints": 6900, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-01-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "afif", "finalPoints": 21700, "placement": 3 },
+            { "playerId": "dice", "finalPoints": 31200, "placement": 1 },
+            { "playerId": "daus", "finalPoints": 30400, "placement": 2 },
+            { "playerId": "fatinah", "finalPoints": 16700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-01-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "eric", "finalPoints": 40700, "placement": 1 },
+            { "playerId": "aaran", "finalPoints": 22900, "placement": 2 },
+            { "playerId": "afif", "finalPoints": 22300, "placement": 3 },
+            { "playerId": "tom", "finalPoints": 14100, "placement": 4 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "season-1-week-02",
+      "weekNumber": 2,
+      "date": "2026-08-08",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "Boardroom Bandit, Ara Damansara",
+      "admissionDisplay": "Free",
+      "status": "completed",
+      "notes": "",
+      "tables": [
+        {
+          "id": "season-1-week-02-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "dice", "finalPoints": 40500, "placement": 1 },
+            { "playerId": "fatinah", "finalPoints": 26400, "placement": 2 },
+            { "playerId": "vincent", "finalPoints": 22100, "placement": 3 },
+            { "playerId": "dennis", "finalPoints": 11000, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-02-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "fatinah", "finalPoints": 33400, "placement": 1 },
+            { "playerId": "dice", "finalPoints": 29700, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 22300, "placement": 3 },
+            { "playerId": "bena", "finalPoints": 14600, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-02-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "bena", "finalPoints": 49100, "placement": 1 },
+            { "playerId": "afif", "finalPoints": 28300, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 27600, "placement": 3 }
+          ]
+        },
+        {
+          "id": "season-1-week-02-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "tom", "finalPoints": 57700, "placement": 1 },
+            { "playerId": "kah-hui", "finalPoints": 37300, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 2500, "placement": 3 },
+            { "playerId": "bena", "finalPoints": 2500, "placement": 4 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "season-1-week-03",
+      "weekNumber": 3,
+      "date": "2026-08-15",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "Starbucks Oasis Damansara, Ara Damansara",
+      "admissionDisplay": "Free",
+      "status": "completed",
+      "notes": "",
+      "tables": [
+        {
+          "id": "season-1-week-03-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "mun", "finalPoints": 30100, "placement": 1 },
+            { "playerId": "wilson", "finalPoints": 26600, "placement": 2 },
+            { "playerId": "art", "finalPoints": 26500, "placement": 3 },
+            { "playerId": "vafa", "finalPoints": 16800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-03-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 51000, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 35000, "placement": 2 },
+            { "playerId": "tom", "finalPoints": 12600, "placement": 3 },
+            { "playerId": "eric", "finalPoints": 1400, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-03-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "mun", "finalPoints": 28600, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 28300, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 27100, "placement": 3 },
+            { "playerId": "eric", "finalPoints": 16000, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-03-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "adam", "finalPoints": 47000, "placement": 1 },
+            { "playerId": "vafa", "finalPoints": 30100, "placement": 2 },
+            { "playerId": "kah-hui", "finalPoints": 17100, "placement": 3 },
+            { "playerId": "art", "finalPoints": 5800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-03-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "daus", "finalPoints": 33800, "placement": 1 },
+            { "playerId": "dice", "finalPoints": 27900, "placement": 2 },
+            { "playerId": "vafa", "finalPoints": 19500, "placement": 3 },
+            { "playerId": "fatinah", "finalPoints": 18800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-03-game-06",
+          "tableNumber": 6,
+          "results": [
+            { "playerId": "nick", "finalPoints": 63100, "placement": 1 },
+            { "playerId": "art", "finalPoints": 22100, "placement": 2 },
+            { "playerId": "vafa", "finalPoints": 15000, "placement": 3 },
+            { "playerId": "wilson", "finalPoints": -200, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-03-game-07",
+          "tableNumber": 7,
+          "results": [
+            { "playerId": "eric", "finalPoints": 42200, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 33600, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 12700, "placement": 3 },
+            { "playerId": "mun", "finalPoints": 11500, "placement": 4 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "season-1-week-04",
+      "weekNumber": 4,
+      "date": "2026-08-22",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "Boardroom Bandit, Ara Damansara",
+      "admissionDisplay": "Free",
+      "status": "completed",
+      "notes": "",
+      "tables": [
+        {
+          "id": "season-1-week-04-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "bena", "finalPoints": 62200, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 23300, "placement": 2 },
+            { "playerId": "kah-hui", "finalPoints": 8300, "placement": 3 },
+            { "playerId": "aaran", "finalPoints": 7200, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "dice", "finalPoints": 36500, "placement": 1 },
+            { "playerId": "nick", "finalPoints": 30800, "placement": 2 },
+            { "playerId": "vincent", "finalPoints": 20200, "placement": 3 },
+            { "playerId": "fatinah", "finalPoints": 12500, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 29300, "placement": 1 },
+            { "playerId": "kah-hui", "finalPoints": 27800, "placement": 2 },
+            { "playerId": "amir", "finalPoints": 25000, "placement": 3 },
+            { "playerId": "eric", "finalPoints": 17900, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "daus", "finalPoints": 44600, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 19700, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 18000, "placement": 3 },
+            { "playerId": "kah-hui", "finalPoints": 17700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "wilson", "finalPoints": 31700, "placement": 1 },
+            { "playerId": "tom", "finalPoints": 31000, "placement": 2 },
+            { "playerId": "insyi", "finalPoints": 21800, "placement": 3 },
+            { "playerId": "eric", "finalPoints": 15500, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-06",
+          "tableNumber": 6,
+          "results": [
+            { "playerId": "bena", "finalPoints": 27300, "placement": 1 },
+            { "playerId": "vincent", "finalPoints": 26900, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 24900, "placement": 3 },
+            { "playerId": "daus", "finalPoints": 20900, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-07",
+          "tableNumber": 7,
+          "results": [
+            { "playerId": "fatinah", "finalPoints": 42200, "placement": 1 },
+            { "playerId": "dice", "finalPoints": 24100, "placement": 2 },
+            { "playerId": "nicholas-lee", "finalPoints": 21000, "placement": 3 },
+            { "playerId": "danny", "finalPoints": 12700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-08",
+          "tableNumber": 8,
+          "results": [
+            { "playerId": "dice", "finalPoints": 59500, "placement": 1 },
+            { "playerId": "aaran", "finalPoints": 25200, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 13500, "placement": 3 },
+            { "playerId": "adam", "finalPoints": 1800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-04-game-09",
+          "tableNumber": 9,
+          "results": [
+            { "playerId": "tom", "finalPoints": 62800, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 29700, "placement": 2 },
+            { "playerId": "fatinah", "finalPoints": 12700, "placement": 3 },
+            { "playerId": "daus", "finalPoints": -5200, "placement": 4 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "season-1-week-05",
+      "weekNumber": 5,
+      "date": "2026-08-29",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "Boardroom Bandit, Ara Damansara",
+      "admissionDisplay": "Free",
+      "status": "completed",
+      "notes": "",
+      "tables": [
+        {
+          "id": "season-1-week-05-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "wilson", "finalPoints": 44400, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 29900, "placement": 2 },
+            { "playerId": "tom", "finalPoints": 24600, "placement": 3 },
+            { "playerId": "mun", "finalPoints": -2200, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "eric", "finalPoints": 51600, "placement": 1 },
+            { "playerId": "daus", "finalPoints": 41200, "placement": 2 },
+            { "playerId": "nick", "finalPoints": 8700, "placement": 3 },
+            { "playerId": "aaran", "finalPoints": -1600, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "tom", "finalPoints": 34800, "placement": 1 },
+            { "playerId": "mun", "finalPoints": 25400, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 22700, "placement": 3 },
+            { "playerId": "wilson", "finalPoints": 17100, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "dice", "finalPoints": 42600, "placement": 1 },
+            { "playerId": "ben", "finalPoints": 26600, "placement": 2 },
+            { "playerId": "fatinah", "finalPoints": 18200, "placement": 3 },
+            { "playerId": "akabii", "finalPoints": 12600, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "dice", "finalPoints": 43900, "placement": 1 },
+            { "playerId": "ben", "finalPoints": 21600, "placement": 2 },
+            { "playerId": "fatinah", "finalPoints": 19100, "placement": 3 },
+            { "playerId": "akabii", "finalPoints": 15400, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-06",
+          "tableNumber": 6,
+          "results": [
+            { "playerId": "gina", "finalPoints": 61200, "placement": 1 },
+            { "playerId": "aaran", "finalPoints": 20500, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 19100, "placement": 3 },
+            { "playerId": "mun", "finalPoints": -600, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-07",
+          "tableNumber": 7,
+          "results": [
+            { "playerId": "daus", "finalPoints": 91300, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 8900, "placement": 2 },
+            { "playerId": "leek", "finalPoints": 8900, "placement": 3 },
+            { "playerId": "ben", "finalPoints": -9100, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-08",
+          "tableNumber": 8,
+          "results": [
+            { "playerId": "leek", "finalPoints": 47100, "placement": 1 },
+            { "playerId": "fatinah", "finalPoints": 30000, "placement": 2 },
+            { "playerId": "dice", "finalPoints": 24400, "placement": 3 },
+            { "playerId": "eric", "finalPoints": -1500, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-09",
+          "tableNumber": 9,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 32600, "placement": 1 },
+            { "playerId": "dice", "finalPoints": 30200, "placement": 2 },
+            { "playerId": "nick", "finalPoints": 29300, "placement": 3 },
+            { "playerId": "wilson", "finalPoints": 7900, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-05-game-10",
+          "tableNumber": 10,
+          "results": [
+            { "playerId": "daus", "finalPoints": 39800, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 28300, "placement": 2 },
+            { "playerId": "gina", "finalPoints": 18900, "placement": 3 },
+            { "playerId": "aaran", "finalPoints": 13000, "placement": 4 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "season-1-week-06",
+      "weekNumber": 6,
+      "date": "2026-09-05",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-07",
+      "weekNumber": 7,
+      "date": "2026-09-12",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-08",
+      "weekNumber": 8,
+      "date": "2026-09-19",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-09",
+      "weekNumber": 9,
+      "date": "2026-09-26",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-10",
+      "weekNumber": 10,
+      "date": "2026-10-03",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-11",
+      "weekNumber": 11,
+      "date": "2026-10-10",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-12",
+      "weekNumber": 12,
+      "date": "2026-10-17",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-13",
+      "weekNumber": 13,
+      "date": "2026-10-24",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    },
+    {
+      "id": "season-1-week-14",
+      "weekNumber": 14,
+      "date": "2026-10-31",
+      "startTime": "13:30",
+      "endTime": null,
+      "location": "",
+      "admissionDisplay": "Free",
+      "status": "scheduled",
+      "notes": "",
+      "tables": []
+    }
+  ]
+}
