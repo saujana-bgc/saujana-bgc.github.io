@@ -23,12 +23,12 @@
         </label>
       </div>
 
+      <button type="button" class="new-hand-btn wizard-new-hand" @click="clearHand">＋ New hand</button>
       <nav class="wizard-progress" aria-label="Calculator steps">
         <button v-for="step in wizardSteps" :key="step.number" type="button" :class="{ active: wizardStep === step.number, complete: wizardStep > step.number }" @click="goToWizardStep(step.number)">
           <span>{{ step.number }}</span>{{ step.label }}
         </button>
       </nav>
-      <button type="button" class="new-hand-btn wizard-new-hand" @click="clearHand">＋ New hand</button>
       <div v-if="wizardStep === 1" class="table-format-picker">
         <p class="result-notice">Choose the table type, then continue to enter every physical tile — including tiles in called melds.</p>
         <div class="field">
@@ -102,18 +102,7 @@
           <p v-else-if="handReady" class="hand-guidance ready">Ready to score.</p>
         </div>
 
-        <div v-show="wizardStep === 3" class="picked-row">
-          <span class="row-label">Calls</span>
-          <MeldBuilder
-            :hand-tiles="handTiles"
-            :melds="parsedMelds"
-            :three-player="threePlayer"
-            @update:hand-tiles="updateMeldHandTiles"
-            @update:melds="updateMelds"
-          />
-        </div>
-
-        <div v-show="wizardStep === 4" class="picked-row">
+        <div v-show="wizardStep === 2" class="picked-row">
           <span class="row-label">Dora indicators</span>
           <div class="row-tiles">
             <span
@@ -144,15 +133,26 @@
           </div>
         </div>
 
-        <div v-if="hasRiichi" v-show="wizardStep === 4" class="picked-row">
-          <span class="row-label">Ura-dora indicators</span>
+        <div v-show="wizardStep === 3" class="picked-row">
+          <span class="row-label">Calls</span>
+          <MeldBuilder
+            :hand-tiles="handTiles"
+            :melds="parsedMelds"
+            :three-player="threePlayer"
+            @update:hand-tiles="updateMeldHandTiles"
+            @update:melds="updateMelds"
+          />
+        </div>
+
+        <div v-show="wizardStep === 4" class="picked-row">
+          <span class="row-label">Called tiles</span>
           <div class="row-tiles">
-            <span v-for="(tile, i) in uraDoraTiles" :key="`ura-${i}-${tileToText(tile)}`" class="hand-tile">
-              <button type="button" class="tile-btn" :title="`Remove ${tileToText(tile)}`" @click="removeUraDoraTile(i)"><TileImage :tile="tile" /></button>
-              <button type="button" class="tile-remove" :title="`Remove ura-dora indicator ${tileToText(tile)}`" :aria-label="`Remove ura-dora indicator ${tileToText(tile)}`" @click.stop="removeUraDoraTile(i)">×</button>
+            <span v-for="(meld, meldIndex) in parsedMelds" :key="`called-${meldIndex}`" class="called-meld">
+              <span v-for="(tile, tileIndex) in meld.tiles" :key="`called-${meldIndex}-${tileIndex}-${tileToText(tile)}`" class="hand-tile">
+                <TileImage :tile="tile" />
+              </span>
             </span>
-            <button type="button" class="row-add" title="Add ura-dora indicators" aria-label="Add ura-dora indicators" @click="aimPicker('ura')">＋</button>
-            <span v-if="uraDoraTiles.length === 0" class="row-empty">None</span>
+            <span v-if="parsedMelds.length === 0" class="row-empty">None</span>
           </div>
         </div>
       </div>
@@ -169,13 +169,12 @@
         <strong>Edit tiles</strong>
       </button>
 
-      <div v-show="wizardStep === 2 || wizardStep === 4" v-if="wizardStep !== 2 || !(!pickerExpanded && handTiles.length >= handTarget)" id="tile-picker" class="tile-picker" aria-label="Tile picker">
+      <div v-show="wizardStep === 2" v-if="!(!pickerExpanded && handTiles.length >= handTarget)" id="tile-picker" class="tile-picker" aria-label="Tile picker">
         <p class="picker-mode-label">
           Adding to
           <button v-if="wizardStep === 2" type="button" class="picker-mode-switch" @click="aimPicker('hand')" :aria-pressed="pickerMode === 'hand'">Hand</button>
           <span v-if="wizardStep === 2" aria-hidden="true">/</span>
           <button type="button" class="picker-mode-switch" @click="aimPicker('dora')" :aria-pressed="pickerMode === 'dora'">Dora</button>
-          <template v-if="hasRiichi"><span aria-hidden="true">/</span><button type="button" class="picker-mode-switch" @click="aimPicker('ura')" :aria-pressed="pickerMode === 'ura'">Ura</button></template>
           <button v-if="handTiles.length >= handTarget" type="button" class="picker-done" @click="pickerExpanded = false">Done</button>
         </p>
         <p v-if="pickerBlockedNote" class="picker-blocked-note">{{ pickerBlockedNote }}</p>
@@ -389,11 +388,6 @@
                 <span class="yaku-en">Aka dora</span>
                 <strong>{{ result.akaDoraCount }}</strong>
               </li>
-              <li v-if="result.uraDoraCount > 0">
-                <span class="yaku-ja">Ura dora</span>
-                <span class="yaku-en">Ura-dora</span>
-                <strong>{{ result.uraDoraCount }}</strong>
-              </li>
               <li v-if="result.nukiDoraCount > 0">
                 <span class="yaku-ja">Nuki dora</span>
                 <span class="yaku-en">Nuki dora</span>
@@ -489,7 +483,6 @@ interface GuidedDetectionResult {
 const handTiles = ref<Tile[]>([])
 const winningTileIndex = ref<number | null>(null)
 const doraTiles = ref<Tile[]>([])
-const uraDoraTiles = ref<Tile[]>([])
 const melds = ref<Meld[]>([])
 const wizardStep = ref(1)
 const wizardSteps = [
@@ -572,15 +565,6 @@ const riichiDeclaration = computed<RiichiDeclaration>({
     flags.doubleRiichi = value === 'doubleRiichi'
   },
 })
-const hasRiichi = computed(() => flags.riichi || flags.doubleRiichi)
-
-watch(hasRiichi, (enabled) => {
-  if (!enabled) {
-    uraDoraTiles.value = []
-    if (pickerMode.value === 'ura') pickerMode.value = 'hand'
-  }
-})
-
 // ─── Session persistence ──────────────────────────────────────────────────────
 // The whole sheet survives a refresh or a phone lock mid-game. Tiles are plain
 // { suit, value, isAka? } objects and serialize to JSON directly.
@@ -611,7 +595,6 @@ function saveSheet() {
     hand: handTiles.value,
     winIndex: winningTileIndex.value,
     dora: doraTiles.value,
-    uraDora: uraDoraTiles.value,
     melds: melds.value,
     winType: winType.value,
     seatWind: seatWind.value,
@@ -625,7 +608,7 @@ function saveSheet() {
     flags: { ...flags },
   }
   try {
-    if (handTiles.value.length || melds.value.length || doraTiles.value.length || uraDoraTiles.value.length) {
+    if (handTiles.value.length || melds.value.length || doraTiles.value.length) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sheet))
     } else {
       localStorage.removeItem(STORAGE_KEY)
@@ -656,8 +639,12 @@ function restoreSheet() {
       ? handTiles.value.findIndex((t) => tilesEqualValue(t, restoredWinner) && isAkaDora(t) === isAkaDora(restoredWinner))
       : null
     if (winningTileIndex.value === -1) winningTileIndex.value = null
-    doraTiles.value = Array.isArray(sheet.dora) ? sheet.dora.slice(0, MAX_DORA_INDICATORS) : []
-    uraDoraTiles.value = Array.isArray(sheet.uraDora) ? sheet.uraDora.slice(0, MAX_DORA_INDICATORS) : []
+    // Older saved hands kept ura-dora separately. Merge it into the unified
+    // Dora list so existing hands continue to score with every indicator.
+    doraTiles.value = [
+      ...(Array.isArray(sheet.dora) ? sheet.dora : []),
+      ...(Array.isArray(sheet.uraDora) ? sheet.uraDora : []),
+    ].slice(0, MAX_DORA_INDICATORS)
     melds.value = Array.isArray(sheet.melds) ? sheet.melds : []
     winType.value = sheet.winType === 'tsumo' ? 'tsumo' : 'ron'
     seatWind.value = sheet.seatWind ?? 'south'
@@ -672,7 +659,7 @@ function restoreSheet() {
       for (const key of Object.keys(flags) as FlagKey[]) flags[key] = !!sheet.flags[key]
       if (flags.doubleRiichi) flags.riichi = false
     }
-    return handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0 || uraDoraTiles.value.length > 0
+    return handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0
   } catch {
     return false
   }
@@ -719,7 +706,7 @@ function windLabel(w: WindValue): string {
 // One shared picker sits directly under the hand; the dora row's ＋ switches
 // it to indicator mode. No collapse/mode chrome — it's always visible.
 
-type PickerMode = 'hand' | 'dora' | 'ura'
+type PickerMode = 'hand' | 'dora'
 const pickerMode = ref<PickerMode>('hand')
 
 // One row per suit; sanma drops the middle man tiles and the red man.
@@ -763,7 +750,7 @@ async function aimPicker(mode: PickerMode) {
 // default). Yaku or hand-structure rules are deliberately not picker concerns
 // — the scorer reports those once the hand is complete.
 
-const MAX_DORA_INDICATORS = 5
+const MAX_DORA_INDICATORS = 10
 
 function countInMelds(face: Tile): number {
   return melds.value.reduce(
@@ -778,7 +765,6 @@ function countFaceInUse(face: Tile): number {
   return handTiles.value.filter(sameFace).length
     + countInMelds(face)
     + doraTiles.value.filter(sameFace).length
-    + uraDoraTiles.value.filter(sameFace).length
 }
 
 function blockedReasonFor(code: string): string | null {
@@ -787,13 +773,9 @@ function blockedReasonFor(code: string): string | null {
 
   // Dora indicators are real tiles taken from the wall: a face can appear at
   // most 4 times across hand + winning tile + melds + dora combined.
-  if (pickerMode.value === 'dora' || pickerMode.value === 'ura') {
-    const indicators = pickerMode.value === 'dora' ? doraTiles.value : uraDoraTiles.value
-    if (indicators.length >= MAX_DORA_INDICATORS) {
-      return `${pickerMode.value === 'ura' ? 'Ura-dora' : 'Dora'} indicator limit reached (5)`
-    }
-    if (pickerMode.value === 'ura' && uraDoraTiles.value.length >= doraTiles.value.length) {
-      return `Ura-dora indicators cannot exceed the ${doraTiles.value.length} visible dora indicator${doraTiles.value.length === 1 ? '' : 's'}`
+  if (pickerMode.value === 'dora') {
+    if (doraTiles.value.length >= MAX_DORA_INDICATORS) {
+      return `Dora indicator limit reached (${MAX_DORA_INDICATORS})`
     }
     const used = countFaceInUse(tile)
     if (used >= 4) {
@@ -802,9 +784,9 @@ function blockedReasonFor(code: string): string | null {
     return null
   }
 
-  // Hand mode uses the same physical-set count, including both indicator rows.
+  // Hand mode uses the same physical-set count, including every dora indicator.
   if (countFaceInUse(tile) >= 4) {
-    return `All four ${code} are already in use (hand, calls, dora and ura count together)`
+    return `All four ${code} are already in use (hand, calls and dora count together)`
   }
   if (handTiles.value.length >= handEntryLimit.value) {
     return `Hand is full (${handEntryLimit.value} tiles) — remove a tile or declare a call`
@@ -836,7 +818,7 @@ const pickerBlockedNote = computed(() => {
 
 function pickerTileTitle(code: string): string {
   const reason = blockedReasons.value[code]
-  return reason ? reason : `Add ${code} to the ${pickerMode.value === 'hand' ? 'hand' : pickerMode.value === 'ura' ? 'ura-dora indicators' : 'dora indicators'}`
+  return reason ? reason : `Add ${code} to the ${pickerMode.value === 'hand' ? 'hand' : 'dora indicators'}`
 }
 
 function appendTile(code: string) {
@@ -849,10 +831,8 @@ function appendTile(code: string) {
     const winner = winningTile.value
     handTiles.value = sortTiles([...handTiles.value, tile])
     if (winner) winningTileIndex.value = handTiles.value.indexOf(winner)
-  } else if (pickerMode.value === 'dora') {
-    doraTiles.value = [...doraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
   } else {
-    uraDoraTiles.value = [...uraDoraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
+    doraTiles.value = [...doraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
   }
 }
 
@@ -866,10 +846,6 @@ function removeHandTile(index: number) {
 
 function removeDoraTile(index: number) {
   doraTiles.value = doraTiles.value.filter((_, i) => i !== index)
-}
-
-function removeUraDoraTile(index: number) {
-  uraDoraTiles.value = uraDoraTiles.value.filter((_, i) => i !== index)
 }
 
 /** Mark the hand tile at `index` as the winning tile (or clear the mark). */
@@ -960,7 +936,6 @@ function clearHand() {
   handTiles.value = []
   winningTileIndex.value = null
   doraTiles.value = []
-  uraDoraTiles.value = []
   melds.value = []
   winType.value = 'ron'
   honba.value = 0
@@ -1083,7 +1058,7 @@ onMounted(() => {
 // the sources directly (reactive objects are watched deeply by default) fires
 // on exactly the same changes the previous deep array-spread watcher did.
 watch(
-  [handTiles, winningTileIndex, doraTiles, uraDoraTiles, melds, winType, seatWind, roundWind, honba, threePlayer, nukiDoraCount, paoResponsible, paoResponsibleSeat, ronDiscarderSeat, flags],
+  [handTiles, winningTileIndex, doraTiles, melds, winType, seatWind, roundWind, honba, threePlayer, nukiDoraCount, paoResponsible, paoResponsibleSeat, ronDiscarderSeat, flags],
   () => {
     if (restored.value) saveSheet()
   },
@@ -1096,15 +1071,6 @@ function clampNukiDora(value: unknown): number {
 watch(nukiDoraCount, (count) => {
   const clamped = clampNukiDora(count)
   if (count !== clamped) nukiDoraCount.value = clamped
-})
-
-// Each ura indicator sits below a visible omote indicator. Trim an old entry
-// immediately when omote indicators are removed, rather than leaving an
-// unscorable state in the sheet.
-watch(doraTiles, (omote) => {
-  if (uraDoraTiles.value.length > omote.length) {
-    uraDoraTiles.value = uraDoraTiles.value.slice(0, omote.length)
-  }
 })
 
 async function requestDetection(payload: Record<string, unknown>): Promise<Record<string, any>> {
@@ -1360,7 +1326,6 @@ const scoreState = computed<ScoreState>(() => {
     ...handTiles.value,
     ...melds.flatMap((m) => [...m.tiles]),
     ...doraTiles.value,
-    ...uraDoraTiles.value,
   ]
   const setProblem = validateTileSetLocal(allTiles, nukiDoraCount.value)
   if (setProblem) return { result: null, error: setProblem, notice: null }
@@ -1373,7 +1338,6 @@ const scoreState = computed<ScoreState>(() => {
     seatWind: seatWind.value,
     roundWind: roundWind.value,
     doraIndicators: doraTiles.value,
-    uraDoraIndicators: uraDoraTiles.value,
     riichi: flags.riichi,
     doubleRiichi: flags.doubleRiichi,
     ippatsu: flags.ippatsu,
