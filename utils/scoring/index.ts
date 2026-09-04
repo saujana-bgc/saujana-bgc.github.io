@@ -1,18 +1,48 @@
-import type { Hand, ScoreResult, RulesConfig, Yaku } from "./types";
+import type { Hand, ScoreResult, RulesConfig, Yaku, WindValue } from "./types";
 import { DEFAULT_RULES } from "./types";
 import { parseHand } from "./hand-parser";
 import { detectYaku, detectYakuman } from "./yaku";
 import { calculateFu, chiitoitsiFuBreakdown } from "./fu";
-import { calculatePoints, handName } from "./points";
+import { calculatePoints, handName, roundUp100 } from "./points";
 import { countDora, countAkaDora } from "./tiles";
 import type { HandInterpretation } from "./hand-parser";
 import type { FuBreakdown } from "./types";
 
+const PAO_YAKU = new Set(["daisangen", "daisuushi"]);
+
+export function hasDeclaredKan(melds: Hand["melds"]): boolean {
+  return melds.some((m) => m.type === "kan-open" || m.type === "kan-closed" || m.type === "kan-added");
+}
+
+// Malformed pao input is rejected rather than silently mis-settled: the
+// responsible player and (for ron) the discarder must be declared and must be
+// someone other than the winner.
+function paoProblem(hand: Hand): string | null {
+  if (hand.paoResponsibleSeat === undefined) return null;
+  if (hand.paoResponsibleSeat === hand.seatWind) return "The pao responsible player cannot be the winner";
+  if (hand.winType === "ron") {
+    if (hand.ronDiscarderSeat === undefined) return "A pao ron needs the discarding player declared";
+    if (hand.ronDiscarderSeat === hand.seatWind) return "The discarding player cannot be the winner";
+  }
+  return null;
+}
+
+/**
+ * Pao (Daisangen/Daisuushii liability) settlement:
+ *  - tsumo: the responsible player alone pays the full winning amount;
+ *  - ron where the responsible player is also the discarder: that player pays everything;
+ *  - ron where the discarder differs: each pays half, each half rounded up
+ *    to 100 (the same rounding the rest of the settlement table uses).
+ */
 function applyPao(hand: Hand, yaku: Yaku[], points: ScoreResult["points"]): ScoreResult["points"] {
-  const applies = hand.pao && yaku.some((y) => y.name === "daisangen" || y.name === "daisuushi");
-  // Pao replaces the ordinary ron/tsumo split: the responsible player alone
-  // pays the full winning amount.
-  return applies ? { total: points.total, responsiblePays: points.total } : points;
+  const responsibleSeat: WindValue | undefined = hand.paoResponsibleSeat;
+  if (!responsibleSeat || !yaku.some((y) => PAO_YAKU.has(y.name))) return points;
+
+  if (hand.winType === "ron" && hand.ronDiscarderSeat !== responsibleSeat) {
+    const half = roundUp100(points.total / 2);
+    return { ...points, responsiblePays: half, discarderPays: half };
+  }
+  return { ...points, responsiblePays: points.total };
 }
 
 function specialWinProblem(hand: Hand): string | null {
@@ -20,6 +50,9 @@ function specialWinProblem(hand: Hand): string | null {
   if (hand.rinshan && hand.winType !== "tsumo") return "Rinshan requires tsumo";
   if (hand.houtei && hand.winType !== "ron") return "Houtei requires ron";
   if (hand.chankan && hand.winType !== "ron") return "Chankan requires ron";
+  // Rinshan kaihou is a win on the kan replacement draw, so a declared kan
+  // must exist even when the caller bypasses the UI.
+  if (hand.rinshan && !hasDeclaredKan(hand.melds)) return "Rinshan requires a declared kan";
   if (hand.haitei && hand.rinshan) return "Haitei and Rinshan cannot apply together";
   if (hand.houtei && hand.chankan) return "Houtei and Chankan cannot apply together";
   return null;
@@ -141,7 +174,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
     ? Math.min(4, Math.max(0, Math.trunc(hand.nukiDoraCount ?? 0)))
     : 0;
 
-  const specialProblem = specialWinProblem(hand);
+  const specialProblem = specialWinProblem(hand) ?? paoProblem(hand);
   if (specialProblem) {
     return {
       valid: false, error: specialProblem, yaku: [], totalHan: 0, fu: 0,

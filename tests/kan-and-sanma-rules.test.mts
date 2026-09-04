@@ -71,7 +71,7 @@ test('pao assigns a daisangen payment to the responsible player', () => {
   }
 
   const withoutPao = score(hand)
-  const withPao = score({ ...hand, pao: true })
+  const withPao = score({ ...hand, paoResponsibleSeat: 'west' })
   assert.equal(withoutPao.valid, true)
   assert.equal(withoutPao.points.responsiblePays, undefined)
   assert.equal(withPao.points.responsiblePays, withPao.points.total)
@@ -85,14 +85,14 @@ test('pao applies to daisuushii but not unrelated yakuman', () => {
   const daisuushii: Hand = {
     closedTiles: [suited('pin', 2)], winningTile: suited('pin', 2),
     melds: [windPon('east'), windPon('south'), windPon('west'), windPon('north')],
-    winType: 'tsumo', seatWind: 'south', roundWind: 'east', doraIndicators: [], pao: true,
+    winType: 'tsumo', seatWind: 'south', roundWind: 'east', doraIndicators: [], paoResponsibleSeat: 'west',
     riichi: false, doubleRiichi: false, ippatsu: false, haitei: false, houtei: false, rinshan: false, chankan: false,
   }
   const result = score(daisuushii)
   assert.equal(result.valid, true)
   assert.equal(result.points.responsiblePays, result.points.total)
 
-  const unrelated: Hand = { ...daisuushii, melds: [{ type: 'kan-closed', tiles: [suited('man', 1), suited('man', 1), suited('man', 1), suited('man', 1)] }, { type: 'kan-closed', tiles: [suited('man', 9), suited('man', 9), suited('man', 9), suited('man', 9)] }, { type: 'kan-closed', tiles: [suited('pin', 1), suited('pin', 1), suited('pin', 1), suited('pin', 1)] }, { type: 'kan-closed', tiles: [suited('sou', 1), suited('sou', 1), suited('sou', 1), suited('sou', 1)] }] }
+  const unrelated: Hand = { ...daisuushii, paoResponsibleSeat: 'west', melds: [{ type: 'kan-closed', tiles: [suited('man', 1), suited('man', 1), suited('man', 1), suited('man', 1)] }, { type: 'kan-closed', tiles: [suited('man', 9), suited('man', 9), suited('man', 9), suited('man', 9)] }, { type: 'kan-closed', tiles: [suited('pin', 1), suited('pin', 1), suited('pin', 1), suited('pin', 1)] }, { type: 'kan-closed', tiles: [suited('sou', 1), suited('sou', 1), suited('sou', 1), suited('sou', 1)] }] }
   assert.equal(score(unrelated).points.responsiblePays, undefined)
 })
 

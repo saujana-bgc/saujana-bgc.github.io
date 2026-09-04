@@ -32,7 +32,9 @@
 
     <slot />
 
-    <WhatsAppButton />
+    <div :class="{ 'calculator-whatsapp': route.path === '/riichi-calculator' }">
+      <WhatsAppButton />
+    </div>
 
     <footer ref="footerRef">
       <span>&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
@@ -130,5 +132,11 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleMenuKeydown))
     letter-spacing: 2px;
     opacity: 0.68;
     margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .calculator-whatsapp {
+    display: none;
+  }
 }
 </style>

@@ -17,7 +17,7 @@
           <h2 id="input-heading">The winning hand</h2>
           <p v-if="threePlayer" class="sanma-note">3-player table — 2–8 man out of play, two red fives, two payers on tsumo</p>
         </div>
-        <label class="sanma-toggle">
+        <label v-if="wizardStep !== 1" class="sanma-toggle">
           <input v-model="threePlayer" type="checkbox" />
           Three-player table
         </label>
@@ -28,7 +28,16 @@
           <span>{{ step.number }}</span>{{ step.label }}
         </button>
       </nav>
-      <p v-if="wizardStep === 1" class="result-notice">Choose the table type, then continue to enter every physical tile — including tiles in called melds.</p>
+      <div v-if="wizardStep === 1" class="table-format-picker">
+        <p class="result-notice">Choose the table type, then continue to enter every physical tile — including tiles in called melds.</p>
+        <div class="field">
+          <span class="field-label">Table format</span>
+          <div class="segmented-control" role="radiogroup" aria-label="Table format">
+            <button type="button" role="radio" :class="{ active: !threePlayer }" :aria-checked="!threePlayer" @click="threePlayer = false">Yonma · 4 players</button>
+            <button type="button" role="radio" :class="{ active: threePlayer }" :aria-checked="threePlayer" @click="threePlayer = true">Sanma · 3 players</button>
+          </div>
+        </div>
+      </div>
 
       <div v-show="wizardStep >= 2" class="capture-row">
         <div class="capture-buttons">
@@ -248,6 +257,18 @@
           <input v-model="paoResponsible" type="checkbox" />
           Responsibility payment (Pao)
         </label>
+        <div v-if="paoResponsible" class="field">
+          <label for="pao-responsible-seat">Responsible player</label>
+          <select id="pao-responsible-seat" v-model="paoResponsibleSeat">
+            <option v-for="seat in paoSeatOptions" :key="seat" :value="seat">{{ windLabel(seat) }}</option>
+          </select>
+        </div>
+        <div v-if="paoResponsible && winType === 'ron'" class="field">
+          <label for="ron-discarder-seat">Discarding player</label>
+          <select id="ron-discarder-seat" v-model="ronDiscarderSeat">
+            <option v-for="seat in discarderSeatOptions" :key="seat" :value="seat">{{ windLabel(seat) }}</option>
+          </select>
+        </div>
       </div>
 
       <div v-show="wizardStep === 4" class="condition-panel">
@@ -305,7 +326,7 @@
       </div>
       <p v-if="wizardStep === 4 && activeFlagHint" class="flag-hint">{{ activeFlagHint }}</p>
       <div class="wizard-actions">
-        <button v-if="wizardStep > 1" type="button" class="text-button" @click="wizardStep--">Back</button>
+        <button v-if="wizardStep > 1" type="button" class="wizard-back" @click="wizardStep--">← Back</button>
         <button v-if="wizardStep < 4" type="button" class="new-hand-btn" :disabled="!canAdvanceWizard" @click="advanceWizard">Continue</button>
         <button v-else type="button" class="new-hand-btn" :disabled="!handReady" @click="scrollToResult">View score</button>
       </div>
@@ -339,7 +360,11 @@
               <strong>{{ formatPoints(result.points.tsumo.nonDealerPays) }}</strong>
             </div>
           </div>
-          <p v-if="result.points.responsiblePays" class="honba-note">Responsible player pays {{ formatPoints(result.points.responsiblePays) }} (pao)</p>
+          <p v-if="result.points.responsiblePays && !result.points.discarderPays" class="honba-note">Responsible player pays {{ formatPoints(result.points.responsiblePays) }} (pao)</p>
+          <p v-else-if="result.points.responsiblePays && result.points.discarderPays" class="honba-note">
+            Pao split — responsible ({{ windLabel(paoResponsibleSeat ?? seatWind) }}) pays {{ formatPoints(result.points.responsiblePays) }},
+            discarder ({{ windLabel(ronDiscarderSeat ?? seatWind) }}) pays {{ formatPoints(result.points.discarderPays) }}
+          </p>
         </div>
 
         <div class="result-columns">
@@ -408,7 +433,7 @@
       <ul class="rules-list">
         <li>Open tanyao and atozuke are allowed.</li>
         <li>Three red fives on a four-player table, two on a three-player table.</li>
-        <li>Three-player tables use 1s/9s man only — 2–8 man are out of play, and up to four declared North tiles count as nuki dora.</li>
+        <li>Three-player tables use 1m and 9m only in the manzu suit — 2–8 man are out of play, and up to four declared North tiles count as nuki dora.</li>
         <li>Kiriage mangan is off — mangan requires 5 han (or 4 han 40+ fu, 3 han 70+ fu).</li>
         <li>13+ han from ordinary yaku counts as a counted yakuman.</li>
         <li>Honba pay 300 all around on ron, 100 per paying player on tsumo.</li>
@@ -431,6 +456,7 @@ import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import type { Hand, Meld, Tile, WindValue } from '~/utils/scoring/types'
 import { score } from '~/utils/scoring'
 import { sortTiles } from '~/utils/scoring/tiles'
+import { validateTileSet } from '~/utils/scoring/tile-set'
 import { tileSrc } from '~/utils/tile-image'
 
 type FlagKey = 'riichi' | 'doubleRiichi' | 'ippatsu' | 'haitei' | 'houtei' | 'rinshan' | 'chankan'
@@ -508,6 +534,10 @@ const honba = ref(0)
 const threePlayer = ref(false)
 const nukiDoraCount = ref(0)
 const paoResponsible = ref(false)
+// Pao liability needs the actual seats so a pao ron can be split between the
+// responsible player and the discarder when they differ.
+const paoResponsibleSeat = ref<WindValue | null>(null)
+const ronDiscarderSeat = ref<WindValue | null>(null)
 const flags = reactive<Record<FlagKey, boolean>>({
   riichi: false,
   doubleRiichi: false,
@@ -567,6 +597,8 @@ interface StoredSheet {
   threePlayer: boolean
   nukiDoraCount?: number
   paoResponsible?: boolean
+  paoResponsibleSeat?: WindValue | null
+  ronDiscarderSeat?: WindValue | null
   flags: Record<FlagKey, boolean>
 }
 
@@ -585,6 +617,8 @@ function saveSheet() {
     threePlayer: threePlayer.value,
     nukiDoraCount: nukiDoraCount.value,
     paoResponsible: paoResponsible.value,
+    paoResponsibleSeat: paoResponsibleSeat.value,
+    ronDiscarderSeat: ronDiscarderSeat.value,
     flags: { ...flags },
   }
   try {
@@ -629,6 +663,8 @@ function restoreSheet() {
     threePlayer.value = !!sheet.threePlayer
     nukiDoraCount.value = clampNukiDora(sheet.nukiDoraCount)
     paoResponsible.value = !!sheet.paoResponsible
+    paoResponsibleSeat.value = sheet.paoResponsibleSeat ?? null
+    ronDiscarderSeat.value = sheet.ronDiscarderSeat ?? null
     if (sheet.flags) {
       for (const key of Object.keys(flags) as FlagKey[]) flags[key] = !!sheet.flags[key]
       if (flags.doubleRiichi) flags.riichi = false
@@ -834,13 +870,13 @@ function setWinningTile(index: number | null) {
 }
 
 function updateMeldHandTiles(tiles: Tile[]) {
+  // Capture the winning-tile object before re-sorting — the old index points
+  // at a different tile after the sort. (If the winner itself moved into the
+  // meld, the mark is cleared.)
+  const winner = winningTileIndex.value !== null ? handTiles.value[winningTileIndex.value] ?? null : null
   handTiles.value = sortTiles(tiles)
-  // Re-point the winning mark at the same tile instance after re-sorting.
-  if (winningTileIndex.value !== null) {
-    const winner = handTiles.value[winningTileIndex.value]
-    const newIndex = winner ? handTiles.value.indexOf(winner) : -1
-    winningTileIndex.value = newIndex >= 0 ? newIndex : null
-  }
+  const newIndex = winner ? handTiles.value.indexOf(winner) : -1
+  winningTileIndex.value = newIndex >= 0 ? newIndex : null
 }
 
 function updateMelds(nextMelds: Meld[]) {
@@ -922,6 +958,8 @@ function clearHand() {
   honba.value = 0
   nukiDoraCount.value = 0
   paoResponsible.value = false
+  paoResponsibleSeat.value = null
+  ronDiscarderSeat.value = null
   for (const key of Object.keys(flags) as FlagKey[]) flags[key] = false
   detectError.value = null
   scanFeedback.value = null
@@ -934,6 +972,11 @@ function clearHand() {
 
 // A hand is "open" if any called meld other than a closed kan is present.
 const isOpenHand = computed(() => parsedMelds.value.some((m) => m.type !== 'kan-closed'))
+
+// Rinshan kaihou needs an actual declared kan (any kan representation).
+function hasDeclaredKanMeld(melds: Meld[]): boolean {
+  return melds.some((m) => m.type === 'kan-open' || m.type === 'kan-closed' || m.type === 'kan-added')
+}
 
 const flagDisabledReasons = computed<Record<FlagKey, string | undefined>>(() => {
   const reasons: Record<FlagKey, string | undefined> = {}
@@ -948,6 +991,9 @@ const flagDisabledReasons = computed<Record<FlagKey, string | undefined>>(() => 
   if (winType.value !== 'tsumo') {
     reasons.haitei = 'Haitei is a win on the last drawn tile (tsumo only)'
     reasons.rinshan = 'Rinshan is a win on a replacement draw (tsumo only)'
+  }
+  if (!hasDeclaredKanMeld(parsedMelds.value)) {
+    reasons.rinshan = 'Rinshan needs a declared kan'
   }
   if (winType.value !== 'ron') {
     reasons.houtei = 'Houtei is a win on the last discard (ron only)'
@@ -1029,7 +1075,7 @@ onMounted(() => {
 // the sources directly (reactive objects are watched deeply by default) fires
 // on exactly the same changes the previous deep array-spread watcher did.
 watch(
-  [handTiles, winningTileIndex, doraTiles, uraDoraTiles, melds, winType, seatWind, roundWind, honba, threePlayer, nukiDoraCount, paoResponsible, flags],
+  [handTiles, winningTileIndex, doraTiles, uraDoraTiles, melds, winType, seatWind, roundWind, honba, threePlayer, nukiDoraCount, paoResponsible, paoResponsibleSeat, ronDiscarderSeat, flags],
   () => {
     if (restored.value) saveSheet()
   },
@@ -1262,34 +1308,13 @@ interface ScoreState {
 }
 
 // Physical-set validation the scoring engine can't know about: tile copy
-// limits and the sanma tile-set restrictions from the league rules.
-function validateTileSet(allTiles: Tile[], nukiCount = 0): string | null {
-  const counts = new Map<string, number>()
-  const akaPerSuit = new Map<string, number>()
-  let akaTotal = 0
-  for (const tile of allTiles) {
-    const key = `${tile.suit}:${tile.value}`
-    counts.set(key, (counts.get(key) ?? 0) + 1)
-    if (tile.isAka) {
-      akaTotal++
-      akaPerSuit.set(tile.suit, (akaPerSuit.get(tile.suit) ?? 0) + 1)
-    }
-    if (threePlayer.value && tile.suit === 'man' && typeof tile.value === 'number' && tile.value >= 2 && tile.value <= 8) {
-      return `${tileToText(tile)} isn't in play on a three-player table (2–8 man removed).`
-    }
-  }
-  for (const count of counts.values()) {
-    if (count > 4) return 'A tile appears more than 4 times — check the hand.'
-  }
-  if (threePlayer.value && (counts.get('honor:north') ?? 0) + nukiCount > 4) {
-    return 'Nuki dora and North tiles in the hand or indicators cannot exceed the four North tiles in the set.'
-  }
-  const akaMax = threePlayer.value ? 2 : 3
-  if (akaTotal > akaMax) return `Only ${akaMax} red fives exist on this table.`
-  for (const count of akaPerSuit.values()) {
-    if (count > 1) return 'Only one red five per suit exists.'
-  }
-  return null
+// limits and the sanma tile-set restrictions from the league rules. The pure
+// validator lives in utils/scoring/tile-set.ts so it can be regression-tested.
+function validateTileSetLocal(allTiles: Tile[], nukiCount = 0): string | null {
+  return validateTileSet(allTiles, {
+    playerCount: threePlayer.value ? 3 : 4,
+    nukiDoraCount: nukiCount,
+  })
 }
 
 const scoreState = computed<ScoreState>(() => {
@@ -1329,7 +1354,7 @@ const scoreState = computed<ScoreState>(() => {
     ...doraTiles.value,
     ...uraDoraTiles.value,
   ]
-  const setProblem = validateTileSet(allTiles, nukiDoraCount.value)
+  const setProblem = validateTileSetLocal(allTiles, nukiDoraCount.value)
   if (setProblem) return { result: null, error: setProblem, notice: null }
 
   const hand: Hand = {
@@ -1350,7 +1375,11 @@ const scoreState = computed<ScoreState>(() => {
     chankan: flags.chankan,
     honba: honba.value,
     nukiDoraCount: threePlayer.value ? nukiDoraCount.value : 0,
-    pao: paoResponsible.value,
+    paoResponsibleSeat: paoResponsible.value ? (paoResponsibleSeat.value ?? undefined) : undefined,
+    // A pao ron needs a discarder; default to the responsible player (the common case) if unset.
+    ronDiscarderSeat: winType.value === 'ron' && paoResponsible.value
+      ? (ronDiscarderSeat.value ?? paoResponsibleSeat.value ?? undefined)
+      : undefined,
   }
 
   const result = score(hand, {
@@ -1371,8 +1400,56 @@ const notice = computed(() => scoreState.value.notice)
 const paoEligible = computed(() => !!result.value?.yaku.some((yaku) =>
   yaku.name === 'daisangen' || yaku.name === 'daisuushi'))
 
+// Seats that can be pao-responsible or the ron discarder: anyone at the table
+// except the winner (sanma tables have no North seat).
+function tableSeats(): WindValue[] {
+  const seats: WindValue[] = threePlayer.value ? ['east', 'south', 'west'] : ['east', 'south', 'west', 'north']
+  return seats.filter((seat) => seat !== seatWind.value)
+}
+
+const paoSeatOptions = computed<WindValue[]>(() => tableSeats())
+const discarderSeatOptions = computed<WindValue[]>(() =>
+  winType.value === 'ron' ? tableSeats() : [])
+
+function firstSeat(seats: WindValue[]): WindValue | null {
+  return seats[0] ?? null
+}
+
+function resetPaoSeats() {
+  paoResponsibleSeat.value = null
+  ronDiscarderSeat.value = null
+}
+
 watch(paoEligible, (eligible) => {
-  if (!eligible) paoResponsible.value = false
+  if (!eligible) {
+    paoResponsible.value = false
+    resetPaoSeats()
+  }
+})
+
+// Ticking pao pre-fills the responsible player (and the discarder for ron)
+// with the first valid seat — usually the same player, the common pao case.
+watch(paoResponsible, (on) => {
+  if (!on) {
+    resetPaoSeats()
+    return
+  }
+  paoResponsibleSeat.value = paoResponsibleSeat.value ?? firstSeat(paoSeatOptions.value)
+  if (winType.value === 'ron') {
+    ronDiscarderSeat.value = ronDiscarderSeat.value ?? paoResponsibleSeat.value
+  }
+})
+
+// A seat choice can become impossible (winner seat changed, table switched to
+// sanma); fall back to a valid seat when that happens.
+watch([paoSeatOptions, discarderSeatOptions], () => {
+  if (!paoResponsible.value) return
+  if (paoResponsibleSeat.value && !paoSeatOptions.value.includes(paoResponsibleSeat.value)) {
+    paoResponsibleSeat.value = firstSeat(paoSeatOptions.value)
+  }
+  if (winType.value === 'ron' && ronDiscarderSeat.value && !discarderSeatOptions.value.includes(ronDiscarderSeat.value)) {
+    ronDiscarderSeat.value = firstSeat(discarderSeatOptions.value)
+  }
 })
 
 const resultHeading = computed(() => {
@@ -1387,7 +1464,11 @@ const scoreDisplay = computed(() => {
   const r = result.value
   if (!r) return ''
   const pts = r.points
-  if (pts.responsiblePays) return `${formatPoints(pts.responsiblePays)} points · pao`
+  if (pts.responsiblePays) {
+    return pts.discarderPays
+      ? `${formatPoints(pts.responsiblePays + pts.discarderPays)} points · pao split`
+      : `${formatPoints(pts.responsiblePays)} points · pao`
+  }
   if (winType.value === 'tsumo' && pts.tsumo) {
     if (seatWind.value === 'east') {
       return `${formatPoints(pts.tsumo.dealerPays)} from each`
@@ -1477,6 +1558,31 @@ function yakuRomaji(name: string): string {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+  margin: 18px 0;
+}
+
+.wizard-back {
+  padding: 10px 14px;
+  color: var(--clay-text);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid rgba(101, 119, 99, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 253, 249, 0.7);
+  cursor: pointer;
+}
+
+.wizard-back:hover {
+  color: var(--matcha-leaf);
+  border-color: var(--matcha-leaf);
+}
+
+.table-format-picker {
+  display: grid;
+  gap: 12px;
   margin: 18px 0;
 }
 

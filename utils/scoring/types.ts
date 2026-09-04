@@ -37,9 +37,12 @@ export type MeldType =
 export interface Meld {
   type: MeldType;
   tiles: [Tile, Tile, Tile] | [Tile, Tile, Tile, Tile];
-  calledFrom?: "left" | "opposite" | "right"; // required for chi/pon/kan-open/kan-added
-  /** Position of the discard within an open meld; absent for a concealed kan. */
+  /** Position of the discard within an open meld; absent for a concealed kan.
+   *  tiles[calledTileIndex] is the tile claimed from another player, the rest
+   *  were taken from the winner's hand (a concealed kan is all held tiles). */
   calledTileIndex?: number;
+  /** Direction the claim came from; display metadata only, never used by scoring. */
+  calledFrom?: "left" | "opposite" | "right";
 }
 
 // ─── Hand input ───────────────────────────────────────────────────────────────
@@ -58,8 +61,18 @@ export interface Hand {
   uraDoraIndicators?: Tile[]; // only revealed with riichi
   /** North tiles declared as nuki dora in sanma (0-4). Ignored in yonma. */
   nukiDoraCount?: number;
-  /** A player is responsible for Daisangen/Daisuushii (pao). */
-  pao?: boolean;
+  /**
+   * Seat of the player responsible for the winner's Daisangen/Daisuushii
+   * (pao). Present only when the winner claims pao; the engine still applies
+   * it only when one of those yakuman actually scores.
+   */
+  paoResponsibleSeat?: WindValue;
+  /**
+   * Seat of the player who discarded the winning tile (ron). Required for a
+   * pao ron so the payment can be split when the discarder is not the
+   * responsible player.
+   */
+  ronDiscarderSeat?: WindValue;
 
   // Situational flags
   riichi: boolean;
@@ -103,8 +116,14 @@ export interface PointsBreakdown {
   total: number;
   tsumo?: TsumoPayment; // present when winType === 'tsumo'
   ron?: number;         // present when winType === 'ron'
-  /** Present when a responsible player pays the full winning amount (pao). */
+  /**
+   * Amount the pao-responsible player pays. For a pao tsumo — or a pao ron
+   * where the responsible player is also the discarder — this is the full
+   * winning amount; for a split pao ron it is the responsible player's half.
+   */
   responsiblePays?: number;
+  /** Amount the discarder pays when a pao ron splits the payment between the responsible player and the discarder. */
+  discarderPays?: number;
 }
 
 // Named hand thresholds

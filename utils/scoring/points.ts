@@ -1,7 +1,7 @@
 import type { HandName, PointsBreakdown } from "./types";
 
 // Round up to nearest 100
-function roundUp100(n: number): number {
+export function roundUp100(n: number): number {
   return Math.ceil(n / 100) * 100;
 }
 
