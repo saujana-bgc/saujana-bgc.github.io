@@ -25,8 +25,10 @@ const NOMINAL_TILE_FRACTION = 0.12;
 // z-notation the parser already understands (1z=East … 5z=Haku, 6z=Hatsu,
 // 7z=Chun); red fives are reported as the suit five with aka=true.
 const CODE_GUIDE = `Suited tiles: suit letter m (man, characters), p (pin, circles/dots), s (sou, bamboo sticks), value 1-9 — e.g. "3m", "7p", "1s".
+Sou (bamboo) tiles differ by stick count — COUNT the sticks before assigning a number: 4s = four sticks in a 2x2 square; 5s = exactly FIVE sticks arranged like a flower/X around the center; 6s = SIX sticks in two columns of three; 7s = five sticks plus one stacked above the middle; 8s = EIGHT sticks in two columns of four. A five is never six sticks — 5s and 6s are the most confused pair, so verify the count.
+Pin (circles) tiles: count the circles the same way. 5p = one large circle at the center with two above and two below; 7p = four circles in a diagonal half-frame around one corner circle.
 Honors: "1z" East wind, "2z" South wind, "3z" West wind, "4z" North wind, "5z" White Dragon (haku — a blank white tile with a thin blue frame), "6z" Green Dragon (hatsu), "7z" Red Dragon (chun).
-Red fives (aka dora): a 5 whose center markings are red instead of blue/black — report it as the suit's five ("5m"/"5p"/"5s") with "aka": true. Ordinary fives have "aka": false.
+Red fives (aka dora): a 5 whose center markings are red instead of blue/black — the center stick of 5s turns red while the other four stay green, still exactly five sticks. Report it as the suit's five ("5m"/"5p"/"5s") with "aka": true. Ordinary fives have "aka": false.
 Careful with the White Dragon (5z): its face is nearly blank, but it is NOT a plain tile — check for the thin blue rectangular frame around the edge. Do not mistake it for a pin/sou tile with small markings, and do not mistake an East wind (1z, the boxed character 東) for it.`;
 
 const SYSTEM_PROMPT = `You are a meticulous Japanese riichi mahjong tile recognizer. You identify every physical mahjong tile face visible in a photo and report each one with a tile code and its approximate position.
@@ -37,6 +39,7 @@ ${CODE_GUIDE}
 Rules:
 - Report each PHYSICAL tile exactly once. Two identical faces side by side are two entries. Never invent tiles that are not visible, never list the same physical tile twice, and never guess tiles partially hidden behind others.
 - Double-check each entry against the image before including it: it must correspond to one clearly visible tile.
+- Before assigning a number to any suited tile, COUNT the markings (bamboo sticks / circles / characters) and match them to the guide — do not pattern-match "a cluster of sticks" as a number. For bamboo, count the sticks individually: 5s has exactly five, 6s has exactly six, and they are the pair most often confused.
 - Tiles may be rotated sideways or upside down; recognize the face regardless of orientation.
 - Recognize tiles from any angle: overhead shots, side shots, stacks, tilted tiles.
 - Ignore anything that is not a mahjong tile face: the table, tile backs, walls, score sticks, other players' out-of-focus tiles, boxes, shadows.
@@ -58,6 +61,7 @@ ${CODE_GUIDE}
 
 Rules:
 - Identify the tile face at the CENTER of the image. Anything partially visible at the very edge of the crop is a neighbor, not the answer — ignore it.
+- Before assigning a number to any suited tile, COUNT the markings (bamboo sticks / circles / characters) and match them to the guide. For bamboo, count the sticks individually: 5s has exactly five, 6s has exactly six.
 - Tiles may be rotated sideways or upside down; recognize the face regardless of orientation.
 - If no mahjong tile face is recognizable at the center, return an empty tiles array.
 
@@ -122,7 +126,7 @@ export async function detectTilesLlm(
   const resized = await sharp(Buffer.from(imageBase64, 'base64'))
     .rotate() // honor EXIF orientation before measuring
     .resize(MAX_IMAGE_EDGE, MAX_IMAGE_EDGE, { fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: 82 })
+    .jpeg({ quality: 90 })
     .toBuffer();
 
   const normalizedExpectedCount = typeof expectedCount === 'number' && Number.isInteger(expectedCount) && expectedCount > 0
@@ -261,7 +265,7 @@ export async function detectWinningTile(cropBase64: string): Promise<Tile | null
   const resized = await sharp(Buffer.from(cropBase64, 'base64'))
     .rotate()
     .resize(MAX_IMAGE_EDGE, MAX_IMAGE_EDGE, { fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: 82 })
+    .jpeg({ quality: 90 })
     .toBuffer();
 
   if (!isOllamaConfigured()) {
