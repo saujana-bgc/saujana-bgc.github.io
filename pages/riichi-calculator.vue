@@ -154,13 +154,13 @@
               :key="code"
               type="button"
               class="picker-tile"
-              :class="{ disabled: !canPickTile(code) }"
-              :disabled="!canPickTile(code)"
+              :class="{ disabled: !!blockedReasons[code] }"
+              :disabled="!!blockedReasons[code]"
               :title="pickerTileTitle(code)"
-              :aria-disabled="!canPickTile(code)"
+              :aria-disabled="!!blockedReasons[code]"
               @click="appendTile(code)"
             >
-              <img :src="tileSrcForCode(code)" :alt="code" draggable="false" />
+              <img :src="tileSrcByCode[code]" :alt="code" loading="lazy" decoding="async" draggable="false" />
             </button>
           </div>
         </div>
@@ -395,7 +395,7 @@ import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import type { Hand, Meld, Tile, WindValue } from '~/utils/scoring/types'
 import { score } from '~/utils/scoring'
 import { sortTiles } from '~/utils/scoring/tiles'
-import { tileFile, tileSrc } from '~/utils/tile-image'
+import { tileSrc } from '~/utils/tile-image'
 
 type FlagKey = 'riichi' | 'doubleRiichi' | 'ippatsu' | 'haitei' | 'houtei' | 'rinshan' | 'chankan'
 type GuidedSectionKey = 'hand' | 'winning' | 'dora'
@@ -633,10 +633,17 @@ const pickerRows = computed(() => {
   return rows
 })
 
-function tileSrcForCode(code: string): string {
-  const tile = parseTile(code)
-  return tile ? tileSrc(tile) : ''
-}
+// Resolved once per pickerRows change instead of per tile per render.
+const tileSrcByCode = computed<Record<string, string>>(() => {
+  const map: Record<string, string> = {}
+  for (const row of pickerRows.value) {
+    for (const code of row.codes) {
+      const tile = parseTile(code)
+      map[code] = tile ? tileSrc(tile) : ''
+    }
+  }
+  return map
+})
 
 function toggleWinningTile(index: number) {
   setWinningTile(winningTileIndex.value === index ? null : index)
@@ -714,15 +721,22 @@ function blockedReasonFor(code: string): string | null {
   return null
 }
 
-function canPickTile(code: string): boolean {
-  return blockedReasonFor(code) === null
-}
+/** Reason each picker code is currently unpickable, or null when allowed.
+ * Memoizes blockedReasonFor once per state change; the template used to call
+ * it four times per tile per render. */
+const blockedReasons = computed<Record<string, string | null>>(() => {
+  const map: Record<string, string | null> = {}
+  for (const row of pickerRows.value) {
+    for (const code of row.codes) map[code] = blockedReasonFor(code)
+  }
+  return map
+})
 
 const pickerBlockedNote = computed(() => {
   // Surface the first blocked reason so the disabled tiles explain themselves.
   for (const row of pickerRows.value) {
     for (const code of row.codes) {
-      const reason = blockedReasonFor(code)
+      const reason = blockedReasons.value[code]
       if (reason) return reason
     }
   }
@@ -730,7 +744,7 @@ const pickerBlockedNote = computed(() => {
 })
 
 function pickerTileTitle(code: string): string {
-  const reason = blockedReasonFor(code)
+  const reason = blockedReasons.value[code]
   return reason ? reason : `Add ${code} to the ${pickerMode.value === 'dora' ? 'dora indicators' : 'hand'}`
 }
 
@@ -935,24 +949,14 @@ onMounted(() => {
     .catch(() => { scanStatus.value = 'failed' })
 })
 
+// Every sheet edit replaces array refs or writes flag properties, so watching
+// the sources directly (reactive objects are watched deeply by default) fires
+// on exactly the same changes the previous deep array-spread watcher did.
 watch(
-  () => [
-    handTiles.value,
-    winningTileIndex.value,
-    doraTiles.value,
-    melds.value,
-    winType.value,
-    seatWind.value,
-    roundWind.value,
-    honba.value,
-    threePlayer.value,
-    nukiDoraCount.value,
-    { ...flags },
-  ],
+  [handTiles, winningTileIndex, doraTiles, melds, winType, seatWind, roundWind, honba, threePlayer, nukiDoraCount, flags],
   () => {
     if (restored.value) saveSheet()
   },
-  { deep: true },
 )
 
 function clampNukiDora(value: unknown): number {
@@ -1360,6 +1364,10 @@ function yakuName(name: string, detail?: string): string {
 
 .rules-card {
   grid-column: 1 / -1;
+  /* Skip layout/paint while scrolled out of view; auto remembers the real
+     height once rendered so the scrollbar doesn't jump. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
 }
 
 .mobile-score-bar {
