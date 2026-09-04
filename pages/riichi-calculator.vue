@@ -28,6 +28,7 @@
           <span>{{ step.number }}</span>{{ step.label }}
         </button>
       </nav>
+      <button type="button" class="new-hand-btn wizard-new-hand" @click="clearHand">＋ New hand</button>
       <div v-if="wizardStep === 1" class="table-format-picker">
         <p class="result-notice">Choose the table type, then continue to enter every physical tile — including tiles in called melds.</p>
         <div class="field">
@@ -39,7 +40,7 @@
         </div>
       </div>
 
-      <div v-show="wizardStep >= 2" class="capture-row">
+      <div v-show="wizardStep === 2" class="capture-row">
         <div class="capture-buttons">
           <TileCaptureMenu
             label="Scan tiles"
@@ -48,7 +49,6 @@
             @capture="scanHand"
             @guided="guidedOpen = true"
           />
-          <button type="button" class="new-hand-btn" @click="clearHand">＋ New hand</button>
         </div>
         <span v-if="warmupNote" class="warmup-note" :class="scanStatus">
           {{ warmupNote }}
@@ -70,13 +70,15 @@
               <button
                 type="button"
                 class="tile-btn"
-                :title="winningTileIndex === i ? 'Winning tile — tap to unmark' : 'Tap to mark as winning tile'"
+                :disabled="wizardStep !== 2"
+                :title="wizardStep === 2 ? (winningTileIndex === i ? 'Winning tile — tap to unmark' : 'Tap to mark as winning tile') : 'Edit the hand in Step 2'"
                 @click="toggleWinningTile(i)"
               >
                 <TileImage :tile="tile" />
               </button>
               <i v-if="winningTileIndex === i" class="win-mark" aria-hidden="true">勝</i>
               <button
+                v-if="wizardStep === 2"
                 type="button"
                 class="tile-remove"
                 :title="`Remove ${tileToText(tile)}`"
@@ -85,6 +87,7 @@
               >×</button>
             </span>
             <button
+              v-if="wizardStep === 2"
               type="button"
               class="row-add"
               title="Add hand tiles"
@@ -156,7 +159,7 @@
       <p v-if="inputNote" class="input-note" :class="{ problem: inputNoteProblem }">{{ inputNote }}</p>
 
       <button
-        v-if="(wizardStep === 2 || wizardStep === 4) && !pickerExpanded && handTiles.length >= handTarget"
+        v-if="wizardStep === 2 && !pickerExpanded && handTiles.length >= handTarget"
         id="tile-picker-summary"
         type="button"
         class="picker-collapsed"
@@ -166,11 +169,11 @@
         <strong>Edit tiles</strong>
       </button>
 
-      <div v-show="wizardStep === 2 || wizardStep === 4" v-if="!(!pickerExpanded && handTiles.length >= handTarget)" id="tile-picker" class="tile-picker" aria-label="Tile picker">
+      <div v-show="wizardStep === 2 || wizardStep === 4" v-if="wizardStep !== 2 || !(!pickerExpanded && handTiles.length >= handTarget)" id="tile-picker" class="tile-picker" aria-label="Tile picker">
         <p class="picker-mode-label">
           Adding to
-          <button type="button" class="picker-mode-switch" @click="aimPicker('hand')" :aria-pressed="pickerMode === 'hand'">Hand</button>
-          <span aria-hidden="true">/</span>
+          <button v-if="wizardStep === 2" type="button" class="picker-mode-switch" @click="aimPicker('hand')" :aria-pressed="pickerMode === 'hand'">Hand</button>
+          <span v-if="wizardStep === 2" aria-hidden="true">/</span>
           <button type="button" class="picker-mode-switch" @click="aimPicker('dora')" :aria-pressed="pickerMode === 'dora'">Dora</button>
           <template v-if="hasRiichi"><span aria-hidden="true">/</span><button type="button" class="picker-mode-switch" @click="aimPicker('ura')" :aria-pressed="pickerMode === 'ura'">Ura</button></template>
           <button v-if="handTiles.length >= handTarget" type="button" class="picker-done" @click="pickerExpanded = false">Done</button>
@@ -188,7 +191,7 @@
               :disabled="!!blockedReasons[code]"
               :title="pickerTileTitle(code)"
               :aria-disabled="!!blockedReasons[code]"
-              @click="appendTile(code)"
+                @click="appendTile(code)"
             >
               <img :src="tileSrcByCode[code]" :alt="code" loading="lazy" decoding="async" draggable="false" />
             </button>
@@ -373,7 +376,7 @@
             <ul class="yaku-list">
               <li v-for="(yaku, index) in result.yaku" :key="`${yaku.name}-${yaku.detail ?? index}`">
                 <span class="yaku-ja">{{ yakuRomaji(yaku.name) }}</span>
-                <span class="yaku-en">{{ yakuName(yaku.name, yaku.detail) }}</span>
+                <span class="yaku-en">{{ yaku.name === 'yakuhai' ? yaku.detail : yakuName(yaku.name, yaku.detail) }}</span>
                 <strong>{{ yaku.isYakuman ? 'yakuman' : `${yaku.han} han` }}</strong>
               </li>
               <li v-if="result.doraCount > 0">
@@ -837,6 +840,7 @@ function pickerTileTitle(code: string): string {
 }
 
 function appendTile(code: string) {
+  if (pickerMode.value === 'hand' && wizardStep.value !== 2) return
   const reason = blockedReasonFor(code)
   if (reason) return
   const tile = parseTile(code)
@@ -914,7 +918,7 @@ const canAdvanceWizard = computed(() =>
 function advanceWizard() {
   if (!canAdvanceWizard.value || wizardStep.value >= 4) return
   wizardStep.value++
-  if (wizardStep.value === 4) pickerMode.value = 'hand'
+  if (wizardStep.value === 4) pickerMode.value = 'dora'
 }
 
 function goToWizardStep(step: number) {
@@ -1563,6 +1567,10 @@ function yakuRomaji(name: string): string {
   gap: 8px;
   align-items: center;
   margin: 18px 0;
+}
+
+.wizard-new-hand {
+  margin: -8px 0 10px auto;
 }
 
 .wizard-back {
