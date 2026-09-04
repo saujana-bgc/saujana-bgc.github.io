@@ -124,7 +124,13 @@ test('sanma pao tsumo: the responsible player pays the full two-payer amount', (
   const withPao = score(daisangenHand({ paoResponsibleSeat: 'west' }), rules)
 
   assert.equal(withoutPao.valid, true)
-  assert.equal(withoutPao.points.tsumo?.nonDealerPays, withoutPao.points.total, 'sanma tsumo: two payers only')
+  // Sanma tsumo: two payers, each making their normal four-player payment
+  // (dealer 2× basic, the other non-dealer 1×) with no absent-fourth compensation.
+  assert.equal(
+    withoutPao.points.total,
+    (withoutPao.points.tsumo?.dealerPays ?? 0) + (withoutPao.points.tsumo?.nonDealerPays ?? 0),
+    'sanma tsumo: exactly two payers',
+  )
   assert.equal(withPao.points.responsiblePays, withPao.points.total)
   assert.equal(withPao.points.total, withoutPao.points.total)
 })

@@ -455,7 +455,7 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import type { Hand, Meld, Tile, WindValue } from '~/utils/scoring/types'
 import { score } from '~/utils/scoring'
-import { sortTiles } from '~/utils/scoring/tiles'
+import { sortTiles, isAkaDora } from '~/utils/scoring/tiles'
 import { validateTileSet } from '~/utils/scoring/tile-set'
 import { tileSrc } from '~/utils/tile-image'
 
@@ -650,7 +650,7 @@ function restoreSheet() {
       ? sheet.hand[sheet.winIndex] ?? null
       : null
     winningTileIndex.value = restoredWinner
-      ? handTiles.value.findIndex((t) => tilesEqualValue(t, restoredWinner) && t.isAka === restoredWinner.isAka)
+      ? handTiles.value.findIndex((t) => tilesEqualValue(t, restoredWinner) && isAkaDora(t) === isAkaDora(restoredWinner))
       : null
     if (winningTileIndex.value === -1) winningTileIndex.value = null
     doraTiles.value = Array.isArray(sheet.dora) ? sheet.dora.slice(0, MAX_DORA_INDICATORS) : []
@@ -683,12 +683,16 @@ const HONOR_VALUES = ['east', 'south', 'west', 'north', 'haku', 'hatsu', 'chun']
 function parseTile(token: string): Tile | null {
   const match = token.trim().toLowerCase().match(/^([0-9])([mpsz])$/)
   if (!match) return null
-  const num = Number(match[1])
-  const suit = SUIT_MAP[match[2]]
+  const numText = match[1]
+  const suitChar = match[2]
+  if (numText === undefined || suitChar === undefined) return null
+  const num = Number(numText)
+  const suit = SUIT_MAP[suitChar]
   if (suit === 'honor') {
-    if (num === 0) return null
-    return { suit, value: HONOR_VALUES[num - 1] }
+    const honorValue = num >= 1 && num <= HONOR_VALUES.length ? HONOR_VALUES[num - 1] : undefined
+    return honorValue ? { suit, value: honorValue } : null
   }
+  if (!suit) return null
   return num === 0 ? { suit, value: 5, isAka: true } : { suit, value: num as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 }
 }
 
@@ -978,8 +982,8 @@ function hasDeclaredKanMeld(melds: Meld[]): boolean {
   return melds.some((m) => m.type === 'kan-open' || m.type === 'kan-closed' || m.type === 'kan-added')
 }
 
-const flagDisabledReasons = computed<Record<FlagKey, string | undefined>>(() => {
-  const reasons: Record<FlagKey, string | undefined> = {}
+const flagDisabledReasons = computed<Partial<Record<FlagKey, string>>>(() => {
+  const reasons: Partial<Record<FlagKey, string>> = {}
   if (isOpenHand.value) {
     reasons.riichi = 'Riichi needs a fully closed hand'
     reasons.doubleRiichi = 'Double riichi needs a fully closed hand'
@@ -1154,10 +1158,10 @@ async function scanHand(base64: string) {
     // A gallery photo is assumed to be a complete hand shot. Keep every tile
     // the scanner actually found and surface any shortfall for manual review;
     // never invent placeholder tiles for a missed detection.
-    const winningTileScanned = tiles[tiles.length - 1]
+    const winningTileScanned = tiles.at(-1) ?? null
     const target = handTarget.value
     handTiles.value = sortTiles(tiles)
-    winningTileIndex.value = handTiles.value.indexOf(winningTileScanned)
+    winningTileIndex.value = winningTileScanned ? handTiles.value.indexOf(winningTileScanned) : null
     scanFeedback.value = detectedHandMessage(tiles.length, target)
     scanStatus.value = 'ready'
   } catch (err) {

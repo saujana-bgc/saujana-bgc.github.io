@@ -7,6 +7,7 @@
 // are deliberately not a concern here — the scorer reports those.
 
 import type { Tile } from "./types";
+import { isAkaDora } from "./tiles";
 
 export interface TileSetRules {
   /** 3-player sets have no 2m–8m, no red 5m, and only two red fives (5p/5s). */
@@ -27,7 +28,7 @@ export function validateTileSet(allTiles: Tile[], rules: TileSetRules): string |
   for (const tile of allTiles) {
     const key = `${tile.suit}:${tile.value}`;
     counts.set(key, (counts.get(key) ?? 0) + 1);
-    if (tile.isAka) {
+    if (isAkaDora(tile)) {
       akaTotal++;
       akaPerSuit.set(tile.suit, (akaPerSuit.get(tile.suit) ?? 0) + 1);
     }

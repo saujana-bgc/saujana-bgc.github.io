@@ -50,11 +50,11 @@ function specialWinProblem(hand: Hand): string | null {
   if (hand.rinshan && hand.winType !== "tsumo") return "Rinshan requires tsumo";
   if (hand.houtei && hand.winType !== "ron") return "Houtei requires ron";
   if (hand.chankan && hand.winType !== "ron") return "Chankan requires ron";
+  if (hand.haitei && hand.rinshan) return "Haitei and Rinshan cannot apply together";
+  if (hand.houtei && hand.chankan) return "Houtei and Chankan cannot apply together";
   // Rinshan kaihou is a win on the kan replacement draw, so a declared kan
   // must exist even when the caller bypasses the UI.
   if (hand.rinshan && !hasDeclaredKan(hand.melds)) return "Rinshan requires a declared kan";
-  if (hand.haitei && hand.rinshan) return "Haitei and Rinshan cannot apply together";
-  if (hand.houtei && hand.chankan) return "Houtei and Chankan cannot apply together";
   return null;
 }
 
@@ -137,7 +137,7 @@ function scoreStandardInterpretations(
 
   const totalHan = structuralHan + doraCount + akaDoraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
-  const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
+  const name = handName(totalHan, fu.total, units, rules.kiriagemangan);
   const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));
 
   return {
@@ -246,7 +246,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
 
     const fuBreakdown = chiitoitsiFuBreakdown();
     const units = yakumanUnits(allYaku);
-    const name = handName(totalHan, 25, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
+    const name = handName(totalHan, 25, units, rules.kiriagemangan);
     const points = calculatePoints(totalHan, 25, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
 
     const chiitoitsuResult: ScoreResult = {
@@ -316,7 +316,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
 
   const totalHan = structuralHan + doraCount + akaDoraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
-  const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
+  const name = handName(totalHan, fu.total, units, rules.kiriagemangan);
   const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));
 
   return {

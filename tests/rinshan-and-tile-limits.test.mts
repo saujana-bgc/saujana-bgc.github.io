@@ -160,15 +160,15 @@ test('meld creation cannot bypass the copy limit', () => {
 })
 
 test('sanma rejects the red five-man and the middle manzu tiles', () => {
-  assert.match(validateTileSet([aka('man')], { playerCount: 3 }), /no red five-man/)
-  assert.match(validateTileSet([suited('man', 5)], { playerCount: 3 }), /2–8 man removed/)
-  assert.match(validateTileSet([suited('man', 2)], { playerCount: 3 }), /2–8 man removed/)
+  assert.match(validateTileSet([aka('man')], { playerCount: 3 }) ?? '', /no red five-man/)
+  assert.match(validateTileSet([suited('man', 5)], { playerCount: 3 }) ?? '', /2–8 man removed/)
+  assert.match(validateTileSet([suited('man', 2)], { playerCount: 3 }) ?? '', /2–8 man removed/)
   assert.equal(validateTileSet([aka('pin'), aka('sou')], { playerCount: 3 }), null, 'the two sanma red fives are legal')
 })
 
 test('sanma nuki dora plus North tiles cannot exceed four copies', () => {
   assert.match(
-    validateTileSet([honor('north'), honor('north'), honor('north')], { playerCount: 3, nukiDoraCount: 2 }),
+    validateTileSet([honor('north'), honor('north'), honor('north')], { playerCount: 3, nukiDoraCount: 2 }) ?? '',
     /four North tiles/,
   )
   assert.equal(validateTileSet([honor('north')], { playerCount: 3, nukiDoraCount: 3 }), null)
@@ -176,6 +176,7 @@ test('sanma nuki dora plus North tiles cannot exceed four copies', () => {
 
 test('yonma allows three red fives but not a repeated suit', () => {
   assert.equal(validateTileSet([aka('man'), aka('pin'), aka('sou')], { playerCount: 4 }), null)
-  assert.match(validateTileSet([aka('pin'), aka('pin')], { playerCount: 4 }), /one red five per suit/)
-  assert.match(validateTileSet([aka('man'), aka('pin'), aka('sou'), aka('man')], { playerCount: 4 }), /Only 3 red fives/)
+  assert.match(validateTileSet([aka('pin'), aka('pin')], { playerCount: 4 }) ?? '', /one red five per suit/)
+  // Two red copies of the same suit trip the per-suit limit before the table total.
+  assert.match(validateTileSet([aka('man'), aka('pin'), aka('sou'), aka('man')], { playerCount: 4 }) ?? '', /red five/)
 })

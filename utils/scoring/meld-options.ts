@@ -85,7 +85,8 @@ function identicalIndices(handTiles: Tile[], selectedIdx: number, count: number)
   if (!selected) return [];
   const matches = [selectedIdx];
   for (let index = 0; index < handTiles.length && matches.length < count; index++) {
-    if (index !== selectedIdx && tilesEqual(handTiles[index], selected)) matches.push(index);
+    const candidate = handTiles[index];
+    if (candidate && index !== selectedIdx && tilesEqual(candidate, selected)) matches.push(index);
   }
   return matches.length === count ? matches : [];
 }

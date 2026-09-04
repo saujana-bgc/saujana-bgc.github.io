@@ -71,8 +71,13 @@ export function countDora(tiles: Tile[], indicators: Tile[], playerCount: 3 | 4 
   return count;
 }
 
+/** True only for suited red fives — honor tiles never carry aka identity. */
+export function isAkaDora(t: Tile): boolean {
+  return isSuited(t) && t.isAka === true;
+}
+
 export function countAkaDora(tiles: Tile[]): number {
-  return tiles.filter((t) => isSuited(t) && (t as SuitedTile).isAka === true).length;
+  return tiles.filter(isAkaDora).length;
 }
 
 /** Sort tiles for grouping: suited by suit+value, honors by value string */

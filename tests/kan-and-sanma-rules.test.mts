@@ -2,11 +2,16 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { score } from '../utils/scoring/index.ts'
 import { countDora, doraFromIndicator } from '../utils/scoring/tiles.ts'
-import type { Hand, Suit, Tile } from '../utils/scoring/types.ts'
+import type { Hand, HonorValue, Meld, Suit, Tile } from '../utils/scoring/types.ts'
 
 const suited = (suit: Suit, value: number): Tile => ({
   suit,
   value: value as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+})
+
+const honorPon = (value: HonorValue): Meld => ({
+  type: 'pon',
+  tiles: [{ suit: 'honor', value }, { suit: 'honor', value }, { suit: 'honor', value }],
 })
 
 test('a completed hand with one kan has eleven concealed tiles', () => {
@@ -58,14 +63,10 @@ test('sanma manzu dora indicators cycle directly between one and nine', () => {
 })
 
 test('pao assigns a daisangen payment to the responsible player', () => {
-  const dragonPon = (value: 'haku' | 'hatsu' | 'chun') => ({
-    type: 'pon' as const,
-    tiles: [{ suit: 'honor' as const, value }, { suit: 'honor' as const, value }, { suit: 'honor' as const, value }],
-  })
   const hand: Hand = {
     closedTiles: [suited('man', 1), suited('man', 2), suited('man', 3), suited('pin', 2)],
     winningTile: suited('pin', 2),
-    melds: [dragonPon('haku'), dragonPon('hatsu'), dragonPon('chun')],
+    melds: [honorPon('haku'), honorPon('hatsu'), honorPon('chun')],
     winType: 'tsumo', seatWind: 'south', roundWind: 'east', doraIndicators: [],
     riichi: false, doubleRiichi: false, ippatsu: false, haitei: false, houtei: false, rinshan: false, chankan: false,
   }
@@ -78,13 +79,9 @@ test('pao assigns a daisangen payment to the responsible player', () => {
 })
 
 test('pao applies to daisuushii but not unrelated yakuman', () => {
-  const windPon = (value: 'east' | 'south' | 'west' | 'north') => ({
-    type: 'pon' as const,
-    tiles: [{ suit: 'honor' as const, value }, { suit: 'honor' as const, value }, { suit: 'honor' as const, value }],
-  })
   const daisuushii: Hand = {
     closedTiles: [suited('pin', 2)], winningTile: suited('pin', 2),
-    melds: [windPon('east'), windPon('south'), windPon('west'), windPon('north')],
+    melds: [honorPon('east'), honorPon('south'), honorPon('west'), honorPon('north')],
     winType: 'tsumo', seatWind: 'south', roundWind: 'east', doraIndicators: [], paoResponsibleSeat: 'west',
     riichi: false, doubleRiichi: false, ippatsu: false, haitei: false, houtei: false, rinshan: false, chankan: false,
   }
