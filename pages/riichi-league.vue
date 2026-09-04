@@ -1,7 +1,6 @@
 <template>
   <main class="league-page">
     <header class="league-hero fade-up">
-      <p class="league-kicker">Saujana Board Game Community</p>
       <h1 class="hero-title">Riichi League</h1>
       <p class="league-intro">Season standings, weekly results, and every score on the road to the final table.</p>
 

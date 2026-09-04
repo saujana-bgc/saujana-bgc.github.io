@@ -1,7 +1,6 @@
 <template>
   <main class="calc-page" :class="{ 'has-mobile-score': !!result }">
     <header class="calc-hero fade-up">
-      <p class="calc-kicker">Saujana Board Game Community</p>
       <h1 class="hero-title">Riichi Calculator</h1>
       <p class="calc-intro">
         Scan a photo or tap the tiles below to build your complete hand, then tap the tile you
@@ -19,11 +18,11 @@
         </div>
       </div>
 
-      <button v-if="wizardStep > 1" type="button" class="new-hand-btn wizard-new-hand" @click="clearHand">＋ New hand</button>
+      <button type="button" class="new-hand-btn wizard-new-hand" @click="clearHand">＋ New hand</button>
       <nav class="wizard-progress" aria-label="Calculator steps">
-        <button v-for="step in wizardSteps" :key="step.number" type="button" :class="{ active: wizardStep === step.number, complete: wizardStep > step.number }" @click="goToWizardStep(step.number)">
+        <span v-for="step in wizardSteps" :key="step.number" class="wizard-step" :class="{ active: wizardStep === step.number, complete: wizardStep > step.number }">
           <span>{{ step.number }}</span>{{ step.label }}
-        </button>
+        </span>
       </nav>
       <div v-if="wizardStep === 1" class="table-format-picker">
         <p class="result-notice">Choose the table type, then continue to enter every physical tile — including tiles in called melds.</p>
@@ -321,7 +320,7 @@
       </div>
       <p v-if="wizardStep === 4 && activeFlagHint" class="flag-hint">{{ activeFlagHint }}</p>
       <div class="wizard-actions">
-        <button v-if="wizardStep > 1" type="button" class="wizard-back" @click="wizardStep--">← Back</button>
+        <button v-if="wizardStep > 1" type="button" class="wizard-back" @click="previousWizard">← Back</button>
         <button v-if="wizardStep < 4" type="button" class="new-hand-btn" :disabled="!canAdvanceWizard" @click="advanceWizard">Continue</button>
         <button v-else type="button" class="new-hand-btn" :disabled="!handReady" @click="scrollToResult">View score</button>
       </div>
@@ -890,8 +889,8 @@ function advanceWizard() {
   if (wizardStep.value === 4) pickerMode.value = 'dora'
 }
 
-function goToWizardStep(step: number) {
-  if (step <= wizardStep.value || step === 2 || (step === 3 && entryPhysicalReady.value) || (step === 4 && handReady.value)) wizardStep.value = step
+function previousWizard() {
+  if (wizardStep.value > 1) wizardStep.value--
 }
 
 watch(
@@ -1557,7 +1556,7 @@ function yakuRomaji(name: string): string {
   margin: 18px 0;
 }
 
-.wizard-progress button {
+.wizard-step {
   display: inline-flex;
   gap: 6px;
   align-items: center;
@@ -1569,11 +1568,10 @@ function yakuRomaji(name: string): string {
   border: 1px solid rgba(101, 119, 99, 0.2);
   border-radius: 999px;
   background: transparent;
-  cursor: pointer;
   opacity: 0.55;
 }
 
-.wizard-progress button span {
+.wizard-step > span {
   display: grid;
   width: 17px;
   height: 17px;
@@ -1584,15 +1582,15 @@ function yakuRomaji(name: string): string {
   background: var(--clay-text);
 }
 
-.wizard-progress button.active,
-.wizard-progress button.complete {
+.wizard-step.active,
+.wizard-step.complete {
   color: var(--matcha-leaf);
   border-color: var(--matcha-leaf);
   opacity: 1;
 }
 
-.wizard-progress button.active span,
-.wizard-progress button.complete span {
+.wizard-step.active > span,
+.wizard-step.complete > span {
   background: var(--matcha-leaf);
 }
 
