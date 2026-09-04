@@ -1,24 +1,12 @@
 <template>
   <div class="capture">
-    <button type="button" class="capture-btn" :disabled="busy || disabled" @click="menuOpen = !menuOpen">
+    <button type="button" class="capture-btn" :disabled="busy || disabled" @click="open(cameraInput)">
       <span v-if="busy" class="spinner" aria-hidden="true"></span>
-      {{ label }}
+      Scan with Camera
     </button>
 
-    <template v-if="menuOpen">
-      <div class="menu-backdrop" @click="menuOpen = false"></div>
-      <div class="menu" role="menu">
-        <button v-if="guided" type="button" role="menuitem" @click="startGuided">
-          <strong>Guided scan</strong>
-          <small>Hand · winning tile · dora in one shot</small>
-        </button>
-        <button type="button" role="menuitem" @click="open(libraryInput)">
-          <strong>Choose from gallery</strong>
-          <small>Upload a photo of your hand</small>
-        </button>
-      </div>
-    </template>
-
+    <button type="button" class="capture-btn gallery-btn" :disabled="busy || disabled" @click="open(libraryInput)">Choose from Gallery</button>
+    <input ref="cameraInput" type="file" accept="image/*" capture="environment" class="hidden-input" @change="onFile" />
     <input ref="libraryInput" type="file" accept="image/*" class="hidden-input" @change="onFile" />
   </div>
 </template>
@@ -26,29 +14,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const props = withDefaults(defineProps<{ label: string; busy?: boolean; disabled?: boolean; guided?: boolean }>(), {
+withDefaults(defineProps<{ busy?: boolean; disabled?: boolean }>(), {
   busy: false,
   disabled: false,
-  guided: false,
 })
-const emit = defineEmits<{
-  capture: [base64: string]
-  guided: []
-}>()
+const emit = defineEmits<{ capture: [base64: string] }>()
 
-const menuOpen = ref(false)
+const cameraInput = ref<HTMLInputElement | null>(null)
 const libraryInput = ref<HTMLInputElement | null>(null)
 
 const MAX_EDGE = 1600
 
 function open(input: HTMLInputElement | null) {
-  menuOpen.value = false
   setTimeout(() => input?.click(), 50)
-}
-
-function startGuided() {
-  menuOpen.value = false
-  emit('guided')
 }
 
 function onFile(e: Event) {
@@ -78,7 +56,9 @@ function processFile(file: File) {
 
 <style scoped>
 .capture {
-  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .capture-btn {
@@ -107,6 +87,12 @@ function processFile(file: File) {
   cursor: wait;
 }
 
+.gallery-btn {
+  color: var(--matcha-leaf);
+  border: 1px solid var(--matcha-leaf);
+  background: rgba(255, 253, 249, 0.85);
+}
+
 .spinner {
   width: 14px;
   height: 14px;
@@ -120,56 +106,6 @@ function processFile(file: File) {
   to {
     transform: rotate(360deg);
   }
-}
-
-.menu-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-}
-
-.menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 50;
-  min-width: 230px;
-  border: 1px solid rgba(185, 139, 104, 0.25);
-  border-radius: 14px;
-  background: rgba(255, 253, 249, 0.98);
-  box-shadow: 0 12px 40px rgba(74, 68, 61, 0.25);
-  overflow: hidden;
-}
-
-.menu button {
-  display: block;
-  width: 100%;
-  padding: 10px 16px;
-  text-align: left;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.menu button + button {
-  border-top: 1px solid rgba(101, 119, 99, 0.12);
-}
-
-.menu button:hover {
-  background: rgba(101, 119, 99, 0.08);
-}
-
-.menu strong {
-  display: block;
-  color: var(--clay-text);
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.menu small {
-  color: var(--clay-text);
-  font-size: 0.7rem;
-  opacity: 0.6;
 }
 
 .hidden-input {

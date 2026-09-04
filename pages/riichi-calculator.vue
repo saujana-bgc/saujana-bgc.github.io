@@ -17,13 +17,9 @@
           <h2 id="input-heading">The winning hand</h2>
           <p v-if="threePlayer" class="sanma-note">3-player table — 2–8 man out of play, two red fives, two payers on tsumo</p>
         </div>
-        <label v-if="wizardStep !== 1" class="sanma-toggle">
-          <input v-model="threePlayer" type="checkbox" />
-          Three-player table
-        </label>
       </div>
 
-      <button type="button" class="new-hand-btn wizard-new-hand" @click="clearHand">＋ New hand</button>
+      <button v-if="wizardStep > 1" type="button" class="new-hand-btn wizard-new-hand" @click="clearHand">＋ New hand</button>
       <nav class="wizard-progress" aria-label="Calculator steps">
         <button v-for="step in wizardSteps" :key="step.number" type="button" :class="{ active: wizardStep === step.number, complete: wizardStep > step.number }" @click="goToWizardStep(step.number)">
           <span>{{ step.number }}</span>{{ step.label }}
@@ -43,11 +39,8 @@
       <div v-show="wizardStep === 2" class="capture-row">
         <div class="capture-buttons">
           <TileCaptureMenu
-            label="Scan tiles"
             :busy="detectingHand || detectingDora"
-            guided
             @capture="scanHand"
-            @guided="guidedOpen = true"
           />
         </div>
         <span v-if="warmupNote" class="warmup-note" :class="scanStatus">
@@ -882,14 +875,14 @@ const handProgress = computed(() => {
   return winningTileIndex.value === null ? 'complete · tap winner' : 'ready'
 })
 
-const handNeedsWinner = computed(() => wizardStep.value === 4
+const handNeedsWinner = computed(() => wizardStep.value === 2
   && handTiles.value.length === handTarget.value && winningTileIndex.value === null)
 
 const handReady = computed(() => wizardStep.value === 4
   && handTiles.value.length === handTarget.value && winningTileIndex.value !== null)
 
 const canAdvanceWizard = computed(() =>
-  wizardStep.value !== 2 || entryPhysicalReady.value)
+  wizardStep.value !== 2 || (entryPhysicalReady.value && winningTile.value !== null))
 
 function advanceWizard() {
   if (!canAdvanceWizard.value || wizardStep.value >= 4) return
@@ -949,6 +942,7 @@ function clearHand() {
   pickerMode.value = 'hand'
   pickerExpanded.value = true
   specialOpen.value = false
+  wizardStep.value = 1
 }
 
 // ─── Smart flag validation ────────────────────────────────────────────────────
@@ -1534,7 +1528,8 @@ function yakuRomaji(name: string): string {
 }
 
 .wizard-new-hand {
-  margin: -8px 0 10px auto;
+  display: block;
+  margin: 18px 0 10px auto;
 }
 
 .wizard-back {
@@ -1657,23 +1652,6 @@ function yakuRomaji(name: string): string {
   border-radius: 999px;
   background: var(--gold-leaf);
   vertical-align: middle;
-}
-
-.sanma-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  color: var(--matcha-leaf);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  border: 1px solid rgba(101, 119, 99, 0.14);
-  border-radius: 999px;
-  background: rgba(255, 253, 249, 0.72);
-  cursor: pointer;
-  min-height: 44px;
 }
 
 .capture-row {
