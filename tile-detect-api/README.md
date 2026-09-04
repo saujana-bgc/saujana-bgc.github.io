@@ -2,8 +2,8 @@
 
 Server-side riichi tile detection for the Saujana BGC riichi calculator.
 The site on GitHub Pages is static, so scans are POSTed here; this project
-runs the same YOLO tile-detector model RiichiCam used, on a Node serverless
-function via `onnxruntime-node` + `sharp`.
+runs a compact MobileNetV3 classifier trained on the exact SVG tile artwork
+and calibrated with photographed crops, via `onnxruntime-node` + `sharp`.
 
 ## Endpoint
 
@@ -32,9 +32,8 @@ Guided scans send normalized viewfinder boxes with the captured dimensions:
 }
 ```
 
-When `expectedCount` is provided, it is included in the recognition prompt. If
-the model returns a different number of physical tiles, the API makes one
-corrective pass and returns whichever result is closest to the expected count.
+When `expectedCount` is provided, the detector locates the warm tile-plastic
+run, splits it into that many physical tiles, and classifies every crop locally.
 
 `GET /api/detect` loads the model and performs a throwaway inference. The
 calculator calls it on mount so the scanner is warm before the first capture.
@@ -45,21 +44,15 @@ restricted to the GitHub Pages origin and localhost dev ports.
 ## Layout
 
 - `api/detect.js` — serverless handler (CORS, validation, JSON shape)
-- `lib/detect.ts` — sharp letterbox → 640×640 CHW tensor → ONNX → YOLO decode
-- `lib/letterbox.ts`, `lib/nms.ts`, `lib/decode-yolo-output.ts`,
-  `lib/tile-classes.ts` — detection math, shared with the site's old
-  on-device code (from RiichiCam)
+- `lib/onnx-detect.ts` — tile-run segmentation, crop rotations, MobileNet ONNX inference
 - `lib/roboflow-parser.ts` — class label → tile mapping
-- `tile-detector.onnx` — the YOLO11m tile detector (also committed to the
-  site repo for reference; this is the copy the function loads)
+- `tile-model.onnx` — 37-class model, including all three aka-dora variants
 
 ## Local testing
 
 ```
 npm install
-npm run test:unit # deterministic duplicate-removal regressions
-npm test          # runs test-llm.mts (blank + synthetic strip sanity)
-npx tsx test-llm.mts <photo...> # inspect one or more real-photo results
+npm test
 ```
 
 `tsx` is a dev dependency so the TypeScript lib modules can run directly.
@@ -85,13 +78,12 @@ For a preview deployment or faster repeat runs:
 .\deploy.ps1 -SkipInstall -SkipTests -DryRun
 ```
 
-The function uses the Hobby plan's 2 GB memory ceiling (`vercel.json` sets
-`memory: 2048`); cold starts take a few seconds to load the 80 MB model, and
-warm instances reuse it.
+The function loads the 6.2 MB model once per warm serverless instance. No API
+key or external inference service is required.
 
 ## Notes
 
-- Input preprocessing is `/255` RGB, CHW, 114-gray letterbox — byte-for-byte
-  the same math as RiichiCam's validated browser pipeline.
+- Input preprocessing is 160×160 ImageNet-normalized RGB. Every crop is tested
+  at all four quarter-turn rotations.
 - The site points at this endpoint via `TILE_DETECT_URL` (set in
   `nuxt.config.ts` runtimeConfig; override with an env var of the same name).

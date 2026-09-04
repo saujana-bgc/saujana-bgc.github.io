@@ -344,6 +344,11 @@
                 <span class="yaku-en">Dora</span>
                 <strong>{{ result.doraCount }}</strong>
               </li>
+              <li v-if="result.akaDoraCount > 0">
+                <span class="yaku-ja">Aka dora</span>
+                <span class="yaku-en">Aka dora</span>
+                <strong>{{ result.akaDoraCount }}</strong>
+              </li>
               <li v-if="result.uraDoraCount > 0">
                 <span class="yaku-ja">Ura dora</span>
                 <span class="yaku-en">Ura-dora</span>
@@ -722,6 +727,9 @@ function blockedReasonFor(code: string): string | null {
     if (indicators.length >= MAX_DORA_INDICATORS) {
       return `${pickerMode.value === 'ura' ? 'Ura-dora' : 'Dora'} indicator limit reached (5)`
     }
+    if (pickerMode.value === 'ura' && uraDoraTiles.value.length >= doraTiles.value.length) {
+      return `Ura-dora indicators cannot exceed the ${doraTiles.value.length} visible dora indicator${doraTiles.value.length === 1 ? '' : 's'}`
+    }
     const used = countFaceInUse(tile)
     if (used >= 4) {
       return `All four ${code} are already in use (hand, calls and dora count together)`
@@ -907,6 +915,10 @@ const flagDisabledReasons = computed<Record<FlagKey, string | undefined>>(() => 
     reasons.houtei = 'Houtei is a win on the last discard (ron only)'
     reasons.chankan = 'Chankan is a ron off a kan extension'
   }
+  if (flags.haitei) reasons.rinshan = 'Rinshan cannot be combined with Haitei'
+  if (flags.rinshan) reasons.haitei = 'Haitei cannot be combined with Rinshan'
+  if (flags.houtei) reasons.chankan = 'Chankan cannot be combined with Houtei'
+  if (flags.chankan) reasons.houtei = 'Houtei cannot be combined with Chankan'
   return reasons
 })
 
@@ -992,6 +1004,15 @@ function clampNukiDora(value: unknown): number {
 watch(nukiDoraCount, (count) => {
   const clamped = clampNukiDora(count)
   if (count !== clamped) nukiDoraCount.value = clamped
+})
+
+// Each ura indicator sits below a visible omote indicator. Trim an old entry
+// immediately when omote indicators are removed, rather than leaving an
+// unscorable state in the sheet.
+watch(doraTiles, (omote) => {
+  if (uraDoraTiles.value.length > omote.length) {
+    uraDoraTiles.value = uraDoraTiles.value.slice(0, omote.length)
+  }
 })
 
 async function requestDetection(payload: Record<string, unknown>): Promise<Record<string, any>> {
@@ -1320,7 +1341,7 @@ const resultHeading = computed(() => {
   if (error.value) return 'Check the hand'
   const r = result.value
   if (!r) return 'Score'
-  const scoredHan = r.totalHan + r.doraCount + r.uraDoraCount + r.nukiDoraCount
+  const scoredHan = r.totalHan + r.doraCount + r.akaDoraCount + r.uraDoraCount + r.nukiDoraCount
   return r.handName ? HAND_NAMES[r.handName] : `${scoredHan} han · ${r.fu} fu`
 })
 

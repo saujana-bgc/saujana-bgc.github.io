@@ -38,6 +38,8 @@ export interface Meld {
   type: MeldType;
   tiles: [Tile, Tile, Tile] | [Tile, Tile, Tile, Tile];
   calledFrom?: "left" | "opposite" | "right"; // required for chi/pon/kan-open/kan-added
+  /** Position of the discard within an open meld; absent for a concealed kan. */
+  calledTileIndex?: number;
 }
 
 // ─── Hand input ───────────────────────────────────────────────────────────────
@@ -123,8 +125,8 @@ export interface ScoreResult {
   fu: number;        // rounded fu
   fuBreakdown: FuBreakdown;
 
-  doraCount: number;     // indicator dora + aka dora combined (used for totalHan math)
-  akaDoraCount: number;  // aka (red-five) portion of doraCount, shown separately in UI
+  doraCount: number;     // dora from visible indicators
+  akaDoraCount: number;  // red-five dora
   uraDoraCount: number;
   nukiDoraCount: number;
 

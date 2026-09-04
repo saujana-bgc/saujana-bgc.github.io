@@ -10,7 +10,19 @@ import type { FuBreakdown } from "./types";
 
 function applyPao(hand: Hand, yaku: Yaku[], points: ScoreResult["points"]): ScoreResult["points"] {
   const applies = hand.pao && yaku.some((y) => y.name === "daisangen" || y.name === "daisuushi");
-  return applies ? { ...points, responsiblePays: points.total } : points;
+  // Pao replaces the ordinary ron/tsumo split: the responsible player alone
+  // pays the full winning amount.
+  return applies ? { total: points.total, responsiblePays: points.total } : points;
+}
+
+function specialWinProblem(hand: Hand): string | null {
+  if (hand.haitei && hand.winType !== "tsumo") return "Haitei requires tsumo";
+  if (hand.rinshan && hand.winType !== "tsumo") return "Rinshan requires tsumo";
+  if (hand.houtei && hand.winType !== "ron") return "Houtei requires ron";
+  if (hand.chankan && hand.winType !== "ron") return "Chankan requires ron";
+  if (hand.haitei && hand.rinshan) return "Haitei and Rinshan cannot apply together";
+  if (hand.houtei && hand.chankan) return "Houtei and Chankan cannot apply together";
+  return null;
 }
 
 // Sum of only the isYakuman-flagged yaku's han, divided into 13-han units.
@@ -90,7 +102,7 @@ function scoreStandardInterpretations(
   const allYaku = supersedeWithYakuman(rawYaku);
   const structuralHan = isYakuman ? allYaku.reduce((sum, y) => sum + y.han, 0) : rawStructuralHan;
 
-  const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
+  const totalHan = structuralHan + doraCount + akaDoraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
   const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));
@@ -120,7 +132,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
 
   const akaDoraCount = countAkaDora(allTiles);
   const playerCount = rules.playerCount ?? 4;
-  const doraCount = countDora(allTiles, hand.doraIndicators, playerCount) + akaDoraCount;
+  const doraCount = countDora(allTiles, hand.doraIndicators, playerCount);
   const uraDoraCount =
     (hand.riichi || hand.doubleRiichi) && hand.uraDoraIndicators
       ? countDora(allTiles, hand.uraDoraIndicators, playerCount)
@@ -128,6 +140,15 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
   const nukiDoraCount = playerCount === 3
     ? Math.min(4, Math.max(0, Math.trunc(hand.nukiDoraCount ?? 0)))
     : 0;
+
+  const specialProblem = specialWinProblem(hand);
+  if (specialProblem) {
+    return {
+      valid: false, error: specialProblem, yaku: [], totalHan: 0, fu: 0,
+      fuBreakdown: { base: 0, pairFu: 0, meldFu: 0, waitFu: 0, tsumoFu: 0, total: 0 },
+      doraCount, akaDoraCount, uraDoraCount, nukiDoraCount, points: { total: 0 },
+    };
+  }
 
   const parsed = parseHand(hand.closedTiles, hand.melds, hand.winningTile);
 
@@ -188,7 +209,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
     const allYaku = supersedeWithYakuman([...yakuList, ...yakumanList]);
 
     const structuralHan = allYaku.reduce((sum, y) => sum + y.han, 0);
-    const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
+    const totalHan = structuralHan + doraCount + akaDoraCount + uraDoraCount + nukiDoraCount;
 
     const fuBreakdown = chiitoitsiFuBreakdown();
     const units = yakumanUnits(allYaku);
@@ -260,7 +281,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
   const allYaku = supersedeWithYakuman(rawYaku);
   const structuralHan = isYakuman ? allYaku.reduce((sum, y) => sum + y.han, 0) : rawStructuralHan;
 
-  const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
+  const totalHan = structuralHan + doraCount + akaDoraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
   const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));

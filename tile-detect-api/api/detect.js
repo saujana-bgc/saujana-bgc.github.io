@@ -1,4 +1,4 @@
-import { detectTilesLlm, detectWinningTile, warmUpLlm } from '../lib/llm-detect.js';
+import { detectTilesOnnx, detectWinningTile, warmUpOnnx } from '../lib/onnx-detect.js';
 import { parsePredictions } from '../lib/roboflow-parser.js';
 import { splitBySection } from '../lib/sections.js';
 import { pixelBoxFor, pointInBox } from '../lib/section-box.js';
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       return fail(res, 403, 'Origin not allowed');
     }
     try {
-      await warmUpLlm();
+      await warmUpOnnx();
       return res.status(200).json({ ready: true });
     } catch (err) {
       console.error('warm-up failed:', err);
@@ -67,9 +67,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // The LLM reports normalized coordinates; they are mapped onto the
-    // original image's pixel size so the guided-mode section boxes (which the
-    // client draws against this same size) align with detections.
     const meta = await sharp(buffer).metadata();
     const imgWidth = meta.width ?? 0;
     const imgHeight = meta.height ?? 0;
@@ -93,7 +90,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ mode: 'guided', ...guided });
     }
 
-    const predictions = await detectTilesLlm(body.image, imgWidth, imgHeight, expectedCount);
+    const predictions = await detectTilesOnnx(body.image, imgWidth, imgHeight, expectedCount);
     const tiles = parsePredictions(predictions);
     return res.status(200).json({ mode: 'individual', tiles });
   } catch (err) {
@@ -102,11 +99,6 @@ export default async function handler(req, res) {
   }
 }
 
-// Guided scan. The winning tile gets a dedicated close-up pass: the winning
-// section box is cropped from the original frame and read by a focused
-// single-tile LLM call in parallel with the full-frame scan, so the winner is
-// whatever is inside the viewfinder box rather than whichever full-frame
-// detection happened to land in the box by its approximate coordinates.
 async function detectGuided(body, buffer, imgWidth, imgHeight, handCount) {
   const sections = body.sections;
   const winningBox = sections.winning;
@@ -120,23 +112,22 @@ async function detectGuided(body, buffer, imgWidth, imgHeight, handCount) {
         })
     : Promise.resolve(null);
 
-  // The hand row is the one region whose count we know up front; ask the
-  // model to hit it and retry once with a different seed if the split comes
-  // back short or long (same corrective pattern as expectedCount scans).
-  let predictions = null;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    predictions = await detectTilesLlm(
-      body.image,
-      imgWidth,
-      imgHeight,
-      undefined,
-      handCount,
-    );
-    if (!handCount) break;
-    const split = splitBySection(predictions, withoutWinning(sections), imgWidth, imgHeight);
-    if (split.hand.length === handCount) break;
-    console.error(`guided hand count ${split.hand.length} != ${handCount}, retrying`);
-  }
+  // Classify each viewfinder region independently. This gives the local
+  // detector a clean tile run instead of asking it to segment the whole table.
+  const predictions = (await Promise.all(
+    Object.entries(withoutWinning(sections)).map(async ([key, box]) => {
+      const pixelBox = pixelBoxFor(box, imgWidth, imgHeight);
+      if (!pixelBox) return [];
+      const crop = await sharp(buffer).extract(pixelBox).toBuffer();
+      const expected = key === 'hand' ? handCount : undefined;
+      const local = await detectTilesOnnx(crop.toString('base64'), pixelBox.width, pixelBox.height, expected);
+      return local.map((prediction) => ({
+        ...prediction,
+        x: prediction.x + pixelBox.left,
+        y: prediction.y + pixelBox.top,
+      }));
+    }),
+  )).flat();
 
   const cropWinner = await winnerCropPromise;
 
@@ -152,8 +143,7 @@ async function detectGuided(body, buffer, imgWidth, imgHeight, handCount) {
     return split;
   }
 
-  // Fallback: today's behavior — bucket full-frame detections by section
-  // boxes, winner = first detection inside the winning box.
+  // Fallback: bucket region detections by section boxes.
   return splitBySection(predictions, sections, imgWidth, imgHeight);
 }
 
@@ -170,7 +160,7 @@ async function cropForWinner(buffer, box, imgWidth, imgHeight) {
   const pixelBox = pixelBoxFor(box, imgWidth, imgHeight);
   if (!pixelBox) return null;
   return sharp(buffer)
-    .rotate() // match the orientation detectTilesLlm applies before measuring
+    .rotate()
     .extract(pixelBox)
     .toBuffer();
 }

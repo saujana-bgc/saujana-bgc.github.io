@@ -7,11 +7,12 @@
     "node": ">=20"
   },
   "dependencies": {
+    "onnxruntime-node": "^1.29.0",
     "sharp": "^0.34.0"
   },
   "scripts": {
-    "test": "tsx test-llm.mts",
-    "test:unit": "tsx --test test-dedup.mts",
+    "test": "tsx test-onnx.mts",
+    "test:unit": "tsx --test test-onnx.mts",
     "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File ./deploy.ps1"
   },
   "devDependencies": {
