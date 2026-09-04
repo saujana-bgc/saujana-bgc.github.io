@@ -7,7 +7,7 @@ import sharp from 'sharp';
 import { detectTilesLlm, warmUpLlm } from './lib/llm-detect.js';
 import { parsePredictions } from './lib/roboflow-parser.js';
 
-if (!process.env.OLLAMA_API_KEY) {
+if (!process.env.ZAI_API_KEY) {
   try {
     const env = readFileSync(new URL('./.env.local', import.meta.url), 'utf8');
     for (const line of env.split(/\r?\n/)) {

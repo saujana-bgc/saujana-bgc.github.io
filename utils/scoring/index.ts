@@ -4,9 +4,14 @@ import { parseHand } from "./hand-parser";
 import { detectYaku, detectYakuman } from "./yaku";
 import { calculateFu, chiitoitsiFuBreakdown } from "./fu";
 import { calculatePoints, handName } from "./points";
-import { countDora, countAkaDora, doraFromIndicator, tilesEqual, isSuited } from "./tiles";
+import { countDora, countAkaDora } from "./tiles";
 import type { HandInterpretation } from "./hand-parser";
 import type { FuBreakdown } from "./types";
+
+function applyPao(hand: Hand, yaku: Yaku[], points: ScoreResult["points"]): ScoreResult["points"] {
+  const applies = hand.pao && yaku.some((y) => y.name === "daisangen" || y.name === "daisuushi");
+  return applies ? { ...points, responsiblePays: points.total } : points;
+}
 
 // Sum of only the isYakuman-flagged yaku's han, divided into 13-han units.
 // A single yakuman is 1 unit; a doubled yakuman (han: 26) or two distinct
@@ -88,7 +93,7 @@ function scoreStandardInterpretations(
   const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
-  const points = calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
+  const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));
 
   return {
     valid: true,
@@ -114,12 +119,13 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
   const allTiles = [...allClosedWithWin, ...allMeldTiles];
 
   const akaDoraCount = countAkaDora(allTiles);
-  const doraCount = countDora(allTiles, hand.doraIndicators) + akaDoraCount;
+  const playerCount = rules.playerCount ?? 4;
+  const doraCount = countDora(allTiles, hand.doraIndicators, playerCount) + akaDoraCount;
   const uraDoraCount =
     (hand.riichi || hand.doubleRiichi) && hand.uraDoraIndicators
-      ? countDora(allTiles, hand.uraDoraIndicators)
+      ? countDora(allTiles, hand.uraDoraIndicators, playerCount)
       : 0;
-  const nukiDoraCount = (rules.playerCount ?? 4) === 3
+  const nukiDoraCount = playerCount === 3
     ? Math.min(4, Math.max(0, Math.trunc(hand.nukiDoraCount ?? 0)))
     : 0;
 
@@ -257,7 +263,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
   const totalHan = structuralHan + doraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
-  const points = calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4);
+  const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));
 
   return {
     valid: true,

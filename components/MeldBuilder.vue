@@ -17,7 +17,7 @@
       :disabled="handTiles.length === 0"
       @click="active = true"
     >
-      + Declare Chi / Pon / Kan
+      + Declare {{ threePlayer ? 'Pon / Kan' : 'Chi / Pon / Kan' }}
     </button>
 
     <div v-else-if="selectedIndex === null" class="builder-panel">
@@ -45,6 +45,7 @@
       </div>
 
       <button
+        v-if="!threePlayer"
         v-for="(indices, index) in possibleChis"
         :key="`chi-${index}`"
         type="button"
@@ -95,6 +96,7 @@ import type { Meld, Tile } from '~/utils/scoring/types'
 const props = defineProps<{
   handTiles: Tile[]
   melds: Meld[]
+  threePlayer?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -111,6 +113,7 @@ function tilesEqual(a: Tile, b: Tile): boolean {
 }
 
 const possibleChis = computed<number[][]>(() => {
+  if (props.threePlayer) return []
   const selected = selectedTile.value
   const selectedIdx = selectedIndex.value
   if (!selected || selectedIdx === null || selected.suit === 'honor') return []

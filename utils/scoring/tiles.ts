@@ -41,7 +41,8 @@ export function tileKey(t: Tile): string {
   return `${t.suit}:${t.value}`;
 }
 
-export function doraFromIndicator(indicator: Tile): Tile {
+/** Resolve a dora indicator. Sanma's reduced manzu suit cycles directly 1m↔9m. */
+export function doraFromIndicator(indicator: Tile, playerCount: 3 | 4 = 4): Tile {
   if (isHonor(indicator)) {
     if (isWind(indicator)) {
       const idx = WIND_DORA_ORDER.indexOf(indicator.value as WindValue);
@@ -52,12 +53,15 @@ export function doraFromIndicator(indicator: Tile): Tile {
     }
   }
   const s = indicator as SuitedTile;
+  if (playerCount === 3 && s.suit === "man") {
+    return { suit: "man", value: s.value === 1 ? 9 : 1 };
+  }
   const nextVal = s.value === 9 ? 1 : s.value + 1;
   return { suit: s.suit, value: nextVal as SuitedTile["value"] };
 }
 
-export function countDora(tiles: Tile[], indicators: Tile[]): number {
-  const doraList = indicators.map(doraFromIndicator);
+export function countDora(tiles: Tile[], indicators: Tile[], playerCount: 3 | 4 = 4): number {
+  const doraList = indicators.map((indicator) => doraFromIndicator(indicator, playerCount));
   let count = 0;
   for (const tile of tiles) {
     for (const dora of doraList) {

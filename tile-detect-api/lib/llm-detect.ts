@@ -1,5 +1,5 @@
-// Tile detection via Ollama Cloud (https://ollama.com/api) using a vision LLM
-// (glm-5.3-flash) instead of the previous local ONNX YOLO model.
+// Tile detection via the z.ai API (https://docs.z.ai) using the multimodal
+// vision LLM glm-5.3-flash instead of the previous local ONNX YOLO model.
 //
 // The model returns one entry per physical tile with its face code and an
 // approximate normalized center. Entries are mapped onto the RawPrediction
@@ -10,7 +10,7 @@ import sharp from 'sharp';
 import { roboflowLabelToTile, type RawPrediction } from './roboflow-parser.js';
 import type { Tile } from './types.js';
 
-const OLLAMA_CHAT_URL = process.env.OLLAMA_CHAT_URL ?? 'https://ollama.com/api/chat';
+const ZAI_CHAT_URL = process.env.ZAI_CHAT_URL ?? 'https://api.z.ai/api/paas/v4/chat/completions';
 const MAX_IMAGE_EDGE = 1536;
 // Two corrective attempts must fit inside Vercel's 60-second function limit.
 const REQUEST_TIMEOUT_MS = 25_000;
@@ -75,41 +75,44 @@ export interface LlmTile {
   y?: unknown;
 }
 
-export function isOllamaConfigured(): boolean {
-  return !!process.env.OLLAMA_API_KEY;
+export function isZaiConfigured(): boolean {
+  return !!process.env.ZAI_API_KEY;
 }
 
 // One throwaway text-only completion so the readiness check exercises the API
 // key and model name, not just env-var presence.
 export async function warmUpLlm(): Promise<void> {
-  if (!isOllamaConfigured()) {
-    throw new Error('OLLAMA_API_KEY is not configured');
+  if (!isZaiConfigured()) {
+    throw new Error('ZAI_API_KEY is not configured');
   }
-  const res = await fetch(OLLAMA_CHAT_URL, {
+  const res = await fetch(ZAI_CHAT_URL, {
     method: 'POST',
-    headers: ollamaHeaders(),
+    headers: zaiHeaders(),
     body: JSON.stringify({
-      model: ollamaModel(),
+      model: zaiModel(),
       messages: [{ role: 'user', content: 'Reply with the single word: ready' }],
       stream: false,
-      options: { temperature: 0, num_predict: 4 },
+      // max_tokens leaves room for the reasoning pass; only res.ok matters here.
+      max_tokens: 512,
+      thinking: { type: 'enabled', clear_thinking: false },
+      reasoning_effort: 'low',
     }),
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`Ollama warm-up failed (${res.status}): ${text.slice(0, 200)}`);
+    throw new Error(`z.ai warm-up failed (${res.status}): ${text.slice(0, 200)}`);
   }
 }
 
-function ollamaModel(): string {
-  return process.env.OLLAMA_MODEL ?? 'glm-5.3-flash';
+function zaiModel(): string {
+  return process.env.ZAI_MODEL ?? 'glm-5.3-flash';
 }
 
-function ollamaHeaders(): Record<string, string> {
+function zaiHeaders(): Record<string, string> {
   return {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${process.env.OLLAMA_API_KEY ?? ''}`,
+    Authorization: `Bearer ${process.env.ZAI_API_KEY ?? ''}`,
   };
 }
 
@@ -211,8 +214,8 @@ async function chatWithImage(
   attempt = 0,
   handCountHint?: number,
 ): Promise<unknown> {
-  if (!isOllamaConfigured()) {
-    throw new Error('OLLAMA_API_KEY is not configured');
+  if (!isZaiConfigured()) {
+    throw new Error('ZAI_API_KEY is not configured');
   }
   let userPrompt = USER_PROMPT;
   if (expectedCount) {
@@ -220,39 +223,43 @@ async function chatWithImage(
   } else if (handCountHint) {
     // Guided scan: the frame holds several regions, so a whole-photo count
     // would be wrong — instead tell the model how many tiles the long hand
-    // row should hold. The caller retries with a different seed if the
-    // resulting section count is off.
+    // row should hold. The caller retries if the resulting section count
+    // is off.
     userPrompt += ` The photo shows a mahjong table with several regions. The long row of ${handCountHint} tiles is the player's hand — that row should contain exactly ${handCountHint} physical tiles, counted with repeated faces separately. Dora indicators and called melds may also be visible in other regions.`;
   }
-  const res = await fetch(OLLAMA_CHAT_URL, {
+  const res = await fetch(ZAI_CHAT_URL, {
     method: 'POST',
-    headers: ollamaHeaders(),
+    headers: zaiHeaders(),
     body: JSON.stringify({
-      model: ollamaModel(),
+      model: zaiModel(),
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: userPrompt,
-          images: [imageBase64],
+          content: [
+            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${imageBase64}` } },
+            { type: 'text', text: userPrompt },
+          ],
         },
       ],
       stream: false,
-      format: 'json',
-      // 'low' keeps the reasoning in a separate channel (or brief) instead of
-      // spilling narration into the JSON content. Omitting `think` leaks the
-      // reasoning pass into `content` as prose around the JSON, and think:
-      // false returns raw reasoning text as the content entirely.
-      think: 'low',
-      // Use a different deterministic seed for the corrective retry so a
-      // truncated first interpretation is not simply repeated.
-      options: { temperature: 0, seed: 42 + attempt, num_predict: 4096 },
+      // z.ai's vision request schema doesn't accept response_format
+      // (documented for text models only), so JSON discipline comes from the
+      // prompt; extractTiles tolerates fenced or prose-wrapped replies.
+      // GLM-5.3 reasoning can't be disabled — it lands in a separate response
+      // field, and 'low' keeps it brief for the 60s function budget.
+      thinking: { type: 'enabled', clear_thinking: false },
+      reasoning_effort: 'low',
+      // z.ai has no seed parameter, so the corrective retry raises the
+      // temperature instead — a pixel-identical second answer helps no one.
+      temperature: attempt === 0 ? 0.2 : 0.7,
+      max_tokens: 4096,
     }),
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`Ollama request failed (${res.status}): ${text.slice(0, 200)}`);
+    throw new Error(`z.ai request failed (${res.status}): ${text.slice(0, 200)}`);
   }
   return res.json();
 }
@@ -268,26 +275,29 @@ export async function detectWinningTile(cropBase64: string): Promise<Tile | null
     .jpeg({ quality: 90 })
     .toBuffer();
 
-  if (!isOllamaConfigured()) {
-    throw new Error('OLLAMA_API_KEY is not configured');
+  if (!isZaiConfigured()) {
+    throw new Error('ZAI_API_KEY is not configured');
   }
-  const res = await fetch(OLLAMA_CHAT_URL, {
+  const res = await fetch(ZAI_CHAT_URL, {
     method: 'POST',
-    headers: ollamaHeaders(),
+    headers: zaiHeaders(),
     body: JSON.stringify({
-      model: ollamaModel(),
+      model: zaiModel(),
       messages: [
         { role: 'system', content: WINNER_SYSTEM_PROMPT },
         {
           role: 'user',
-          content: 'Identify the mahjong tile face at the center of this crop. Return the JSON object only.',
-          images: [resized.toString('base64')],
+          content: [
+            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${resized.toString('base64')}` } },
+            { type: 'text', text: 'Identify the mahjong tile face at the center of this crop. Return the JSON object only.' },
+          ],
         },
       ],
       stream: false,
-      format: 'json',
-      think: 'low',
-      options: { temperature: 0, seed: 42, num_predict: 512 },
+      thinking: { type: 'enabled', clear_thinking: false },
+      reasoning_effort: 'low',
+      temperature: 0.2,
+      max_tokens: 512,
     }),
     // One tile is a much shorter completion than a full hand; keep a tighter
     // ceiling so the guided scan's budget stays inside the function limit.
@@ -295,7 +305,7 @@ export async function detectWinningTile(cropBase64: string): Promise<Tile | null
   });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`Ollama request failed (${res.status}): ${text.slice(0, 200)}`);
+    throw new Error(`z.ai request failed (${res.status}): ${text.slice(0, 200)}`);
   }
   const tiles = extractTiles(await res.json());
   for (const tile of tiles) {
@@ -310,20 +320,38 @@ export async function detectWinningTile(cropBase64: string): Promise<Tile | null
   return null;
 }
 
+interface ChatMessageShape {
+  content?: unknown;
+  reasoning_content?: unknown;
+  thinking?: unknown;
+}
+
 function extractTiles(data: unknown): LlmTile[] {
-  const message = (data as { message?: { content?: unknown; thinking?: unknown } })?.message;
+  // z.ai answers arrive OpenAI-style (choices[0].message); the bare Ollama
+  // message shape stays as a fallback while the provider switch settles.
+  const dataObj = data as {
+    choices?: { message?: ChatMessageShape }[];
+    message?: ChatMessageShape;
+  };
+  const message: ChatMessageShape | undefined =
+    Array.isArray(dataObj.choices) && dataObj.choices[0]?.message
+      ? dataObj.choices[0].message
+      : dataObj.message;
   let content = typeof message?.content === 'string' ? message.content : '';
+  if (!content.trim() && typeof message?.reasoning_content === 'string') {
+    // A reasoning-only completion puts everything in the thinking channel.
+    content = message.reasoning_content;
+  }
   if (!content.trim() && typeof message?.thinking === 'string') {
-    // Some thinking models emit the answer in `thinking` when the visible
-    // content ends up empty (e.g. a reasoning-only completion).
+    // Ollama's name for the same channel, kept for symmetry.
     content = message.thinking;
   }
   if (!content.trim()) {
-    throw new Error('Ollama response had no message content');
+    throw new Error('z.ai response had no message content');
   }
-  // With format: 'json' the Cloud endpoint returns the JSON object as a
-  // string-encoded message content ("{\"tiles\":...}"), i.e. JSON-in-JSON.
-  // Unwrap that layer first; a plain object arrives as {...} directly.
+  // Some endpoints return the JSON object string-encoded inside the message
+  // content ("{\"tiles\":...}"), i.e. JSON-in-JSON. Unwrap that layer first;
+  // a plain object arrives as {...} directly.
   let text = content.trim();
   const unquoted = tryParse(text);
   if (typeof unquoted === 'string') text = unquoted.trim();
@@ -334,12 +362,12 @@ function extractTiles(data: unknown): LlmTile[] {
     const start = text.indexOf('{');
     const end = text.lastIndexOf('}');
     if (start === -1 || end <= start) {
-      throw new Error(`Ollama response was not valid JSON: ${text.slice(0, 200)}`);
+      throw new Error(`z.ai response was not valid JSON: ${text.slice(0, 200)}`);
     }
     parsed = tryParse(text.slice(start, end + 1));
   }
   if (parsed === null) {
-    throw new Error(`Ollama response was not valid JSON: ${text.slice(0, 200)}`);
+    throw new Error(`z.ai response was not valid JSON: ${text.slice(0, 200)}`);
   }
   const tiles = (parsed as { tiles?: unknown })?.tiles;
   return Array.isArray(tiles) ? (tiles as LlmTile[]) : [];

@@ -88,6 +88,7 @@
           <MeldBuilder
             :hand-tiles="handTiles"
             :melds="parsedMelds"
+            :three-player="threePlayer"
             @update:hand-tiles="updateMeldHandTiles"
             @update:melds="updateMelds"
           />
@@ -123,6 +124,18 @@
             <span v-if="doraTiles.length === 0" class="row-empty">None</span>
           </div>
         </div>
+
+        <div v-if="hasRiichi" class="picked-row">
+          <span class="row-label">Ura-dora indicators</span>
+          <div class="row-tiles">
+            <span v-for="(tile, i) in uraDoraTiles" :key="`ura-${i}-${tileToText(tile)}`" class="hand-tile">
+              <button type="button" class="tile-btn" :title="`Remove ${tileToText(tile)}`" @click="removeUraDoraTile(i)"><TileImage :tile="tile" /></button>
+              <button type="button" class="tile-remove" :title="`Remove ura-dora indicator ${tileToText(tile)}`" :aria-label="`Remove ura-dora indicator ${tileToText(tile)}`" @click.stop="removeUraDoraTile(i)">×</button>
+            </span>
+            <button type="button" class="row-add" title="Add ura-dora indicators" aria-label="Add ura-dora indicators" @click="aimPicker('ura')">＋</button>
+            <span v-if="uraDoraTiles.length === 0" class="row-empty">None</span>
+          </div>
+        </div>
       </div>
       <p v-if="inputNote" class="input-note" :class="{ problem: inputNoteProblem }">{{ inputNote }}</p>
 
@@ -143,6 +156,7 @@
           <button type="button" class="picker-mode-switch" @click="aimPicker('hand')" :aria-pressed="pickerMode === 'hand'">Hand</button>
           <span aria-hidden="true">/</span>
           <button type="button" class="picker-mode-switch" @click="aimPicker('dora')" :aria-pressed="pickerMode === 'dora'">Dora</button>
+          <template v-if="hasRiichi"><span aria-hidden="true">/</span><button type="button" class="picker-mode-switch" @click="aimPicker('ura')" :aria-pressed="pickerMode === 'ura'">Ura</button></template>
           <button v-if="handTiles.length >= handTarget" type="button" class="picker-done" @click="pickerExpanded = false">Done</button>
         </p>
         <p v-if="pickerBlockedNote" class="picker-blocked-note">{{ pickerBlockedNote }}</p>
@@ -223,6 +237,10 @@
           <label for="nuki-dora">Nuki dora (North)</label>
           <input id="nuki-dora" v-model.number="nukiDoraCount" type="number" min="0" max="4" step="1" inputmode="numeric" />
         </div>
+        <label v-if="paoEligible" class="flag active">
+          <input v-model="paoResponsible" type="checkbox" />
+          Responsibility payment (Pao)
+        </label>
       </div>
 
       <div class="condition-panel">
@@ -299,7 +317,7 @@
             <strong>{{ scoreDisplay }}</strong>
             <span v-if="honba > 0" class="honba-note">includes {{ honba }} honba</span>
           </div>
-          <div v-if="result.points.tsumo" class="score-split">
+          <div v-if="result.points.tsumo && !result.points.responsiblePays" class="score-split">
             <div>
               <span>Dealer pays</span>
               <strong>{{ formatPoints(result.points.tsumo.dealerPays) }}</strong>
@@ -309,6 +327,7 @@
               <strong>{{ formatPoints(result.points.tsumo.nonDealerPays) }}</strong>
             </div>
           </div>
+          <p v-if="result.points.responsiblePays" class="honba-note">Responsible player pays {{ formatPoints(result.points.responsiblePays) }} (pao)</p>
         </div>
 
         <div class="result-columns">
@@ -424,6 +443,7 @@ interface GuidedDetectionResult {
 const handTiles = ref<Tile[]>([])
 const winningTileIndex = ref<number | null>(null)
 const doraTiles = ref<Tile[]>([])
+const uraDoraTiles = ref<Tile[]>([])
 const melds = ref<Meld[]>([])
 
 const parsedMelds = computed(() => melds.value)
@@ -431,13 +451,8 @@ const parsedMelds = computed(() => melds.value)
 const winningTile = computed<Tile | null>(() =>
   winningTileIndex.value !== null ? handTiles.value[winningTileIndex.value] ?? null : null)
 
-/** Closed-set size including the winning tile: 14 minus 3 per called meld,
- * plus 1 per kan (a kan draws a replacement tile, so the concealed set grows
- * from 11+kans×3 up to 18 with four kans). */
-const handTarget = computed(() => {
-  const kans = parsedMelds.value.filter((m) => m.type.startsWith('kan')).length
-  return 14 - 3 * parsedMelds.value.length + kans
-})
+/** Closed-set size including the winning tile: 14 minus 3 per meld. */
+const handTarget = computed(() => 14 - 3 * parsedMelds.value.length)
 
 /** Hand tiles minus the winning-tile instance — what the scorer calls closedTiles. */
 const closedHandTiles = computed(() =>
@@ -465,6 +480,7 @@ const roundWindOptions = windOptions.filter((w) => w.value === 'east' || w.value
 const honba = ref(0)
 const threePlayer = ref(false)
 const nukiDoraCount = ref(0)
+const paoResponsible = ref(false)
 const flags = reactive<Record<FlagKey, boolean>>({
   riichi: false,
   doubleRiichi: false,
@@ -496,6 +512,14 @@ const riichiDeclaration = computed<RiichiDeclaration>({
     flags.doubleRiichi = value === 'doubleRiichi'
   },
 })
+const hasRiichi = computed(() => flags.riichi || flags.doubleRiichi)
+
+watch(hasRiichi, (enabled) => {
+  if (!enabled) {
+    uraDoraTiles.value = []
+    if (pickerMode.value === 'ura') pickerMode.value = 'hand'
+  }
+})
 
 // ─── Session persistence ──────────────────────────────────────────────────────
 // The whole sheet survives a refresh or a phone lock mid-game. Tiles are plain
@@ -507,6 +531,7 @@ interface StoredSheet {
   hand: Tile[]
   winIndex: number | null
   dora: Tile[]
+  uraDora?: Tile[]
   melds: Meld[]
   winType: 'ron' | 'tsumo'
   seatWind: WindValue
@@ -514,6 +539,7 @@ interface StoredSheet {
   honba: number
   threePlayer: boolean
   nukiDoraCount?: number
+  paoResponsible?: boolean
   flags: Record<FlagKey, boolean>
 }
 
@@ -523,6 +549,7 @@ function saveSheet() {
     hand: handTiles.value,
     winIndex: winningTileIndex.value,
     dora: doraTiles.value,
+    uraDora: uraDoraTiles.value,
     melds: melds.value,
     winType: winType.value,
     seatWind: seatWind.value,
@@ -530,10 +557,11 @@ function saveSheet() {
     honba: honba.value,
     threePlayer: threePlayer.value,
     nukiDoraCount: nukiDoraCount.value,
+    paoResponsible: paoResponsible.value,
     flags: { ...flags },
   }
   try {
-    if (handTiles.value.length || melds.value.length || doraTiles.value.length) {
+    if (handTiles.value.length || melds.value.length || doraTiles.value.length || uraDoraTiles.value.length) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sheet))
     } else {
       localStorage.removeItem(STORAGE_KEY)
@@ -565,6 +593,7 @@ function restoreSheet() {
       : null
     if (winningTileIndex.value === -1) winningTileIndex.value = null
     doraTiles.value = Array.isArray(sheet.dora) ? sheet.dora.slice(0, MAX_DORA_INDICATORS) : []
+    uraDoraTiles.value = Array.isArray(sheet.uraDora) ? sheet.uraDora.slice(0, MAX_DORA_INDICATORS) : []
     melds.value = Array.isArray(sheet.melds) ? sheet.melds : []
     winType.value = sheet.winType === 'tsumo' ? 'tsumo' : 'ron'
     seatWind.value = sheet.seatWind ?? 'south'
@@ -572,11 +601,12 @@ function restoreSheet() {
     honba.value = Number(sheet.honba) || 0
     threePlayer.value = !!sheet.threePlayer
     nukiDoraCount.value = clampNukiDora(sheet.nukiDoraCount)
+    paoResponsible.value = !!sheet.paoResponsible
     if (sheet.flags) {
       for (const key of Object.keys(flags) as FlagKey[]) flags[key] = !!sheet.flags[key]
       if (flags.doubleRiichi) flags.riichi = false
     }
-    return handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0
+    return handTiles.value.length > 0 || melds.value.length > 0 || doraTiles.value.length > 0 || uraDoraTiles.value.length > 0
   } catch {
     return false
   }
@@ -619,7 +649,7 @@ function windLabel(w: WindValue): string {
 // One shared picker sits directly under the hand; the dora row's ＋ switches
 // it to indicator mode. No collapse/mode chrome — it's always visible.
 
-type PickerMode = 'hand' | 'dora'
+type PickerMode = 'hand' | 'dora' | 'ura'
 const pickerMode = ref<PickerMode>('hand')
 
 // One row per suit; sanma drops the middle man tiles and the red man.
@@ -663,7 +693,7 @@ async function aimPicker(mode: PickerMode) {
 // default). Yaku or hand-structure rules are deliberately not picker concerns
 // — the scorer reports those once the hand is complete.
 
-const MAX_DORA_INDICATORS = 10
+const MAX_DORA_INDICATORS = 5
 
 /** True for any five of a suited tile, red or ordinary — they share a face. */
 function isFiveFace(tile: Tile): boolean {
@@ -683,13 +713,15 @@ function blockedReasonFor(code: string): string | null {
 
   // Dora indicators are real tiles taken from the wall: a face can appear at
   // most 4 times across hand + winning tile + melds + dora combined.
-  if (pickerMode.value === 'dora') {
-    if (doraTiles.value.length >= MAX_DORA_INDICATORS) {
-      return 'Dora indicator limit reached (10)'
+  if (pickerMode.value === 'dora' || pickerMode.value === 'ura') {
+    const indicators = pickerMode.value === 'dora' ? doraTiles.value : uraDoraTiles.value
+    if (indicators.length >= MAX_DORA_INDICATORS) {
+      return `${pickerMode.value === 'ura' ? 'Ura-dora' : 'Dora'} indicator limit reached (5)`
     }
     const used = handTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
       + countInMelds(tile)
       + doraTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
+      + uraDoraTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
     if (used >= 4) {
       return `All four ${code} are already in use (hand, calls and dora count together)`
     }
@@ -745,7 +777,7 @@ const pickerBlockedNote = computed(() => {
 
 function pickerTileTitle(code: string): string {
   const reason = blockedReasons.value[code]
-  return reason ? reason : `Add ${code} to the ${pickerMode.value === 'dora' ? 'dora indicators' : 'hand'}`
+  return reason ? reason : `Add ${code} to the ${pickerMode.value === 'hand' ? 'hand' : pickerMode.value === 'ura' ? 'ura-dora indicators' : 'dora indicators'}`
 }
 
 function appendTile(code: string) {
@@ -759,6 +791,8 @@ function appendTile(code: string) {
     if (winner) winningTileIndex.value = handTiles.value.indexOf(winner)
   } else if (pickerMode.value === 'dora') {
     doraTiles.value = [...doraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
+  } else {
+    uraDoraTiles.value = [...uraDoraTiles.value, tile].slice(0, MAX_DORA_INDICATORS)
   }
 }
 
@@ -772,6 +806,10 @@ function removeHandTile(index: number) {
 
 function removeDoraTile(index: number) {
   doraTiles.value = doraTiles.value.filter((_, i) => i !== index)
+}
+
+function removeUraDoraTile(index: number) {
+  uraDoraTiles.value = uraDoraTiles.value.filter((_, i) => i !== index)
 }
 
 /** Mark the hand tile at `index` as the winning tile (or clear the mark). */
@@ -846,10 +884,12 @@ function clearHand() {
   handTiles.value = []
   winningTileIndex.value = null
   doraTiles.value = []
+  uraDoraTiles.value = []
   melds.value = []
   winType.value = 'ron'
   honba.value = 0
   nukiDoraCount.value = 0
+  paoResponsible.value = false
   for (const key of Object.keys(flags) as FlagKey[]) flags[key] = false
   detectError.value = null
   scanFeedback.value = null
@@ -953,7 +993,7 @@ onMounted(() => {
 // the sources directly (reactive objects are watched deeply by default) fires
 // on exactly the same changes the previous deep array-spread watcher did.
 watch(
-  [handTiles, winningTileIndex, doraTiles, melds, winType, seatWind, roundWind, honba, threePlayer, nukiDoraCount, flags],
+  [handTiles, winningTileIndex, doraTiles, uraDoraTiles, melds, winType, seatWind, roundWind, honba, threePlayer, nukiDoraCount, paoResponsible, flags],
   () => {
     if (restored.value) saveSheet()
   },
@@ -1205,10 +1245,8 @@ const scoreState = computed<ScoreState>(() => {
     }
   }
 
-  const numMelds = melds.length
   const numKans = melds.filter((m) => m.type.startsWith('kan')).length
-  // Total tiles across the whole hand: closed set (14 - 3 per meld + 1 per
-  // kan) plus the meld tiles themselves. Four kans top out at 18 + 16 = 34.
+  // Kans add a physical tile to their meld, so the whole hand is 14 + kans.
   const targetTotal = 14 + numKans
   const totalTiles = handTiles.value.length + melds.reduce((sum, m) => sum + m.tiles.length, 0)
   if (totalTiles !== targetTotal) {
@@ -1217,7 +1255,7 @@ const scoreState = computed<ScoreState>(() => {
     return {
       result: null,
       error: null,
-      notice: handTiles.value.length + 3 * numMelds - numKans < 14 + numKans
+      notice: totalTiles < targetTotal
         ? `Hand holds ${totalTiles} of ${targetTotal} tiles — add ${targetTotal - totalTiles} more.`
         : `Hand holds ${totalTiles} tiles — ${totalTiles - targetTotal} too many. Remove some hand tiles.`,
     }
@@ -1227,6 +1265,7 @@ const scoreState = computed<ScoreState>(() => {
     ...handTiles.value,
     ...melds.flatMap((m) => [...m.tiles]),
     ...doraTiles.value,
+    ...uraDoraTiles.value,
   ]
   const setProblem = validateTileSet(allTiles, nukiDoraCount.value)
   if (setProblem) return { result: null, error: setProblem, notice: null }
@@ -1239,6 +1278,7 @@ const scoreState = computed<ScoreState>(() => {
     seatWind: seatWind.value,
     roundWind: roundWind.value,
     doraIndicators: doraTiles.value,
+    uraDoraIndicators: uraDoraTiles.value,
     riichi: flags.riichi,
     doubleRiichi: flags.doubleRiichi,
     ippatsu: flags.ippatsu,
@@ -1248,6 +1288,7 @@ const scoreState = computed<ScoreState>(() => {
     chankan: flags.chankan,
     honba: honba.value,
     nukiDoraCount: threePlayer.value ? nukiDoraCount.value : 0,
+    pao: paoResponsible.value,
   }
 
   const result = score(hand, {
@@ -1265,6 +1306,12 @@ const scoreState = computed<ScoreState>(() => {
 const result = computed(() => scoreState.value.result)
 const error = computed(() => scoreState.value.error)
 const notice = computed(() => scoreState.value.notice)
+const paoEligible = computed(() => !!result.value?.yaku.some((yaku) =>
+  yaku.name === 'daisangen' || yaku.name === 'daisuushi'))
+
+watch(paoEligible, (eligible) => {
+  if (!eligible) paoResponsible.value = false
+})
 
 const resultHeading = computed(() => {
   if (error.value) return 'Check the hand'
@@ -1278,6 +1325,7 @@ const scoreDisplay = computed(() => {
   const r = result.value
   if (!r) return ''
   const pts = r.points
+  if (pts.responsiblePays) return `${formatPoints(pts.responsiblePays)} points · pao`
   if (winType.value === 'tsumo' && pts.tsumo) {
     if (seatWind.value === 'east') {
       return `${formatPoints(pts.tsumo.dealerPays)} from each`

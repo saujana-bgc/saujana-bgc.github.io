@@ -56,6 +56,8 @@ export interface Hand {
   uraDoraIndicators?: Tile[]; // only revealed with riichi
   /** North tiles declared as nuki dora in sanma (0-4). Ignored in yonma. */
   nukiDoraCount?: number;
+  /** A player is responsible for Daisangen/Daisuushii (pao). */
+  pao?: boolean;
 
   // Situational flags
   riichi: boolean;
@@ -99,6 +101,8 @@ export interface PointsBreakdown {
   total: number;
   tsumo?: TsumoPayment; // present when winType === 'tsumo'
   ron?: number;         // present when winType === 'ron'
+  /** Present when a responsible player pays the full winning amount (pao). */
+  responsiblePays?: number;
 }
 
 // Named hand thresholds

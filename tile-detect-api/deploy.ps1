@@ -31,8 +31,8 @@ try {
   Write-Host "Deploying tile-detect-api from $apiRoot" -ForegroundColor Cyan
 
   if (!(Test-Path -LiteralPath (Join-Path $apiRoot '.env.local')) -or
-      !(Select-String -LiteralPath (Join-Path $apiRoot '.env.local') -Pattern 'OLLAMA_API_KEY' -Quiet)) {
-    Write-Host 'OLLAMA_API_KEY not found in .env.local; the deployed function will fail its readiness check until the env var is set in the Vercel project.' -ForegroundColor Yellow
+      !(Select-String -LiteralPath (Join-Path $apiRoot '.env.local') -Pattern 'ZAI_API_KEY' -Quiet)) {
+    Write-Host 'ZAI_API_KEY not found in .env.local; the deployed function will fail its readiness check until the env var is set in the Vercel project.' -ForegroundColor Yellow
   }
 
   if (!$SkipInstall) {
