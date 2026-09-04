@@ -14,14 +14,14 @@
       v-if="!active"
       type="button"
       class="declare-button"
-      :disabled="handTiles.length === 0"
+      :disabled="handTiles.length < 3"
       @click="active = true"
     >
       + Declare {{ threePlayer ? 'Pon / Kan' : 'Chi / Pon / Kan' }}
     </button>
 
     <div v-else-if="selectedIndex === null" class="builder-panel">
-      <p>Tap a tile from your hand to declare a call</p>
+      <p>Tap the discard you called; the calculator will only offer complete melds already entered.</p>
       <div class="selectable-tiles">
         <button
           v-for="(tile, index) in handTiles"
@@ -63,13 +63,13 @@
         <span class="meld-type">Chi</span>
       </button>
 
-      <button v-if="ponIndices" type="button" class="meld-option" @click="commit('pon', ponIndices, calledMeldTiles(ponIndices, 3), 2)">
-        <span class="option-tiles"><TileImage v-for="(tile, index) in calledMeldTiles(ponIndices, 3)" :key="index" :tile="tile" size="small" /></span>
+      <button v-if="ponIndices" type="button" class="meld-option" @click="commit('pon', ponIndices, tilesAt(ponIndices), 0)">
+        <span class="option-tiles"><TileImage v-for="(tile, index) in tilesAt(ponIndices)" :key="index" :tile="tile" size="small" /></span>
         <span class="meld-type">Pon</span>
       </button>
 
-      <button v-if="openKanIndices" type="button" class="meld-option" @click="commit('kan-open', openKanIndices, calledMeldTiles(openKanIndices, 4), 3)">
-        <span class="option-tiles"><TileImage v-for="(tile, index) in calledMeldTiles(openKanIndices, 4)" :key="index" :tile="tile" size="small" /></span>
+      <button v-if="openKanIndices" type="button" class="meld-option" @click="commit('kan-open', openKanIndices, tilesAt(openKanIndices), 0)">
+        <span class="option-tiles"><TileImage v-for="(tile, index) in tilesAt(openKanIndices)" :key="index" :tile="tile" size="small" /></span>
         <span class="meld-type">Open Kan</span>
       </button>
 
@@ -79,7 +79,7 @@
       </button>
 
       <p v-if="noValidMelds" class="no-melds">
-        No valid calls for this tile.
+        No complete meld using this tile.
         <button type="button" class="text-button" @click="selectedIndex = null">Pick another</button>
       </p>
 
@@ -125,20 +125,26 @@ const possibleChis = computed<ChiOption[]>(() => {
 
   const results: ChiOption[] = []
   for (const sequence of sequences) {
-    for (let calledTileIndex = 0; calledTileIndex < sequence.length; calledTileIndex++) {
-      const heldValues = sequence.filter((_, index) => index !== calledTileIndex)
-      if (!heldValues.includes(value)) continue
-      const otherValue = heldValues.find((number) => number !== value)
-      const otherIndex = props.handTiles.findIndex((tile, tileIndex) =>
-        tileIndex !== selectedIdx && tile.suit === selected.suit && tile.value === otherValue,
+    const indices = [selectedIdx]
+    let valid = true
+    for (const number of sequence) {
+      if (number === value) continue
+      const index = props.handTiles.findIndex((tile, tileIndex) =>
+        tileIndex !== selectedIdx && !indices.includes(tileIndex) && tile.suit === selected.suit && tile.value === number,
       )
-      if (otherIndex !== -1) {
-        results.push({
-          indices: [selectedIdx, otherIndex],
-          tiles: sequence.map((number) => ({ suit: selected.suit, value: number as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 })),
-          calledTileIndex,
-        })
+      if (index === -1) {
+        valid = false
+        break
       }
+      indices.push(index)
+    }
+    if (valid) {
+      results.push({
+        indices,
+        tiles: tilesAt(indices),
+        // The first tile the player selected is the discard they called.
+        calledTileIndex: 0,
+      })
     }
   }
   return results
@@ -155,8 +161,8 @@ const matchingIndices = computed<number[]>(() => {
   return matches
 })
 
-const ponIndices = computed(() => matchingIndices.value.length >= 2 ? matchingIndices.value.slice(0, 2) : null)
-const openKanIndices = computed(() => matchingIndices.value.length >= 3 ? matchingIndices.value.slice(0, 3) : null)
+const ponIndices = computed(() => matchingIndices.value.length >= 3 ? matchingIndices.value.slice(0, 3) : null)
+const openKanIndices = computed(() => matchingIndices.value.length === 4 ? matchingIndices.value : null)
 const closedKanIndices = computed(() => matchingIndices.value.length === 4 ? matchingIndices.value : null)
 const noValidMelds = computed(() => !!selectedTile.value
   && possibleChis.value.length === 0
@@ -166,18 +172,6 @@ const noValidMelds = computed(() => !!selectedTile.value
 
 function tilesAt(indices: number[]): Tile[] {
   return indices.map((index) => props.handTiles[index])
-}
-
-function cloneTile(tile: Tile): Tile {
-  return tile.suit === 'honor'
-    ? { suit: tile.suit, value: tile.value }
-    : { suit: tile.suit, value: tile.value }
-}
-
-function calledMeldTiles(indices: number[], count: number): Tile[] {
-  const tiles = tilesAt(indices)
-  while (tiles.length < count && tiles[0]) tiles.push(cloneTile(tiles[0]))
-  return tiles
 }
 
 function commit(type: Meld['type'], indices: number[], tiles: Tile[], calledTileIndex?: number) {
@@ -190,10 +184,7 @@ function commit(type: Meld['type'], indices: number[], tiles: Tile[], calledTile
 function removeMeld(index: number) {
   const meld = props.melds[index]
   if (!meld) return
-  const returnedTiles = meld.type === 'kan-closed'
-    ? meld.tiles
-    : meld.tiles.filter((_, tileIndex) => tileIndex !== (meld.calledTileIndex ?? meld.tiles.length - 1))
-  emit('update:handTiles', [...props.handTiles, ...returnedTiles])
+  emit('update:handTiles', [...props.handTiles, ...meld.tiles])
   emit('update:melds', props.melds.filter((_, meldIndex) => meldIndex !== index))
 }
 

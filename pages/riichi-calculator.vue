@@ -23,7 +23,14 @@
         </label>
       </div>
 
-      <div class="capture-row">
+      <nav class="wizard-progress" aria-label="Calculator steps">
+        <button v-for="step in wizardSteps" :key="step.number" type="button" :class="{ active: wizardStep === step.number, complete: wizardStep > step.number }" @click="goToWizardStep(step.number)">
+          <span>{{ step.number }}</span>{{ step.label }}
+        </button>
+      </nav>
+      <p v-if="wizardStep === 1" class="result-notice">Choose the table type, then continue to enter every physical tile — including tiles in called melds.</p>
+
+      <div v-show="wizardStep >= 2" class="capture-row">
         <div class="capture-buttons">
           <TileCaptureMenu
             label="Scan tiles"
@@ -42,7 +49,7 @@
       <p v-else-if="scanFeedback" class="scan-feedback">{{ scanFeedback }}</p>
 
       <div class="picked-rows">
-        <div class="picked-row hand-row" :class="{ 'needs-winner': handNeedsWinner, ready: handReady }">
+        <div v-show="wizardStep === 2 || wizardStep === 4" class="picked-row hand-row" :class="{ 'needs-winner': handNeedsWinner, ready: handReady }">
           <span class="row-label">Hand <em>{{ handProgress }}</em></span>
           <div class="row-tiles">
             <span
@@ -83,7 +90,7 @@
           <p v-else-if="handReady" class="hand-guidance ready">Ready to score.</p>
         </div>
 
-        <div class="picked-row">
+        <div v-show="wizardStep === 3" class="picked-row">
           <span class="row-label">Calls</span>
           <MeldBuilder
             :hand-tiles="handTiles"
@@ -94,7 +101,7 @@
           />
         </div>
 
-        <div class="picked-row">
+        <div v-show="wizardStep === 4" class="picked-row">
           <span class="row-label">Dora indicators</span>
           <div class="row-tiles">
             <span
@@ -125,7 +132,7 @@
           </div>
         </div>
 
-        <div v-if="hasRiichi" class="picked-row">
+        <div v-if="hasRiichi" v-show="wizardStep === 4" class="picked-row">
           <span class="row-label">Ura-dora indicators</span>
           <div class="row-tiles">
             <span v-for="(tile, i) in uraDoraTiles" :key="`ura-${i}-${tileToText(tile)}`" class="hand-tile">
@@ -140,7 +147,7 @@
       <p v-if="inputNote" class="input-note" :class="{ problem: inputNoteProblem }">{{ inputNote }}</p>
 
       <button
-        v-if="!pickerExpanded && handTiles.length >= handTarget"
+        v-if="(wizardStep === 2 || wizardStep === 4) && !pickerExpanded && handTiles.length >= handTarget"
         id="tile-picker-summary"
         type="button"
         class="picker-collapsed"
@@ -150,7 +157,7 @@
         <strong>Edit tiles</strong>
       </button>
 
-      <div v-else id="tile-picker" class="tile-picker" aria-label="Tile picker">
+      <div v-show="wizardStep === 2 || wizardStep === 4" v-if="!(!pickerExpanded && handTiles.length >= handTarget)" id="tile-picker" class="tile-picker" aria-label="Tile picker">
         <p class="picker-mode-label">
           Adding to
           <button type="button" class="picker-mode-switch" @click="aimPicker('hand')" :aria-pressed="pickerMode === 'hand'">Hand</button>
@@ -180,7 +187,7 @@
         </div>
       </div>
 
-      <div class="option-grid">
+      <div v-show="wizardStep === 4" class="option-grid">
         <div class="field win-type-field">
           <span class="field-label">Win</span>
           <div class="segmented-control" role="radiogroup" aria-label="Win type">
@@ -243,7 +250,7 @@
         </label>
       </div>
 
-      <div class="condition-panel">
+      <div v-show="wizardStep === 4" class="condition-panel">
         <div class="field declaration-field">
           <span class="field-label">Declaration</span>
           <div class="segmented-control declaration-control" role="radiogroup" aria-label="Riichi declaration">
@@ -296,7 +303,12 @@
           </label>
         </div>
       </div>
-      <p v-if="activeFlagHint" class="flag-hint">{{ activeFlagHint }}</p>
+      <p v-if="wizardStep === 4 && activeFlagHint" class="flag-hint">{{ activeFlagHint }}</p>
+      <div class="wizard-actions">
+        <button v-if="wizardStep > 1" type="button" class="text-button" @click="wizardStep--">Back</button>
+        <button v-if="wizardStep < 4" type="button" class="new-hand-btn" :disabled="!canAdvanceWizard" @click="advanceWizard">Continue</button>
+        <button v-else type="button" class="new-hand-btn" :disabled="!handReady" @click="scrollToResult">View score</button>
+      </div>
     </section>
 
     <section class="content-card result-card fade-up" aria-labelledby="result-heading" aria-live="polite">
@@ -450,6 +462,13 @@ const winningTileIndex = ref<number | null>(null)
 const doraTiles = ref<Tile[]>([])
 const uraDoraTiles = ref<Tile[]>([])
 const melds = ref<Meld[]>([])
+const wizardStep = ref(1)
+const wizardSteps = [
+  { number: 1, label: 'Table' },
+  { number: 2, label: 'Tiles' },
+  { number: 3, label: 'Calls' },
+  { number: 4, label: 'Win & score' },
+] as const
 
 const parsedMelds = computed(() => melds.value)
 
@@ -458,6 +477,9 @@ const winningTile = computed<Tile | null>(() =>
 
 /** Closed-set size including the winning tile: 14 minus 3 per meld. */
 const handTarget = computed(() => 14 - 3 * parsedMelds.value.length)
+const entryPhysicalReady = computed(() => handTiles.value.length >= 14 && handTiles.value.length <= 18)
+const handEntryLimit = computed(() =>
+  wizardStep.value === 2 && parsedMelds.value.length === 0 ? 18 : handTarget.value)
 
 /** Hand tiles minus the winning-tile instance — what the scorer calls closedTiles. */
 const closedHandTiles = computed(() =>
@@ -741,8 +763,8 @@ function blockedReasonFor(code: string): string | null {
   if (countFaceInUse(tile) >= 4) {
     return `All four ${code} are already in use (hand, calls, dora and ura count together)`
   }
-  if (handTiles.value.length >= handTarget.value) {
-    return `Hand is full (${handTarget.value} tiles) — remove a tile or declare a call`
+  if (handTiles.value.length >= handEntryLimit.value) {
+    return `Hand is full (${handEntryLimit.value} tiles) — remove a tile or declare a call`
   }
   return null
 }
@@ -831,17 +853,33 @@ function updateMelds(nextMelds: Meld[]) {
 
 const handProgress = computed(() => {
   const count = handTiles.value.length
+  if (wizardStep.value === 2 && parsedMelds.value.length === 0) {
+    return count < 14 ? `${14 - count} tile${14 - count === 1 ? '' : 's'} to enter` : `${count} physical tiles entered`
+  }
   const remaining = handTarget.value - count
   if (remaining > 0) return `${remaining} tile${remaining === 1 ? '' : 's'} remaining`
   if (remaining < 0) return `${Math.abs(remaining)} too many`
   return winningTileIndex.value === null ? 'complete · tap winner' : 'ready'
 })
 
-const handNeedsWinner = computed(() =>
-  handTiles.value.length === handTarget.value && winningTileIndex.value === null)
+const handNeedsWinner = computed(() => wizardStep.value === 4
+  && handTiles.value.length === handTarget.value && winningTileIndex.value === null)
 
-const handReady = computed(() =>
-  handTiles.value.length === handTarget.value && winningTileIndex.value !== null)
+const handReady = computed(() => wizardStep.value === 4
+  && handTiles.value.length === handTarget.value && winningTileIndex.value !== null)
+
+const canAdvanceWizard = computed(() =>
+  wizardStep.value !== 2 || entryPhysicalReady.value)
+
+function advanceWizard() {
+  if (!canAdvanceWizard.value || wizardStep.value >= 4) return
+  wizardStep.value++
+  if (wizardStep.value === 4) pickerMode.value = 'hand'
+}
+
+function goToWizardStep(step: number) {
+  if (step <= wizardStep.value || step === 2 || (step === 3 && entryPhysicalReady.value) || (step === 4 && handReady.value)) wizardStep.value = step
+}
 
 watch(
   () => [handTiles.value.length, handTarget.value] as const,
@@ -1431,6 +1469,59 @@ function yakuRomaji(name: string): string {
   background:
     radial-gradient(circle at 92% 8%, rgba(212, 206, 223, 0.5), transparent 32%),
     linear-gradient(145deg, rgba(255, 253, 249, 0.98), rgba(246, 236, 231, 0.92));
+}
+
+.wizard-progress,
+.wizard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 18px 0;
+}
+
+.wizard-progress button {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 7px 9px;
+  color: var(--clay-text);
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 700;
+  border: 1px solid rgba(101, 119, 99, 0.2);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.wizard-progress button span {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  color: white;
+  font-size: 0.58rem;
+  border-radius: 50%;
+  background: var(--clay-text);
+}
+
+.wizard-progress button.active,
+.wizard-progress button.complete {
+  color: var(--matcha-leaf);
+  border-color: var(--matcha-leaf);
+  opacity: 1;
+}
+
+.wizard-progress button.active span,
+.wizard-progress button.complete span {
+  background: var(--matcha-leaf);
+}
+
+.wizard-actions {
+  justify-content: space-between;
+  margin-top: 24px;
 }
 
 .result-card {
