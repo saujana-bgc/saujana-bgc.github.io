@@ -569,7 +569,7 @@ export function detectYakuman(
 
   // Daisuushi: four wind triplets
   if (windTriplets.length === 4) {
-    yaku.push({ name: "daisuushi", nameJa: "大四喜", han: 13, isYakuman: true });
+    yaku.push({ name: "daisuushi", nameJa: "大四喜", han: rules.doubleYakuman ? 26 : 13, isYakuman: true });
   }
 
   // Tsuuiisou: all honors

@@ -16,15 +16,12 @@
         class="frame-overlay"
         :style="overlayStyle"
       >
-        <button
+        <div
           v-for="key in SECTION_ORDER"
           :key="key"
-          type="button"
           class="viewfinder"
-          :class="[`viewfinder-${key}`, { disabled: !enabled[key] }]"
+          :class="`viewfinder-${key}`"
           :style="viewfinderStyle(key)"
-          :aria-pressed="enabled[key]"
-          @click="toggleSection(key)"
         >
           <i class="corner corner-tl"></i>
           <i class="corner corner-tr"></i>
@@ -34,7 +31,7 @@
             {{ activeBoxes[key].label }}
             <small>{{ activeBoxes[key].hint }}</small>
           </span>
-        </button>
+        </div>
       </div>
 
       <div v-if="cameraError" class="camera-error">
@@ -49,21 +46,7 @@
     <button type="button" class="close-camera" aria-label="Close guided scan" @click="close">×</button>
 
     <div v-if="!cameraError" class="camera-controls">
-      <p>Tap a region to include or exclude it</p>
-      <div class="section-toggles">
-        <button
-          v-for="key in SECTION_ORDER"
-          :key="key"
-          type="button"
-          :class="{ active: enabled[key] }"
-          :style="{ '--section-color': activeBoxes[key].color }"
-          :aria-pressed="enabled[key]"
-          @click="toggleSection(key)"
-        >
-          {{ activeBoxes[key].shortLabel }}
-          <small>{{ enabled[key] ? 'On' : 'Off' }}</small>
-        </button>
-      </div>
+      <p>Align your tiles inside all three guides, then capture.</p>
 
       <div class="shutter-row">
         <button
@@ -79,7 +62,7 @@
         <button
           type="button"
           class="shutter"
-          :disabled="!ready || !anySectionEnabled"
+          :disabled="!ready"
           aria-label="Capture guided scan"
           @click="capture"
         ><span></span></button>
@@ -94,7 +77,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'v
 
 type SectionKey = 'hand' | 'winning' | 'dora'
 type SectionBox = { x: number; y: number; w: number; h: number }
-type BoxDef = SectionBox & { label: string; shortLabel: string; hint: string; color: string }
+type BoxDef = SectionBox & { label: string; hint: string; color: string }
 
 interface GuidedCaptureData {
   image: string
@@ -112,15 +95,15 @@ const emit = defineEmits<{
 // normalized means the overlay and server-side section splitter agree even
 // when the captured frame is downscaled before upload.
 const LANDSCAPE: Record<SectionKey, BoxDef> = {
-  dora: { x: 0.04, y: 0.22, w: 0.60, h: 0.20, label: 'Dora indicators', shortLabel: 'Dora', hint: '1–8 tiles', color: '#98e87e' },
-  hand: { x: 0.02, y: 0.47, w: 0.72, h: 0.28, label: 'Hand', shortLabel: 'Hand', hint: '13 tiles', color: '#d6b868' },
-  winning: { x: 0.76, y: 0.47, w: 0.19, h: 0.28, label: 'Winning tile', shortLabel: 'Win', hint: '1 tile', color: '#7ec8e3' },
+  dora: { x: 0.04, y: 0.22, w: 0.60, h: 0.20, label: 'Dora indicators', hint: 'Omote, then ura', color: '#98e87e' },
+  hand: { x: 0.02, y: 0.47, w: 0.72, h: 0.28, label: 'Hand', hint: '13 tiles', color: '#d6b868' },
+  winning: { x: 0.76, y: 0.47, w: 0.19, h: 0.28, label: 'Winning tile', hint: '1 tile', color: '#7ec8e3' },
 }
 
 const PORTRAIT: Record<SectionKey, BoxDef> = {
-  dora: { x: 0.02, y: 0.04, w: 0.96, h: 0.14, label: 'Dora indicators', shortLabel: 'Dora', hint: '1–8 tiles', color: '#98e87e' },
-  hand: { x: 0.02, y: 0.25, w: 0.96, h: 0.18, label: 'Hand', shortLabel: 'Hand', hint: '13 tiles', color: '#d6b868' },
-  winning: { x: 0.02, y: 0.48, w: 0.22, h: 0.14, label: 'Winning tile', shortLabel: 'Win', hint: '1 tile', color: '#7ec8e3' },
+  dora: { x: 0.02, y: 0.04, w: 0.96, h: 0.14, label: 'Dora indicators', hint: 'Omote, then ura', color: '#98e87e' },
+  hand: { x: 0.02, y: 0.25, w: 0.96, h: 0.18, label: 'Hand', hint: '13 tiles', color: '#d6b868' },
+  winning: { x: 0.02, y: 0.48, w: 0.22, h: 0.14, label: 'Winning tile', hint: '1 tile', color: '#7ec8e3' },
 }
 
 const SECTION_ORDER: SectionKey[] = ['hand', 'winning', 'dora']
@@ -132,7 +115,6 @@ const isLandscape = ref(true)
 const torchSupported = ref(false)
 const torchOn = ref(false)
 const overlay = reactive({ left: 0, top: 0, width: 0, height: 0 })
-const enabled = reactive<Record<SectionKey, boolean>>({ hand: true, winning: true, dora: true })
 let stream: MediaStream | null = null
 let resizeObserver: ResizeObserver | null = null
 let previousHtmlOverflow = ''
@@ -140,7 +122,6 @@ let previousBodyOverflow = ''
 let previousOverscroll = ''
 
 const activeBoxes = computed(() => isLandscape.value ? LANDSCAPE : PORTRAIT)
-const anySectionEnabled = computed(() => SECTION_ORDER.some((key) => enabled[key]))
 const overlayStyle = computed(() => ({
   left: `${overlay.left}px`,
   top: `${overlay.top}px`,
@@ -157,10 +138,6 @@ function viewfinderStyle(key: SectionKey) {
     height: `${box.h * 100}%`,
     '--section-color': box.color,
   }
-}
-
-function toggleSection(key: SectionKey) {
-  enabled[key] = !enabled[key]
 }
 
 function computeOverlay() {
@@ -194,7 +171,7 @@ async function toggleTorch() {
 
 function capture() {
   const vid = video.value
-  if (!vid?.videoWidth || !anySectionEnabled.value) return
+  if (!vid?.videoWidth) return
 
   const maxEdge = 2048
   const scale = Math.min(1, maxEdge / Math.max(vid.videoWidth, vid.videoHeight))
@@ -211,7 +188,6 @@ function capture() {
 
   const sections: Partial<Record<SectionKey, SectionBox>> = {}
   for (const key of SECTION_ORDER) {
-    if (!enabled[key]) continue
     const { x, y, w, h } = activeBoxes.value[key]
     sections[key] = { x, y, w, h }
   }
@@ -316,15 +292,6 @@ onBeforeUnmount(() => {
   border: 2px solid var(--section-color);
   border-radius: 5px;
   background: rgba(0, 0, 0, 0.04);
-  cursor: pointer;
-  pointer-events: auto;
-  transition: opacity 0.15s ease, border-color 0.15s ease;
-}
-
-.viewfinder.disabled {
-  color: rgba(255, 255, 255, 0.34);
-  border-color: rgba(255, 255, 255, 0.25);
-  opacity: 0.45;
 }
 
 .corner {
@@ -399,13 +366,6 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
 }
 
-.section-toggles {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.section-toggles button,
 .torch-btn {
   min-width: 72px;
   padding: 8px 12px;
@@ -418,18 +378,6 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.48);
-}
-
-.section-toggles button.active {
-  color: var(--section-color);
-  border-color: var(--section-color);
-  background: rgba(0, 0, 0, 0.58);
-}
-
-.section-toggles small {
-  display: block;
-  margin-top: 3px;
-  font-size: 0.54rem;
 }
 
 .shutter-row {
@@ -519,14 +467,12 @@ onBeforeUnmount(() => {
   }
 
   .camera-controls > p { display: none; }
-  .section-toggles { grid-column: 3; grid-row: 1; justify-self: start; }
   .shutter-row { grid-column: 2; grid-row: 1; grid-template-columns: 74px; }
   .torch-btn { position: fixed; left: max(20px, env(safe-area-inset-left)); bottom: max(22px, env(safe-area-inset-bottom)); }
   .control-spacer { display: none; }
 }
 
 @media (max-width: 390px) {
-  .section-toggles button { min-width: 64px; padding-inline: 8px; }
   .viewfinder-label small { display: none; }
 }
 </style>

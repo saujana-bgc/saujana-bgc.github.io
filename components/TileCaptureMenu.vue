@@ -1,12 +1,11 @@
 <template>
   <div class="capture">
-    <button type="button" class="capture-btn" :disabled="busy || disabled" @click="open(cameraInput)">
+    <button type="button" class="capture-btn" :disabled="busy || disabled" @click="emit('camera')">
       <span v-if="busy" class="spinner" aria-hidden="true"></span>
       Scan with Camera
     </button>
 
     <button type="button" class="capture-btn gallery-btn" :disabled="busy || disabled" @click="open(libraryInput)">Choose from Gallery</button>
-    <input ref="cameraInput" type="file" accept="image/*" capture="environment" class="hidden-input" @change="onFile" />
     <input ref="libraryInput" type="file" accept="image/*" class="hidden-input" @change="onFile" />
   </div>
 </template>
@@ -18,9 +17,8 @@ withDefaults(defineProps<{ busy?: boolean; disabled?: boolean }>(), {
   busy: false,
   disabled: false,
 })
-const emit = defineEmits<{ capture: [base64: string] }>()
+const emit = defineEmits<{ capture: [base64: string]; camera: [] }>()
 
-const cameraInput = ref<HTMLInputElement | null>(null)
 const libraryInput = ref<HTMLInputElement | null>(null)
 
 const MAX_EDGE = 1600

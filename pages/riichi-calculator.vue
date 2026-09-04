@@ -40,6 +40,7 @@
           <TileCaptureMenu
             :busy="detectingHand || detectingDora"
             @capture="scanHand"
+            @camera="guidedOpen = true"
           />
         </div>
         <span v-if="warmupNote" class="warmup-note" :class="scanStatus">
@@ -123,6 +124,7 @@
             </button>
             <span v-if="doraTiles.length === 0" class="row-empty">None</span>
           </div>
+          <p class="dora-guidance">{{ doraInputGuidance }}</p>
         </div>
 
         <div v-show="wizardStep === 3" class="picked-row">
@@ -375,6 +377,11 @@
                 <span class="yaku-en">Dora</span>
                 <strong>{{ result.doraCount }}</strong>
               </li>
+              <li v-if="result.uraDoraCount > 0">
+                <span class="yaku-ja">Ura dora</span>
+                <span class="yaku-en">Ura dora</span>
+                <strong>{{ result.uraDoraCount }}</strong>
+              </li>
               <li v-if="result.akaDoraCount > 0">
                 <span class="yaku-ja">Aka dora</span>
                 <span class="yaku-en">Aka dora</span>
@@ -433,7 +440,7 @@
     <Teleport to="body">
       <GuidedTileCapture
         v-if="guidedOpen"
-        @capture="scanGuided"
+        @capture="scanCameraCapture"
         @close="guidedOpen = false"
       />
     </Teleport>
@@ -446,18 +453,19 @@ import type { Hand, Meld, Tile, WindValue } from '~/utils/scoring/types'
 import { score } from '~/utils/scoring'
 import { sortTiles, isAkaDora } from '~/utils/scoring/tiles'
 import { validateTileSet } from '~/utils/scoring/tile-set'
+import { splitCombinedDoraIndicators } from '~/utils/scoring/dora-indicators'
 import { tileSrc } from '~/utils/tile-image'
 
 type FlagKey = 'riichi' | 'doubleRiichi' | 'ippatsu' | 'haitei' | 'houtei' | 'rinshan' | 'chankan'
-type GuidedSectionKey = 'hand' | 'winning' | 'dora'
-type GuidedSectionBox = { x: number; y: number; w: number; h: number }
-interface GuidedCaptureData {
+type CameraSectionKey = 'hand' | 'winning' | 'dora'
+type CameraSectionBox = { x: number; y: number; w: number; h: number }
+interface CameraCaptureData {
   image: string
-  sections: Partial<Record<GuidedSectionKey, GuidedSectionBox>>
+  sections: Partial<Record<CameraSectionKey, CameraSectionBox>>
   imageWidth: number
   imageHeight: number
 }
-interface GuidedDetectionResult {
+interface CameraDetectionResult {
   mode: 'guided'
   hand: Tile[]
   winningTile: Tile | null
@@ -880,6 +888,14 @@ const handNeedsWinner = computed(() => wizardStep.value === 2
 const handReady = computed(() => wizardStep.value === 4
   && handTiles.value.length === handTarget.value && winningTileIndex.value !== null)
 
+const doraInputGuidance = computed(() => {
+  const omoteCount = 1 + parsedMelds.value.filter((meld) => meld.type.startsWith('kan')).length
+  const visible = `${omoteCount} omote indicator${omoteCount === 1 ? '' : 's'}`
+  return (flags.riichi || flags.doubleRiichi)
+    ? `Enter or scan ${visible} first, then the same number of ura indicators.`
+    : `Enter or scan ${visible}. Ura indicators are revealed only after riichi.`
+})
+
 const canAdvanceWizard = computed(() =>
   wizardStep.value !== 2 || (entryPhysicalReady.value && winningTile.value !== null))
 
@@ -1115,7 +1131,7 @@ async function scanHand(base64: string) {
       return
     }
     if (tiles.length > 20) {
-      detectError.value = 'Too many tiles detected. Crop the photo to the hand, or use Guided scan.'
+      detectError.value = 'Too many tiles detected. Crop the photo to the hand, or use Camera Scan.'
       return
     }
     // A gallery photo is assumed to be a complete hand shot. Keep every tile
@@ -1137,7 +1153,7 @@ async function scanHand(base64: string) {
   }
 }
 
-async function scanGuided(capture: GuidedCaptureData) {
+async function scanCameraCapture(capture: CameraCaptureData) {
   guidedOpen.value = false
   const scansHand = !!capture.sections.hand || !!capture.sections.winning
   const scansDora = !!capture.sections.dora
@@ -1157,10 +1173,10 @@ async function scanGuided(capture: GuidedCaptureData) {
       handCount: capture.sections.hand
         ? handTarget.value - (capture.sections.winning ? 1 : 0)
         : undefined,
-    }) as unknown as GuidedDetectionResult
+    }) as unknown as CameraDetectionResult
 
     if (data.mode !== 'guided' || !Array.isArray(data.hand) || !Array.isArray(data.dora)) {
-      throw new Error('Detection service returned an invalid guided-scan result')
+      throw new Error('Detection service returned an invalid camera-scan result')
     }
 
     const foundCount = data.hand.length
@@ -1201,7 +1217,7 @@ async function scanGuided(capture: GuidedCaptureData) {
     scanStatus.value = 'failed'
     detectError.value = err instanceof Error && err.message
       ? `${err.message} Please enter the tiles manually.`
-      : 'Guided detection failed. Please enter the tiles manually.'
+      : 'Camera scan failed. Please enter the tiles manually.'
   } finally {
     detectingHand.value = false
     detectingDora.value = false
@@ -1300,6 +1316,11 @@ const scoreState = computed<ScoreState>(() => {
   }
 
   const numKans = melds.filter((m) => m.type.startsWith('kan')).length
+  const doraIndicators = splitCombinedDoraIndicators(
+    doraTiles.value,
+    numKans,
+    flags.riichi || flags.doubleRiichi,
+  )
   // Kans add a physical tile to their meld, so the whole hand is 14 + kans.
   const targetTotal = 14 + numKans
   const totalTiles = handTiles.value.length + melds.reduce((sum, m) => sum + m.tiles.length, 0)
@@ -1330,7 +1351,8 @@ const scoreState = computed<ScoreState>(() => {
     winType: winType.value,
     seatWind: seatWind.value,
     roundWind: roundWind.value,
-    doraIndicators: doraTiles.value,
+    doraIndicators: doraIndicators.omote,
+    uraDoraIndicators: doraIndicators.ura,
     riichi: flags.riichi,
     doubleRiichi: flags.doubleRiichi,
     ippatsu: flags.ippatsu,
@@ -1350,6 +1372,7 @@ const scoreState = computed<ScoreState>(() => {
   const result = score(hand, {
     playerCount: threePlayer.value ? 3 : 4,
     akaDoraCount: threePlayer.value ? 2 : 3,
+    doubleYakuman: true,
   })
 
   if (!result.valid) {
@@ -1928,6 +1951,15 @@ function yakuRomaji(name: string): string {
 
 .hand-guidance.ready {
   color: var(--matcha-leaf);
+}
+
+.dora-guidance {
+  grid-column: 2;
+  margin: -4px 2px 0;
+  color: var(--clay-text);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  opacity: 0.68;
 }
 
 .tile-btn {
