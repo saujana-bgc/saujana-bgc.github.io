@@ -80,13 +80,16 @@ export default async function handler(req, res) {
     const handCount = Number.isInteger(body.handCount) && body.handCount >= 1 && body.handCount <= 20
       ? body.handCount
       : undefined;
+    const doraCount = Number.isInteger(body.doraCount) && body.doraCount >= 1 && body.doraCount <= 10
+      ? body.doraCount
+      : undefined;
 
     // Individual mode: a flat tile list (hand / dora scanning).
     // Guided mode: optional section boxes (normalized 0..1) split one frame
     // into hand / winning / dora / meld groups; the image pixel size is
     // passed through so splitBySection can map boxes back to pixels.
     if (body.sections && Object.keys(body.sections).length > 0) {
-      const guided = await detectGuided(body, buffer, imgWidth, imgHeight, handCount);
+      const guided = await detectGuided(body, buffer, imgWidth, imgHeight, handCount, doraCount);
       return res.status(200).json({ mode: 'guided', ...guided });
     }
 
@@ -99,7 +102,7 @@ export default async function handler(req, res) {
   }
 }
 
-async function detectGuided(body, buffer, imgWidth, imgHeight, handCount) {
+async function detectGuided(body, buffer, imgWidth, imgHeight, handCount, doraCount) {
   const sections = body.sections;
   const winningBox = sections.winning;
 
@@ -119,7 +122,7 @@ async function detectGuided(body, buffer, imgWidth, imgHeight, handCount) {
       const pixelBox = pixelBoxFor(box, imgWidth, imgHeight);
       if (!pixelBox) return [];
       const crop = await sharp(buffer).extract(pixelBox).toBuffer();
-      const expected = key === 'hand' ? handCount : undefined;
+      const expected = key === 'hand' ? handCount : key === 'dora' ? doraCount : undefined;
       const local = await detectTilesOnnx(crop.toString('base64'), pixelBox.width, pixelBox.height, expected);
       return local.map((prediction) => ({
         ...prediction,

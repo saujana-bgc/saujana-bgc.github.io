@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { score } from '../utils/scoring/index.ts'
-import { splitCombinedDoraIndicators } from '../utils/scoring/dora-indicators.ts'
+import { combinedDoraIndicatorCount, doraIndicatorRowCount, splitCombinedDoraIndicators } from '../utils/scoring/dora-indicators.ts'
 import type { Hand, HonorValue, Suit, Tile } from '../utils/scoring/types.ts'
 
 const suited = (suit: Suit, value: number): Tile => ({
@@ -42,6 +42,9 @@ test('combined dora input splits omote and ura rows from kan count and riichi', 
     omote: indicators.slice(0, 3),
     ura: [],
   })
+  assert.equal(doraIndicatorRowCount(2), 3)
+  assert.equal(combinedDoraIndicatorCount(2, false), 3)
+  assert.equal(combinedDoraIndicatorCount(2, true), 6)
 })
 
 test('SRL double-yakuman forms are worth two yakuman units', () => {

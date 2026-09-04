@@ -453,7 +453,7 @@ import type { Hand, Meld, Tile, WindValue } from '~/utils/scoring/types'
 import { score } from '~/utils/scoring'
 import { sortTiles, isAkaDora } from '~/utils/scoring/tiles'
 import { validateTileSet } from '~/utils/scoring/tile-set'
-import { splitCombinedDoraIndicators } from '~/utils/scoring/dora-indicators'
+import { combinedDoraIndicatorCount, doraIndicatorRowCount, splitCombinedDoraIndicators } from '~/utils/scoring/dora-indicators'
 import { tileSrc } from '~/utils/tile-image'
 
 type FlagKey = 'riichi' | 'doubleRiichi' | 'ippatsu' | 'haitei' | 'houtei' | 'rinshan' | 'chankan'
@@ -889,7 +889,7 @@ const handReady = computed(() => wizardStep.value === 4
   && handTiles.value.length === handTarget.value && winningTileIndex.value !== null)
 
 const doraInputGuidance = computed(() => {
-  const omoteCount = 1 + parsedMelds.value.filter((meld) => meld.type.startsWith('kan')).length
+  const omoteCount = doraIndicatorRowCount(parsedMelds.value.filter((meld) => meld.type.startsWith('kan')).length)
   const visible = `${omoteCount} omote indicator${omoteCount === 1 ? '' : 's'}`
   return (flags.riichi || flags.doubleRiichi)
     ? `Enter or scan ${visible} first, then the same number of ura indicators.`
@@ -1157,6 +1157,8 @@ async function scanCameraCapture(capture: CameraCaptureData) {
   guidedOpen.value = false
   const scansHand = !!capture.sections.hand || !!capture.sections.winning
   const scansDora = !!capture.sections.dora
+  const kanCount = parsedMelds.value.filter((meld) => meld.type.startsWith('kan')).length
+  const doraCount = combinedDoraIndicatorCount(kanCount, flags.riichi || flags.doubleRiichi)
   detectingHand.value = scansHand
   detectingDora.value = scansDora
   detectError.value = null
@@ -1173,6 +1175,10 @@ async function scanCameraCapture(capture: CameraCaptureData) {
       handCount: capture.sections.hand
         ? handTarget.value - (capture.sections.winning ? 1 : 0)
         : undefined,
+      // The dora guide contains a known number of tiles: omote first, then
+      // ura after riichi. Supplying it avoids the detector guessing from a
+      // short, wide row where the count heuristic is least reliable.
+      doraCount: scansDora ? doraCount : undefined,
     }) as unknown as CameraDetectionResult
 
     if (data.mode !== 'guided' || !Array.isArray(data.hand) || !Array.isArray(data.dora)) {

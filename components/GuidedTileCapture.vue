@@ -95,13 +95,13 @@ const emit = defineEmits<{
 // normalized means the overlay and server-side section splitter agree even
 // when the captured frame is downscaled before upload.
 const LANDSCAPE: Record<SectionKey, BoxDef> = {
-  dora: { x: 0.04, y: 0.22, w: 0.60, h: 0.20, label: 'Dora indicators', hint: 'Omote, then ura', color: '#98e87e' },
+  dora: { x: 0.03, y: 0.13, w: 0.94, h: 0.27, label: 'Dora indicators', hint: 'Omote, then ura', color: '#98e87e' },
   hand: { x: 0.02, y: 0.47, w: 0.72, h: 0.28, label: 'Hand', hint: '13 tiles', color: '#d6b868' },
   winning: { x: 0.76, y: 0.47, w: 0.19, h: 0.28, label: 'Winning tile', hint: '1 tile', color: '#7ec8e3' },
 }
 
 const PORTRAIT: Record<SectionKey, BoxDef> = {
-  dora: { x: 0.02, y: 0.04, w: 0.96, h: 0.14, label: 'Dora indicators', hint: 'Omote, then ura', color: '#98e87e' },
+  dora: { x: 0.02, y: 0.03, w: 0.96, h: 0.18, label: 'Dora indicators', hint: 'Omote, then ura', color: '#98e87e' },
   hand: { x: 0.02, y: 0.25, w: 0.96, h: 0.18, label: 'Hand', hint: '13 tiles', color: '#d6b868' },
   winning: { x: 0.02, y: 0.48, w: 0.22, h: 0.14, label: 'Winning tile', hint: '1 tile', color: '#7ec8e3' },
 }
