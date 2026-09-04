@@ -105,6 +105,7 @@ export default async function handler(req, res) {
 async function detectGuided(body, buffer, imgWidth, imgHeight, handCount, doraCount) {
   const sections = body.sections;
   const winningBox = sections.winning;
+  const doraBox = sections.dora;
 
   const winnerCropPromise = winningBox
     ? cropForWinner(buffer, winningBox, imgWidth, imgHeight)
@@ -115,6 +116,20 @@ async function detectGuided(body, buffer, imgWidth, imgHeight, handCount, doraCo
         })
     : Promise.resolve(null);
 
+  // A standard hand always has at least one omote dora. Give the single-tile
+  // case its own focused classification pass as a safety net: section
+  // bucketing intentionally ignores low-confidence predictions, while a
+  // tightly cropped, expected single tile can still be classified reliably.
+  const expectedDoraCount = doraCount ?? 1;
+  const doraCropPromise = doraBox && expectedDoraCount === 1
+    ? cropForWinner(buffer, doraBox, imgWidth, imgHeight)
+        .then((crop) => (crop ? detectWinningTile(crop) : null))
+        .catch((err) => {
+          console.error('dora-crop detection failed:', err);
+          return null;
+        })
+    : Promise.resolve(null);
+
   // Classify each viewfinder region independently. This gives the local
   // detector a clean tile run instead of asking it to segment the whole table.
   const predictions = (await Promise.all(
@@ -122,7 +137,10 @@ async function detectGuided(body, buffer, imgWidth, imgHeight, handCount, doraCo
       const pixelBox = pixelBoxFor(box, imgWidth, imgHeight);
       if (!pixelBox) return [];
       const crop = await sharp(buffer).extract(pixelBox).toBuffer();
-      const expected = key === 'hand' ? handCount : key === 'dora' ? doraCount : undefined;
+      // Never make the dora crop estimate a count from its short row. Every
+      // valid hand has one omote indicator, even for older browser clients
+      // that do not send the newer doraCount hint.
+      const expected = key === 'hand' ? handCount : key === 'dora' ? expectedDoraCount : undefined;
       const local = await detectTilesOnnx(crop.toString('base64'), pixelBox.width, pixelBox.height, expected);
       return local.map((prediction) => ({
         ...prediction,
@@ -132,7 +150,7 @@ async function detectGuided(body, buffer, imgWidth, imgHeight, handCount, doraCo
     }),
   )).flat();
 
-  const cropWinner = await winnerCropPromise;
+  const [cropWinner, cropDora] = await Promise.all([winnerCropPromise, doraCropPromise]);
 
   if (cropWinner) {
     // The winner is a physically separate tile: drop any full-frame detection
@@ -143,11 +161,16 @@ async function detectGuided(body, buffer, imgWidth, imgHeight, handCount, doraCo
     );
     const split = splitBySection(filtered, withoutWinning(sections), imgWidth, imgHeight);
     split.winningTile = cropWinner;
-    return split;
+    return applyDoraFallback(split, cropDora);
   }
 
   // Fallback: bucket region detections by section boxes.
-  return splitBySection(predictions, sections, imgWidth, imgHeight);
+  return applyDoraFallback(splitBySection(predictions, sections, imgWidth, imgHeight), cropDora);
+}
+
+function applyDoraFallback(split, dora) {
+  if (split.dora.length === 0 && dora) split.dora = [dora];
+  return split;
 }
 
 function withoutWinning(sections) {
