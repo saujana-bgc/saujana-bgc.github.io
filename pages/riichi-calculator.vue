@@ -335,22 +335,22 @@
             <h3>Yaku ({{ result.totalHan }} han)</h3>
             <ul class="yaku-list">
               <li v-for="(yaku, index) in result.yaku" :key="`${yaku.name}-${yaku.detail ?? index}`">
-                <span class="yaku-ja">{{ yaku.nameJa }}</span>
+                <span class="yaku-ja">{{ yakuRomaji(yaku.name) }}</span>
                 <span class="yaku-en">{{ yakuName(yaku.name, yaku.detail) }}</span>
                 <strong>{{ yaku.isYakuman ? 'yakuman' : `${yaku.han} han` }}</strong>
               </li>
               <li v-if="result.doraCount > 0">
-                <span class="yaku-ja">ドラ</span>
+                <span class="yaku-ja">Dora</span>
                 <span class="yaku-en">Dora</span>
                 <strong>{{ result.doraCount }}</strong>
               </li>
               <li v-if="result.uraDoraCount > 0">
-                <span class="yaku-ja">裏ドラ</span>
+                <span class="yaku-ja">Ura dora</span>
                 <span class="yaku-en">Ura-dora</span>
                 <strong>{{ result.uraDoraCount }}</strong>
               </li>
               <li v-if="result.nukiDoraCount > 0">
-                <span class="yaku-ja">抜きドラ</span>
+                <span class="yaku-ja">Nuki dora</span>
                 <span class="yaku-en">Nuki dora</span>
                 <strong>{{ result.nukiDoraCount }}</strong>
               </li>
@@ -695,16 +695,20 @@ async function aimPicker(mode: PickerMode) {
 
 const MAX_DORA_INDICATORS = 5
 
-/** True for any five of a suited tile, red or ordinary — they share a face. */
-function isFiveFace(tile: Tile): boolean {
-  return tile.suit !== 'honor' && tile.value === 5
-}
-
 function countInMelds(face: Tile): number {
   return melds.value.reduce(
     (sum, meld) => sum + meld.tiles.filter((t) => t.suit === face.suit && t.value === face.value).length,
     0,
   )
+}
+
+/** Every copy of a face shares the same four-tile physical-set limit. */
+function countFaceInUse(face: Tile): number {
+  const sameFace = (tile: Tile) => tile.suit === face.suit && tile.value === face.value
+  return handTiles.value.filter(sameFace).length
+    + countInMelds(face)
+    + doraTiles.value.filter(sameFace).length
+    + uraDoraTiles.value.filter(sameFace).length
 }
 
 function blockedReasonFor(code: string): string | null {
@@ -718,34 +722,16 @@ function blockedReasonFor(code: string): string | null {
     if (indicators.length >= MAX_DORA_INDICATORS) {
       return `${pickerMode.value === 'ura' ? 'Ura-dora' : 'Dora'} indicator limit reached (5)`
     }
-    const used = handTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
-      + countInMelds(tile)
-      + doraTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
-      + uraDoraTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
+    const used = countFaceInUse(tile)
     if (used >= 4) {
       return `All four ${code} are already in use (hand, calls and dora count together)`
     }
     return null
   }
 
-  // Hand mode: enforce physical-set counts across hand + melds (doras included
-  // via the dora-mode rule above; the winning tile is one of the hand tiles).
-  const inHand = handTiles.value.filter((t) => t.suit === tile.suit && t.value === tile.value).length
-  const inMelds = countInMelds(tile)
-  if (inHand + inMelds >= 4) {
-    return `All four ${code} are already in use`
-  }
-  if (isFiveFace(tile)) {
-    // 3 ordinary fives + 1 red five = 4 tiles of that face; both codes draw
-    // from the same pool, so once 4 fives of a suit exist neither can be added.
-    const fivesInHand = handTiles.value.filter((t) => t.suit === tile.suit && isFiveFace(t)).length
-    const fivesInMelds = melds.value.reduce(
-      (sum, meld) => sum + meld.tiles.filter((t) => t.suit === tile.suit && isFiveFace(t)).length,
-      0,
-    )
-    if (fivesInHand + fivesInMelds >= 4) {
-      return `All four ${tile.suit === 'man' ? '5m' : tile.suit === 'pin' ? '5p' : '5s'} (including the red five) are already in use`
-    }
+  // Hand mode uses the same physical-set count, including both indicator rows.
+  if (countFaceInUse(tile) >= 4) {
+    return `All four ${code} are already in use (hand, calls, dora and ura count together)`
   }
   if (handTiles.value.length >= handTarget.value) {
     return `Hand is full (${handTarget.value} tiles) — remove a tile or declare a call`
@@ -1183,6 +1169,23 @@ const YAKU_EN: Record<string, string> = {
   kokushi: 'Kokushi musou',
 }
 
+const YAKU_ROMAJI: Record<string, string> = {
+  riichi: 'Riichi', 'double-riichi': 'Daburu riichi', ippatsu: 'Ippatsu', tsumo: 'Menzen tsumo',
+  pinfu: 'Pinfu', tanyao: 'Tanyao', yakuhai: 'Yakuhai', chiitoitsu: 'Chiitoitsu',
+  iipeiko: 'Iipeikou', ryanpeiko: 'Ryanpeikou', 'sanshoku-doujun': 'Sanshoku doujun',
+  'sanshoku-doukou': 'Sanshoku doukou', ittsu: 'Ittsu', chanta: 'Chanta', junchan: 'Junchan',
+  honitsu: 'Honitsu', chinitsu: 'Chinitsu', toitoi: 'Toitoi', sanankou: 'Sanankou',
+  sankantsu: 'Sankantsu', honroutou: 'Honroutou', shousangen: 'Shousangen',
+  haitei: 'Haitei raoyue', houtei: 'Houtei raoyui', rinshan: 'Rinshan kaihou', chankan: 'Chankan',
+  nagashi: 'Nagashi mangan', kokushi: 'Kokushi musou', daisangen: 'Daisangen',
+  shousuushi: 'Shousuushii', daisuushi: 'Daisuushii', suuankou: 'Suuankou',
+  tsuuiisou: 'Tsuuiisou', ryuuiisou: 'Ryuuiisou', chinroutou: 'Chinroutou',
+  suukantsu: 'Suukantsu', chuurenpoutou: 'Chuuren poutou', renho: 'Renhou',
+  iipinmoyue: 'Iipin moyue', chuupinraoyui: 'Chuupin raoyui', daisharin: 'Daisharin',
+  daishichi: 'Daishichisei', sanrenkou: 'Sanrenkou', suurenkou: 'Suurenkou',
+  uumensai: 'Uumensai', iisousanjun: 'Iisou sanjun',
+}
+
 const HAND_NAMES: Record<string, string> = {
   mangan: 'Mangan',
   haneman: 'Haneman',
@@ -1350,6 +1353,10 @@ function formatPoints(n: number): string {
 function yakuName(name: string, detail?: string): string {
   const label = YAKU_EN[name] ?? name
   return detail ? `${label} — ${detail}` : label
+}
+
+function yakuRomaji(name: string): string {
+  return YAKU_ROMAJI[name] ?? name
 }
 </script>
 
