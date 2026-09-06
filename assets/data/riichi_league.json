@@ -73,6 +73,7 @@
     { "id": "amir", "displayName": "Amir" },
     { "id": "insyi", "displayName": "Insyi" },
     { "id": "danny", "displayName": "Danny" },
+    { "id": "denzel", "displayName": "Denzel" },
     { "id": "nicholas-lee", "displayName": "Nicholas Lee" },
     { "id": "ben", "displayName": "Ben" },
     { "id": "leek", "displayName": "Leek" },
@@ -502,9 +503,80 @@
       "endTime": null,
       "location": "",
       "admissionDisplay": "Free",
-      "status": "scheduled",
+      "status": "completed",
       "notes": "",
-      "tables": []
+      "tables": [
+        {
+          "id": "season-1-week-06-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 39800, "placement": 1 },
+            { "playerId": "tom", "finalPoints": 31100, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 23900, "placement": 3 },
+            { "playerId": "daus", "finalPoints": 5200, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-06-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "tom", "finalPoints": 34900, "placement": 1 },
+            { "playerId": "nick", "finalPoints": 29500, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 24900, "placement": 3 },
+            { "playerId": "amir", "finalPoints": 10700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-06-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "nick", "finalPoints": 39100, "placement": 1 },
+            { "playerId": "daus", "finalPoints": 28100, "placement": 2 },
+            { "playerId": "eric", "finalPoints": 16600, "placement": 3 },
+            { "playerId": "aaran", "finalPoints": 16200, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-06-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "bena", "finalPoints": 54900, "placement": 1 },
+            { "playerId": "fatinah", "finalPoints": 20700, "placement": 2 },
+            { "playerId": "dice", "finalPoints": 14700, "placement": 3 },
+            { "playerId": "tom", "finalPoints": 9700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-06-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "dice", "finalPoints": 59500, "placement": 1 },
+            { "playerId": "fatinah", "finalPoints": 27200, "placement": 2 },
+            { "playerId": "danny", "finalPoints": 10000, "placement": 3 },
+            { "playerId": "denzel", "finalPoints": 3300, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-06-game-06",
+          "tableNumber": 6,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 44200, "placement": 1 },
+            { "playerId": "daus", "finalPoints": 21100, "placement": 2 },
+            { "playerId": "tom", "finalPoints": 19600, "placement": 3 },
+            { "playerId": "bena", "finalPoints": 15100, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-06-game-07",
+          "tableNumber": 7,
+          "results": [
+            { "playerId": "daus", "finalPoints": 43800, "placement": 1 },
+            { "playerId": "dice", "finalPoints": 27300, "placement": 2 },
+            { "playerId": "fatinah", "finalPoints": 16900, "placement": 3 },
+            { "playerId": "aaran", "finalPoints": 12000, "placement": 4 }
+          ]
+        }
+      ]
     },
     {
       "id": "season-1-week-07",
