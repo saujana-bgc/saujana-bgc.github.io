@@ -67,7 +67,6 @@
     { "id": "afif", "displayName": "Afif" },
     { "id": "eric", "displayName": "Eric" },
     { "id": "freya", "displayName": "Freya" },
-    { "id": "danial", "displayName": "Danial" },
     { "id": "erin", "displayName": "Erin" },
     { "id": "sasi", "displayName": "Sasi" },
     { "id": "dennis", "displayName": "Dennis" },
@@ -589,7 +588,7 @@
       "date": "2026-09-12",
       "startTime": "13:30",
       "endTime": null,
-      "location": "",
+      "location": "Boardroom Bandit, Ara Damansara",
       "admissionDisplay": "Free",
       "status": "completed",
       "notes": "",
@@ -629,7 +628,7 @@
           "tableNumber": 4,
           "results": [
             { "playerId": "aaran", "finalPoints": 38100, "placement": 1 },
-            { "playerId": "danial", "finalPoints": 35600, "placement": 2 },
+            { "playerId": "dice", "finalPoints": 35600, "placement": 2 },
             { "playerId": "daus", "finalPoints": 28700, "placement": 3 },
             { "playerId": "freya", "finalPoints": -2400, "placement": 4 }
           ]
@@ -702,7 +701,7 @@
       "date": "2026-09-19",
       "startTime": "13:30",
       "endTime": null,
-      "location": "",
+      "location": "Boardroom Bandit, Ara Damansara",
       "admissionDisplay": "Free",
       "status": "scheduled",
       "notes": "",
