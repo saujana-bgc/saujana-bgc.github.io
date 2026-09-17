@@ -63,8 +63,12 @@
     { "id": "fatinah", "displayName": "Fatinah" },
     { "id": "tom", "displayName": "Tom" },
     { "id": "aaran", "displayName": "Aaran" },
+    { "id": "aaron", "displayName": "Aaron" },
     { "id": "afif", "displayName": "Afif" },
     { "id": "eric", "displayName": "Eric" },
+    { "id": "freya", "displayName": "Freya" },
+    { "id": "erin", "displayName": "Erin" },
+    { "id": "sasi", "displayName": "Sasi" },
     { "id": "dennis", "displayName": "Dennis" },
     { "id": "mun", "displayName": "Mun" },
     { "id": "wilson", "displayName": "Wilson" },
@@ -584,11 +588,112 @@
       "date": "2026-09-12",
       "startTime": "13:30",
       "endTime": null,
-      "location": "",
+      "location": "Boardroom Bandit, Ara Damansara",
       "admissionDisplay": "Free",
-      "status": "scheduled",
+      "status": "completed",
       "notes": "",
-      "tables": []
+      "tables": [
+        {
+          "id": "season-1-week-07-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "bena", "finalPoints": 39700, "placement": 1 },
+            { "playerId": "aaran", "finalPoints": 33000, "placement": 2 },
+            { "playerId": "eric", "finalPoints": 24400, "placement": 3 },
+            { "playerId": "tom", "finalPoints": 2900, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 39200, "placement": 1 },
+            { "playerId": "freya", "finalPoints": 20800, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 20000, "placement": 3 },
+            { "playerId": "tom", "finalPoints": 20000, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "dice", "finalPoints": 37500, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 34400, "placement": 2 },
+            { "playerId": "adam", "finalPoints": 17300, "placement": 3 },
+            { "playerId": "daus", "finalPoints": 10800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 38100, "placement": 1 },
+            { "playerId": "dice", "finalPoints": 35600, "placement": 2 },
+            { "playerId": "daus", "finalPoints": 28700, "placement": 3 },
+            { "playerId": "freya", "finalPoints": -2400, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 30500, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 26100, "placement": 2 },
+            { "playerId": "daus", "finalPoints": 21900, "placement": 3 },
+            { "playerId": "erin", "finalPoints": 21500, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-06",
+          "tableNumber": 6,
+          "results": [
+            { "playerId": "aaron", "finalPoints": 40500, "placement": 1 },
+            { "playerId": "sasi", "finalPoints": 31100, "placement": 2 },
+            { "playerId": "daus", "finalPoints": 30400, "placement": 3 },
+            { "playerId": "eric", "finalPoints": -2000, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-07",
+          "tableNumber": 7,
+          "results": [
+            { "playerId": "adam", "finalPoints": 30000, "placement": 1 },
+            { "playerId": "sasi", "finalPoints": 28900, "placement": 2 },
+            { "playerId": "aaron", "finalPoints": 27400, "placement": 3 },
+            { "playerId": "eric", "finalPoints": 13700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-08",
+          "tableNumber": 8,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 40100, "placement": 1 },
+            { "playerId": "daus", "finalPoints": 28700, "placement": 2 },
+            { "playerId": "tom", "finalPoints": 24500, "placement": 3 },
+            { "playerId": "bena", "finalPoints": 6700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-09",
+          "tableNumber": 9,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 44800, "placement": 1 },
+            { "playerId": "erin", "finalPoints": 27100, "placement": 2 },
+            { "playerId": "tom", "finalPoints": 14300, "placement": 3 },
+            { "playerId": "bena", "finalPoints": 13800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-07-game-10",
+          "tableNumber": 10,
+          "results": [
+            { "playerId": "eric", "finalPoints": 39200, "placement": 1 },
+            { "playerId": "aaron", "finalPoints": 34700, "placement": 2 },
+            { "playerId": "adam", "finalPoints": 28900, "placement": 3 },
+            { "playerId": "sasi", "finalPoints": -2800, "placement": 4 }
+          ]
+        }
+      ]
     },
     {
       "id": "season-1-week-08",
@@ -596,7 +701,7 @@
       "date": "2026-09-19",
       "startTime": "13:30",
       "endTime": null,
-      "location": "",
+      "location": "Boardroom Bandit, Ara Damansara",
       "admissionDisplay": "Free",
       "status": "scheduled",
       "notes": "",
