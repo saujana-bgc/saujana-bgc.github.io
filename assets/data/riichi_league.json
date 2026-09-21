@@ -712,7 +712,7 @@
           "id": "season-1-week-08-game-01",
           "tableNumber": 1,
           "results": [
-            { "playerId": "naavin", "finalPoints": 90600, "placement": 1 },
+            { "playerId": "naavin", "finalPoints": 113400, "placement": 1 },
             { "playerId": "elvin", "finalPoints": 10000, "placement": 2 },
             { "playerId": "bena", "finalPoints": -18400, "placement": 3 }
           ]
