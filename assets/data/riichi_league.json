@@ -58,6 +58,8 @@
     { "id": "kah-hui", "displayName": "Kah Hui" },
     { "id": "vincent", "displayName": "Vincent" },
     { "id": "bena", "displayName": "Bena" },
+    { "id": "elvin", "displayName": "Elvin" },
+    { "id": "naavin", "displayName": "Naavin" },
     { "id": "dice", "displayName": "Dice" },
     { "id": "daus", "displayName": "Daus" },
     { "id": "fatinah", "displayName": "Fatinah" },
@@ -703,9 +705,137 @@
       "endTime": null,
       "location": "Boardroom Bandit, Ara Damansara",
       "admissionDisplay": "Free",
-      "status": "scheduled",
+      "status": "completed",
       "notes": "",
-      "tables": []
+      "tables": [
+        {
+          "id": "season-1-week-08-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "naavin", "finalPoints": 90600, "placement": 1 },
+            { "playerId": "elvin", "finalPoints": 10000, "placement": 2 },
+            { "playerId": "bena", "finalPoints": -18400, "placement": 3 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "fatinah", "finalPoints": 38300, "placement": 1 },
+            { "playerId": "adam", "finalPoints": 33400, "placement": 2 },
+            { "playerId": "daus", "finalPoints": 26500, "placement": 3 },
+            { "playerId": "dice", "finalPoints": 1800, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "daus", "finalPoints": 43200, "placement": 1 },
+            { "playerId": "adam", "finalPoints": 30500, "placement": 2 },
+            { "playerId": "dice", "finalPoints": 27600, "placement": 3 },
+            { "playerId": "fatinah", "finalPoints": -1300, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "sasi", "finalPoints": 36400, "placement": 1 },
+            { "playerId": "aaron", "finalPoints": 34600, "placement": 2 },
+            { "playerId": "freya", "finalPoints": 21600, "placement": 3 },
+            { "playerId": "aaran", "finalPoints": 7400, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "bena", "finalPoints": 48400, "placement": 1 },
+            { "playerId": "naavin", "finalPoints": 34500, "placement": 2 },
+            { "playerId": "elvin", "finalPoints": 16900, "placement": 3 },
+            { "playerId": "eric", "finalPoints": 200, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-06",
+          "tableNumber": 6,
+          "results": [
+            { "playerId": "eric", "finalPoints": 28900, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 25500, "placement": 2 },
+            { "playerId": "naavin", "finalPoints": 23600, "placement": 3 },
+            { "playerId": "elvin", "finalPoints": 22000, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-07",
+          "tableNumber": 7,
+          "results": [
+            { "playerId": "dice", "finalPoints": 39100, "placement": 1 },
+            { "playerId": "daus", "finalPoints": 36400, "placement": 2 },
+            { "playerId": "aaron", "finalPoints": 25000, "placement": 3 },
+            { "playerId": "adam", "finalPoints": -500, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-08",
+          "tableNumber": 8,
+          "results": [
+            { "playerId": "fatinah", "finalPoints": 39500, "placement": 1 },
+            { "playerId": "aaran", "finalPoints": 32500, "placement": 2 },
+            { "playerId": "sasi", "finalPoints": 28700, "placement": 3 },
+            { "playerId": "tom", "finalPoints": -700, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-09",
+          "tableNumber": 9,
+          "results": [
+            { "playerId": "aaron", "finalPoints": 50800, "placement": 1 },
+            { "playerId": "sasi", "finalPoints": 28100, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 23100, "placement": 3 },
+            { "playerId": "kah-hui", "finalPoints": -1900, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-10",
+          "tableNumber": 10,
+          "results": [
+            { "playerId": "daus", "finalPoints": 38200, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 26900, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 23800, "placement": 3 },
+            { "playerId": "tom", "finalPoints": 11100, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-11",
+          "tableNumber": 11,
+          "results": [
+            { "playerId": "daus", "finalPoints": 38200, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 26900, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 23800, "placement": 3 },
+            { "playerId": "tom", "finalPoints": 11100, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-12",
+          "tableNumber": 12,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 41000, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 38100, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 25900, "placement": 3 }
+          ]
+        },
+        {
+          "id": "season-1-week-08-game-13",
+          "tableNumber": 13,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 66000, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 40600, "placement": 2 },
+            { "playerId": "bena", "finalPoints": -1600, "placement": 3 }
+          ]
+        }
+      ]
     },
     {
       "id": "season-1-week-09",
