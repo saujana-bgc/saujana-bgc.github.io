@@ -809,16 +809,6 @@
         },
         {
           "id": "season-1-week-08-game-11",
-          "tableNumber": 11,
-          "results": [
-            { "playerId": "daus", "finalPoints": 38200, "placement": 1 },
-            { "playerId": "eric", "finalPoints": 26900, "placement": 2 },
-            { "playerId": "aaran", "finalPoints": 23800, "placement": 3 },
-            { "playerId": "tom", "finalPoints": 11100, "placement": 4 }
-          ]
-        },
-        {
-          "id": "season-1-week-08-game-12",
           "tableNumber": 12,
           "results": [
             { "playerId": "aaran", "finalPoints": 41000, "placement": 1 },
@@ -827,7 +817,7 @@
           ]
         },
         {
-          "id": "season-1-week-08-game-13",
+          "id": "season-1-week-08-game-12",
           "tableNumber": 13,
           "results": [
             { "playerId": "aaran", "finalPoints": 66000, "placement": 1 },
@@ -843,7 +833,7 @@
       "date": "2026-09-26",
       "startTime": "13:30",
       "endTime": null,
-      "location": "",
+      "location": "Boardroom Bandit, Ara Damansara",
       "admissionDisplay": "Free",
       "status": "scheduled",
       "notes": "",
