@@ -149,6 +149,35 @@ class SupabaseRestClient {
         }
     }
 
+    /** Lists objects in a Supabase Storage bucket. */
+    async listFiles(bucket, options = {}) {
+        try {
+            const res = await fetch(`${this.baseUrl}/storage/v1/object/list/${encodeURIComponent(bucket)}`, {
+                method: 'POST',
+                headers: {
+                    ...this.headers,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prefix: options.prefix ?? '',
+                    limit: options.limit ?? 100,
+                    offset: options.offset ?? 0,
+                    sortBy: options.sortBy ?? { column: 'created_at', order: 'desc' },
+                }),
+            })
+
+            if (!res.ok) return { data: null, error: await res.text() }
+            return { data: await res.json(), error: null }
+        } catch (error) {
+            return { data: null, error }
+        }
+    }
+
+    getPublicUrl(bucket, path) {
+        const encodedPath = String(path).split('/').map(segment => encodeURIComponent(segment)).join('/')
+        return `${this.baseUrl}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encodedPath}`
+    }
+
     async request(url, options = {}) {
         try {
             const res = await fetch(url, {
