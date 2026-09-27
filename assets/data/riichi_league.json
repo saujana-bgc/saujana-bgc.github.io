@@ -82,7 +82,11 @@
     { "id": "ben", "displayName": "Ben" },
     { "id": "leek", "displayName": "Leek" },
     { "id": "gina", "displayName": "Gina" },
-    { "id": "akabii", "displayName": "Akabii" }
+    { "id": "akabii", "displayName": "Akabii" },
+    { "id": "greg", "displayName": "Greg" },
+    { "id": "elvin", "displayName": "Elvin" },
+    { "id": "naavin", "displayName": "Naavin" },
+    { "id": "martin", "displayName": "Martin" }
   ],
   "weeks": [
     {
@@ -715,9 +719,128 @@
       "endTime": null,
       "location": "",
       "admissionDisplay": "Free",
-      "status": "scheduled",
-      "notes": "",
-      "tables": []
+      "status": "completed",
+      "notes": "Game 7: Adam (Initial East) placed ahead of Tom (Initial North) on equal points.",
+      "tables": [
+        {
+          "id": "season-1-week-09-game-01",
+          "tableNumber": 1,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 33600, "placement": 1 },
+            { "playerId": "aaron", "finalPoints": 28700, "placement": 2 },
+            { "playerId": "adam", "finalPoints": 24600, "placement": 3 },
+            { "playerId": "greg", "finalPoints": 13100, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-02",
+          "tableNumber": 2,
+          "results": [
+            { "playerId": "daus", "finalPoints": 51600, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 32100, "placement": 2 },
+            { "playerId": "eric", "finalPoints": 21300, "placement": 3 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-03",
+          "tableNumber": 3,
+          "results": [
+            { "playerId": "daus", "finalPoints": 48100, "placement": 1 },
+            { "playerId": "eric", "finalPoints": 45400, "placement": 2 },
+            { "playerId": "bena", "finalPoints": 11500, "placement": 3 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-04",
+          "tableNumber": 4,
+          "results": [
+            { "playerId": "fatinah", "finalPoints": 53300, "placement": 1 },
+            { "playerId": "tom", "finalPoints": 28800, "placement": 2 },
+            { "playerId": "dice", "finalPoints": 11500, "placement": 3 },
+            { "playerId": "freya", "finalPoints": 6400, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-05",
+          "tableNumber": 5,
+          "results": [
+            { "playerId": "aaron", "finalPoints": 44700, "placement": 1 },
+            { "playerId": "adam", "finalPoints": 39700, "placement": 2 },
+            { "playerId": "aaran", "finalPoints": 11200, "placement": 3 },
+            { "playerId": "greg", "finalPoints": 4400, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-06",
+          "tableNumber": 6,
+          "results": [
+            { "playerId": "bena", "finalPoints": 53400, "placement": 1 },
+            { "playerId": "elvin", "finalPoints": 25300, "placement": 2 },
+            { "playerId": "eric", "finalPoints": 21500, "placement": 3 },
+            { "playerId": "naavin", "finalPoints": -200, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-07",
+          "tableNumber": 7,
+          "results": [
+            { "playerId": "daus", "finalPoints": 38600, "placement": 1 },
+            { "playerId": "adam", "finalPoints": 23400, "placement": 2 },
+            { "playerId": "tom", "finalPoints": 23400, "placement": 3 },
+            { "playerId": "dice", "finalPoints": 14600, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-08",
+          "tableNumber": 8,
+          "results": [
+            { "playerId": "dice", "finalPoints": 33100, "placement": 1 },
+            { "playerId": "fatinah", "finalPoints": 32100, "placement": 2 },
+            { "playerId": "akabii", "finalPoints": 23900, "placement": 3 },
+            { "playerId": "daus", "finalPoints": 10900, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-09",
+          "tableNumber": 9,
+          "results": [
+            { "playerId": "aaran", "finalPoints": 41300, "placement": 1 },
+            { "playerId": "naavin", "finalPoints": 29800, "placement": 2 },
+            { "playerId": "elvin", "finalPoints": 17500, "placement": 3 },
+            { "playerId": "aaron", "finalPoints": 11400, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-10",
+          "tableNumber": 10,
+          "results": [
+            { "playerId": "dennis", "finalPoints": 35200, "placement": 1 },
+            { "playerId": "bena", "finalPoints": 31400, "placement": 2 },
+            { "playerId": "eric", "finalPoints": 20400, "placement": 3 },
+            { "playerId": "martin", "finalPoints": 13000, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-11",
+          "tableNumber": 11,
+          "results": [
+            { "playerId": "tom", "finalPoints": 36100, "placement": 1 },
+            { "playerId": "naavin", "finalPoints": 26600, "placement": 2 },
+            { "playerId": "elvin", "finalPoints": 19200, "placement": 3 },
+            { "playerId": "aaron", "finalPoints": 18100, "placement": 4 }
+          ]
+        },
+        {
+          "id": "season-1-week-09-game-12",
+          "tableNumber": 12,
+          "results": [
+            { "playerId": "eric", "finalPoints": 52200, "placement": 1 },
+            { "playerId": "naavin", "finalPoints": 22000, "placement": 2 },
+            { "playerId": "elvin", "finalPoints": 20000, "placement": 3 },
+            { "playerId": "aaran", "finalPoints": 5800, "placement": 4 }
+          ]
+        }
+      ]
     },
     {
       "id": "season-1-week-10",
@@ -725,7 +848,7 @@
       "date": "2026-10-03",
       "startTime": "13:30",
       "endTime": null,
-      "location": "",
+      "location": "Boardroom Bandit, Ara Damansara",
       "admissionDisplay": "Free",
       "status": "scheduled",
       "notes": "",
