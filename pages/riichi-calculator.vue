@@ -1507,7 +1507,7 @@ function yakuRomaji(name: string): string {
 .calc-hero {
   grid-column: 1 / -1;
   width: 100%;
-  padding: clamp(44px, 8vw, 78px) 16px 34px;
+  padding: 30px 16px 34px;
   text-align: center;
 }
 
