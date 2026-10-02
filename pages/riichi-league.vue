@@ -173,13 +173,13 @@
           <form class="score-entry-form" @submit.prevent="submitMatch">
             <div class="score-entry-options">
               <label>
-                <span class="league-field-label">Players at table</span>
+                <span class="league-field-label">Table size</span>
                 <select class="league-control" v-model.number="scoreForm.tableSize" :disabled="isSubmittingScore">
-                  <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players</option>
+                  <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players · {{ seatNames(size).join(', ') }}</option>
                 </select>
               </label>
               <p class="score-entry-auto">
-                Table number is assigned automatically. Enter results by {{ formatDate(scoreEntryCutoffDate, true) }}.
+                Enter players top to bottom by seat: East, South, West{{ scoreForm.tableSize === 4 ? ', North' : '' }}. Equal points are ranked by this order. Table number is assigned automatically; enter results by {{ formatDate(scoreEntryCutoffDate, true) }}.
               </p>
             </div>
 
@@ -187,13 +187,13 @@
               <div v-for="(row, index) in scoreForm.results" :key="index" class="score-entry-row">
                 <LeaguePlayerPicker
                   :id="`league-player-${index}`" :key="`${selectedWeekId}-${formResetKey}-${index}`"
-                  v-model="row.playerName" :label="`Player ${index + 1}`"
+                  v-model="row.playerName" :label="`${seatNames(scoreForm.tableSize)[index]} seat`"
                   :names="selectedSeason.players.map(player => player.displayName)"
                   :excluded="scoreForm.results.filter((_, other) => other !== index).map(item => item.playerName)"
                   :disabled="isSubmittingScore"
                 />
                 <label>
-                  <span class="league-field-label">Final points · Player {{ index + 1 }}</span>
+                  <span class="league-field-label">Final points</span>
                   <input class="league-control" v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" placeholder="e.g. 25000" :disabled="isSubmittingScore" required>
                 </label>
               </div>
@@ -230,6 +230,7 @@
                 <thead>
                   <tr>
                     <th scope="col">Place</th>
+                    <th scope="col">Seat</th>
                     <th scope="col">Player</th>
                     <th scope="col">Final points</th>
                     <th scope="col">League score</th>
@@ -238,6 +239,7 @@
                 <tbody>
                   <tr v-for="result in sortedResults(table.results)" :key="result.playerId">
                     <td><span class="place-marker">{{ ordinal(result.placement) }}</span></td>
+                    <td>{{ seatLabel(result.seatWind) }}</td>
                     <th scope="row">{{ playerName(result.playerId) }}</th>
                     <td>{{ numberFormat(result.finalPoints) }}</td>
                     <td><strong :class="scoreClass(leagueScore(result, table))">{{ scoreDisplay(leagueScore(result, table)) }}</strong></td>
@@ -251,7 +253,7 @@
                 <span class="place-marker">{{ ordinal(result.placement) }}</span>
                 <div>
                   <h5>{{ playerName(result.playerId) }}</h5>
-                  <p>{{ numberFormat(result.finalPoints) }} pts</p>
+                  <p>{{ result.seatWind ? `${seatLabel(result.seatWind)} seat · ` : '' }}{{ numberFormat(result.finalPoints) }} pts</p>
                 </div>
                 <strong :class="scoreClass(leagueScore(result, table))">{{ scoreDisplay(leagueScore(result, table)) }}<small>league pts</small></strong>
               </article>
@@ -582,6 +584,8 @@ const duplicatePlayerName = computed(() => {
   return ''
 })
 
+const seatNames = size => Number(size) === 3 ? ['East', 'South', 'West'] : ['East', 'South', 'West', 'North']
+
 const seasonStatus = computed(() => {
   if (completedWeeks.value.length === selectedWeeks.value.length) return 'completed'
   if (completedWeeks.value.length) return 'active'
@@ -729,6 +733,7 @@ async function loadLeagueFromSupabase() {
             playerId: result.player_id,
             finalPoints: result.final_points,
             placement: result.placement,
+            seatWind: result.seat_wind,
           })),
         }))
         return {
@@ -848,6 +853,10 @@ async function submitMatch() {
 
 function playerName(playerId) {
   return playerMap.value.get(playerId)?.displayName ?? 'Unknown player'
+}
+
+function seatLabel(value) {
+  return value ? `${value[0].toUpperCase()}${value.slice(1)}` : '—'
 }
 
 function parseDate(value) {
