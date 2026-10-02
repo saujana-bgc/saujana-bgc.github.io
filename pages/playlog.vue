@@ -357,7 +357,7 @@ onUnmounted(() => {
 
 .session-card {
     background: var(--white-pure);
-    border-radius: 35px;
+    border-radius: var(--radius-card);
     padding: var(--section-pad);
     box-shadow: 0 15px 40px var(--pebble-shadow);
     border: 1px solid rgba(107, 122, 104, 0.06);
@@ -658,7 +658,7 @@ onUnmounted(() => {
 }
 
 @media (min-width: 768px) {
-    .session-card { border-radius: 50px; padding: 40px; }
+    .session-card { border-radius: var(--radius-card); padding: 40px; }
     .game-pill { font-size: 0.72rem; padding: 8px 18px; }
 }
 

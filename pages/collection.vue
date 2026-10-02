@@ -364,7 +364,7 @@ watch([search, currentSort, selectedCategories], () => {
     max-width: 760px;
     margin: 0 auto 28px;
     padding: 24px;
-    border-radius: 28px;
+    border-radius: var(--radius-card);
     background: var(--white-pure);
     border: 1px solid rgba(201, 190, 239, 0.12);
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 12px 32px rgba(160, 100, 110, 0.08);

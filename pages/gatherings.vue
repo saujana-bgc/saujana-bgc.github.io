@@ -881,7 +881,7 @@ watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' }
     box-sizing: border-box;
     margin: 0 auto 18px;
     padding: 22px clamp(20px, 4vw, 34px);
-    border-radius: 28px;
+    border-radius: var(--radius-card);
     background: rgba(255, 255, 255, 0.78);
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 12px 32px rgba(160, 100, 110, 0.08);
     text-align: center;
@@ -940,7 +940,7 @@ watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' }
 /* --- EVENT CARDS --- */
 .event-card {
     background: var(--white-pure);
-    border-radius: 35px;
+    border-radius: var(--radius-card);
     padding: var(--section-pad);
     margin-bottom: 30px;
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 15px 40px rgba(160, 100, 110, 0.1);
@@ -1306,7 +1306,7 @@ watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' }
 }
 
 @media (min-width: 768px) {
-    .event-card { border-radius: 50px; margin-bottom: 50px; }
+    .event-card { border-radius: var(--radius-card); margin-bottom: 50px; }
 }
 
 /* --- ATTENDEES SECTION --- */

@@ -31,6 +31,8 @@
 }
 
 :root {
+    --font-body: 'Quicksand', sans-serif;
+    --font-display: 'Playfair Display', serif;
     --bg-silk: #FCF7EF;
     --matcha-leaf: #657763;
     --clay-text: #4A443D;
@@ -41,10 +43,41 @@
     --lavender-mist: #ECE9F1;
     --lavender-mid: #D4CEDF;
     --pebble-shadow: rgba(122, 92, 76, 0.1);
-    --section-pad: clamp(20px, 6vw, 80px);
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 40px;
+    --section-pad: clamp(var(--space-5), 4vw, var(--space-7));
+    --radius-card: 24px;
+    --radius-control: 12px;
 }
 
 html { scroll-behavior: smooth; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: var(--font-body);
+    line-height: 1.6;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+select,
+textarea {
+    border-radius: var(--radius-control);
+}
+
+:focus-visible {
+    outline: 3px solid rgba(101, 119, 99, 0.48);
+    outline-offset: 2px;
+}
 
 html, body {
     margin: 0; padding: 0; width: 100%; min-height: 100%;
@@ -94,7 +127,7 @@ html, body {
 }
 
 #__nuxt {
-    color: var(--clay-text); font-family: 'Quicksand', sans-serif;
+    color: var(--clay-text); font-family: var(--font-body);
     min-height: 100vh; width: 100%;
     display: flex; flex-direction: column; align-items: center;
     background-color: var(--bg-silk);
@@ -172,7 +205,7 @@ nav {
 header { padding: 30px 20px 36px; text-align: center; width: 100%; box-sizing: border-box; }
 
 .hero-title {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-display);
     font-size: clamp(2.2rem, 10vw, 3.8rem);
     font-style: italic; font-weight: 400;
     color: var(--matcha-leaf); margin: 0; line-height: 1.1;

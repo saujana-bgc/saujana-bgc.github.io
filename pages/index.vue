@@ -191,7 +191,7 @@ const expectations = [
 /* --- MAIN CONTENT CARD --- */
 .announcement-box {
     background: var(--white-pure);
-    border-radius: 35px;
+    border-radius: var(--radius-card);
     padding: var(--section-pad);
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 20px 60px rgba(160, 100, 110, 0.1);
     border: 1px solid rgba(201, 190, 239, 0.12);
@@ -366,7 +366,7 @@ const expectations = [
     max-width: 900px;
     margin: 20px auto 0;
     background: var(--white-pure);
-    border-radius: 35px;
+    border-radius: var(--radius-card);
     padding: var(--section-pad);
     box-shadow: inset 0 3px 0 #B48682, 0 20px 60px rgba(122, 92, 76, 0.1);
     border: 1px solid rgba(201, 190, 239, 0.12);
@@ -493,7 +493,7 @@ const expectations = [
 
 @media (min-width: 540px) {
     .ig-grid { grid-template-columns: repeat(4, 1fr); }
-    .ig-section { border-radius: 50px; width: 92%; }
+    .ig-section { border-radius: var(--radius-card); width: 92%; }
 }
 
 </style>

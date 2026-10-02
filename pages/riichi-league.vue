@@ -548,6 +548,10 @@ const selectedSeason = computed(() => seasons.value.find(item => item.id === sel
 const selectedWeeks = computed(() => [...(selectedSeason.value?.weeks ?? [])].sort((a, b) => a.weekNumber - b.weekNumber))
 const completedWeeks = computed(() => selectedWeeks.value.filter(week => week.status === 'completed' || week.tables?.length))
 const selectedWeek = computed(() => selectedWeeks.value.find(week => week.id === selectedWeekId.value) ?? selectedWeeks.value[0])
+const latestSessionForToday = computed(() => {
+  const datedWeeks = [...selectedWeeks.value].sort((a, b) => a.date.localeCompare(b.date))
+  return datedWeeks.filter(week => week.date <= currentKualaLumpurDate.value).at(-1) ?? datedWeeks[0]
+})
 const currentKualaLumpurDate = ref(kualaLumpurDate())
 const scoreEntryCutoffDate = computed(() => selectedWeek.value?.date ? addCalendarDays(selectedWeek.value.date, 3) : '')
 const isScoreEntryClosed = computed(() => Boolean(scoreEntryCutoffDate.value)
@@ -668,7 +672,7 @@ const standings = computed(() => {
 })
 
 watch(selectedSeasonId, () => {
-  selectedWeekId.value = completedWeeks.value.at(-1)?.id ?? selectedWeeks.value[0]?.id ?? ''
+  selectedWeekId.value = latestSessionForToday.value?.id ?? ''
 }, { immediate: true })
 
 watch(selectedWeekId, (next, previous) => {
@@ -765,6 +769,7 @@ async function loadLeagueFromSupabase() {
 
     if (!loadedSeasons.length) return
     seasons.value = loadedSeasons
+    selectedWeekId.value = latestSessionForToday.value?.id ?? ''
     if (!loadedSeasons.some(season => season.id === selectedSeasonId.value)) {
       selectedSeasonId.value = loadedSeasons[0].id
     }
@@ -1067,7 +1072,7 @@ onBeforeUnmount(() => {
 
 .season-card {
   padding: clamp(24px, 5vw, 46px);
-  border-radius: 32px;
+  border-radius: var(--radius-card);
   background:
     radial-gradient(circle at 92% 8%, rgba(212, 206, 223, .5), transparent 32%),
     linear-gradient(145deg, rgba(255,253,249,.98), rgba(246,236,231,.92));
@@ -1178,7 +1183,7 @@ onBeforeUnmount(() => {
 
 .content-card {
   padding: clamp(24px, 5vw, 46px);
-  border-radius: 32px;
+  border-radius: var(--radius-card);
 }
 
 .section-heading {

@@ -193,7 +193,7 @@ function resetForm() {
   box-sizing: border-box;
   background: var(--white-pure);
   border: 1px solid rgba(201, 190, 239, 0.12);
-  border-radius: 35px;
+  border-radius: var(--radius-card);
   box-shadow: inset 0 3px 0 var(--lavender-mid), 0 20px 60px rgba(122, 92, 76, 0.1);
 }
 
@@ -409,12 +409,12 @@ function resetForm() {
 
 @media (max-width: 520px) {
   .birthday-page { padding: 0 14px 58px; }
-  .birthday-card { width: 100%; padding: 26px 20px 30px; border-radius: 28px; }
+  .birthday-card { width: 100%; padding: 26px 20px 30px; border-radius: var(--radius-card); }
   .date-grid { grid-template-columns: 1fr; gap: 0; }
 }
 
 @media (min-width: 768px) {
-  .birthday-card { width: 92%; border-radius: 50px; }
+  .birthday-card { width: 92%; border-radius: var(--radius-card); }
 }
 
 @media (prefers-reduced-motion: reduce) {

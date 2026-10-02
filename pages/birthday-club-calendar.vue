@@ -340,7 +340,7 @@ onMounted(async () => {
 .state-card {
   padding: clamp(28px, 4vw, 46px);
   border: 1px solid rgba(101, 119, 99, 0.12);
-  border-radius: 34px;
+  border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.94);
   box-shadow: inset 0 3px 0 var(--lavender-mid), 0 24px 70px rgba(88, 75, 67, 0.12);
 }
@@ -778,7 +778,7 @@ onMounted(async () => {
 @media (max-width: 520px) {
   .calendar-page { padding-left: 12px; padding-right: 12px; padding-bottom: 60px; }
   .login-intro h1, .calendar-header h1 { font-size: clamp(2.65rem, 14vw, 4rem); }
-  .login-card { padding: 27px 21px; border-radius: 27px; }
+  .login-card { padding: 27px 21px; border-radius: var(--radius-card); }
   .calendar-header { display: block; margin-bottom: 28px; padding: 0 6px; }
   .header-copy { margin-top: 16px; }
   .logout-button { margin-top: 21px; }

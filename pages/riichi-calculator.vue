@@ -1535,7 +1535,7 @@ function yakuRomaji(name: string): string {
   margin-bottom: 24px;
   padding: clamp(18px, 4.5vw, 40px);
   border: 1px solid rgba(185, 139, 104, 0.18);
-  border-radius: 28px;
+  border-radius: var(--radius-card);
   background: rgba(255, 253, 249, 0.92);
   box-shadow: 0 18px 48px rgba(74, 68, 61, 0.09);
 }
