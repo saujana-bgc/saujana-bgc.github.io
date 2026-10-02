@@ -5,17 +5,17 @@
       <p class="league-intro">Season standings, weekly results, and every score on the road to the final table.</p>
 
       <div class="season-switcher">
-        <label for="season-select">Season</label>
-        <select id="season-select" v-model="selectedSeasonId" :disabled="isSubmittingScore">
+        <label class="league-field-label" for="season-select">Season</label>
+        <select class="league-control" id="season-select" v-model="selectedSeasonId" :disabled="isSubmittingScore">
           <option v-for="item in seasons" :key="item.id" :value="item.id">
             Season {{ item.number }}
           </option>
         </select>
       </div>
       <nav class="league-shortcuts" aria-label="League sections">
-        <a href="#standings-heading">Standings</a>
-        <a href="#weeks-heading">Weekly results</a>
-        <button v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add a table</button>
+        <a class="league-button" href="#standings-heading">Standings</a>
+        <a class="league-button" href="#weeks-heading">Weekly results</a>
+        <button class="league-button league-button-primary" v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add a table</button>
       </nav>
     </header>
 
@@ -62,8 +62,8 @@
       </div>
 
       <label class="standing-search">
-        <span>Find a player</span>
-        <input v-model="standingQuery" type="search" placeholder="Search standings" autocomplete="off">
+        <span class="league-field-label">Find a player</span>
+        <input class="league-control" v-model="standingQuery" type="search" placeholder="Search standings" autocomplete="off">
       </label>
       <p v-if="!filteredStandings.length" role="status">No players match “{{ standingQuery }}”.</p>
       <div class="standings-table-wrap">
@@ -106,7 +106,7 @@
           <strong :class="scoreClass(player.bestTotal)">{{ scoreDisplay(player.bestTotal) }}<small>league pts</small></strong>
         </article>
       </div>
-      <button v-if="!standingQuery && filteredStandings.length > 10" type="button" class="standings-toggle" :aria-expanded="showAllStandings" @click="showAllStandings = !showAllStandings">
+      <button v-if="!standingQuery && filteredStandings.length > 10" type="button" class="standings-toggle league-button" :aria-expanded="showAllStandings" @click="showAllStandings = !showAllStandings">
         {{ showAllStandings ? 'Show top 10' : `Show all ${filteredStandings.length} players` }}
       </button>
     </section>
@@ -121,8 +121,8 @@
       </div>
 
       <label class="mobile-week-select">
-        <span>Session</span>
-        <select v-model="selectedWeekId" :disabled="isSubmittingScore">
+        <span class="league-field-label">Session</span>
+        <select class="league-control" v-model="selectedWeekId" :disabled="isSubmittingScore">
           <option v-for="week in selectedWeeks" :key="week.id" :value="week.id">Week {{ week.weekNumber }} · {{ formatDate(week.date) }} · {{ week.tables.length ? 'Results' : 'Scheduled' }}</option>
         </select>
       </label>
@@ -173,8 +173,8 @@
           <form class="score-entry-form" @submit.prevent="submitMatch">
             <div class="score-entry-options">
               <label>
-                <span>Players at table</span>
-                <select v-model.number="scoreForm.tableSize" :disabled="isSubmittingScore">
+                <span class="league-field-label">Players at table</span>
+                <select class="league-control" v-model.number="scoreForm.tableSize" :disabled="isSubmittingScore">
                   <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players</option>
                 </select>
               </label>
@@ -193,8 +193,8 @@
                   :disabled="isSubmittingScore"
                 />
                 <label>
-                  <span>Final points · Player {{ index + 1 }}</span>
-                  <input v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" placeholder="e.g. 25000" :disabled="isSubmittingScore" required>
+                  <span class="league-field-label">Final points · Player {{ index + 1 }}</span>
+                  <input class="league-control" v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" placeholder="e.g. 25000" :disabled="isSubmittingScore" required>
                 </label>
               </div>
             </div>
@@ -204,10 +204,10 @@
                 <p v-if="scoreEntryMessage" class="score-entry-message" role="status">{{ scoreEntryMessage }}</p>
               </div>
               <div class="score-entry-actions">
-                <button type="button" class="score-entry-reset" :disabled="isSubmittingScore" @click="resetScoreForm">
+                <button type="button" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="resetScoreForm">
                   Reset
                 </button>
-                <button type="submit" class="score-entry-submit" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
+                <button type="submit" class="score-entry-submit league-button league-button-primary" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
                   {{ isSubmittingScore ? 'Saving results…' : 'Save table results' }}
                 </button>
               </div>
@@ -279,7 +279,7 @@
           Scores are based only on finishing position. Final mahjong points are recorded for the match result,
           but no uma or oka is added to the league standings.
         </p>
-        <button type="button" class="rules-button" @click="openRules">
+        <button type="button" class="rules-button league-button league-button-primary" @click="openRules">
           View full table rules
           <span aria-hidden="true">→</span>
         </button>
@@ -2164,4 +2164,84 @@ onBeforeUnmount(() => {
   .table-title { align-items: start; }
   .table-metadata { flex-direction: column; align-items: end; text-align: right; }
 }
+/* Shared typography and controls also style the player-picker component. */
+.league-page {
+  --league-border: rgba(101, 119, 99, .35);
+  --league-muted: #68665d;
+  --league-label-size: .8125rem;
+  --league-body-size: .875rem;
+  --league-detail-size: .8125rem;
+}
+.league-page :deep(.league-field-label) {
+  display: block;
+  margin: 0;
+  color: var(--matcha-leaf);
+  font-family: 'Quicksand', sans-serif;
+  font-size: var(--league-label-size);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.league-page :deep(.league-control) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--league-border);
+  border-radius: 10px;
+  background: var(--white-pure);
+  color: var(--clay-text);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+.league-page :deep(.league-control::placeholder) { color: var(--league-muted); opacity: 1; }
+.league-page :deep(.league-button) {
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 10px 18px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--league-border);
+  border-radius: 999px;
+  background: var(--white-pure);
+  color: var(--matcha-leaf);
+  font-family: 'Quicksand', sans-serif;
+  font-size: var(--league-body-size);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: none;
+}
+.league-page :deep(.league-button-primary) { background: var(--matcha-leaf); border-color: var(--matcha-leaf); color: var(--white-pure); }
+.league-page :deep(.league-button:hover:not(:disabled)) { background: var(--rose-dust); }
+.league-page :deep(.league-button-primary:hover:not(:disabled)) { background: #526450; border-color: #526450; }
+.league-page :deep(.league-button:disabled), .league-page :deep(.league-control:disabled) { opacity: .6; cursor: not-allowed; }
+.league-page :deep(.league-control:focus-visible), .league-page :deep(.league-button:focus-visible) { outline: 3px solid var(--gold-leaf); outline-offset: 3px; }
+.league-page :deep(.league-field-hint),
+.score-entry-heading > p, .score-entry-auto, .score-entry-message,
+.table-metadata span, .standing-player p, .result-cards p,
+.week-notes, .scheduled-state p, .season-stats span, .prize-card small {
+  font-size: var(--league-detail-size);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--league-muted);
+  opacity: 1;
+}
+.score-entry-message { color: var(--matcha-leaf); font-weight: 700; }
+.standing-search, .mobile-week-select { gap: 6px; }
+.standings-table td, .standings-table tbody th, .result-table td, .result-table tbody th { font-size: var(--league-body-size); }
+.standings-table thead th, .result-table thead th, .section-kicker, .table-title h4 { font-size: .75rem; letter-spacing: .06em; }
+.season-switcher .league-control { width: auto; min-width: 120px; }
+.season-switcher { gap: 10px; padding: 0; background: transparent; }
+.standing-player > strong, .result-cards article > strong { font-variant-numeric: tabular-nums; }
+.standing-player small, .result-cards article > strong small { font-size: .75rem; color: var(--league-muted); }
 </style>

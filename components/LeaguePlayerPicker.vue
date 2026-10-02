@@ -1,21 +1,23 @@
 <template>
   <div class="player-picker" @focusout="onFocusOut">
-    <label :for="id">{{ label }}</label>
-    <input
-      ref="entryInput" :id="id" :value="modelValue" role="combobox" aria-autocomplete="list"
-      :aria-expanded="open" :aria-controls="`${id}-options`"
-      :aria-activedescendant="open && active >= 0 ? `${id}-option-${active}` : undefined"
-      :aria-describedby="`${id}-hint`" :disabled="disabled" required maxlength="80"
-      autocomplete="off" spellcheck="false" placeholder="Search or type a new name"
-      @input="onInput" @focus="open = true" @keydown="onKeydown"
-    >
-    <ul v-if="open && options.length" :id="`${id}-options`" role="listbox" :aria-label="label">
-      <li v-for="(option, index) in options" :id="`${id}-option-${index}`" :key="option.name"
-        role="option" tabindex="-1" :aria-selected="active === index" :class="{ active: active === index }"
-        @mousedown.prevent @click="choose(option.name)"
-      >{{ option.isNew ? `Add “${option.name}”` : option.name }}</li>
-    </ul>
-    <small :id="`${id}-hint`">{{ isNew ? 'New player — added when you save this table.' : 'Choose an existing player or enter a new name.' }}</small>
+    <label class="league-field-label" :for="id">{{ label }}</label>
+    <div class="picker-control">
+      <input class="league-control"
+        ref="entryInput" :id="id" :value="modelValue" role="combobox" aria-autocomplete="list"
+        :aria-expanded="open" :aria-controls="`${id}-options`"
+        :aria-activedescendant="open && active >= 0 ? `${id}-option-${active}` : undefined"
+        :aria-describedby="`${id}-hint`" :disabled="disabled" required maxlength="80"
+        autocomplete="off" spellcheck="false" placeholder="Search or type a new name"
+        @input="onInput" @focus="open = true" @keydown="onKeydown"
+      >
+      <ul v-if="open && options.length" :id="`${id}-options`" role="listbox" :aria-label="label">
+        <li v-for="(option, index) in options" :id="`${id}-option-${index}`" :key="option.name"
+          role="option" tabindex="-1" :aria-selected="active === index" :class="{ active: active === index }"
+          @mousedown.prevent @click="choose(option.name)"
+        >{{ option.isNew ? `Add “${option.name}”` : option.name }}</li>
+      </ul>
+    </div>
+    <small class="league-field-hint" :id="`${id}-hint`">{{ isNew ? 'New player — added when you save this table.' : 'Choose an existing player or enter a new name.' }}</small>
   </div>
 </template>
 
@@ -80,12 +82,37 @@ async function onKeydown(event) {
 </script>
 
 <style scoped>
-.player-picker { position: relative; min-width: 0; }
-label { display: block; margin-bottom: 6px; color: var(--matcha-leaf); font-size: .8rem; font-weight: 700; }
-input { box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 12px; font: inherit; font-size: 16px; color: var(--clay-text); background: #fffdf9; border: 1px solid #9ca998; border-radius: 10px; }
-input:focus-visible { outline: 3px solid var(--gold-leaf); outline-offset: 2px; }
-small { display: block; margin-top: 6px; font-size: .75rem; line-height: 1.4; }
-ul { position: absolute; z-index: 20; top: 76px; left: 0; right: 0; margin: 0; padding: 4px; list-style: none; border: 1px solid #9ca998; border-radius: 12px; background: #fffdf9; box-shadow: 0 10px 24px #25352726; max-height: 240px; overflow-y: auto; overscroll-behavior: contain; }
-li { padding: 12px; min-height: 44px; box-sizing: border-box; font-size: 16px; border-radius: 8px; cursor: pointer; overflow-wrap: anywhere; }
-li.active, li:hover { background: #e6eddf; color: #344832; }
+.player-picker { display: grid; gap: 6px; min-width: 0; }
+.picker-control { position: relative; }
+small { display: block; }
+ul {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--league-border);
+  border-radius: 10px;
+  background: var(--white-pure);
+  box-shadow: 0 10px 24px var(--pebble-shadow);
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+li {
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 10px 12px;
+  color: var(--clay-text);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+li.active, li:hover { background: var(--lavender-mist); }
 </style>
