@@ -52,7 +52,6 @@ const navigation = [
   { name: 'Gatherings', url: '/gatherings' },
   { name: 'Playlog', url: '/playlog' },
   { name: 'Riichi League', url: '/riichi-league' },
-  { name: 'Riichi Calculator', url: '/riichi-calculator' },
   { name: 'Collection', url: '/collection' }
 ]
 

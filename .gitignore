@@ -26,6 +26,12 @@ Thumbs.db
 
 # Supabase edge functions (contain hardcoded secrets)
 supabase/
+!supabase/
+supabase/*
+!supabase/config.toml
+!supabase/migrations/
+supabase/migrations/*
+!supabase/migrations/*.sql
 
 # IDE files
 .vscode/

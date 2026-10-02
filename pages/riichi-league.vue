@@ -112,13 +112,13 @@
           v-for="week in selectedWeeks"
           :key="week.id"
           type="button"
-          :class="{ active: selectedWeekId === week.id, completed: week.status === 'completed' }"
+          :class="{ active: selectedWeekId === week.id, completed: week.status === 'completed' || week.tables.length > 0 }"
           :aria-pressed="selectedWeekId === week.id"
           @click="selectedWeekId = week.id"
         >
           <span>Week {{ week.weekNumber }}</span>
           <strong>{{ shortDate(week.date) }}</strong>
-          <small>{{ week.status === 'completed' ? 'Results' : 'Scheduled' }}</small>
+          <small>{{ week.tables.length ? 'Results' : 'Scheduled' }}</small>
         </button>
       </div>
 
@@ -145,7 +145,10 @@
           <section v-for="table in selectedWeek.tables" :key="table.id" class="table-result">
             <div class="table-title">
               <h4>Table {{ table.tableNumber }}</h4>
-              <span>{{ table.results.length }} players</span>
+              <div class="table-metadata">
+                <span>{{ table.results.length }} players</span>
+                <span v-if="table.submittedAt">Submitted {{ formatSubmissionTime(table.submittedAt) }}</span>
+              </div>
             </div>
 
             <div class="result-table-wrap">
@@ -189,6 +192,70 @@
             <p>This round is scheduled for {{ formatDate(selectedWeek.date, true) }}. Scores and standings will update when the tables are complete.</p>
           </div>
         </div>
+
+        <section v-if="!isScoreEntryClosed" class="score-entry" aria-labelledby="score-entry-heading">
+          <div class="score-entry-heading">
+            <div>
+              <p class="section-kicker">Add a table</p>
+              <h4 id="score-entry-heading">Enter match results</h4>
+            </div>
+            <p>Anyone can submit a complete table. Saved results appear in the league immediately.</p>
+          </div>
+
+          <form class="score-entry-form" @submit.prevent="submitMatch">
+            <div class="score-entry-options">
+              <label>
+                <span>Players at table</span>
+                <select v-model.number="scoreForm.tableSize" :disabled="isScoreEntryClosed">
+                  <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players</option>
+                </select>
+              </label>
+              <p class="score-entry-auto">
+                Table number is assigned automatically. Enter results by {{ formatDate(scoreEntryCutoffDate, true) }}.
+              </p>
+            </div>
+
+            <div class="score-entry-rows">
+              <div v-for="(row, index) in scoreForm.results" :key="index" class="score-entry-row">
+                <label>
+                  <span>Player</span>
+                  <input
+                    v-model.trim="row.playerName"
+                    type="text"
+                    :list="playerOptionsId"
+                    :disabled="isScoreEntryClosed"
+                    maxlength="80"
+                    autocomplete="off"
+                    placeholder="Choose or add a player"
+                    required
+                  >
+                </label>
+                <label>
+                  <span>Final points</span>
+                  <input v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" :disabled="isScoreEntryClosed" required>
+                </label>
+              </div>
+            </div>
+            <datalist :id="playerOptionsId">
+              <option v-for="player in selectedSeason.players" :key="player.id" :value="player.displayName" />
+            </datalist>
+
+            <div class="score-entry-footer">
+              <div>
+                <p v-if="duplicatePlayerName" class="score-entry-message" role="alert">{{ duplicatePlayerName }} is entered more than once.</p>
+                <p v-if="scoreEntryMessage" class="score-entry-message" role="status">{{ scoreEntryMessage }}</p>
+              </div>
+              <div class="score-entry-actions">
+                <button type="button" class="score-entry-reset" :disabled="isSubmittingScore" @click="resetScoreForm">
+                  Reset
+                </button>
+                <button type="submit" class="score-entry-submit" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
+                  {{ isSubmittingScore ? 'Saving results…' : 'Save table results' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
 
         <p v-if="selectedWeek.notes" class="week-notes">{{ selectedWeek.notes }}</p>
       </article>
@@ -446,6 +513,7 @@
 
 <script setup>
 import leagueData from '~/assets/data/riichi_league.json'
+import { onMounted } from 'vue'
 
 useHead({
   meta: [
@@ -466,8 +534,30 @@ const rulesDialog = ref(null)
 
 const selectedSeason = computed(() => seasons.value.find(item => item.id === selectedSeasonId.value) ?? seasons.value[0])
 const selectedWeeks = computed(() => [...(selectedSeason.value?.weeks ?? [])].sort((a, b) => a.weekNumber - b.weekNumber))
-const completedWeeks = computed(() => selectedWeeks.value.filter(week => week.status === 'completed'))
+const completedWeeks = computed(() => selectedWeeks.value.filter(week => week.status === 'completed' || week.tables?.length))
 const selectedWeek = computed(() => selectedWeeks.value.find(week => week.id === selectedWeekId.value) ?? selectedWeeks.value[0])
+const currentKualaLumpurDate = ref(kualaLumpurDate())
+const scoreEntryCutoffDate = computed(() => selectedWeek.value?.date ? addCalendarDays(selectedWeek.value.date, 3) : '')
+const isScoreEntryClosed = computed(() => Boolean(scoreEntryCutoffDate.value)
+  && currentKualaLumpurDate.value > scoreEntryCutoffDate.value)
+const isSubmittingScore = ref(false)
+const scoreEntryMessage = ref('')
+const playerOptionsId = 'riichi-league-player-options'
+let dateRefresh
+const scoreForm = ref({
+  tableSize: selectedSeason.value?.supportedTableSizes?.includes(4) ? 4 : selectedSeason.value?.supportedTableSizes?.[0] ?? 4,
+  results: [],
+})
+const duplicatePlayerName = computed(() => {
+  const seen = new Set()
+  for (const row of scoreForm.value.results) {
+    const normalizedName = String(row.playerName ?? '').trim().toLocaleLowerCase()
+    if (!normalizedName) continue
+    if (seen.has(normalizedName)) return String(row.playerName).trim()
+    seen.add(normalizedName)
+  }
+  return ''
+})
 
 const seasonStatus = computed(() => {
   if (completedWeeks.value.length === selectedWeeks.value.length) return 'completed'
@@ -554,6 +644,173 @@ watch(selectedSeasonId, () => {
   selectedWeekId.value = completedWeeks.value.at(-1)?.id ?? selectedWeeks.value[0]?.id ?? ''
 }, { immediate: true })
 
+watch(() => scoreForm.value.tableSize, (size) => {
+  const currentRows = scoreForm.value.results
+  scoreForm.value.results = Array.from({ length: Number(size) }, (_, index) => ({
+    playerName: currentRows[index]?.playerName ?? '',
+    finalPoints: currentRows[index]?.finalPoints ?? null,
+  }))
+})
+
+onMounted(async () => {
+  dateRefresh = setInterval(() => {
+    currentKualaLumpurDate.value = kualaLumpurDate()
+  }, 60_000)
+  scoreForm.value.results = createEmptyResults(scoreForm.value.tableSize)
+  await loadLeagueFromSupabase()
+  resetScoreForm()
+})
+
+async function loadLeagueFromSupabase() {
+  try {
+    const supabase = useSupabase()
+    const [seasonResponse, playerResponse, weekResponse, matchResponse, resultResponse] = await Promise.all([
+      supabase.from('riichi_league_seasons').select('*').order('season_number').range(0, 9999),
+      supabase.from('riichi_league_players').select('*').order('display_name').range(0, 9999),
+      supabase.from('riichi_league_weeks').select('*').order('week_number').range(0, 9999),
+      supabase.from('riichi_league_matches').select('*').order('table_number').range(0, 9999),
+      supabase.from('riichi_league_results').select('*').range(0, 9999),
+    ])
+    const responses = [seasonResponse, playerResponse, weekResponse, matchResponse, resultResponse]
+    const failed = responses.find(response => response.error)
+    if (failed) throw failed.error
+
+    const playerRows = playerResponse.data ?? []
+    const weekRows = weekResponse.data ?? []
+    const matchRows = matchResponse.data ?? []
+    const resultRows = resultResponse.data ?? []
+    const playersBySeason = groupBy(playerRows, 'season_id')
+    const matchesByWeek = groupBy(matchRows, 'week_id')
+    const resultsByMatch = groupBy(resultRows, 'match_id')
+
+    const loadedSeasons = (seasonResponse.data ?? []).map((season) => {
+      const players = (playersBySeason.get(season.id) ?? []).map(player => ({
+        id: player.id,
+        displayName: player.display_name,
+      }))
+      const weeks = (weekRows.filter(week => week.season_id === season.id)).map((week) => {
+        const tables = (matchesByWeek.get(week.id) ?? []).map((match) => ({
+          id: match.id,
+          tableNumber: match.table_number,
+          submittedAt: match.submitted_at,
+          results: (resultsByMatch.get(match.id) ?? []).map(result => ({
+            playerId: result.player_id,
+            finalPoints: result.final_points,
+            placement: result.placement,
+          })),
+        }))
+        return {
+          ...week.metadata,
+          id: week.id,
+          weekNumber: week.week_number,
+          date: week.event_date,
+          status: week.status === 'completed' ? 'completed' : tables.length ? 'active' : week.status,
+          tables,
+        }
+      })
+
+      return {
+        ...season.metadata,
+        id: season.id,
+        number: season.season_number,
+        name: season.name,
+        startDate: season.start_date,
+        endDate: season.end_date,
+        status: season.status,
+        totalWeeks: season.total_weeks,
+        bestResultsCount: season.best_results_count,
+        supportedTableSizes: season.supported_table_sizes,
+        scoring: season.scoring,
+        players,
+        weeks,
+      }
+    })
+
+    if (!loadedSeasons.length) return
+    seasons.value = loadedSeasons
+    if (!loadedSeasons.some(season => season.id === selectedSeasonId.value)) {
+      selectedSeasonId.value = loadedSeasons[0].id
+    }
+  } catch (error) {
+    console.error('Could not load Riichi League data from Supabase:', error)
+    scoreEntryMessage.value = 'Live league data is unavailable right now. Please try again later.'
+  }
+}
+
+function groupBy(rows, key) {
+  const grouped = new Map()
+  for (const row of rows) {
+    const values = grouped.get(row[key]) ?? []
+    values.push(row)
+    grouped.set(row[key], values)
+  }
+  return grouped
+}
+
+function createEmptyResults(size) {
+  return Array.from({ length: Number(size) }, (_, index) => ({
+    playerName: '',
+    finalPoints: null,
+  }))
+}
+
+function resetScoreForm() {
+  const sizes = selectedSeason.value?.supportedTableSizes ?? [4]
+  const tableSize = sizes.includes(4) ? 4 : sizes[0]
+  scoreForm.value = {
+    tableSize,
+    results: createEmptyResults(tableSize),
+  }
+  scoreEntryMessage.value = ''
+}
+
+async function submitMatch() {
+  if (!selectedWeek.value || isSubmittingScore.value) return
+  if (isScoreEntryClosed.value) {
+    scoreEntryMessage.value = `Results closed on ${formatDate(scoreEntryCutoffDate.value, true)}.`
+    return
+  }
+
+  const results = scoreForm.value.results.map(row => ({
+    player_name: String(row.playerName ?? '').trim(),
+    final_points: Number(row.finalPoints),
+  }))
+  const playerNames = results.map(result => result.player_name)
+  const validPoints = results.every(result => Number.isInteger(result.final_points)
+    && result.final_points >= -50000 && result.final_points <= 200000)
+
+  if (playerNames.some(name => !name || name.length > 80)) {
+    scoreEntryMessage.value = 'Enter a player name (80 characters or fewer) for every player.'
+    return
+  }
+  if (duplicatePlayerName) {
+    scoreEntryMessage.value = `${duplicatePlayerName} is entered more than once.`
+    return
+  }
+  if (!validPoints) {
+    scoreEntryMessage.value = 'Enter a whole number of final points for every player.'
+    return
+  }
+
+  isSubmittingScore.value = true
+  scoreEntryMessage.value = ''
+  try {
+    const { data: tableNumber, error } = await useSupabase().rpc('submit_riichi_match', {
+      p_week_id: selectedWeek.value.id,
+      p_results: results,
+    })
+    if (error) throw error
+    await loadLeagueFromSupabase()
+    resetScoreForm()
+    scoreEntryMessage.value = `Table ${tableNumber} saved. Standings have been updated.`
+  } catch (error) {
+    console.error('Could not save Riichi League results:', error)
+    scoreEntryMessage.value = 'Could not save these results. Check the player names and scores, then try again.'
+  } finally {
+    isSubmittingScore.value = false
+  }
+}
+
 function playerName(playerId) {
   return playerMap.value.get(playerId)?.displayName ?? 'Unknown player'
 }
@@ -563,6 +820,22 @@ function parseDate(value) {
   return new Date(year, month - 1, day)
 }
 
+function addCalendarDays(value, days) {
+  const [year, month, day] = value.split('-').map(Number)
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10)
+}
+
+function kualaLumpurDate() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kuala_Lumpur',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date())
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]))
+  return `${values.year}-${values.month}-${values.day}`
+}
+
 function formatDate(value, includeYear = false) {
   if (!value) return 'To be announced'
   return new Intl.DateTimeFormat('en-MY', {
@@ -570,6 +843,18 @@ function formatDate(value, includeYear = false) {
     month: 'long',
     ...(includeYear ? { year: 'numeric' } : {}),
   }).format(parseDate(value))
+}
+
+function formatSubmissionTime(value) {
+  if (!value) return ''
+  return new Intl.DateTimeFormat('en-MY', {
+    timeZone: 'Asia/Kuala_Lumpur',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(value))
 }
 
 function shortDate(value) {
@@ -660,6 +945,7 @@ function onRulesClosed() {
 }
 
 onBeforeUnmount(() => {
+  clearInterval(dateRefresh)
   document.body.style.overflow = ''
 })
 </script>
@@ -1095,7 +1381,14 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
 }
 
-.table-title span {
+.table-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.table-metadata span {
   font-size: .65rem;
   opacity: .55;
 }
@@ -1139,6 +1432,178 @@ onBeforeUnmount(() => {
 
 .week-notes {
   margin-top: 18px;
+}
+
+.score-entry {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid rgba(101, 119, 99, .14);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(246, 236, 231, .56), rgba(236, 233, 241, .6));
+}
+
+.score-entry-heading,
+.score-entry-footer {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.score-entry-heading h4 {
+  margin: 0;
+  color: var(--matcha-leaf);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.score-entry-heading > p {
+  max-width: 300px;
+  margin: 0;
+  font-size: .7rem;
+  line-height: 1.6;
+  text-align: right;
+  opacity: .65;
+}
+
+.score-entry-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.score-entry-options {
+  display: grid;
+  grid-template-columns: minmax(180px, .6fr) 1fr;
+  align-items: end;
+  gap: 10px;
+}
+
+.score-entry-row label,
+.score-entry-options label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.score-entry-row label > span,
+.score-entry-options label > span {
+  color: var(--matcha-leaf);
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+.score-entry-options label > span small {
+  font-size: inherit;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: .65;
+}
+
+.score-entry-row input,
+.score-entry-row select,
+.score-entry-options input,
+.score-entry-options select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--clay-text);
+  font: inherit;
+  font-size: .72rem;
+  border: 1px solid rgba(101, 119, 99, .2);
+  border-radius: 10px;
+  background: rgba(255, 253, 249, .88);
+}
+
+.score-entry-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.score-entry-row {
+  display: grid;
+  grid-template-columns: 1.5fr .9fr;
+  align-items: end;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(101, 119, 99, .1);
+  border-radius: 13px;
+  background: rgba(255, 253, 249, .55);
+}
+
+.score-entry-footer {
+  align-items: center;
+}
+
+.score-entry-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-entry-message {
+  margin: 0;
+  color: var(--matcha-leaf);
+  font-size: .7rem;
+  line-height: 1.5;
+}
+
+.score-entry-auto {
+  margin: 0;
+  font-size: .62rem;
+  line-height: 1.5;
+  opacity: .65;
+}
+
+.score-entry-submit {
+  min-height: 42px;
+  padding: 0 18px;
+  color: #fff;
+  font: inherit;
+  font-size: .7rem;
+  font-weight: 700;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--matcha-leaf);
+}
+
+.score-entry-reset {
+  min-height: 42px;
+  padding: 0 16px;
+  color: var(--matcha-leaf);
+  font: inherit;
+  font-size: .7rem;
+  font-weight: 700;
+  border: 1px solid rgba(101, 119, 99, .25);
+  border-radius: 999px;
+  cursor: pointer;
+  background: rgba(255, 253, 249, .72);
+}
+
+.score-entry-reset:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.score-entry-submit:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.score-entry-submit:focus-visible,
+.score-entry-reset:focus-visible,
+.score-entry input:focus-visible,
+.score-entry select:focus-visible {
+  outline: 3px solid var(--gold-leaf);
+  outline-offset: 2px;
 }
 
 .rules-card {
@@ -1542,6 +2007,40 @@ onBeforeUnmount(() => {
 
   .week-detail dl {
     grid-template-columns: 1fr;
+  }
+
+  .score-entry {
+    padding: 16px;
+  }
+
+  .score-entry-heading,
+  .score-entry-footer {
+    display: grid;
+    align-items: start;
+  }
+
+  .score-entry-heading > p {
+    text-align: left;
+  }
+
+  .score-entry-options {
+    grid-template-columns: 1fr;
+  }
+
+  .score-entry-row {
+    grid-template-columns: 1fr;
+  }
+
+  .score-entry-actions {
+    width: 100%;
+  }
+
+  .score-entry-actions button {
+    flex: 1;
+  }
+
+  .score-entry-submit {
+    width: auto;
   }
 
   .rules-card {
