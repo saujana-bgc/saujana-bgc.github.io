@@ -6,12 +6,17 @@
 
       <div class="season-switcher">
         <label for="season-select">Season</label>
-        <select id="season-select" v-model="selectedSeasonId">
+        <select id="season-select" v-model="selectedSeasonId" :disabled="isSubmittingScore">
           <option v-for="item in seasons" :key="item.id" :value="item.id">
             Season {{ item.number }}
           </option>
         </select>
       </div>
+      <nav class="league-shortcuts" aria-label="League sections">
+        <a href="#standings-heading">Standings</a>
+        <a href="#weeks-heading">Weekly results</a>
+        <button v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add a table</button>
+      </nav>
     </header>
 
     <section class="season-card fade-up" aria-labelledby="season-heading">
@@ -56,6 +61,11 @@
         </p>
       </div>
 
+      <label class="standing-search">
+        <span>Find a player</span>
+        <input v-model="standingQuery" type="search" placeholder="Search standings" autocomplete="off">
+      </label>
+      <p v-if="!filteredStandings.length" role="status">No players match “{{ standingQuery }}”.</p>
       <div class="standings-table-wrap">
         <table class="standings-table">
           <thead>
@@ -70,7 +80,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="player in standings" :key="player.id">
+            <tr v-for="player in filteredStandings" :key="player.id">
               <td><span class="rank-medal" :class="`rank-${player.rank}`">{{ player.rank }}</span></td>
               <th scope="row">{{ player.name }}</th>
               <td>{{ player.played }}</td>
@@ -84,7 +94,7 @@
       </div>
 
       <div class="standings-cards">
-        <article v-for="player in standings" :key="`card-${player.id}`" class="standing-player">
+        <article v-for="player in mobileStandings" :key="`card-${player.id}`" class="standing-player">
           <span class="rank-medal" :class="`rank-${player.rank}`">{{ player.rank }}</span>
           <div>
             <h3>{{ player.name }}</h3>
@@ -93,9 +103,12 @@
               {{ player.wins }} 1st · {{ player.seconds }} 2nd
             </p>
           </div>
-          <strong :class="scoreClass(player.bestTotal)">{{ scoreDisplay(player.bestTotal) }}</strong>
+          <strong :class="scoreClass(player.bestTotal)">{{ scoreDisplay(player.bestTotal) }}<small>league pts</small></strong>
         </article>
       </div>
+      <button v-if="!standingQuery && filteredStandings.length > 10" type="button" class="standings-toggle" :aria-expanded="showAllStandings" @click="showAllStandings = !showAllStandings">
+        {{ showAllStandings ? 'Show top 10' : `Show all ${filteredStandings.length} players` }}
+      </button>
     </section>
 
     <section class="content-card weeks-card fade-up" aria-labelledby="weeks-heading">
@@ -107,6 +120,12 @@
         <p>Select a week to see its schedule or completed table results.</p>
       </div>
 
+      <label class="mobile-week-select">
+        <span>Session</span>
+        <select v-model="selectedWeekId" :disabled="isSubmittingScore">
+          <option v-for="week in selectedWeeks" :key="week.id" :value="week.id">Week {{ week.weekNumber }} · {{ formatDate(week.date) }} · {{ week.tables.length ? 'Results' : 'Scheduled' }}</option>
+        </select>
+      </label>
       <div class="week-picker" role="list" aria-label="League weeks">
         <button
           v-for="week in selectedWeeks"
@@ -114,6 +133,7 @@
           type="button"
           :class="{ active: selectedWeekId === week.id, completed: week.status === 'completed' || week.tables.length > 0 }"
           :aria-pressed="selectedWeekId === week.id"
+          :disabled="isSubmittingScore"
           @click="selectedWeekId = week.id"
         >
           <span>Week {{ week.weekNumber }}</span>
@@ -140,6 +160,60 @@
             </div>
           </dl>
         </div>
+
+        <section v-if="!isScoreEntryClosed" id="score-entry" class="score-entry" aria-labelledby="score-entry-heading">
+          <div class="score-entry-heading">
+            <div>
+              <p class="section-kicker">Add a table</p>
+              <h4 id="score-entry-heading" tabindex="-1">Week {{ selectedWeek.weekNumber }} · Add results</h4>
+            </div>
+            <p>Anyone can submit a complete table. Saved results appear in the league immediately.</p>
+          </div>
+
+          <form class="score-entry-form" @submit.prevent="submitMatch">
+            <div class="score-entry-options">
+              <label>
+                <span>Players at table</span>
+                <select v-model.number="scoreForm.tableSize" :disabled="isSubmittingScore">
+                  <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players</option>
+                </select>
+              </label>
+              <p class="score-entry-auto">
+                Table number is assigned automatically. Enter results by {{ formatDate(scoreEntryCutoffDate, true) }}.
+              </p>
+            </div>
+
+            <div class="score-entry-rows">
+              <div v-for="(row, index) in scoreForm.results" :key="index" class="score-entry-row">
+                <LeaguePlayerPicker
+                  :id="`league-player-${index}`" :key="`${selectedWeekId}-${formResetKey}-${index}`"
+                  v-model="row.playerName" :label="`Player ${index + 1}`"
+                  :names="selectedSeason.players.map(player => player.displayName)"
+                  :excluded="scoreForm.results.filter((_, other) => other !== index).map(item => item.playerName)"
+                  :disabled="isSubmittingScore"
+                />
+                <label>
+                  <span>Final points · Player {{ index + 1 }}</span>
+                  <input v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" placeholder="e.g. 25000" :disabled="isSubmittingScore" required>
+                </label>
+              </div>
+            </div>
+            <div class="score-entry-footer">
+              <div>
+                <p v-if="duplicatePlayerName" class="score-entry-message" role="alert">{{ duplicatePlayerName }} is entered more than once.</p>
+                <p v-if="scoreEntryMessage" class="score-entry-message" role="status">{{ scoreEntryMessage }}</p>
+              </div>
+              <div class="score-entry-actions">
+                <button type="button" class="score-entry-reset" :disabled="isSubmittingScore" @click="resetScoreForm">
+                  Reset
+                </button>
+                <button type="submit" class="score-entry-submit" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
+                  {{ isSubmittingScore ? 'Saving results…' : 'Save table results' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
 
         <template v-if="selectedWeek.tables.length">
           <section v-for="table in selectedWeek.tables" :key="table.id" class="table-result">
@@ -179,7 +253,7 @@
                   <h5>{{ playerName(result.playerId) }}</h5>
                   <p>{{ numberFormat(result.finalPoints) }} pts</p>
                 </div>
-                <strong :class="scoreClass(leagueScore(result, table))">{{ scoreDisplay(leagueScore(result, table)) }}</strong>
+                <strong :class="scoreClass(leagueScore(result, table))">{{ scoreDisplay(leagueScore(result, table)) }}<small>league pts</small></strong>
               </article>
             </div>
           </section>
@@ -192,70 +266,6 @@
             <p>This round is scheduled for {{ formatDate(selectedWeek.date, true) }}. Scores and standings will update when the tables are complete.</p>
           </div>
         </div>
-
-        <section v-if="!isScoreEntryClosed" class="score-entry" aria-labelledby="score-entry-heading">
-          <div class="score-entry-heading">
-            <div>
-              <p class="section-kicker">Add a table</p>
-              <h4 id="score-entry-heading">Enter match results</h4>
-            </div>
-            <p>Anyone can submit a complete table. Saved results appear in the league immediately.</p>
-          </div>
-
-          <form class="score-entry-form" @submit.prevent="submitMatch">
-            <div class="score-entry-options">
-              <label>
-                <span>Players at table</span>
-                <select v-model.number="scoreForm.tableSize" :disabled="isScoreEntryClosed">
-                  <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players</option>
-                </select>
-              </label>
-              <p class="score-entry-auto">
-                Table number is assigned automatically. Enter results by {{ formatDate(scoreEntryCutoffDate, true) }}.
-              </p>
-            </div>
-
-            <div class="score-entry-rows">
-              <div v-for="(row, index) in scoreForm.results" :key="index" class="score-entry-row">
-                <label>
-                  <span>Player</span>
-                  <input
-                    v-model.trim="row.playerName"
-                    type="text"
-                    :list="playerOptionsId"
-                    :disabled="isScoreEntryClosed"
-                    maxlength="80"
-                    autocomplete="off"
-                    placeholder="Choose or add a player"
-                    required
-                  >
-                </label>
-                <label>
-                  <span>Final points</span>
-                  <input v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" :disabled="isScoreEntryClosed" required>
-                </label>
-              </div>
-            </div>
-            <datalist :id="playerOptionsId">
-              <option v-for="player in selectedSeason.players" :key="player.id" :value="player.displayName" />
-            </datalist>
-
-            <div class="score-entry-footer">
-              <div>
-                <p v-if="duplicatePlayerName" class="score-entry-message" role="alert">{{ duplicatePlayerName }} is entered more than once.</p>
-                <p v-if="scoreEntryMessage" class="score-entry-message" role="status">{{ scoreEntryMessage }}</p>
-              </div>
-              <div class="score-entry-actions">
-                <button type="button" class="score-entry-reset" :disabled="isSubmittingScore" @click="resetScoreForm">
-                  Reset
-                </button>
-                <button type="submit" class="score-entry-submit" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
-                  {{ isSubmittingScore ? 'Saving results…' : 'Save table results' }}
-                </button>
-              </div>
-            </div>
-          </form>
-        </section>
 
         <p v-if="selectedWeek.notes" class="week-notes">{{ selectedWeek.notes }}</p>
       </article>
@@ -542,7 +552,20 @@ const isScoreEntryClosed = computed(() => Boolean(scoreEntryCutoffDate.value)
   && currentKualaLumpurDate.value > scoreEntryCutoffDate.value)
 const isSubmittingScore = ref(false)
 const scoreEntryMessage = ref('')
-const playerOptionsId = 'riichi-league-player-options'
+const formResetKey = ref(0)
+const scoreDrafts = new Map()
+const standingQuery = ref('')
+const showAllStandings = ref(false)
+const filteredStandings = computed(() => standings.value.filter(player => player.name.toLocaleLowerCase().includes(standingQuery.value.trim().toLocaleLowerCase())))
+const mobileStandings = computed(() => showAllStandings.value || standingQuery.value ? filteredStandings.value : filteredStandings.value.slice(0, 10))
+const entryWeek = computed(() => selectedWeeks.value.find(week => week.date <= currentKualaLumpurDate.value && addCalendarDays(week.date, 3) >= currentKualaLumpurDate.value)
+  ?? selectedWeeks.value.find(week => week.date > currentKualaLumpurDate.value))
+async function goToEntry() {
+  selectedWeekId.value = entryWeek.value.id
+  await nextTick()
+  document.getElementById('score-entry-heading')?.focus()
+  document.getElementById('score-entry')?.scrollIntoView({ block: 'start' })
+}
 let dateRefresh
 const scoreForm = ref({
   tableSize: selectedSeason.value?.supportedTableSizes?.includes(4) ? 4 : selectedSeason.value?.supportedTableSizes?.[0] ?? 4,
@@ -644,6 +667,16 @@ watch(selectedSeasonId, () => {
   selectedWeekId.value = completedWeeks.value.at(-1)?.id ?? selectedWeeks.value[0]?.id ?? ''
 }, { immediate: true })
 
+watch(selectedWeekId, (next, previous) => {
+  if (previous) scoreDrafts.set(previous, {
+    tableSize: scoreForm.value.tableSize,
+    results: scoreForm.value.results.map(row => ({ ...row })),
+  })
+  const draft = scoreDrafts.get(next)
+  resetScoreForm()
+  if (draft) scoreForm.value = draft
+})
+
 watch(() => scoreForm.value.tableSize, (size) => {
   const currentRows = scoreForm.value.results
   scoreForm.value.results = Array.from({ length: Number(size) }, (_, index) => ({
@@ -658,7 +691,6 @@ onMounted(async () => {
   }, 60_000)
   scoreForm.value.results = createEmptyResults(scoreForm.value.tableSize)
   await loadLeagueFromSupabase()
-  resetScoreForm()
 })
 
 async function loadLeagueFromSupabase() {
@@ -755,6 +787,8 @@ function createEmptyResults(size) {
 }
 
 function resetScoreForm() {
+  scoreDrafts.delete(selectedWeekId.value)
+  formResetKey.value += 1
   const sizes = selectedSeason.value?.supportedTableSizes ?? [4]
   const tableSize = sizes.includes(4) ? 4 : sizes[0]
   scoreForm.value = {
@@ -776,15 +810,16 @@ async function submitMatch() {
     final_points: Number(row.finalPoints),
   }))
   const playerNames = results.map(result => result.player_name)
-  const validPoints = results.every(result => Number.isInteger(result.final_points)
+  const validPoints = scoreForm.value.results.every(row => row.finalPoints !== null && row.finalPoints !== '')
+    && results.every(result => Number.isInteger(result.final_points)
     && result.final_points >= -50000 && result.final_points <= 200000)
 
   if (playerNames.some(name => !name || name.length > 80)) {
     scoreEntryMessage.value = 'Enter a player name (80 characters or fewer) for every player.'
     return
   }
-  if (duplicatePlayerName) {
-    scoreEntryMessage.value = `${duplicatePlayerName} is entered more than once.`
+  if (duplicatePlayerName.value) {
+    scoreEntryMessage.value = `${duplicatePlayerName.value} is entered more than once.`
     return
   }
   if (!validPoints) {
@@ -1529,7 +1564,7 @@ onBeforeUnmount(() => {
 .score-entry-row {
   display: grid;
   grid-template-columns: 1.5fr .9fr;
-  align-items: end;
+  align-items: start;
   gap: 10px;
   padding: 12px;
   border: 1px solid rgba(101, 119, 99, .1);
@@ -2087,5 +2122,46 @@ onBeforeUnmount(() => {
   .season-stats {
     grid-template-columns: 1fr;
   }
+}
+/* Comfortable touch targets and shortcuts shared across screen sizes. */
+.league-shortcuts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
+.league-shortcuts a, .league-shortcuts button, .standings-toggle { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 8px 16px; border: 1px solid #9ba995; border-radius: 999px; background: #fffdf9; color: #41513d; font: inherit; font-size: .9rem; text-decoration: none; cursor: pointer; }
+.league-shortcuts button { background: var(--matcha-leaf); color: white; }
+#standings-heading, #weeks-heading, #score-entry { scroll-margin-top: 90px; }
+.standing-search { display: grid; gap: 6px; max-width: 340px; margin: 18px 0; font-size: .85rem; }
+.standing-search input, .mobile-week-select select { width: 100%; box-sizing: border-box; min-height: 48px; padding: 10px 12px; border: 1px solid #9ba995; border-radius: 10px; background: #fffdf9; color: var(--clay-text); font: inherit; font-size: 16px; }
+.mobile-week-select, .standings-toggle { display: none; }
+.score-entry-row input, .score-entry-options select { font-size: 16px; min-height: 48px; }
+.score-entry-row label > span, .score-entry-options label > span { font-size: .8rem; letter-spacing: 0; text-transform: none; }
+.score-entry-heading > p, .score-entry-auto, .score-entry-message { font-size: .85rem; opacity: 1; }
+.score-entry-submit, .score-entry-reset { min-height: 48px; font-size: .9rem; }
+.score-entry { margin-bottom: 28px; }
+.standing-player small, .result-cards article > strong small { display: block; font-size: .65rem; font-weight: 400; white-space: nowrap; }
+.table-title { gap: 12px; }
+.table-metadata { gap: 4px 12px; }
+.table-metadata span { font-size: .75rem; opacity: .85; }
+@media (max-width: 760px) {
+  .season-card, .content-card, .rules-card { padding: 20px 16px; }
+  .season-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .season-stats > div { padding: 12px 8px; }
+  .season-stats span { font-size: .75rem; line-height: 1.45; opacity: .85; }
+  .league-hero { padding: 24px 8px; }
+  .league-intro, .section-heading > p, .rules-card > div > p { font-size: .9rem; opacity: .85; }
+  .mobile-week-select { display: grid; gap: 8px; margin: 18px 0; font-size: .9rem; }
+  .week-picker { display: none; }
+  .standings-toggle { display: flex; width: 100%; margin-top: 14px; }
+  .standing-search { max-width: none; }
+  .standing-player, .result-cards article { gap: 10px; padding: 12px; }
+  .standing-player > div, .result-cards article > div { min-width: 0; overflow-wrap: anywhere; }
+  .standing-player h3, .result-cards h5 { font-size: 1rem; }
+  .standing-player p, .result-cards p { font-size: .8rem; opacity: .85; }
+  .standing-player > strong, .result-cards article > strong { font-size: 1.15rem; text-align: right; }
+  .score-entry { padding: 14px 10px; }
+  .score-entry-row { padding: 12px 10px; gap: 14px; }
+  .score-entry-heading > p { max-width: none; }
+  .score-entry-actions { flex-wrap: wrap; }
+  .score-entry-actions button { white-space: nowrap; }
+  .table-title { align-items: start; }
+  .table-metadata { flex-direction: column; align-items: end; text-align: right; }
 }
 </style>
