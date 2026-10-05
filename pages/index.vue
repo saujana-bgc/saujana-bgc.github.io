@@ -1,6 +1,16 @@
 <template>
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <section class="hero-section fade-up">
+      <div class="hero-copy">
+        <p class="page-eyebrow">Saujana Board Game Community</p>
+        <h1>Good games.<br><em>Even better company.</em></h1>
+        <p class="hero-description">Slow afternoons, a new favourite game, and a place at the table. Come as you are. We’ll teach you the rest.</p>
+        <div class="hero-actions">
+          <NuxtLink to="/gatherings" class="primary-link" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
+          <NuxtLink to="/collection" class="text-link" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
+        </div>
+        <p class="hero-footnote"><span aria-hidden="true"></span> New faces always welcome</p>
+      </div>
       <div class="banner-container">
         <img
           class="hero-banner"
@@ -16,44 +26,7 @@
       </div>
     </section>
 
-    <section v-if="posts.length" class="ig-section fade-up" style="animation-delay: 0.1s;">
-      <div class="ig-header">
-        <span class="ig-icon" v-html="igSvg" aria-hidden="true"></span>
-        <div>
-          <p class="ig-handle">@saujana.bgc</p>
-          <p class="ig-sub">Recent Instagram posts</p>
-        </div>
-        <a href="https://www.instagram.com/saujana.bgc" target="_blank" class="ig-follow-btn">Follow</a>
-      </div>
-
-      <div class="ig-grid">
-        <a
-          v-for="post in posts"
-          :key="post.shortcode"
-          :href="post.url"
-          target="_blank"
-          class="ig-cell"
-        >
-          <img
-            :src="getInstagramThumb(post.img)"
-            :alt="post.caption || 'Instagram post'"
-            width="360"
-            height="360"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="ig-overlay">
-            <span v-if="post.is_sidecar" class="ig-badge">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M3 4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2H3a1 1 0 0 1-1-1V4zm2 9v1h10V6h-1v7a1 1 0 0 1-1 1H5zm-1-2h9V4H4v7z"/></svg>
-            </span>
-            <span v-if="post.is_video" class="ig-badge">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84z"/></svg>
-            </span>
-            <p class="ig-caption">{{ post.caption }}</p>
-          </div>
-        </a>
-      </div>
-    </section>
+    <div class="welcome-strip"><span>Come solo or bring a friend</span><span>Learn as you play</span><span>Stay for the company</span></div>
 
     <section class="announcement-box fade-up" style="animation-delay: 0.2s;">
       <h2 class="hero-title" style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 15px; padding: 0;">Board games, easy company</h2>
@@ -87,10 +60,50 @@
 
       <div class="care-guide">
         <div v-for="(pillar, i) in pillars" :key="pillar.title" class="pillar" :style="{ animationDelay: (0.15 + i * 0.1) + 's' }">
-          <div class="pillar-icon">{{ pillar.title.split(' ')[0] }}</div>
+          <div class="pillar-icon" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</div>
           <h3>{{ pillar.title.split(' ').slice(1).join(' ') }}</h3>
           <p v-html="pillar.content"></p>
         </div>
+      </div>
+    </section>
+
+    <section v-if="posts.length" class="ig-section fade-up" style="animation-delay: 0.1s;">
+      <div class="ig-header">
+        <span class="ig-icon" v-html="igSvg" aria-hidden="true"></span>
+        <div>
+          <p class="ig-sub">The community, lately</p>
+          <h2 class="ig-handle">Life around the table</h2>
+        </div>
+        <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer" class="ig-follow-btn">Follow along ↗</a>
+      </div>
+
+      <div class="ig-grid">
+        <a
+          v-for="post in posts"
+          :key="post.shortcode"
+          :href="post.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="ig-cell"
+        >
+          <img
+            :src="getInstagramThumb(post.img)"
+            :alt="post.caption || 'Instagram post'"
+            width="360"
+            height="360"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="ig-overlay">
+            <span v-if="post.is_sidecar" class="ig-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M3 4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2H3a1 1 0 0 1-1-1V4zm2 9v1h10V6h-1v7a1 1 0 0 1-1 1H5zm-1-2h9V4H4v7z"/></svg>
+            </span>
+            <span v-if="post.is_video" class="ig-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84z"/></svg>
+            </span>
+            <p class="ig-caption">{{ post.caption }}</p>
+          </div>
+        </a>
       </div>
     </section>
 
@@ -101,7 +114,7 @@
 import { instagramData } from '~/assets/data/instagram_data.js'
 
 const heroImageSrcset = '/images/site/saujana_bgc_banner_640.avif?v=20260806-hero-v6 640w, /images/site/saujana_bgc_banner_800.avif?v=20260806-hero-v6 800w, /images/site/saujana_bgc_banner_900.avif?v=20260806-hero-v6 900w, /images/site/saujana_bgc_banner_1000.avif?v=20260806-hero-v6 1000w, /images/site/saujana_bgc_banner_1200.avif?v=20260806-hero-v6 1200w, /images/site/saujana_bgc_banner.avif?v=20260806-hero-v6 1920w'
-const heroImageSizes = '(min-width: 978px) 900px, (min-width: 768px) 92vw, 90vw'
+const heroImageSizes = '(min-width: 1200px) 580px, (min-width: 900px) 48vw, 92vw'
 
 const posts = computed(() => (instagramData?.posts ?? []).slice(0, 4))
 const getInstagramThumb = (src) => `/${src.replace('images/instagram/', 'images/instagram/thumbs/')}`
@@ -143,357 +156,74 @@ const expectations = [
 </script>
 
 <style scoped>
-/* --- PORCH LABEL --- */
-.porch-label {
-    display: inline-block;
-    margin-top: 12px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 2.5px;
-    font-weight: 600;
-    color: var(--gold-leaf);
-    opacity: 0.9;
+.hero-section { width: min(1200px, 92%); display: grid; grid-template-columns: 1fr 1.05fr; align-items: center; gap: clamp(28px, 5vw, 72px); padding: 68px 0 52px; }
+.hero-copy .page-eyebrow { justify-content: flex-start; font-size: .6rem; }
+.hero-copy .page-eyebrow::before, .hero-copy .page-eyebrow::after { display: none; }
+.hero-copy h1 { font-family: var(--font-display); font-size: clamp(2.8rem, 4.7vw, 4.4rem); color: var(--matcha-leaf); font-weight: 400; letter-spacing: -.055em; line-height: 1.12; margin: 0; text-wrap: balance; }
+.hero-copy h1 em { color: #798064; font-weight: 400; }
+.hero-description { max-width: 400px; margin: 24px 0 28px; font-size: 1rem; color: var(--muted); line-height: 1.85; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; }
+.primary-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 26px; min-height: 48px; padding: 13px 22px; border-radius: 6px; background: var(--matcha-leaf); color: white; font-size: .82rem; text-decoration: none; transition: background .2s; }
+.primary-link:hover { background: #243a2d; }
+.text-link { display: inline-flex; gap: 14px; padding: 12px 0; color: var(--matcha-leaf); font-size: .8rem; text-decoration: none; border-bottom: 1px solid var(--line); }
+.hero-footnote { display: flex; align-items: center; gap: 8px; margin: 25px 0 0; color: var(--muted); font-size: .73rem; }
+.hero-footnote span { width: 5px; height: 5px; border-radius: 50%; background: #798064; }
+.banner-container { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 60px 60px 12px 12px; background: #ece8dd; overflow: hidden; }
+.hero-banner { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 52px 52px 6px 6px; }
+.welcome-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 64px; width: min(1200px,92%); padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); font-size: .67rem; letter-spacing: .1em; text-transform: uppercase; }
+.welcome-strip span { display: flex; align-items: center; gap: 14px; }
+.welcome-strip span::before { content: '✧'; color: var(--gold-leaf); }
+.announcement-box { width: min(1120px,92%); margin: 72px auto 0; text-align: center; }
+.porch-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .15em; color: var(--gold-leaf); }
+.first-timer-note { margin: 18px auto 0; color: var(--matcha-leaf); font-size: .9rem; }
+.welcome-note { margin: 32px auto; max-width: 760px; padding: 28px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.welcome-note h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 0 0 10px; }
+.welcome-note p { font-size: .9rem; color: var(--muted); margin: 0; }
+.welcome-note a { display: inline-block; color: var(--matcha-leaf); font-size: .8rem; margin-top: 16px; }
+.expect-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin: 44px 0 32px; }
+.expect-card { padding: 12px 0; border-top: 1px solid var(--line); }
+.expect-card span { color: var(--gold-leaf); font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; }
+.expect-card h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 12px 0; }
+.expect-card p { color: var(--muted); font-size: .9rem; line-height: 1.8; margin: 0; }
+.table-scenes { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.table-scenes img { width: 100%; height: 230px; object-fit: cover; border-radius: 8px; }
+.care-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin-top: 40px; padding: 32px 0; border-top: 1px solid var(--line); }
+.pillar-icon { color: var(--gold-leaf); font-size: .7rem; letter-spacing: .1em; }
+.pillar h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; color: var(--matcha-leaf); margin: 12px 0; }
+.pillar p { font-size: .85rem; line-height: 1.8; color: var(--muted); margin: 0; }
+.ig-section { width: min(1120px,92%); margin: 44px auto 20px; padding: 36px 0 0; border-top: 1px solid var(--line); }
+.ig-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.ig-icon { display: none; }
+.ig-handle { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem,3vw,2rem); color: var(--matcha-leaf); margin: 6px 0 0; }
+.ig-sub { font-size: .62rem; text-transform: uppercase; letter-spacing: .15em; color: var(--gold-leaf); margin: 0; }
+.ig-follow-btn { margin-left: auto; color: var(--matcha-leaf); font-size: .8rem; text-decoration: none; border-bottom: 1px solid var(--line); padding: 12px 0; white-space: nowrap; }
+.ig-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+.ig-cell { position: relative; aspect-ratio: 1; overflow: hidden; display: block; border-radius: 6px; background: var(--surface-soft); }
+.ig-cell img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+.ig-cell:hover img { transform: scale(1.04); }
+.ig-overlay { position: absolute; inset: 0; background: linear-gradient(to top,rgba(25,39,28,.85),transparent 90%); opacity: 0; transition: opacity .2s; display: flex; align-items: flex-end; padding: 16px; }
+.ig-cell:hover .ig-overlay, .ig-cell:focus-visible .ig-overlay { opacity: 1; }
+.ig-caption { color: white; font-size: .75rem; line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ig-badge { position: absolute; top: 10px; right: 10px; color: white; }
+@media (max-width: 899px) {
+ .hero-section { grid-template-columns: 1fr; gap: 32px; padding: 40px 0 32px; }
+ .hero-copy { max-width: 640px; }
+ .hero-copy h1 { font-size: clamp(2.65rem,7vw,4rem); }
+ .hero-description { max-width: 540px; }
+ .banner-container { border-radius: 80px 80px 10px 10px; }
+ .hero-banner { aspect-ratio: 16 / 9; border-radius: 72px 72px 5px 5px; }
+ .welcome-strip { gap: 12px 24px; font-size: .6rem; }
+ .announcement-box { margin-top: 44px; }
 }
-
-/* --- HERO & BANNER --- */
-.hero-section {
-    width: 90%;
-    max-width: 900px;
-    padding-top: clamp(14px, 2vw, 22px);
-    text-align: center;
-    box-sizing: border-box;
+@media (max-width: 600px) {
+ .expect-guide, .care-guide { grid-template-columns: 1fr; gap: 22px; }
+ .care-guide { margin-top: 28px; }
+ .pillar { padding-bottom: 10px; }
+ .table-scenes { gap: 8px; }
+ .table-scenes img { height: 130px; }
+ .ig-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+ .welcome-note { padding: 24px 18px; }
+ .ig-header { gap: 8px; }
+ .ig-follow-btn { font-size: .72rem; }
 }
-
-.banner-container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-}
-
-.hero-banner {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(74, 68, 63, 0.12);
-    border: 4px solid var(--white-pure);
-    margin: 0 auto;
-    transition: box-shadow 0.4s;
-}
-
-.hero-banner:hover {
-    box-shadow: 0 18px 50px rgba(74, 68, 63, 0.16);
-}
-
-/* --- MAIN CONTENT CARD --- */
-.announcement-box {
-    background: var(--white-pure);
-    border-radius: var(--radius-card);
-    padding: var(--section-pad);
-    box-shadow: inset 0 3px 0 var(--gold-leaf), 0 20px 60px rgba(160, 100, 110, 0.1);
-    border: 1px solid rgba(201, 190, 239, 0.12);
-    max-width: 900px; width: 90%; margin: 30px auto; text-align: center;
-    box-sizing: border-box;
-}
-
-.welcome-note {
-    margin: 34px auto 0;
-    max-width: 660px;
-    padding: 26px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, var(--rose-dust), var(--lavender-mist));
-    box-shadow: inset 0 3px 0 var(--gold-leaf);
-}
-
-.welcome-note h3 {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    color: var(--matcha-leaf);
-    font-size: 1.35rem;
-    margin: 0 0 10px;
-}
-
-.welcome-note p {
-    margin: 0 auto;
-    max-width: 560px;
-    font-size: 0.95rem;
-    line-height: 1.8;
-    opacity: 0.86;
-}
-
-.welcome-note a {
-    display: inline-block;
-    margin-top: 18px;
-    color: var(--matcha-leaf);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    text-decoration: none;
-    border-bottom: 1px solid var(--gold-leaf);
-}
-
-.first-timer-note {
-    margin: 18px auto 0;
-    max-width: 620px;
-    padding: 14px 18px;
-    border-radius: 999px;
-    background: rgba(237, 232, 245, 0.72);
-    color: var(--matcha-leaf);
-    font-size: 0.82rem;
-    font-weight: 700;
-    line-height: 1.6;
-    box-shadow: inset 0 0 0 1px rgba(107, 122, 104, 0.08);
-}
-
-.expect-guide {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-    margin-top: 28px;
-    text-align: left;
-}
-
-.expect-card {
-    padding: 22px;
-    border-radius: 20px;
-    border: 1px solid rgba(107, 122, 104, 0.1);
-    background: rgba(255,255,255,0.72);
-}
-
-.expect-card span {
-    color: var(--gold-leaf);
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-}
-
-.expect-card h3 {
-    margin: 8px 0;
-    color: var(--matcha-leaf);
-    font-size: 0.98rem;
-}
-
-.expect-card p {
-    margin: 0;
-    font-size: 0.84rem;
-    line-height: 1.7;
-    opacity: 0.78;
-}
-
-.table-scenes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 30px;
-    border-radius: 22px;
-    overflow: hidden;
-}
-
-.table-scenes img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    display: block;
-}
-
-/* --- PILLARS --- */
-.care-guide {
-    display: grid; grid-template-columns: 1fr;
-    gap: 20px; text-align: left; margin-top: 40px;
-    padding-top: 40px; border-top: 1px solid rgba(107, 122, 104, 0.1);
-}
-
-.pillar {
-    background: var(--rose-dust);
-    border-radius: 20px;
-    padding: 28px;
-    border-top: none;
-    box-shadow: inset 0 3px 0 var(--gold-leaf), 0 4px 16px rgba(160, 100, 120, 0.06);
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
-    animation: fadeSlideUp 0.65s ease both;
-}
-
-.pillar:nth-child(2) {
-    background: var(--lavender-mist);
-    box-shadow: inset 0 3px 0 var(--lavender-mid), 0 4px 16px rgba(140, 120, 190, 0.08);
-}
-
-.pillar:hover {
-    transform: translateY(-4px);
-    box-shadow: inset 0 3px 0 var(--gold-leaf), 0 14px 36px rgba(160, 100, 120, 0.12);
-}
-
-.pillar:nth-child(2):hover {
-    box-shadow: inset 0 3px 0 var(--lavender-mid), 0 14px 36px rgba(140, 120, 190, 0.13);
-}
-
-.pillar-icon {
-    font-size: 1.6rem;
-    margin-bottom: 12px;
-}
-
-.pillar h3 {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    color: var(--matcha-leaf);
-    font-size: 1.15rem;
-    margin: 0 0 10px;
-}
-
-.pillar p { font-size: 0.9rem; line-height: 1.7; margin: 0; opacity: 0.85; }
-
-@media (max-width: 767px) {
-    .care-guide { margin-top: 24px; padding-top: 24px; gap: 16px; }
-}
-
-@media (min-width: 768px) {
-    .hero-section { width: 92%; }
-    .announcement-box { border-radius: 50px; width: 92%; }
-    .expect-guide { grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .table-scenes img { height: 190px; }
-    .care-guide { grid-template-columns: repeat(3, 1fr); gap: 30px; }
-    .pillar { padding: 35px; border-radius: 24px; }
-}
-
-/* --- INSTAGRAM SECTION --- */
-.ig-section {
-    width: 90%;
-    max-width: 900px;
-    margin: 20px auto 0;
-    background: var(--white-pure);
-    border-radius: var(--radius-card);
-    padding: var(--section-pad);
-    box-shadow: inset 0 3px 0 #B48682, 0 20px 60px rgba(122, 92, 76, 0.1);
-    border: 1px solid rgba(201, 190, 239, 0.12);
-    box-sizing: border-box;
-}
-
-.ig-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 22px;
-}
-
-.ig-icon {
-    display: flex;
-    align-items: center;
-    background: linear-gradient(135deg, #B48682, #7C8475);
-    border-radius: 12px;
-    padding: 8px;
-    color: white;
-    flex-shrink: 0;
-}
-
-.ig-handle {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--clay-text);
-    margin: 0;
-}
-
-.ig-sub {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--matcha-leaf);
-    margin: 3px 0 0;
-}
-
-.ig-follow-btn {
-    margin-left: auto;
-    background: linear-gradient(135deg, #B48682, #7C8475);
-    color: white;
-    border-radius: 40px;
-    padding: 8px 22px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: opacity 0.25s, transform 0.25s;
-    flex-shrink: 0;
-}
-
-.ig-follow-btn:hover {
-    opacity: 0.88;
-    transform: translateY(-2px);
-}
-
-.ig-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
-    border-radius: 16px;
-    overflow: hidden;
-}
-
-.ig-cell {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    display: block;
-    background: var(--rose-dust);
-}
-
-.ig-cell img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.4s ease;
-}
-
-.ig-cell:hover img {
-    transform: scale(1.04);
-}
-
-.ig-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(74, 68, 63, 0.72) 0%, transparent 55%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 12px;
-    box-sizing: border-box;
-}
-
-.ig-cell:hover .ig-overlay {
-    opacity: 1;
-}
-
-.ig-caption {
-    color: white;
-    font-size: 0.72rem;
-    line-height: 1.5;
-    margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.ig-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    color: white;
-    display: flex;
-    align-items: center;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
-}
-
-@media (min-width: 540px) {
-    .ig-grid { grid-template-columns: repeat(4, 1fr); }
-    .ig-section { border-radius: var(--radius-card); width: 92%; }
-}
-
 </style>

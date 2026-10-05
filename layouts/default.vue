@@ -1,10 +1,11 @@
 <template>
-  <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <nav aria-label="Primary navigation">
+  <div class="site-shell">
+    <a class="skip-link" href="#page-content">Skip to content</a>
+    <nav class="site-nav" aria-label="Primary navigation">
       <div class="mobile-nav-bar">
         <NuxtLink to="/" class="mobile-brand" no-prefetch @click="closeMenu">
           <img class="mobile-brand-logo" src="/favicon.ico" alt="" width="34" height="34" />
-          <span>Saujana BGC</span>
+          <span class="brand-wordmark">Saujana<span class="brand-caption">Board Game Community</span></span>
         </NuxtLink>
         <button
           type="button"
@@ -30,14 +31,28 @@
       </div>
     </nav>
 
-    <slot />
+    <div id="page-content" class="page-content" tabindex="-1">
+      <slot />
+    </div>
 
     <div :class="{ 'calculator-whatsapp': route.path === '/riichi-calculator' }">
       <WhatsAppButton />
     </div>
 
-    <footer ref="footerRef">
-      <span>&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
+    <footer ref="footerRef" class="site-footer">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <NuxtLink to="/" no-prefetch>Saujana</NuxtLink>
+          <p>Good games. Easy company.<br>A place at the table for everyone.</p>
+        </div>
+        <div class="footer-links" aria-label="Community links">
+          <NuxtLink to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
+          <NuxtLink to="/birthday-club" no-prefetch>Birthday Club <span aria-hidden="true">↗</span></NuxtLink>
+          <NuxtLink to="/riichi-calculator" no-prefetch>Riichi Calculator <span aria-hidden="true">↗</span></NuxtLink>
+          <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <span class="footer-copyright">&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
       </ClientOnly>

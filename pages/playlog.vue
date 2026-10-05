@@ -1,6 +1,7 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
+      <p class="page-eyebrow">The community journal</p>
       <h1 class="hero-title">Playlog</h1>
       <div class="stats-container">A record of games played, discoveries made, and favorites returning.</div>
     </header>
@@ -18,7 +19,7 @@
 
       <template v-else>
         <div class="search-wrap fade-up">
-          <input v-model="search" class="search-input" placeholder="Search games..." />
+          <input v-model="search" type="search" aria-label="Search play history" class="search-input" placeholder="Search games..." />
         </div>
 
         <section class="session-card stats-panel fade-up">
@@ -507,7 +508,7 @@ onUnmounted(() => {
     background: var(--white-pure);
     border: 1px solid rgba(107, 122, 104, 0.18);
     color: var(--matcha-leaf);
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-body);
     font-size: 0.72rem;
     font-weight: 700;
     padding: 8px 14px;
@@ -683,4 +684,21 @@ onUnmounted(() => {
         border-top: 1px solid rgba(107, 122, 104, 0.12);
     }
 }
+
+/* Boutique surfaces and readable controls. */
+
+.search-wrap, .session-card { max-width: 960px; }
+.search-input { min-height: 50px; border-radius: 8px; border-color: var(--line); }
+.session-card { border: 1px solid var(--line); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
+.session-card:hover { transform: none; box-shadow: var(--shadow-card); }
+.stat-tile { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; box-shadow: none; padding: 20px 16px; }
+.stat-label { font-size: .7rem; letter-spacing: .02em; text-transform: none; opacity: 1; color: var(--muted); }
+.session-date { font-style: normal; font-size: 1.5rem; }
+.session-date::after { background: var(--line); }
+.game-pill { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 6px; text-transform: none; font-weight: 400; font-size: .85rem; letter-spacing: 0; padding: 8px 14px; }
+.ranking-title { text-align: left; opacity: 1; font-size: .68rem; }
+.page-btn { min-width: 44px; min-height: 44px; border-radius: 6px; }
+.pagination { flex-wrap: wrap; justify-content: center; max-width: 92%; }
+@media (max-width: 767px) { .stat-tile:nth-child(3) { grid-column: 1 / -1; } }
+
 </style>

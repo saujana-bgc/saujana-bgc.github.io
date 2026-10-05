@@ -1,6 +1,7 @@
 <template>
   <main class="calc-page" :class="{ 'has-mobile-score': !!result }">
     <header class="calc-hero fade-up">
+      <p class="page-eyebrow">Tools for the table</p>
       <h1 class="hero-title">Riichi Calculator</h1>
       <p class="calc-intro">
         Scan a photo or tap the tiles below to build your complete hand, then tap the tile you
@@ -2559,4 +2560,25 @@ function yakuRomaji(name: string): string {
     height: 48px;
   }
 }
+
+/* Boutique surfaces and readable controls. */
+.score-banner { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; box-shadow: none; }
+.result-columns { grid-template-columns: 1fr; gap: 18px; }
+
+.content-card { border-color: var(--line); background: var(--white-pure); box-shadow: var(--shadow-card); }
+.calc-intro { max-width: 660px; opacity: 1; color: var(--muted); }
+.section-heading h2 { font-style: normal; letter-spacing: -.03em; }
+.wizard-progress { padding: 14px 0; border-bottom: 1px solid var(--line); background: transparent; box-shadow: none; }
+.wizard-step { font-size: .75rem; border: 0; border-radius: 6px; padding: 8px 10px; opacity: 1; color: var(--muted); }
+.wizard-step.active { background: var(--lavender-mist); }
+.wizard-step > span { width: 22px; height: 22px; font-size: .65rem; }
+.result-card { top: 112px; }
+.segmented-control { border-radius: 8px; }
+.wizard-back, .new-hand-btn { border-radius: 6px; min-height: 44px; }
+@media (max-width: 767px) {
+ .result-card { top: 90px; }
+ .wizard-progress { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+ .wizard-step { flex-direction: column; justify-content: center; text-align: center; padding: 8px 2px; font-size: .68rem; }
+}
+
 </style>

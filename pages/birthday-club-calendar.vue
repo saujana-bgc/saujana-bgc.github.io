@@ -798,4 +798,20 @@ onMounted(async () => {
   .loading-spark { animation: none; }
   .primary-button, .secondary-button, .logout-button, .today-button { transition: none; }
 }
+
+/* Boutique surfaces and readable controls. */
+
+.login-card, .state-card, .month-card { border-color: var(--line); border-radius: var(--radius-card); box-shadow: var(--shadow-card); background: var(--white-pure); }
+.login-card { border-top: 3px solid var(--gold-leaf); }
+.login-intro h1 { color: var(--matcha-leaf); line-height: 1.08; }
+.login-intro > p:last-child { opacity: 1; color: var(--muted); }
+.field-group label { font-size: .78rem; letter-spacing: .02em; text-transform: none; }
+.field-group input { border-radius: 8px; border-color: var(--line); }
+.primary-button, .secondary-button, .today-button, .logout-button { border-radius: 6px; box-shadow: none; }
+.security-note, .remember-row small { opacity: 1; color: var(--muted); font-size: .78rem; }
+.calendar-toolbar { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; box-shadow: none; }
+.month-card.current-month { border-color: var(--gold-leaf); box-shadow: var(--shadow-card); }
+.person-name { font-size: .7rem; }
+.wish-status { font-size: .56rem; letter-spacing: 0; text-transform: none; }
+
 </style>

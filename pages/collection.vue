@@ -1,21 +1,17 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <header class="fade-up">
+    <header class="collection-header fade-up">
+      <p class="page-eyebrow">The game library</p>
       <h1 class="hero-title">Collection</h1>
-      <div class="stats-container">
-        <span style="font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; color: var(--matcha-leaf);">{{ totalGames }}</span> games on the shelf.
-        <div style="font-size: 0.85rem; margin-top: 10px;">
-          <span style="font-weight: 700; color: #a67c52;">{{ unplayedCount }}</span> unplayed.
-        </div>
-        <div style="font-size: 0.65rem; color: var(--matcha-leaf); text-transform: uppercase; letter-spacing: 2px; margin-top: 15px; font-weight: 700; opacity: 0.6;">
-          Updated: {{ lastTended }}
-        </div>
+      <div class="stats-container collection-summary">
+        <span><strong>{{ totalGames }}</strong> games on the shelf</span>
+        <span><strong>{{ unplayedCount }}</strong> yet to be played</span>
       </div>
+      <p class="collection-updated">Shelf updated {{ lastTended }}</p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <section class="collection-invite fade-up">
-        <h2>Browse the shelf</h2>
         <p>Explore the host's collection, find familiar names, and spot games that have not been played yet.</p>
       </section>
 
@@ -61,7 +57,7 @@
         <article v-for="game in virtualGames" :key="game.name" class="editorial-card">
           <div class="card-game-title">{{ game.name }}</div>
 
-          <div class="pebble-container" @click="openModal(game)">
+          <button type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game)">
             <img
               :src="'/' + game.img"
               :alt="game.name"
@@ -71,7 +67,7 @@
               decoding="async"
               @error="handleImgError"
             >
-          </div>
+          </button>
 
           <div class="card-meta">
             {{ game.categories ? game.categories.join(' • ') : 'BOARD GAME' }}
@@ -101,9 +97,9 @@
     </main>
 
     <div v-if="selectedGame" class="modal" @click="closeModal">
-      <div class="modal-container" @click.stop>
+      <div ref="modalRef" class="modal-container" role="dialog" aria-modal="true" aria-labelledby="game-detail-title" tabindex="-1" @click.stop @keydown="trapModalFocus">
         <div style="width: 40px; height: 5px; background: #e0e0e0; border-radius: 10px; margin: 15px auto 0; display: block;" class="mobile-handle"></div>
-        <button @click="closeModal" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.5rem; color: var(--matcha-leaf); cursor: pointer; line-height: 1;">&times;</button>
+        <button aria-label="Close game details" @click="closeModal" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.5rem; color: var(--matcha-leaf); cursor: pointer; line-height: 1;">&times;</button>
 
         <div class="modal-content">
           <div style="text-align: center;">
@@ -121,7 +117,7 @@
             </div>
           </div>
           <div style="text-align: left;">
-            <h2 class="hero-title" style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 5px;">{{ selectedGame.name }}</h2>
+            <h2 id="game-detail-title" class="hero-title" style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 5px;">{{ selectedGame.name }}</h2>
             <div v-if="selectedGame.designers && selectedGame.designers.length" style="font-style: italic; opacity: 0.6; margin: 10px 0 25px; font-family: 'Playfair Display', serif; font-size: 1.1rem;">
               Designed by {{ selectedGame.designers.join(', ') }}
             </div>
@@ -142,6 +138,24 @@ const selectedCategories = ref([])
 function resetSort() { currentSort.value = null }
 function resetCategories() { selectedCategories.value = [] }
 const selectedGame = ref(null)
+const modalRef = ref(null)
+let modalTrigger = null
+
+function trapModalFocus(event) {
+    if (event.key !== 'Tab') return
+    const controls = [...modalRef.value.querySelectorAll('a[href], button:not(:disabled), [tabindex="0"]')]
+        .filter(element => element.getClientRects().length)
+    const first = controls[0]
+    const last = controls.at(-1)
+    if (!first) { event.preventDefault(); return }
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === modalRef.value)) {
+        event.preventDefault()
+        last.focus()
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+    }
+}
 const surpriseGames = ref([])
 const gridRef = ref(null)
 const gridTop = ref(0)
@@ -282,8 +296,11 @@ async function getFullGame(gameName) {
 }
 
 const openModal = async (game) => {
+    modalTrigger = document.activeElement
     selectedGame.value = { ...game, description: '' }
     document.body.style.overflow = 'hidden'
+    await nextTick()
+    modalRef.value?.focus()
 
     const fullGame = await getFullGame(game.name)
     if (selectedGame.value?.name === game.name) {
@@ -294,7 +311,12 @@ const openModal = async (game) => {
         }
     }
 }
-const closeModal = () => { selectedGame.value = null; document.body.style.overflow = '' }
+const closeModal = () => {
+    if (!selectedGame.value) return
+    selectedGame.value = null
+    document.body.style.overflow = ''
+    modalTrigger?.focus()
+}
 const handleImgError = (e) => { e.target.src = FALLBACK_IMG }
 
 let rafId = 0
@@ -597,4 +619,29 @@ watch([search, currentSort, selectedCategories], () => {
     .editorial-card { padding: 40px; border-radius: 40px; height: 520px; }
     .sort-btn { padding: 12px 28px; font-size: 0.72rem; }
 }
+
+/* Boutique surfaces and readable controls. */
+.collection-header { padding-bottom: 20px; }
+.collection-summary { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 24px; }
+.collection-summary strong { color: var(--matcha-leaf); }
+.collection-updated { margin: 10px 0 0; font-size: .72rem; color: var(--muted); }
+
+.collection-invite { max-width: 760px; padding: 0; background: none; border: 0; box-shadow: none; margin-bottom: 24px; }
+.collection-invite h2 { font-style: normal; }
+.collection-invite p { opacity: 1; color: var(--muted); }
+.collection-search-input { border-color: var(--line); border-radius: 8px; min-height: 50px; }
+.sort-controls { max-width: 720px; gap: 8px; margin-bottom: 8px; }
+.sort-btn { padding: 10px 12px; min-height: 44px; border-radius: 6px; text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
+.sort-btn:hover { transform: none; box-shadow: none; }
+.editorial-card { border: 1px solid var(--line); border-radius: 10px; padding: 18px; box-shadow: var(--shadow-card); text-align: left; }
+.editorial-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(44,55,40,.08); }
+.card-game-title { justify-content: flex-start; font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--matcha-leaf); }
+.pebble-container { flex-shrink: 0; border-radius: 6px; background: #f6f5f0; border: 0; margin: 16px 0; }
+.card-meta { font-size: .72rem; opacity: 1; color: var(--muted); letter-spacing: 0; text-transform: none; }
+.card-players { font-size: .73rem; letter-spacing: 0; text-transform: none; }
+.last-played { font-size: .7rem; letter-spacing: 0; text-transform: none; font-weight: 400; padding-top: 12px; }
+.modal-container { border-radius: 16px 16px 0 0; }
+@media (min-width: 768px) { .sort-controls { grid-template-columns: repeat(4, 1fr); } .editorial-card { padding: 22px; border-radius: 10px; } .modal-container { border-radius: 16px; } }
+@media (max-width: 400px) { .editorial-card { padding: 12px; } .card-game-title { font-size: 1.05rem; } .sort-btn { font-size: .75rem; } }
+
 </style>

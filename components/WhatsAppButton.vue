@@ -28,14 +28,14 @@
   justify-content: center;
   gap: 9px;
   min-width: 58px;
-  height: 58px;
+  height: 52px;
   padding: 0 18px;
   box-sizing: border-box;
-  border: 2px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 999px;
-  background: #25d366;
+  background: var(--matcha-leaf);
   color: #fff;
-  box-shadow: 0 8px 24px rgba(22, 101, 52, 0.28);
+  box-shadow: 0 6px 20px rgba(32, 43, 34, 0.16);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -44,7 +44,7 @@
 }
 
 .whatsapp-button:hover {
-  background: #1fbd59;
+  background: #243a2d;
   box-shadow: 0 10px 28px rgba(22, 101, 52, 0.36);
   transform: translateY(-2px);
 }

@@ -1,6 +1,7 @@
 <template>
   <main class="league-page">
     <header class="league-hero fade-up">
+      <p class="page-eyebrow">The riichi room</p>
       <h1 class="hero-title">Riichi League</h1>
       <p class="league-intro">Season standings, weekly results, and every score on the road to the final table.</p>
 
@@ -2276,7 +2277,7 @@ onBeforeUnmount(() => {
   display: block;
   margin: 0;
   color: var(--matcha-leaf);
-  font-family: 'Quicksand', sans-serif;
+  font-family: var(--font-body);
   font-size: var(--league-label-size);
   font-weight: 700;
   line-height: 1.5;
@@ -2292,7 +2293,7 @@ onBeforeUnmount(() => {
   border-radius: 10px;
   background: var(--white-pure);
   color: var(--clay-text);
-  font-family: 'Quicksand', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
@@ -2310,7 +2311,7 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   background: var(--white-pure);
   color: var(--matcha-leaf);
-  font-family: 'Quicksand', sans-serif;
+  font-family: var(--font-body);
   font-size: var(--league-body-size);
   font-weight: 700;
   line-height: 1.5;
@@ -2344,4 +2345,25 @@ onBeforeUnmount(() => {
 .season-switcher { gap: 10px; padding: 0; background: transparent; }
 .standing-player > strong, .result-cards article > strong { font-variant-numeric: tabular-nums; }
 .standing-player small, .result-cards article > strong small { font-size: .75rem; color: var(--league-muted); }
+
+/* Boutique surfaces and readable controls. */
+
+.season-card, .content-card, .rules-card { border-color: var(--line); background: var(--white-pure); box-shadow: var(--shadow-card); }
+.season-card { border-top: 3px solid var(--gold-leaf); background: var(--surface-soft); }
+.season-heading h2, .section-heading h2, .rules-card h2, .week-detail-head h3 { font-style: normal; letter-spacing: -.03em; }
+.season-heading h2 { font-size: clamp(1.8rem,4vw,2.6rem); }
+.prize-card { border: 1px solid var(--line); border-radius: 8px; box-shadow: none; background: var(--white-pure); }
+.prize-card strong { font-style: normal; }
+.prize-card span { opacity: 1; color: var(--muted); }
+.season-stats div { border-radius: 8px; border-color: var(--line); background: transparent; }
+.season-stats strong { font-family: var(--font-display); font-weight: 400; font-size: 2rem; }
+.league-page :deep(.league-button) { border-radius: 6px; }
+.league-shortcuts { background: transparent; box-shadow: none; border: 0; }
+.week-picker button { border-radius: 8px; box-shadow: none; }
+.week-picker button.active { background: var(--matcha-leaf); color: white; box-shadow: none; }
+.week-detail, .score-entry { border-radius: 10px; background: var(--surface-soft); }
+.standings-table thead, .result-table thead { background: var(--surface-soft); }
+.standings-table td, .result-table td { font-variant-numeric: tabular-nums; }
+.rules-button { border-radius: 6px; box-shadow: none; }
+
 </style>

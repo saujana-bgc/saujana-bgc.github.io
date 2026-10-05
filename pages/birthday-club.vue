@@ -1,6 +1,7 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
+      <p class="page-eyebrow">Our people</p>
       <h1 class="hero-title">Birthday Club</h1>
       <div class="stats-container">
         Share your birthday with us so we can celebrate the people who make our game nights special.
@@ -421,4 +422,15 @@ function resetForm() {
   .submit-button,
   .secondary-button { transition: none; }
 }
+
+/* Boutique surfaces and readable controls. */
+
+.birthday-page { min-height: auto; padding-bottom: 24px; }
+.birthday-card { max-width: 680px; border: 1px solid var(--line); border-top: 3px solid var(--gold-leaf); box-shadow: var(--shadow-card); padding: clamp(24px,5vw,48px); }
+.field-group label, .birthday-fields legend { font-size: .78rem; letter-spacing: .02em; text-transform: none; }
+.field-group input, .field-group select { border-radius: 8px; border-color: var(--line); }
+.consent-row { border-radius: 8px; background: var(--surface-soft); }
+.consent-row small, .privacy-note { opacity: 1; color: var(--muted); font-size: .8rem; }
+.submit-button, .secondary-button { border-radius: 6px; box-shadow: none; font-size: .85rem; text-transform: none; letter-spacing: .02em; }
+
 </style>

@@ -265,7 +265,7 @@ onBeforeUnmount(() => {
   z-index: 1000;
   color: #fff;
   background: #000;
-  font-family: 'Quicksand', sans-serif;
+  font-family: var(--font-body);
 }
 
 .camera-stage {
