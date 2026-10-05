@@ -35,9 +35,7 @@
       <slot />
     </div>
 
-    <div :class="{ 'calculator-whatsapp': route.path === '/riichi-calculator' }">
-      <WhatsAppButton />
-    </div>
+    <WhatsAppButton />
 
     <footer ref="footerRef" class="site-footer">
       <div class="footer-main">
@@ -48,7 +46,6 @@
         <div class="footer-links" aria-label="Community links">
           <NuxtLink to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
           <NuxtLink to="/birthday-club" no-prefetch>Birthday Club <span aria-hidden="true">↗</span></NuxtLink>
-          <NuxtLink to="/riichi-calculator" no-prefetch>Riichi Calculator <span aria-hidden="true">↗</span></NuxtLink>
           <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a>
         </div>
       </div>
@@ -65,6 +62,7 @@
 const navigation = [
   { name: 'Home', url: '/' },
   { name: 'Gatherings', url: '/gatherings' },
+  { name: 'Birthday Club', url: '/birthday-club' },
   { name: 'Playlog', url: '/playlog' },
   { name: 'Riichi League', url: '/riichi-league' },
   { name: 'Collection', url: '/collection' }
@@ -148,9 +146,4 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleMenuKeydown))
     margin-top: 8px;
 }
 
-@media (max-width: 640px) {
-  .calculator-whatsapp {
-    display: none;
-  }
-}
 </style>

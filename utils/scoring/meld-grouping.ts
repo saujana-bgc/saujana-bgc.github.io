@@ -16,7 +16,7 @@
 //
 // A closed kan's two face-down tiles can't be scanned, so 2-of-a-kind is the
 // deliberate heuristic for it — the weakest rule, and the reason the manual
-// MeldBuilder stays available to correct any mis-grouping.
+// The returned groups preserve tile identity for future UI integrations.
 
 import type { Tile, Meld } from "./types";
 import { isSuited, tilesEqual, sortTiles } from "./tiles";

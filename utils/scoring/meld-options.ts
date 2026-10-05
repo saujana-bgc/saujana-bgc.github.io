@@ -1,4 +1,4 @@
-// Pure meld-declaration helpers shared by the MeldBuilder UI.
+// Pure meld-declaration helpers that keep red-five identity intact.
 //
 // The meld builder's mental model: the player taps the tile in their hand that
 // they claimed from another player's discard, and the calculator offers every

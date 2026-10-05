@@ -5,8 +5,6 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: process.env.SUPABASE_URL ?? 'https://gjucszyfwcpsquirxooq.supabase.co',
       supabaseKey: process.env.SUPABASE_KEY ?? 'sb_publishable_xq0Pgq5GqlL_aLyObEf4kg_4xX9xSMZ',
-      // Tile-detection endpoint (tile-detect-api/ deployed on Vercel).
-      tileDetectUrl: process.env.TILE_DETECT_URL ?? 'https://tile-detect-api.vercel.app/api/detect',
     },
   },
   css: ['~/assets/css/main.css'],
