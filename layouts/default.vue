@@ -37,6 +37,13 @@
 
     <WhatsAppButton />
 
+    <footer ref="footerRef" class="site-meta" aria-label="Site information">
+      <span class="footer-copyright">&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
+      <ClientOnly v-if="showVisitorCounter">
+        <LazyVisitorCounter />
+      </ClientOnly>
+      <div v-if="lastUpdated" class="last-updated">Site updated {{ lastUpdated }}</div>
+    </footer>
   </div>
 </template>
 
@@ -50,8 +57,12 @@ const navigation = [
   { name: 'Collection', url: '/collection' }
 ]
 
+const { lastUpdated } = useVersion()
 const route = useRoute()
 
+const year = computed(() => new Date().getFullYear())
+const footerRef = ref(null)
+const showVisitorCounter = ref(false)
 const menuOpen = ref(false)
 
 function closeMenu() {
@@ -66,10 +77,49 @@ watch(() => route.fullPath, closeMenu)
 
 onMounted(() => {
   window.addEventListener('keydown', handleMenuKeydown)
+  if (!footerRef.value || showVisitorCounter.value) return
+  if (!('IntersectionObserver' in window)) {
+    showVisitorCounter.value = true
+    return
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    if (!entries.some(entry => entry.isIntersecting)) return
+    showVisitorCounter.value = true
+    observer.disconnect()
+  }, { rootMargin: '300px 0px' })
+
+  observer.observe(footerRef.value)
 })
 
 onBeforeUnmount(() => window.removeEventListener('keydown', handleMenuKeydown))
 </script>
 
 <style scoped>
+.site-meta {
+  width: min(1120px, 92%);
+  margin: 40px auto 0;
+  padding: 22px 0 28px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+}
+
+.footer-copyright {
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+}
+
+.last-updated {
+  margin-top: 3px;
+  color: var(--clay-text);
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.68;
+}
 </style>
