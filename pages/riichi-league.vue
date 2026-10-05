@@ -164,17 +164,17 @@
         <section v-if="!isScoreEntryClosed" id="score-entry" class="score-entry" aria-labelledby="score-entry-heading">
           <div class="score-entry-heading">
             <div>
-              <p class="section-kicker">Add a table</p>
-              <h4 id="score-entry-heading" tabindex="-1">Week {{ selectedWeek.weekNumber }} · Add results</h4>
+              <p class="section-kicker">{{ editingTable ? `Editing Table ${editingTable.tableNumber}` : 'Add a table' }}</p>
+              <h4 id="score-entry-heading" tabindex="-1">Week {{ selectedWeek.weekNumber }} · {{ editingTable ? 'Edit results' : 'Add results' }}</h4>
             </div>
-            <p>Anyone can submit a complete table. Saved results appear in the league immediately.</p>
+            <p>{{ editingTable ? 'Update the players or final points. Standings recalculate when you save.' : 'Anyone can submit a complete table. Saved results appear in the league immediately.' }}</p>
           </div>
 
           <form class="score-entry-form" @submit.prevent="submitMatch">
             <div class="score-entry-options">
               <label>
                 <span class="league-field-label">Table size</span>
-                <select class="league-control" v-model.number="scoreForm.tableSize" :disabled="isSubmittingScore">
+                <select class="league-control" v-model.number="scoreForm.tableSize" :disabled="isSubmittingScore || Boolean(editingTable)">
                   <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players · {{ seatNames(size).join(', ') }}</option>
                 </select>
               </label>
@@ -205,11 +205,12 @@
               </div>
               <div class="score-entry-actions">
                 <button type="button" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="resetScoreForm">
-                  Reset
+                  {{ editingTable ? 'Reset changes' : 'Reset' }}
                 </button>
                 <button type="submit" class="score-entry-submit league-button league-button-primary" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
-                  {{ isSubmittingScore ? 'Saving results…' : 'Save table results' }}
+                  {{ isSubmittingScore ? (editingTable ? 'Updating results…' : 'Saving results…') : (editingTable ? 'Update table results' : 'Save table results') }}
                 </button>
+                <button v-if="editingTable" type="button" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="cancelEditTable">Cancel edit</button>
               </div>
             </div>
           </form>
@@ -222,6 +223,10 @@
               <div class="table-metadata">
                 <span>{{ table.results.length }} players</span>
                 <span v-if="table.submittedAt">Submitted {{ formatSubmissionTime(table.submittedAt) }}</span>
+                <div v-if="canManageResults" class="table-actions">
+                  <button type="button" class="league-button table-action-button" :disabled="isSubmittingScore" @click="editTable(table)">Edit</button>
+                  <button type="button" class="league-button table-action-button" :disabled="isSubmittingScore" @click="deleteTable(table)">Delete</button>
+                </div>
               </div>
             </div>
 
@@ -556,7 +561,11 @@ const currentKualaLumpurDate = ref(kualaLumpurDate())
 const scoreEntryCutoffDate = computed(() => selectedWeek.value?.date ? addCalendarDays(selectedWeek.value.date, 3) : '')
 const isScoreEntryClosed = computed(() => Boolean(scoreEntryCutoffDate.value)
   && currentKualaLumpurDate.value > scoreEntryCutoffDate.value)
+const canManageResults = computed(() => Boolean(selectedWeek.value?.date)
+  && currentKualaLumpurDate.value <= addCalendarDays(selectedWeek.value.date, 3))
 const isSubmittingScore = ref(false)
+const editingTableId = ref('')
+const editingTable = computed(() => selectedWeek.value?.tables.find(table => table.id === editingTableId.value) ?? null)
 const scoreEntryMessage = ref('')
 const formResetKey = ref(0)
 const scoreDrafts = new Map()
@@ -798,6 +807,7 @@ function createEmptyResults(size) {
 
 function resetScoreForm() {
   scoreDrafts.delete(selectedWeekId.value)
+  editingTableId.value = ''
   formResetKey.value += 1
   const sizes = selectedSeason.value?.supportedTableSizes ?? [4]
   const tableSize = sizes.includes(4) ? 4 : sizes[0]
@@ -806,6 +816,59 @@ function resetScoreForm() {
     results: createEmptyResults(tableSize),
   }
   scoreEntryMessage.value = ''
+}
+
+function editTable(table) {
+  if (!canManageResults.value || isSubmittingScore.value) return
+  editingTableId.value = table.id
+  scoreForm.value = {
+    tableSize: table.results.length,
+    results: seatOrderedResults(table).map(result => ({
+      playerName: playerName(result.playerId),
+      finalPoints: result.finalPoints,
+    })),
+  }
+  scoreEntryMessage.value = ''
+  nextTick(() => {
+    document.getElementById('score-entry-heading')?.focus()
+    document.getElementById('score-entry')?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  })
+}
+
+function seatOrderedResults(table) {
+  const seatOrder = ['east', 'south', 'west', 'north']
+  return [...table.results].sort((a, b) => {
+    const aSeat = seatOrder.indexOf(String(a.seatWind ?? '').toLowerCase())
+    const bSeat = seatOrder.indexOf(String(b.seatWind ?? '').toLowerCase())
+    if (aSeat >= 0 && bSeat >= 0) return aSeat - bSeat
+    if (aSeat >= 0) return -1
+    if (bSeat >= 0) return 1
+    return Number(a.placement) - Number(b.placement)
+  })
+}
+
+function cancelEditTable() {
+  resetScoreForm()
+}
+
+async function deleteTable(table) {
+  if (!canManageResults.value || isSubmittingScore.value) return
+  if (!window.confirm(`Delete Table ${table.tableNumber}? Its results will be removed from the standings.`)) return
+
+  isSubmittingScore.value = true
+  scoreEntryMessage.value = ''
+  try {
+    const { error } = await useSupabase().rpc('delete_riichi_match', { p_match_id: table.id })
+    if (error) throw error
+    if (editingTableId.value === table.id) resetScoreForm()
+    await loadLeagueFromSupabase()
+    scoreEntryMessage.value = `Table ${table.tableNumber} deleted. Standings have been updated.`
+  } catch (error) {
+    console.error('Could not delete Riichi League results:', error)
+    scoreEntryMessage.value = 'Could not delete these results. Please try again.'
+  } finally {
+    isSubmittingScore.value = false
+  }
 }
 
 async function submitMatch() {
@@ -840,14 +903,24 @@ async function submitMatch() {
   isSubmittingScore.value = true
   scoreEntryMessage.value = ''
   try {
-    const { data: tableNumber, error } = await useSupabase().rpc('submit_riichi_match', {
-      p_week_id: selectedWeek.value.id,
-      p_results: results,
-    })
+    const rpc = useSupabase()
+    const { data: tableNumber, error } = editingTable.value
+      ? await rpc.rpc('update_riichi_match', {
+          p_match_id: editingTable.value.id,
+          p_results: results,
+        })
+      : await rpc.rpc('submit_riichi_match', {
+          p_week_id: selectedWeek.value.id,
+          p_results: results,
+        })
     if (error) throw error
+    const wasEditing = Boolean(editingTable.value)
+    const updatedTableNumber = editingTable.value?.tableNumber
     await loadLeagueFromSupabase()
     resetScoreForm()
-    scoreEntryMessage.value = `Table ${tableNumber} saved. Standings have been updated.`
+    scoreEntryMessage.value = wasEditing
+      ? `Table ${updatedTableNumber} updated. Standings have been updated.`
+      : `Table ${tableNumber} saved. Standings have been updated.`
   } catch (error) {
     console.error('Could not save Riichi League results:', error)
     scoreEntryMessage.value = 'Could not save these results. Check the player names and scores, then try again.'
@@ -1434,7 +1507,20 @@ onBeforeUnmount(() => {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.table-action-button {
+  min-height: 38px !important;
+  padding: 6px 13px !important;
+  font-size: .8rem !important;
 }
 
 .table-metadata span {
