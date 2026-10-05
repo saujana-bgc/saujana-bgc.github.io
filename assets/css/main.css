@@ -149,20 +149,6 @@ button:disabled { cursor: not-allowed; }
 .stats-container { margin: 20px auto 0; font-size: .95rem; line-height: 1.75; max-width: 530px; color: var(--muted); }
 [id] { scroll-margin-top: 112px; }
 
-/* A useful, quiet end to every page. */
-.site-footer { width: min(1120px, 92%); margin: 56px auto 0; padding: 38px 0 28px; border-top: 1px solid var(--line); text-align: center; }
-.footer-main { display: flex; justify-content: space-between; gap: 32px; text-align: left; margin-bottom: 36px; }
-.footer-brand > a { font-family: var(--font-display); font-size: 2rem; letter-spacing: -.04em; color: var(--matcha-leaf); text-decoration: none; }
-.footer-brand p { font-size: .85rem; color: var(--muted); line-height: 1.8; margin: 10px 0 0; }
-.footer-links { display: grid; grid-template-columns: repeat(2, minmax(140px, 1fr)); align-content: center; gap: 18px 44px; }
-.footer-links a { display: flex; justify-content: space-between; gap: 18px; font-size: .8rem; color: var(--matcha-leaf); text-decoration: none; }
-.footer-links a:hover { text-decoration: underline; }
-.footer-links span { color: var(--gold-leaf); }
-.footer-copyright { font-size: .62rem; letter-spacing: .13em; color: var(--muted); }
-.visitor-counter { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; }
-.visitor-label { font-size: .6rem; letter-spacing: 1px; text-transform: uppercase; }
-.visitor-badge { height: 16px; border-radius: 4px; }
-
 @media (max-width: 767px) {
   .site-nav { display: block; min-height: 72px; padding: 0; }
   .mobile-nav-bar { position: relative; z-index: 2; width: 100%; min-height: 72px; padding: 10px 20px; background: var(--bg-silk); }
@@ -179,9 +165,6 @@ button:disabled { cursor: not-allowed; }
   .nav-item { min-height: 48px; padding: 12px 0; font-size: .95rem; }
   .nav-item::after { right: auto; width: 26px; }
   .page-content header { padding: 38px 20px 30px; }
-  .footer-main { flex-direction: column; }
-  .footer-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; }
-  .site-footer { margin-top: 36px; padding-bottom: 90px; }
   [id] { scroll-margin-top: 90px; }
   input:not([type=checkbox]):not([type=radio]), select, textarea { font-size: 16px; }
 }
