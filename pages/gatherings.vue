@@ -273,7 +273,7 @@
         </div>
       </div>
 
-      <div class="pagination fade-up" v-if="totalCurrentPages > 1">
+      <div class="pagination fade-up" v-if="activeTab === 'present' && totalCurrentPages > 1">
         <button class="page-btn" :disabled="currentPage === 1" @click="prevPage">← Prev</button>
         <span class="page-info">{{ currentPage }} / {{ totalCurrentPages }}</span>
         <button class="page-btn" :disabled="currentPage === totalCurrentPages" @click="nextPage">Next →</button>
@@ -308,9 +308,7 @@ const loading = computed(() => loadingTab.value === activeTab.value)
 const presentEventsList = ref([])
 const pastEventsList = ref([])
 const presentLoaded = ref(false)
-const pastEventsByPage = reactive({})
-const pastLoadedPages = reactive(new Set())
-const pastTotalCount = ref(0)
+const pastLoaded = ref(false)
 const attendeesByEvent = reactive({})
 const savedPayloads = new Map()
 const attendeeEventIds = new Set()
@@ -399,17 +397,13 @@ function onExistingNameBlur(attendee, event) {
 }
 const activeTab = ref('present')
 const presentPage = ref(1)
-const pastPage = ref(1)
 const expandedEvents = reactive(new Set())
 
 const presentEvents = computed(() => presentEventsList.value)
 const pastEvents = computed(() => pastEventsList.value)
 
-const currentPage = computed(() => activeTab.value === 'present' ? presentPage.value : pastPage.value)
-const totalCurrentPages = computed(() => {
-    const total = activeTab.value === 'present' ? presentEvents.value.length : pastTotalCount.value
-    return Math.max(1, Math.ceil(total / PAGE_SIZE))
-})
+const currentPage = computed(() => presentPage.value)
+const totalCurrentPages = computed(() => Math.max(1, Math.ceil(presentEvents.value.length / PAGE_SIZE)))
 
 const currentEvents = computed(() => {
     const list = activeTab.value === 'present' ? presentEvents.value : pastEvents.value
@@ -421,7 +415,6 @@ const currentEvents = computed(() => {
 function switchTab(tab) {
     activeTab.value = tab
     presentPage.value = 1
-    pastPage.value = 1
     loadEventsForTab(tab).catch(() => showToast('Gatherings are taking longer to load.'))
     resizeAllAreas()
 }
@@ -436,21 +429,11 @@ function toggleEvent(eventId) {
 }
 
 function prevPage() {
-    if (activeTab.value === 'present') {
-        presentPage.value--
-    } else {
-        pastPage.value--
-        loadEventsForTab('past').catch(() => showToast('Gatherings are taking longer to load.'))
-    }
+    presentPage.value--
 }
 
 function nextPage() {
-    if (activeTab.value === 'present') {
-        presentPage.value++
-    } else {
-        pastPage.value++
-        loadEventsForTab('past').catch(() => showToast('Gatherings are taking longer to load.'))
-    }
+    presentPage.value++
 }
 
 function formatDate(dateStr) {
@@ -556,28 +539,17 @@ async function getPresentEvents() {
     await getAttendeesForEvents(presentEventsList.value)
 }
 
-async function getPastEvents(page = pastPage.value) {
-    if (pastLoadedPages.has(page)) {
-        if (page === pastPage.value) pastEventsList.value = pastEventsByPage[page] ?? []
-        await getAttendeesForEvents(pastEventsByPage[page] ?? [])
-        return
-    }
-
-    const from = (page - 1) * PAGE_SIZE
-    const to = from + PAGE_SIZE - 1
-
-    const { data: events, count } = await supabase
+async function getPastEvents() {
+    const { data: events } = await supabase
         .from('events')
-        .select('id,name,date,description,venue,venue_url,time', { count: 'exact' })
+        .select('id,name,date,description,venue,venue_url,time')
         .lt('date', todayIso())
         .order('date', { ascending: false })
-        .range(from, to)
+        .limit(5)
 
-    pastEventsByPage[page] = events ?? []
-    if (page === pastPage.value) pastEventsList.value = pastEventsByPage[page]
-    pastTotalCount.value = count ?? pastTotalCount.value
-    pastLoadedPages.add(page)
-    await getAttendeesForEvents(pastEventsByPage[page])
+    pastEventsList.value = events ?? []
+    pastLoaded.value = true
+    await getAttendeesForEvents(pastEventsList.value)
 }
 
 async function getAttendeesForEvents(events) {
@@ -613,11 +585,7 @@ async function getAttendeesForEvents(events) {
 
 async function loadEventsForTab(tab) {
     if (tab === 'present' && presentLoaded.value) return
-    if (tab === 'past' && pastLoadedPages.has(pastPage.value)) {
-        pastEventsList.value = pastEventsByPage[pastPage.value] ?? []
-        await getAttendeesForEvents(pastEventsList.value)
-        return
-    }
+    if (tab === 'past' && pastLoaded.value) return
 
     loadingTab.value = tab
     if (tab === 'past') pastEventsList.value = []
