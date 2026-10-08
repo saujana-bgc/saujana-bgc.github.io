@@ -12,7 +12,7 @@
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <section class="collection-invite fade-up">
-        <p>Explore the host's collection, find familiar names, and spot games that have not been played yet.</p>
+        <p>Find an old favourite or discover your next one. Explore the host’s collection, then ask about a game you’d like to try at a gathering.</p>
       </section>
 
       <div class="collection-search fade-up">

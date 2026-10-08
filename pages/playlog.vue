@@ -3,7 +3,7 @@
     <header class="fade-up">
       <p class="page-eyebrow">The community journal</p>
       <h1 class="hero-title">Playlog</h1>
-      <div class="stats-container">A record of games played, discoveries made, and favorites returning.</div>
+      <div class="stats-container">Games we’ve explored and moments we’ve shared, with new discoveries and old favourites around the table.</div>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">

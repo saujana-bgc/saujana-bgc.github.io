@@ -3,7 +3,8 @@
     <header class="league-hero fade-up">
       <p class="page-eyebrow">The riichi room</p>
       <h1 class="hero-title">Riichi League</h1>
-      <p class="league-intro">Season standings, weekly results, and every score on the road to the final table.</p>
+      <p class="league-intro">A friendly riichi mahjong league within the Saujana community. Follow the season standings and the games we play together.</p>
+      <p class="league-welcome">Curious about riichi? <NuxtLink to="/gatherings" no-prefetch>Find a gathering</NuxtLink> and ask the host about learning to play.</p>
 
       <div class="season-switcher">
         <label class="league-field-label" for="season-select">Season</label>
@@ -1101,6 +1102,16 @@ onBeforeUnmount(() => {
   line-height: 1.75;
   opacity: .78;
 }
+
+.league-welcome {
+  max-width: 590px;
+  margin: 12px auto 0;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.75;
+}
+
+.league-welcome a { color: var(--matcha-leaf); }
 
 .season-switcher {
   display: inline-flex;

@@ -3,14 +3,19 @@
     <header class="fade-up">
       <p class="page-eyebrow">Around the table</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Dates, venues, and sign-ups for upcoming play.</div>
+      <div class="stats-container">An open table for new faces and familiar friends. Find a date, add your name, and come play with us.</div>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
       <section class="first-time-panel fade-up" aria-label="First time guidance">
-        <h2>First time?</h2>
-        <p>Come solo, watch first, or join a taught game. Add your name so the host can plan the room.</p>
+        <h2>Your first gathering</h2>
+        <p>Come solo or with friends. No experience needed: you can watch a round, ask questions, or join a game and learn as you play.</p>
+        <ul class="first-time-details">
+          <li><strong>Before you come:</strong> Check the date, time, and venue below, then add your name. A nickname is fine; mention in notes if it’s your first visit.</li>
+          <li><strong>When you arrive:</strong> Say hi to the host and ask for help finding a table or a game. You’re welcome to bring a game you’d like to share.</li>
+          <li><strong>At the venue:</strong> Plan to order at least RM10 per person to support the space that hosts us. After ordering, update your spend and pay at the counter.</li>
+        </ul>
       </section>
 
       <div class="tabs fade-up">
@@ -1816,6 +1821,9 @@ watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' }
 .first-time-panel { max-width: 960px; background: var(--surface-soft); border: 1px solid var(--line); box-shadow: none; border-radius: 8px; text-align: left; padding: 22px 28px; }
 .first-time-panel h2 { font-style: normal; font-size: 1.2rem; }
 .first-time-panel p { max-width: none; color: var(--muted); opacity: 1; }
+.first-time-details { margin: 18px 0 0; padding-left: 20px; color: var(--muted); font-size: .9rem; line-height: 1.8; }
+.first-time-details li + li { margin-top: 10px; }
+.first-time-details strong { color: var(--matcha-leaf); }
 .tabs { margin: 8px auto 28px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; box-shadow: none; background: var(--surface-soft); }
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }

@@ -38,6 +38,7 @@
     <WhatsAppButton />
 
     <footer ref="footerRef" class="site-meta" aria-label="Site information">
+      <p class="footer-signature">Open tables. Shared discoveries.</p>
       <span class="footer-copyright">&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
@@ -106,6 +107,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleMenuKeydown))
   align-items: center;
   gap: 5px;
   text-align: center;
+}
+
+.footer-signature {
+  margin: 0 0 12px;
+  color: var(--matcha-leaf);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
 }
 
 .footer-copyright {

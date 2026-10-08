@@ -3,13 +3,13 @@
     <section class="hero-section fade-up">
       <div class="hero-copy">
         <p class="page-eyebrow">Saujana Board Game Community</p>
-        <h1>Good games.<br><em>Even better company.</em></h1>
-        <p class="hero-description">Slow afternoons, a new favourite game, and a place at the table. Come as you are. We’ll teach you the rest.</p>
+        <h1>An open table.<br><em>A wider horizon.</em></h1>
+        <p class="hero-description">A welcoming board game community for curious newcomers and familiar faces. Come solo or bring a friend, discover a game, and enjoy the company. We’ll help you get started.</p>
         <div class="hero-actions">
           <NuxtLink to="/gatherings" class="primary-link" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
           <NuxtLink to="/collection" class="text-link" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
         </div>
-        <p class="hero-footnote"><span aria-hidden="true"></span> New faces always welcome</p>
+        <p class="hero-footnote"><span aria-hidden="true"></span> Your first game or your fiftieth, you’re welcome here.</p>
       </div>
       <div class="banner-container">
         <img
@@ -26,22 +26,24 @@
       </div>
     </section>
 
-    <div class="welcome-strip"><span>Come solo or bring a friend</span><span>Learn as you play</span><span>Stay for the company</span></div>
+    <div class="welcome-strip"><span>No experience needed</span><span>Come solo or with friends</span><span>Learn as you play</span></div>
 
     <section class="announcement-box fade-up" style="animation-delay: 0.2s;">
-      <h2 class="hero-title" style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 15px; padding: 0;">Board games, easy company</h2>
-      <p class="porch-label">Casual afternoons, welcoming tables</p>
-      <div class="first-timer-note">
-        Come solo or with friends. No experience needed.
+      <div class="name-story" aria-labelledby="name-story-title">
+        <p class="porch-label">Why Saujana?</p>
+        <h2 id="name-story-title" class="hero-title story-title">A name with room to explore</h2>
+        <svg class="horizon-mark" viewBox="0 0 320 48" fill="none" aria-hidden="true" focusable="false">
+          <path d="M1 38H319" />
+          <path d="M128 38a32 32 0 0 1 64 0" />
+        </svg>
+        <p>In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. For us, that means staying open to new people, new games, and new experiences.</p>
+        <p>Around our tables, you can learn something unfamiliar, meet someone new, or settle in with an old favourite. Everyone brings something to the community.</p>
       </div>
-      <p style="font-size: 1rem; font-weight: 300; line-height: 1.9; max-width: 640px; margin: 20px auto 0; opacity: 0.85;">
-        Saujana Board Game Community is a casual meetup for people who want to learn a game, share a few laughs, and spend an afternoon at an easy pace.
-      </p>
 
       <div class="welcome-note">
-        <h3>Join an upcoming gathering</h3>
-        <p>Check the date, venue, and headcount, then add your name when you are ready.</p>
-        <a href="/gatherings">See gatherings</a>
+        <h2>There’s a place for you at the table</h2>
+        <p>Pick a gathering, check the venue details, and add your name when you’re ready. Come for a new game, a familiar favourite, or simply the company.</p>
+        <NuxtLink to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
       <div class="expect-guide">
@@ -53,18 +55,32 @@
       </div>
 
       <div class="table-scenes" aria-label="Scenes from Saujana gatherings">
-        <img src="/images/site/table_scene_1.avif" alt="Players gathered around a Saujana board game table" loading="lazy" decoding="async" width="640" height="480">
-        <img src="/images/site/table_scene_2.avif" alt="Friends playing together at a Saujana gathering" loading="lazy" decoding="async" width="640" height="480">
-        <img src="/images/site/table_scene_3.avif" alt="Board games prepared for a Saujana meetup" loading="lazy" decoding="async" width="640" height="480">
+        <figure>
+          <img src="/images/site/table_scene_1.avif" alt="Players gathered around a Saujana board game table" loading="lazy" decoding="async" width="640" height="480">
+          <figcaption>Good games, even better company.</figcaption>
+        </figure>
+        <figure>
+          <img src="/images/site/table_scene_2.avif" alt="Friends playing together at a Saujana gathering" loading="lazy" decoding="async" width="640" height="480">
+          <figcaption>Shared moments around the table.</figcaption>
+        </figure>
+        <figure>
+          <img src="/images/site/table_scene_3.avif" alt="Board games prepared for a Saujana meetup" loading="lazy" decoding="async" width="640" height="480">
+          <figcaption>Something new to discover together.</figcaption>
+        </figure>
       </div>
 
-      <div class="care-guide">
-        <div v-for="(pillar, i) in pillars" :key="pillar.title" class="pillar" :style="{ animationDelay: (0.15 + i * 0.1) + 's' }">
-          <div class="pillar-icon" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</div>
-          <h3>{{ pillar.title.split(' ').slice(1).join(' ') }}</h3>
-          <p v-html="pillar.content"></p>
+      <section class="community-values" aria-labelledby="community-values-title">
+        <p class="porch-label">How we welcome each other</p>
+        <h2 id="community-values-title" class="hero-title story-title">An open table starts with us</h2>
+        <div class="care-guide">
+          <div v-for="(pillar, i) in pillars" :key="pillar.title" class="pillar" :style="{ animationDelay: (0.15 + i * 0.1) + 's' }">
+            <div class="pillar-icon" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</div>
+            <h3>{{ pillar.title }}</h3>
+            <p>{{ pillar.content }}</p>
+          </div>
         </div>
-      </div>
+        <p class="respect-note">Everyone deserves to feel welcome and respected. Harassment and disruptive behaviour are not tolerated. Message an admin privately if anything feels off.</p>
+      </section>
     </section>
 
     <section v-if="posts.length" class="ig-section fade-up" style="animation-delay: 0.1s;">
@@ -123,29 +139,29 @@ const igSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fil
 
 const pillars = [
   {
-    title: '🍃 Stewardship',
-    content: 'We support the venues that host us and leave each space ready for the next group.'
+    title: 'Make room for people',
+    content: 'Welcome new faces, invite someone into a game, and treat everyone with respect. Coming alone should still feel like joining in.'
   },
   {
-    title: '✨ Spirit of Play',
-    content: 'We play for the shared moment. RSVP thoughtfully, be patient with rules, and help pack up when you can.'
+    title: 'Stay curious',
+    content: 'Try something unfamiliar, ask questions, and give each other time to learn. Enjoy an old favourite or explore something new at your own pace.'
   },
   {
-    title: '🛡️ Respect',
-    content: 'Harassment and disruptive behavior are not tolerated. Message an admin privately if anything feels off.'
+    title: 'Care for the table',
+    content: 'Look after the games, support our host venues, and help pack up when you can. RSVP thoughtfully so there’s room to plan for everyone.'
   }
 ]
 
 const expectations = [
   {
     step: 'Arrive',
-    title: 'Arrive easy',
-    copy: 'Say hi, order from the venue, and take a few minutes to settle in.'
+    title: 'Come as you are',
+    copy: 'Come solo or with friends. Say hi to the host and take a few minutes to settle in.'
   },
   {
     step: 'Learn',
     title: 'Find a fit',
-    copy: 'Hosts and regulars can suggest a game that matches the group.'
+    copy: 'Ask the host or a regular for a suggestion. We’ll help you find a game and learn the rules.'
   },
   {
     step: 'Play',
@@ -175,9 +191,12 @@ const expectations = [
 .welcome-strip span::before { content: '✧'; color: var(--gold-leaf); }
 .announcement-box { width: min(1120px,92%); margin: 72px auto 0; text-align: center; }
 .porch-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .15em; color: var(--gold-leaf); }
-.first-timer-note { margin: 18px auto 0; color: var(--matcha-leaf); font-size: .9rem; }
+.story-title { font-size: clamp(1.8rem, 6vw, 2.5rem); }
+.name-story { max-width: 680px; margin: 0 auto; }
+.name-story > p:not(.porch-label) { font-size: 1rem; line-height: 1.9; color: var(--muted); margin: 18px 0 0; }
+.horizon-mark { display: block; width: min(320px, 75%); height: 48px; margin: 22px auto; color: var(--gold-leaf); stroke: currentColor; stroke-width: 1; }
 .welcome-note { margin: 32px auto; max-width: 760px; padding: 28px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
-.welcome-note h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 0 0 10px; }
+.welcome-note h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 0 0 10px; }
 .welcome-note p { font-size: .9rem; color: var(--muted); margin: 0; }
 .welcome-note a { display: inline-block; color: var(--matcha-leaf); font-size: .8rem; margin-top: 16px; }
 .expect-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin: 44px 0 32px; }
@@ -186,8 +205,12 @@ const expectations = [
 .expect-card h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 12px 0; }
 .expect-card p { color: var(--muted); font-size: .9rem; line-height: 1.8; margin: 0; }
 .table-scenes { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.table-scenes figure { min-width: 0; margin: 0; text-align: left; }
 .table-scenes img { width: 100%; height: 230px; object-fit: cover; border-radius: 8px; }
-.care-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin-top: 40px; padding: 32px 0; border-top: 1px solid var(--line); }
+.table-scenes figcaption { margin-top: 10px; color: var(--muted); font-size: .78rem; line-height: 1.6; }
+.community-values { margin-top: 52px; padding-top: 32px; border-top: 1px solid var(--line); }
+.care-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin-top: 28px; padding: 12px 0 28px; }
+.respect-note { max-width: 760px; margin: 0 auto; padding: 20px 0 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; line-height: 1.8; }
 .pillar-icon { color: var(--gold-leaf); font-size: .7rem; letter-spacing: .1em; }
 .pillar h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; color: var(--matcha-leaf); margin: 12px 0; }
 .pillar p { font-size: .85rem; line-height: 1.8; color: var(--muted); margin: 0; }

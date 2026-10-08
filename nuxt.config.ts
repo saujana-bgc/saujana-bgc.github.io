@@ -14,12 +14,12 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'en',
       },
-      title: 'SAUJANA BG COMMUNITY',
+      title: 'Saujana Board Game Community',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'theme-color', content: '#354C3E' },
-        { name: 'description', content: 'Saujana Board Game Community — a quiet analog sanctuary in Saujana where people gather to slow down, play, and connect over tabletop games.' },
+        { name: 'description', content: 'Saujana Board Game Community welcomes newcomers and experienced players to connect, learn, and discover tabletop games together. Find a gathering and join us.' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
