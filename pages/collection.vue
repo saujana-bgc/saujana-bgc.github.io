@@ -1,18 +1,19 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="collection-header fade-up">
-      <p class="page-eyebrow">The game library</p>
+      <p class="page-eyebrow">What shall we play next?</p>
       <h1 class="hero-title">Collection</h1>
       <div class="stats-container collection-summary">
         <span><strong>{{ totalGames }}</strong> games on the shelf</span>
-        <span><strong>{{ unplayedCount }}</strong> yet to be played</span>
+        <span><strong>{{ unplayedCount }}</strong> with no plays logged</span>
       </div>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <section class="collection-invite fade-up">
-        <p>Find an old favourite or discover your next one. Explore the host’s collection, then ask about a game you’d like to try at a gathering.</p>
+        <p>Revisit a favourite or find something you’ve never tried. Browse the host’s collection, then ask about a title you’d like to play at your next gathering.</p>
+        <NuxtLink class="context-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       </section>
 
       <div class="collection-search fade-up">
@@ -20,27 +21,27 @@
           v-model="search"
           class="collection-search-input"
           type="search"
-          placeholder="Search titles, categories, players, or designers..."
-          aria-label="Search collection"
+          placeholder="Find your next game"
+          aria-label="Search the collection by title, category, player count, or designer"
         />
-        <button v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear</button>
+        <button v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</button>
       </div>
 
 <div class="sort-controls fade-up">
         <button class="sort-btn" :class="{ active: currentSort === 'name' }" @click="[currentSort = 'name', resetCategories()]">A to Z</button>
         <button class="sort-btn" :class="{ active: currentSort === 'played' }" @click="[currentSort = 'played', resetCategories()]">Recently played</button>
-        <button class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" @click="[generateSurprise(), resetCategories()]">Unplayed</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Card Game') }" @click="[selectedCategories = selectedCategories.includes('Card Game') ? [] : ['Card Game'], resetSort()]">Card Game</button>
+        <button class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" @click="[generateSurprise(), resetCategories()]">No plays logged</button>
+        <button class="sort-btn" :class="{ active: selectedCategories.includes('Card Game') }" @click="[selectedCategories = selectedCategories.includes('Card Game') ? [] : ['Card Game'], resetSort()]">Card games</button>
         <button class="sort-btn" :class="{ active: selectedCategories.includes('Deduction') }" @click="[selectedCategories = selectedCategories.includes('Deduction') ? [] : ['Deduction'], resetSort()]">Deduction</button>
         <button class="sort-btn" :class="{ active: selectedCategories.includes('Animals') }" @click="[selectedCategories = selectedCategories.includes('Animals') ? [] : ['Animals'], resetSort()]">Animals</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Party Game') }" @click="[selectedCategories = selectedCategories.includes('Party Game') ? [] : ['Party Game'], resetSort()]">Party Game</button>
+        <button class="sort-btn" :class="{ active: selectedCategories.includes('Party Game') }" @click="[selectedCategories = selectedCategories.includes('Party Game') ? [] : ['Party Game'], resetSort()]">Party games</button>
         <button class="sort-btn" :class="{ active: selectedCategories.includes('Bluffing') }" @click="[selectedCategories = selectedCategories.includes('Bluffing') ? [] : ['Bluffing'], resetSort()]">Bluffing</button>
       </div>
 
-      <div v-if="isError" style="font-size: 0.8rem; opacity: 0.5; margin: 10px 0 30px;">Play stats could not load. Showing the collection only.</div>
+      <div v-if="isError" class="page-hint" role="status">The collection is here, but play history is unavailable. Refresh the page to try again.</div>
 
       <div v-if="isPending" class="editorial-grid">
-        <div class="loading-copy">Checking the shelves...</div>
+        <div class="loading-copy">Loading the collection…</div>
         <article class="editorial-card" v-for="n in 8" :key="'skel-'+n" style="pointer-events: none;">
           <div class="skel" style="height: 50px; margin-bottom: 18px;"></div>
           <div style="width: 100%; aspect-ratio: 1/1; margin: 18px 0; border-radius: 20px; overflow: hidden;">
@@ -74,13 +75,13 @@
           </div>
 
           <div class="card-players">
-            {{ game.players }} • Weight: {{ game.weight || 'N/A' }}
+            {{ game.players }} • <span title="Complexity is rated out of 5. Higher ratings mean a more involved game.">Complexity: {{ game.weight ? `${game.weight}/5` : 'not rated' }}</span>
           </div>
 
           <div class="last-played">
             <div>
               <span v-if="game.stats.date">Last played {{ formatDate(game.stats.date) }}</span>
-              <span v-else style="opacity: 0.4; font-style: italic;">Not played yet</span>
+              <span v-else style="opacity: 0.65; font-style: italic;">No plays logged yet</span>
             </div>
             <div style="margin-top: 6px; opacity: 0.65;">
               Plays logged: {{ game.stats.count }}
@@ -92,7 +93,9 @@
       </div>
 
       <div v-if="!isPending && displayedGames.length === 0" class="collection-empty">
-        No games found for "{{ search.trim() }}".
+        <p>{{ search.trim() ? `No games match “${search.trim()}”.` : 'No games match these filters.' }}</p>
+        <p>Try a shorter search, or give the whole shelf another look.</p>
+        <button type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; resetCategories()">Show all games</button>
       </div>
     </main>
 
@@ -113,7 +116,7 @@
               @error="handleImgError"
             >
             <div style="margin-top: 25px; font-size: 0.75rem; font-weight: 700; color: var(--matcha-leaf); text-transform: uppercase; letter-spacing: 2px;">
-              {{ selectedGame.players }} • Weight {{ selectedGame.weight }}
+              {{ selectedGame.players }} • Complexity {{ selectedGame.weight ? `${selectedGame.weight}/5` : 'not rated' }}
             </div>
           </div>
           <div style="text-align: left;">
@@ -122,6 +125,7 @@
               Designed by {{ selectedGame.designers.join(', ') }}
             </div>
             <div style="font-size: 0.95rem; line-height: 1.8; font-weight: 300; opacity: 0.9; white-space: pre-wrap;" v-html="selectedGame.description"></div>
+            <NuxtLink class="context-link" to="/gatherings" no-prefetch>Want to try this one? Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           </div>
         </div>
       </div>
@@ -131,6 +135,11 @@
 
 <script setup>
 import { collectionDataSimple } from '~/assets/data/game_data_simple.js'
+
+useHead({
+    title: 'Collection | Saujana BGC',
+    meta: [{ name: 'description', content: 'Browse the Saujana host’s board game collection. Find a familiar favourite or something new to try at your next gathering.' }],
+})
 
 const currentSort = ref('name')
 const search = ref('')
@@ -278,7 +287,7 @@ const lastTended = computed(() => collectionDataSimple?.date || '--')
 
 const generateSurprise = () => {
     const unplayed = gamesWithStats.value.filter(g => g.stats.count === 0)
-    if (unplayed.length === 0) { alert("Every game has been played."); return }
+    if (unplayed.length === 0) { alert('Every game on the shelf has a logged play. Try Recently played to find a favourite.'); return }
     surpriseGames.value = unplayed.sort((a, b) => a.name.localeCompare(b.name))
     currentSort.value = 'surprise'
 }

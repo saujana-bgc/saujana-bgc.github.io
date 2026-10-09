@@ -1,6 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  nitro: {
+    // Bundle Nuxt 4.6's renderer so its generated build artifacts resolve in Nitro.
+    externals: { inline: ['nuxt/internal'] },
+  },
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL ?? 'https://gjucszyfwcpsquirxooq.supabase.co',
@@ -19,7 +23,7 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'theme-color', content: '#354C3E' },
-        { name: 'description', content: 'Saujana Board Game Community welcomes newcomers and experienced players to connect, learn, and discover tabletop games together. Find a gathering and join us.' },
+        { name: 'description', content: 'Come on your own or bring a friend. Find a Saujana board game gathering, explore the collection, and learn a new game with good company.' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

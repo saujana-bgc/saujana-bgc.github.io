@@ -7,7 +7,7 @@
         :aria-expanded="open" :aria-controls="`${id}-options`"
         :aria-activedescendant="open && active >= 0 ? `${id}-option-${active}` : undefined"
         :aria-describedby="`${id}-hint`" :disabled="disabled" required maxlength="80"
-        autocomplete="off" spellcheck="false" placeholder="Search or type a new name"
+        autocomplete="off" spellcheck="false" placeholder="Find a player or enter a new name"
         @input="onInput" @focus="open = true" @keydown="onKeydown"
       >
       <ul v-if="open && options.length" :id="`${id}-options`" role="listbox" :aria-label="label">
@@ -17,7 +17,7 @@
         >{{ option.isNew ? `Add “${option.name}”` : option.name }}</li>
       </ul>
     </div>
-    <small class="league-field-hint" :id="`${id}-hint`">{{ isNew ? 'New player — added when you save this table.' : 'Choose an existing player or enter a new name.' }}</small>
+    <small class="league-field-hint" :id="`${id}-hint`">{{ isNew ? 'This player will be added when you save the results.' : 'Choose a familiar name or add someone new.' }}</small>
   </div>
 </template>
 

@@ -1,14 +1,14 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
-      <p class="page-eyebrow">The community journal</p>
-      <h1 class="hero-title">Playlog</h1>
-      <div class="stats-container">Games we’ve explored and moments we’ve shared, with new discoveries and old favourites around the table.</div>
+      <p class="page-eyebrow">One game leads to another</p>
+      <h1 class="hero-title">Play history</h1>
+      <div class="stats-container">A record of what we’ve played and who joined in. Look back at a gathering, or see which favourites keep making it to the table.</div>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <template v-if="isPending">
-        <div class="loading-state loading-copy">Loading play history...</div>
+        <div class="loading-state loading-copy">Loading play history…</div>
         <section class="session-card" v-for="n in 3" :key="'skel-'+n">
           <div class="skel" style="width: 200px; height: 22px; margin-bottom: 20px;"></div>
           <div style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -17,15 +17,21 @@
         </section>
       </template>
 
+      <div v-else-if="isError" class="loading-state" role="alert">
+        <p>We couldn’t load the play history. Refresh the page to try again.</p>
+        <NuxtLink class="context-link" to="/collection" no-prefetch>Browse the collection while you’re here <span aria-hidden="true">→</span></NuxtLink>
+      </div>
+
       <template v-else>
         <div class="search-wrap fade-up">
-          <input v-model="search" type="search" aria-label="Search play history" class="search-input" placeholder="Search games..." />
+          <input v-model="search" type="search" aria-label="Search play history" class="search-input" placeholder="Find a game we’ve played" />
+          <p class="page-hint">Tap a game, or hover over it, for a closer look.</p>
         </div>
 
         <section class="session-card stats-panel fade-up">
-          <div class="session-date">Play stats</div>
+          <div class="session-date">Our time in games</div>
           <div class="stats-layout">
-            <div class="stats-grid" aria-label="Playlog statistics">
+            <div class="stats-grid" aria-label="Play history statistics">
               <div class="stat-tile">
                 <span class="stat-value">{{ playlogStats.totalPlays }}</span>
                 <span class="stat-label">plays logged</span>
@@ -36,7 +42,7 @@
               </div>
               <div class="stat-tile">
                 <span class="stat-value">{{ playlogStats.avgGamesPerSession }}</span>
-                <span class="stat-label">average games / gathering</span>
+                <span class="stat-label">games per gathering, on average</span>
               </div>
               <div class="stat-tile stat-tile-wide">
                 <span class="stat-value">{{ playlogStats.biggestSession.count }}</span>
@@ -66,7 +72,7 @@
               </div>
 
               <div class="ranking-group">
-                <div class="ranking-title">Top players</div>
+                <div class="ranking-title">Most active players</div>
                 <div
                   v-for="player in topPlayers"
                   :key="player.label"
@@ -101,11 +107,12 @@
         </section>
 
         <div v-if="filteredSessions.length === 0" class="loading-state">
-          No sessions found for "{{ search }}".
+          <p>{{ search.trim() ? `No gatherings include “${search.trim()}”. Try another game title.` : 'Our play history is waiting for its first entry.' }}</p>
+          <NuxtLink class="context-link" to="/collection" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
         </div>
 
         <div v-if="totalPages > 1" class="pagination">
-          <button class="page-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">Prev</button>
+          <button class="page-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">Previous</button>
           <button
             v-for="p in totalPages"
             :key="p"
@@ -131,6 +138,11 @@
 </template>
 
 <script setup>
+useHead({
+    title: 'Play history | Saujana BGC',
+    meta: [{ name: 'description', content: 'Look back at Saujana gatherings, the games we’ve played, and the favourites we keep coming back to.' }],
+})
+
 const PAGE_SIZE = 10
 const HOVER_CARD_HEIGHT = 245
 
@@ -138,7 +150,7 @@ const currentPage = ref(1)
 const search = ref('')
 const hoverImage = reactive({ visible: false, src: '', name: '', showPlayers: true, players: [], x: 0, y: 0, above: true })
 
-const { data: rawRows, isPending } = usePlaylogData()
+const { data: rawRows, isPending, isError } = usePlaylogData()
 
 const processedData = computed(() => {
     const rows = rawRows.value ?? []

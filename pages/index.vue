@@ -3,13 +3,13 @@
     <section class="hero-section fade-up">
       <div class="hero-copy">
         <p class="page-eyebrow">Saujana Board Game Community</p>
-        <h1>An open table.<br><em>A wider horizon.</em></h1>
-        <p class="hero-description">A welcoming board game community for curious newcomers and familiar faces. Come solo or bring a friend, discover a game, and enjoy the company. We’ll help you get started.</p>
+        <h1>Pull up a chair.<br><em>Let’s play.</em></h1>
+        <p class="hero-description">We’re Saujana, a board game community where new faces become familiar ones. Come on your own or bring a friend. We’ll help you find a game, learn the rules, and settle in.</p>
         <div class="hero-actions">
           <NuxtLink to="/gatherings" class="primary-link" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
           <NuxtLink to="/collection" class="text-link" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
         </div>
-        <p class="hero-footnote"><span aria-hidden="true"></span> Your first game or your fiftieth, you’re welcome here.</p>
+        <p class="hero-footnote"><span aria-hidden="true"></span> No experience needed. Curiosity is plenty.</p>
       </div>
       <div class="banner-container">
         <img
@@ -26,23 +26,23 @@
       </div>
     </section>
 
-    <div class="welcome-strip"><span>No experience needed</span><span>Come solo or with friends</span><span>Learn as you play</span></div>
+    <div class="welcome-strip"><span>New faces welcome</span><span>Come on your own</span><span>We’ll teach the rules</span></div>
 
     <section class="announcement-box fade-up" style="animation-delay: 0.2s;">
       <div class="name-story" aria-labelledby="name-story-title">
         <p class="porch-label">Why Saujana?</p>
-        <h2 id="name-story-title" class="hero-title story-title">A name with room to explore</h2>
+        <h2 id="name-story-title" class="hero-title story-title">There’s more to discover</h2>
         <svg class="horizon-mark" viewBox="0 0 320 48" fill="none" aria-hidden="true" focusable="false">
           <path d="M1 38H319" />
           <path d="M128 38a32 32 0 0 1 64 0" />
         </svg>
-        <p>In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. For us, that means staying open to new people, new games, and new experiences.</p>
-        <p>Around our tables, you can learn something unfamiliar, meet someone new, or settle in with an old favourite. Everyone brings something to the community.</p>
+        <p>In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
+        <p>There’s room here for the first-time player, the regular with a favourite, and the person who’s just curious. Start wherever you are.</p>
       </div>
 
       <div class="welcome-note">
-        <h2>There’s a place for you at the table</h2>
-        <p>Pick a gathering, check the venue details, and add your name when you’re ready. Come for a new game, a familiar favourite, or simply the company.</p>
+        <h2>Make a little time for play</h2>
+        <p>Choose a date that suits you, check the venue, and add your name. We’ll see you there.</p>
         <NuxtLink to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
@@ -57,21 +57,21 @@
       <div class="table-scenes" aria-label="Scenes from Saujana gatherings">
         <figure>
           <img src="/images/site/table_scene_1.avif" alt="Players gathered around a Saujana board game table" loading="lazy" decoding="async" width="640" height="480">
-          <figcaption>Good games, even better company.</figcaption>
+          <figcaption>The rules get explained. The fun follows.</figcaption>
         </figure>
         <figure>
           <img src="/images/site/table_scene_2.avif" alt="Friends playing together at a Saujana gathering" loading="lazy" decoding="async" width="640" height="480">
-          <figcaption>Shared moments around the table.</figcaption>
+          <figcaption>A few rounds. Plenty to talk about.</figcaption>
         </figure>
         <figure>
           <img src="/images/site/table_scene_3.avif" alt="Board games prepared for a Saujana meetup" loading="lazy" decoding="async" width="640" height="480">
-          <figcaption>Something new to discover together.</figcaption>
+          <figcaption>What shall we try next?</figcaption>
         </figure>
       </div>
 
       <section class="community-values" aria-labelledby="community-values-title">
-        <p class="porch-label">How we welcome each other</p>
-        <h2 id="community-values-title" class="hero-title story-title">An open table starts with us</h2>
+        <p class="porch-label">A little care goes a long way</p>
+        <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
         <div class="care-guide">
           <div v-for="(pillar, i) in pillars" :key="pillar.title" class="pillar" :style="{ animationDelay: (0.15 + i * 0.1) + 's' }">
             <div class="pillar-icon" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</div>
@@ -79,7 +79,7 @@
             <p>{{ pillar.content }}</p>
           </div>
         </div>
-        <p class="respect-note">Everyone deserves to feel welcome and respected. Harassment and disruptive behaviour are not tolerated. Message an admin privately if anything feels off.</p>
+        <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, message an admin privately.</p>
       </section>
     </section>
 
@@ -87,10 +87,10 @@
       <div class="ig-header">
         <span class="ig-icon" v-html="igSvg" aria-hidden="true"></span>
         <div>
-          <p class="ig-sub">The community, lately</p>
-          <h2 class="ig-handle">Life around the table</h2>
+          <p class="ig-sub">A glimpse of Saujana</p>
+          <h2 class="ig-handle">The games end. The stories stay.</h2>
         </div>
-        <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer" class="ig-follow-btn">Follow along ↗</a>
+        <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer" class="ig-follow-btn">Find us on Instagram ↗</a>
       </div>
 
       <div class="ig-grid">
@@ -129,6 +129,11 @@
 <script setup>
 import { instagramData } from '~/assets/data/instagram_data.js'
 
+useHead({
+  title: 'Saujana Board Game Community | Pull up a chair',
+  meta: [{ name: 'description', content: 'Come on your own or bring a friend. Find a Saujana board game gathering, explore the collection, and learn a new game with good company.' }],
+})
+
 const heroImageSrcset = '/images/site/saujana_bgc_banner_640.avif?v=20260806-hero-v6 640w, /images/site/saujana_bgc_banner_800.avif?v=20260806-hero-v6 800w, /images/site/saujana_bgc_banner_900.avif?v=20260806-hero-v6 900w, /images/site/saujana_bgc_banner_1000.avif?v=20260806-hero-v6 1000w, /images/site/saujana_bgc_banner_1200.avif?v=20260806-hero-v6 1200w, /images/site/saujana_bgc_banner.avif?v=20260806-hero-v6 1920w'
 const heroImageSizes = '(min-width: 1200px) 580px, (min-width: 900px) 48vw, 92vw'
 
@@ -139,34 +144,34 @@ const igSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fil
 
 const pillars = [
   {
-    title: 'Make room for people',
-    content: 'Welcome new faces, invite someone into a game, and treat everyone with respect. Coming alone should still feel like joining in.'
+    title: 'Make the first hello',
+    content: 'Notice someone new? Introduce yourself and invite them into a game. A small welcome makes arriving alone much easier.'
   },
   {
     title: 'Stay curious',
-    content: 'Try something unfamiliar, ask questions, and give each other time to learn. Enjoy an old favourite or explore something new at your own pace.'
+    content: 'Ask questions, try an unfamiliar game, and give each other time to learn. Nobody needs to get every rule right on the first go.'
   },
   {
     title: 'Care for the table',
-    content: 'Look after the games, support our host venues, and help pack up when you can. RSVP thoughtfully so there’s room to plan for everyone.'
+    content: 'Handle the games with care, order something at the venue, and lend a hand packing up. Keep your sign-up current so the host can plan for everyone.'
   }
 ]
 
 const expectations = [
   {
     step: 'Arrive',
-    title: 'Come as you are',
-    copy: 'Come solo or with friends. Say hi to the host and take a few minutes to settle in.'
+    title: 'Say hello',
+    copy: 'Find the host when you arrive. Let us know it’s your first visit, and take a moment to settle in.'
   },
   {
     step: 'Learn',
-    title: 'Find a fit',
-    copy: 'Ask the host or a regular for a suggestion. We’ll help you find a game and learn the rules.'
+    title: 'Find your game',
+    copy: 'Fancy something quick, clever, or a little chaotic? Ask for a suggestion. We’ll walk you through the rules.'
   },
   {
     step: 'Play',
-    title: 'Play your way',
-    copy: 'Start light, watch a round, or join a deeper game if it feels right.'
+    title: 'See where it goes',
+    copy: 'Watch a round, start with something light, or settle into a longer game. You can find your pace as you go.'
   }
 ]
 </script>

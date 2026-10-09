@@ -1,10 +1,10 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
-      <p class="page-eyebrow">Our people</p>
+      <p class="page-eyebrow">A little more to celebrate</p>
       <h1 class="hero-title">Birthday Club</h1>
       <div class="stats-container">
-        Share your birthday with us so we can celebrate the people who make our game nights special.
+        The games bring us together. The people make it special. Share your birthday so we can remember your day, too.
       </div>
     </header>
 
@@ -12,9 +12,9 @@
       <section class="birthday-card fade-up" aria-label="Birthday submission form">
         <div v-if="isSubmitted" class="birthday-success" role="status">
           <div class="success-mark" aria-hidden="true">&#10022;</div>
-          <p class="success-kicker">You&rsquo;re in, {{ submittedName }}!</p>
-          <h2>We&rsquo;ll keep your day in mind.</h2>
-          <p>Thank you for being part of the Saujana board game community.</p>
+          <p class="success-kicker">Birthday saved, {{ submittedName }}.</p>
+          <h2>A date worth remembering.</h2>
+          <p>Your birthday and greeting preference are on our calendar. Thanks for giving us another reason to celebrate.</p>
           <button class="secondary-button" type="button" @click="resetForm">
             Add another birthday
           </button>
@@ -51,7 +51,7 @@
                   :aria-describedby="errors.month ? 'birth-month-error' : undefined"
                   @change="errors.month = ''"
                 >
-                  <option :value="null" disabled>Select month</option>
+                  <option :value="null" disabled>Choose a month</option>
                   <option v-for="month in months" :key="month.value" :value="month.value">
                     {{ month.label }}
                   </option>
@@ -70,7 +70,7 @@
                   :aria-describedby="errors.day ? 'birth-day-error' : undefined"
                   @change="errors.day = ''"
                 >
-                  <option :value="null" disabled>{{ birthMonth ? 'Select day' : 'Choose month first' }}</option>
+                  <option :value="null" disabled>{{ birthMonth ? 'Choose a day' : 'Choose a month first' }}</option>
                   <option v-for="day in availableDays" :key="day" :value="day">{{ day }}</option>
                 </select>
                 <p v-if="errors.day" id="birth-day-error" class="field-error">{{ errors.day }}</p>
@@ -82,13 +82,13 @@
             <input id="public-greeting" v-model="allowPublicGreeting" type="checkbox" name="public_greeting">
             <span class="check-box" aria-hidden="true"></span>
             <span>
-              <strong>You may greet me publicly</strong>
-              <small>Saujana BGC may wish me publicly on community channels.</small>
+              <strong>I’m happy with a public birthday wish</strong>
+              <small>Saujana may greet you on community channels. Leave this unchecked if you’d rather not have a public greeting.</small>
             </span>
           </label>
 
           <p class="privacy-note">
-            We only collect your chosen name, birth month and day. Your birth year is not needed, and your details will not be shown as a public list.
+            Just your chosen name, month, and day. We don’t need your birth year. Your details are kept off the public site; organisers use a private calendar to remember birthdays and greeting preferences.
           </p>
 
           <p v-if="submitError" class="submit-error" role="alert">{{ submitError }}</p>
@@ -103,6 +103,11 @@
 </template>
 
 <script setup>
+useHead({
+  title: 'Birthday Club | Saujana BGC',
+  meta: [{ name: 'description', content: 'Share your birthday with Saujana and choose whether you’d like a public greeting. Just your name, month, and day.' }],
+})
+
 const supabase = useSupabase()
 
 const months = [
@@ -135,9 +140,9 @@ watch(birthMonth, () => {
 
 function validateForm() {
   const cleanName = name.value.trim()
-  errors.name = cleanName ? '' : 'Please tell us what we should call you.'
-  errors.month = birthMonth.value ? '' : 'Please choose your birth month.'
-  errors.day = birthDay.value ? '' : 'Please choose your birth day.'
+  errors.name = cleanName ? '' : 'Tell us what you’d like to be called.'
+  errors.month = birthMonth.value ? '' : 'Choose the month of your birthday.'
+  errors.day = birthDay.value ? '' : 'Choose the day of your birthday.'
   return cleanName && birthMonth.value && birthDay.value
 }
 
@@ -158,7 +163,7 @@ async function submitBirthday() {
   isSubmitting.value = false
 
   if (error) {
-    submitError.value = 'We could not save your birthday just yet. Please try again.'
+    submitError.value = 'Your birthday hasn’t been saved. Please try again.'
     return
   }
 

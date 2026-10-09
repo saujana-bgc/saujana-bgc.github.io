@@ -1,10 +1,10 @@
 <template>
   <main class="league-page">
     <header class="league-hero fade-up">
-      <p class="page-eyebrow">The riichi room</p>
+      <p class="page-eyebrow">One more hand?</p>
       <h1 class="hero-title">Riichi League</h1>
-      <p class="league-intro">A friendly riichi mahjong league within the Saujana community. Follow the season standings and the games we play together.</p>
-      <p class="league-welcome">Curious about riichi? <NuxtLink to="/gatherings" no-prefetch>Find a gathering</NuxtLink> and ask the host about learning to play.</p>
+      <p class="league-intro">A friendly season of riichi mahjong, one gathering at a time. Follow the standings, look back at a table, or add the results of your latest game.</p>
+      <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings" no-prefetch>Come to a gathering</NuxtLink> and ask the host how to get started.</p>
 
       <div class="season-switcher">
         <label class="league-field-label" for="season-select">Season</label>
@@ -17,7 +17,7 @@
       <nav class="league-shortcuts" aria-label="League sections">
         <a class="league-button" href="#standings-heading">Standings</a>
         <a class="league-button" href="#weeks-heading">Weekly results</a>
-        <button class="league-button league-button-primary" v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add a table</button>
+        <button class="league-button league-button-primary" v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add results</button>
       </nav>
     </header>
 
@@ -58,8 +58,8 @@
           <h2 id="standings-heading">Standings</h2>
         </div>
         <p>
-          Each calendar day produces one result per player: their highest league-point score that day. The season
-          total adds together their {{ selectedSeason.bestResultsCount }} highest-scoring daily results.
+          Your best league score each day counts as one daily result. Your season
+          total adds up your best {{ selectedSeason.bestResultsCount }} daily results. Play again without risking the points you’ve already earned.
         </p>
       </div>
 
@@ -119,11 +119,11 @@
           <p class="section-kicker">Round by round</p>
           <h2 id="weeks-heading">Weekly results</h2>
         </div>
-        <p>Select a week to see its schedule or completed table results.</p>
+        <p>Choose a week to see where we’re meeting and how the tables finished.</p>
       </div>
 
       <label class="mobile-week-select">
-        <span class="league-field-label">Session</span>
+        <span class="league-field-label">Week</span>
         <select class="league-control" v-model="selectedWeekId" :disabled="isSubmittingScore">
           <option v-for="week in selectedWeeks" :key="week.id" :value="week.id">Week {{ week.weekNumber }} · {{ formatDate(week.date) }} · {{ week.tables.length ? 'Results' : 'Scheduled' }}</option>
         </select>
@@ -166,10 +166,10 @@
         <section v-if="!isScoreEntryClosed" id="score-entry" class="score-entry" aria-labelledby="score-entry-heading">
           <div class="score-entry-heading">
             <div>
-              <p class="section-kicker">{{ editingTable ? `Editing Table ${editingTable.tableNumber}` : 'Add a table' }}</p>
+              <p class="section-kicker">{{ editingTable ? `Editing Table ${editingTable.tableNumber}` : 'Add results' }}</p>
               <h4 id="score-entry-heading" tabindex="-1">Week {{ selectedWeek.weekNumber }} · {{ editingTable ? 'Edit results' : 'Add results' }}</h4>
             </div>
-            <p>{{ editingTable ? 'Update the players or final points. Standings recalculate when you save.' : 'Anyone can submit a complete table. Saved results appear in the league immediately.' }}</p>
+            <p>{{ editingTable ? 'Correct the players or final points, then save. The standings will update with your changes.' : 'One person can enter the results for the whole table. Add every player and their final points, then save to update the standings.' }}</p>
           </div>
 
           <form class="score-entry-form" @submit.prevent="submitMatch">
@@ -181,7 +181,7 @@
                 </select>
               </label>
               <p class="score-entry-auto">
-                Enter players top to bottom by seat: East, South, West{{ scoreForm.tableSize === 4 ? ', North' : '' }}. Equal points are ranked by this order. Table number is assigned automatically; enter results by {{ formatDate(scoreEntryCutoffDate, true) }}.
+                Enter players in seat order: East, South, West{{ scoreForm.tableSize === 4 ? ', North' : '' }}. This order breaks ties in final points. We’ll assign the table number when you save. Submit by {{ formatDate(scoreEntryCutoffDate, true) }}.
               </p>
             </div>
 
@@ -207,7 +207,7 @@
               </div>
               <div class="score-entry-actions">
                 <button type="button" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="resetScoreForm">
-                  {{ editingTable ? 'Reset changes' : 'Reset' }}
+                  {{ editingTable ? 'Reset changes' : 'Clear form' }}
                 </button>
                 <button type="submit" class="score-entry-submit league-button league-button-primary" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
                   {{ isSubmittingScore ? (editingTable ? 'Updating results…' : 'Saving results…') : (editingTable ? 'Update table results' : 'Save table results') }}
@@ -271,8 +271,8 @@
         <div v-else class="scheduled-state">
           <span aria-hidden="true">東</span>
           <div>
-            <h4>Results will appear here</h4>
-            <p>This round is scheduled for {{ formatDate(selectedWeek.date, true) }}. Scores and standings will update when the tables are complete.</p>
+            <h4>No table results yet</h4>
+            <p>This week’s gathering is dated {{ formatDate(selectedWeek.date, true) }}. Once a table’s results are saved, you’ll find them here.</p>
           </div>
         </div>
 
@@ -283,7 +283,7 @@
     <section class="rules-card fade-up" aria-labelledby="scoring-heading">
       <div>
         <p class="section-kicker">How scoring works</p>
-        <h2 id="scoring-heading">Placement decides the score</h2>
+        <h2 id="scoring-heading">Your finishing place counts</h2>
         <p>
           Scores are based only on finishing position. Final mahjong points are recorded for the match result,
           but no uma or oka is added to the league standings.
@@ -316,10 +316,10 @@
         <header class="rules-dialog-header">
           <div>
             <p class="section-kicker">Saujana Riichi League</p>
-            <h2 id="rules-dialog-title">Table Rules</h2>
+            <h2 id="rules-dialog-title">Table rules</h2>
             <p>
-              Riichi League is intended to be friendly and accessible. We follow standard Japanese Riichi
-              Mahjong rules, with the settings below.
+              We want everyone to feel comfortable playing and learning. These are the Japanese riichi
+              mahjong rules and table settings used in our league.
             </p>
           </div>
           <button type="button" class="rules-close" aria-label="Close table rules" @click="closeRules">×</button>
@@ -327,7 +327,7 @@
 
         <div class="rules-dialog-content">
           <section>
-            <h3>Basic Settings</h3>
+            <h3>Basic settings</h3>
             <ul>
               <li>Four-player matches are played as East–South games.</li>
               <li>Each player starts with 25,000 points.</li>
@@ -347,7 +347,7 @@
           </section>
 
           <section>
-            <h3>Three-player Matches</h3>
+            <h3>Three-player matches</h3>
             <p>
               Three-player matches use the same rules as four-player matches wherever possible, with these
               differences:
@@ -386,7 +386,7 @@
           </section>
 
           <section>
-            <h3>Draws and Calls</h3>
+            <h3>Draws and calls</h3>
             <ul>
               <li>Subject to the three-player differences above, standard chi, pon, kan, riichi, tsumo and ron rules apply.</li>
               <li>
@@ -409,7 +409,7 @@
           </section>
 
           <section>
-            <h3>Dealer and Match Progression</h3>
+            <h3>Dealer and match progression</h3>
             <ul>
               <li>The dealer continues after winning a hand.</li>
               <li>The dealer continues after an exhaustive draw when tenpai.</li>
@@ -422,7 +422,7 @@
           </section>
 
           <section>
-            <h3>Exhaustive Draws</h3>
+            <h3>Exhaustive draws</h3>
             <ul>
               <li>Standard 3,000-point noten payments apply.</li>
               <li>Players may choose whether to reveal a tenpai hand.</li>
@@ -447,7 +447,7 @@
           </section>
 
           <section class="league-points-section">
-            <h3>League Points</h3>
+            <h3>League points</h3>
             <p>Final mahjong points determine finishing position.</p>
             <p>No uma or oka is added to league standings. League points are awarded only according to placement.</p>
             <p>
@@ -501,7 +501,7 @@
           </section>
 
           <section>
-            <h3>Mistakes and Disputes</h3>
+            <h3>Mistakes and disputes</h3>
             <p>This is a friendly community league, and many players are still learning.</p>
             <ul>
               <li>Minor mistakes should be corrected where possible without disrupting the hand.</li>
@@ -514,7 +514,7 @@
           </section>
 
           <section>
-            <h3>Table Conduct</h3>
+            <h3>Table conduct</h3>
             <ul>
               <li>Calls and win declarations should be made clearly.</li>
               <li>Discards should remain in order.</li>
@@ -535,6 +535,7 @@ import leagueData from '~/assets/data/riichi_league.json'
 import { onMounted } from 'vue'
 
 useHead({
+  title: 'Riichi League | Saujana BGC',
   meta: [
     { name: 'description', content: 'Saujana Riichi League season standings, weekly schedules, and table results.' },
   ],
@@ -786,7 +787,7 @@ async function loadLeagueFromSupabase() {
     }
   } catch (error) {
     console.error('Could not load Riichi League data from Supabase:', error)
-    scoreEntryMessage.value = 'Live league data is unavailable right now. Please try again later.'
+    scoreEntryMessage.value = 'We couldn’t load the latest league results. Refresh the page to try again.'
   }
 }
 
@@ -921,8 +922,8 @@ async function submitMatch() {
     await loadLeagueFromSupabase()
     resetScoreForm()
     scoreEntryMessage.value = wasEditing
-      ? `Table ${updatedTableNumber} updated. Standings have been updated.`
-      : `Table ${tableNumber} saved. Standings have been updated.`
+      ? `Table ${updatedTableNumber} updated. The standings now include your changes.`
+      : `Table ${tableNumber} saved. Your results are in the standings.`
   } catch (error) {
     console.error('Could not save Riichi League results:', error)
     scoreEntryMessage.value = 'Could not save these results. Check the player names and scores, then try again.'

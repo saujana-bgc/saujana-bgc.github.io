@@ -3,14 +3,14 @@
     <main class="calendar-page">
       <section v-if="isRestoring" class="state-card loading-card" aria-live="polite">
         <span class="loading-spark" aria-hidden="true">&#10022;</span>
-        <p>Opening your private calendar&hellip;</p>
+        <p>Opening the birthday calendar&hellip;</p>
       </section>
 
       <section v-else-if="!isAuthenticated" class="login-wrap" aria-labelledby="login-title">
         <div class="login-intro fade-up">
-          <p class="eyebrow">Private keeper&rsquo;s view</p>
+          <p class="eyebrow">For community organisers</p>
           <h1 id="login-title">Birthday Club<br><em>Calendar</em></h1>
-          <p>Sign in to see the community birthday calendar and public greeting preferences.</p>
+          <p>Sign in to see whose birthday is coming up and how they’d like to be greeted.</p>
         </div>
 
         <form class="login-card fade-up" novalidate @submit.prevent="submitLogin">
@@ -59,16 +59,16 @@
             {{ isLoggingIn ? 'Signing in…' : 'Open calendar' }}
           </button>
 
-          <p class="security-note">Your password is handled by the secure sign-in service and is never stored by this page.</p>
+          <p class="security-note">This calendar is for organisers. Check each person’s preference before sharing a birthday wish publicly.</p>
         </form>
       </section>
 
       <template v-else>
         <header class="calendar-header fade-up">
           <div>
-            <p class="eyebrow">Private keeper&rsquo;s view</p>
+            <p class="eyebrow">For community organisers</p>
             <h1>Birthday Club <em>Calendar</em></h1>
-            <p class="header-copy">Every birthday at a glance, with each member&rsquo;s greeting preference kept close by.</p>
+            <p class="header-copy">A year of people to celebrate. Check the greeting preference beside each name before posting a birthday wish.</p>
           </div>
           <button class="logout-button" type="button" @click="signOut">Sign out</button>
         </header>
@@ -89,7 +89,7 @@
 
             <div class="summary-stats" aria-live="polite">
               <span><strong>{{ birthdays.length }}</strong> birthdays</span>
-              <span><strong>{{ publicGreetingCount }}</strong> public wishes</span>
+              <span><strong>{{ publicGreetingCount }}</strong> public greetings allowed</span>
             </div>
 
             <button v-if="calendarYear !== currentYear" class="today-button" type="button" @click="calendarYear = currentYear">
@@ -99,7 +99,7 @@
 
           <div v-if="isLoading" class="state-card loading-card" aria-live="polite">
             <span class="loading-spark" aria-hidden="true">&#10022;</span>
-            <p>Gathering birthdays&hellip;</p>
+            <p>Loading birthdays&hellip;</p>
           </div>
 
           <div v-else class="months-grid">
@@ -128,9 +128,9 @@
                       <span
                         class="wish-status"
                         :class="birthday.allow_public_greeting ? 'public-wish' : 'private-wish'"
-                        :title="birthday.allow_public_greeting ? 'Public birthday greeting is allowed' : 'Do not greet publicly'"
+                        :title="birthday.allow_public_greeting ? 'Public birthday greeting is allowed' : 'No public birthday greeting'"
                       >
-                        {{ birthday.allow_public_greeting ? 'Public' : 'Private' }}
+                        {{ birthday.allow_public_greeting ? 'Public wish OK' : 'No public wish' }}
                       </span>
                     </li>
                   </ul>
@@ -140,8 +140,8 @@
           </div>
 
           <div v-if="!isLoading" class="calendar-legend" aria-label="Greeting preference legend">
-            <span><i class="legend-dot public-dot"></i> Public wish is okay</span>
-            <span><i class="legend-dot private-dot"></i> Keep the wish private</span>
+            <span><i class="legend-dot public-dot"></i> Public greeting allowed</span>
+            <span><i class="legend-dot private-dot"></i> No public greeting</span>
           </div>
         </section>
       </template>
@@ -232,7 +232,7 @@ async function loadBirthdays() {
   try {
     birthdays.value = await fetchBirthdays()
   } catch {
-    loadError.value = 'Your session is active, but the birthday list could not be loaded. Please try again.'
+    loadError.value = 'You’re signed in, but we couldn’t load the birthdays. Please try again.'
   } finally {
     isLoading.value = false
   }
@@ -706,9 +706,9 @@ onMounted(async () => {
 .wish-status {
   display: block;
   margin-top: 2px;
-  font-size: 0.45rem;
+  font-size: 0.55rem;
   font-weight: 700;
-  letter-spacing: 0.7px;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 

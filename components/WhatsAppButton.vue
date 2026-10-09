@@ -4,7 +4,8 @@
     href="https://wa.me/saujanabgc"
     target="_blank"
     rel="noopener noreferrer"
-    aria-label="Chat with @saujanabgc on WhatsApp"
+    aria-label="Say hello to Saujana on WhatsApp"
+    title="Questions before your first gathering? Say hello on WhatsApp."
   >
     <svg aria-hidden="true" viewBox="0 0 32 32" focusable="false">
       <path
@@ -12,7 +13,7 @@
         d="M16.04 3A12.9 12.9 0 0 0 5.1 22.75L3.38 29l6.4-1.68A12.94 12.94 0 1 0 16.04 3Zm0 23.7c-2.1 0-4.15-.57-5.94-1.65l-.43-.25-3.8 1 1.02-3.7-.28-.45a10.72 10.72 0 1 1 9.43 5.05Zm5.88-8.03c-.32-.16-1.9-.94-2.2-1.05-.29-.1-.5-.16-.72.16-.21.32-.82 1.05-1 1.27-.19.21-.38.24-.7.08-.33-.16-1.37-.5-2.61-1.61a9.78 9.78 0 0 1-1.81-2.25c-.19-.32-.02-.5.14-.66.15-.14.32-.37.48-.56.16-.19.22-.32.32-.54.11-.21.06-.4-.02-.56-.08-.16-.72-1.73-.99-2.37-.26-.63-.53-.55-.72-.56h-.62c-.22 0-.57.08-.86.4-.3.32-1.13 1.1-1.13 2.69s1.16 3.12 1.32 3.34c.16.21 2.28 3.48 5.52 4.88.77.33 1.37.53 1.84.68.77.25 1.48.21 2.03.13.62-.1 1.9-.78 2.17-1.53.27-.75.27-1.4.19-1.53-.08-.14-.3-.22-.62-.38Z"
       />
     </svg>
-    <span class="whatsapp-label">WhatsApp</span>
+    <span class="whatsapp-label">Say hello</span>
     <span class="sr-only">@saujanabgc</span>
   </a>
 </template>

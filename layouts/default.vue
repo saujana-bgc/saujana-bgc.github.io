@@ -38,7 +38,7 @@
     <WhatsAppButton />
 
     <footer ref="footerRef" class="site-meta" aria-label="Site information">
-      <p class="footer-signature">Open tables. Shared discoveries.</p>
+      <p class="footer-signature">Good games. Good company. See you soon.</p>
       <span class="footer-copyright">&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
@@ -53,7 +53,7 @@ const navigation = [
   { name: 'Home', url: '/' },
   { name: 'Gatherings', url: '/gatherings' },
   { name: 'Birthday Club', url: '/birthday-club' },
-  { name: 'Playlog', url: '/playlog' },
+  { name: 'Play history', url: '/playlog' },
   { name: 'Riichi League', url: '/riichi-league' },
   { name: 'Collection', url: '/collection' }
 ]

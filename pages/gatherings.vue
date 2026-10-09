@@ -1,20 +1,20 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
-      <p class="page-eyebrow">Around the table</p>
+      <p class="page-eyebrow">Something to look forward to</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">An open table for new faces and familiar friends. Find a date, add your name, and come play with us.</div>
+      <div class="stats-container">Choose a date, add your name, and make a little time for games and good company. Your first visit starts here.</div>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
       <section class="first-time-panel fade-up" aria-label="First time guidance">
-        <h2>Your first gathering</h2>
-        <p>Come solo or with friends. No experience needed: you can watch a round, ask questions, or join a game and learn as you play.</p>
+        <h2>Your first visit, made easy</h2>
+        <p>Come on your own or bring a friend. You don’t need to know the games; the host can help you find a seat and get started.</p>
         <ul class="first-time-details">
-          <li><strong>Before you come:</strong> Check the date, time, and venue below, then add your name. A nickname is fine; mention in notes if it’s your first visit.</li>
-          <li><strong>When you arrive:</strong> Say hi to the host and ask for help finding a table or a game. You’re welcome to bring a game you’d like to share.</li>
-          <li><strong>At the venue:</strong> Plan to order at least RM10 per person to support the space that hosts us. After ordering, update your spend and pay at the counter.</li>
+          <li><strong>Before you come:</strong> Check the date, time, and venue, then add your name below. Still deciding? Say so in the notes.</li>
+          <li><strong>When you arrive:</strong> Say hello to the host. Ask for a game suggestion, watch a round, or join in. You can bring a game to share, too.</li>
+          <li><strong>At the venue:</strong> Order at least RM10 per person to support our hosts. Add your spend to the list after ordering, and pay at the counter.</li>
         </ul>
       </section>
 
@@ -81,7 +81,7 @@
         </div>
 
         <button v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" @click="toggleEvent(event.id)">
-          <span>View details</span>
+          <span>Look back at this gathering</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
         </button>
 
@@ -92,24 +92,24 @@
 
           <div class="attendees-section">
             <div v-if="activeTab === 'present'" class="signup-intro">
-              <h3>Add your name</h3>
-              <p>A nickname is fine. If you are tentative, mention it in notes.</p>
+              <h3>Join us</h3>
+              <p>Use the name you’d like us to know you by. Still deciding? Add “tentative” in the notes.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="attendees-actions attendees-actions-primary">
-              <button v-if="!newRows[event.id]" @click="addRow(event.id)" class="btn-add">Add me</button>
+              <button v-if="!newRows[event.id]" @click="addRow(event.id)" class="btn-add">Add my name</button>
               <template v-else>
-                <button @click="saveNewRow(event.id)" class="btn-save">Save</button>
+                <button @click="saveNewRow(event.id)" class="btn-save">Join the list</button>
                 <button @click="cancelNewRow(event.id)" class="btn-cancel">Cancel</button>
               </template>
             </div>
 
             <div class="attendees-header">
-              <h3 class="attendees-title">Who's coming</h3>
+              <h3 class="attendees-title">{{ activeTab === 'past' ? 'Who signed up' : 'Who’s coming' }}</h3>
               <div class="attendees-stats">
                 <div class="stat-pill">
                   <span class="stat-num">{{ attendeesByEvent[event.id]?.length ?? 0 }}</span>
-                  <span class="stat-lbl">coming</span>
+                  <span class="stat-lbl">signed up</span>
                 </div>
                 <div class="stat-pill">
                   <span class="stat-num">RM {{ totalSpent(event.id).toFixed(2) }}</span>
@@ -117,21 +117,21 @@
                 </div>
                 <div class="stat-pill">
                   <span class="stat-num">RM {{ avgSpent(event.id).toFixed(2) }}</span>
-                  <span class="stat-lbl">avg per person</span>
+                  <span class="stat-lbl">average spend</span>
                 </div>
                 <div v-if="canEditEvent(event)" class="stat-pill stat-pill-min">
                   <span class="stat-num">RM10</span>
-                  <span class="stat-lbl">min / person</span>
+                  <span class="stat-lbl">minimum spend</span>
                 </div>
               </div>
             </div>
 
             <div v-if="canEditEvent(event)" class="attendees-notice">
-              <p class="notice-intro">A few details help the host plan games and support the venue.</p>
+              <p class="notice-intro">Help us plan a good gathering and look after the venue.</p>
               <ul>
-                <li><strong>Minimum spend of RM10 per person.</strong> Everyone orders so we can keep using the space comfortably.</li>
-                <li>One person per row. For a +1, add a separate row (e.g. <em>Adam's +1 (Eve)</em>) and include their spend.</li>
-                <li>After ordering, update your spend and pay at the counter.</li>
+                <li><strong>Order at least RM10 per person.</strong> Supporting the venue helps keep these gatherings going.</li>
+                <li>Bringing someone? Give each person their own row, including their spend. A name like <em>Adam’s +1 (Eve)</em> works.</li>
+                <li>Add your spend after ordering, then pay at the counter.</li>
               </ul>
             </div>
 
@@ -139,13 +139,13 @@
               <table class="attendees-table">
                 <thead>
                   <tr>
-                    <th @mouseenter="showTooltip($event, 'Name or nickname for planning.')" @mouseleave="hideTooltip">Name</th>
-                    <th @mouseenter="showTooltip($event, 'Expected arrival time. Leave blank if unsure.')" @mouseleave="hideTooltip">ETA</th>
+                    <th @mouseenter="showTooltip($event, 'The name you’d like us to know you by.')" @mouseleave="hideTooltip">Name</th>
+                    <th @mouseenter="showTooltip($event, 'When you expect to arrive. You can leave this blank if you’re unsure.')" @mouseleave="hideTooltip">ETA</th>
                     <th @mouseenter="showTooltip($event, 'Minimum spend is RM10 per person. Update this after ordering.')" @mouseleave="hideTooltip">
                       Spent (RM)<br><span class="th-sub">min. RM10</span>
                     </th>
-                    <th @mouseenter="showTooltip($event, 'Games you may bring.')" @mouseleave="hideTooltip">Games</th>
-                    <th @mouseenter="showTooltip($event, 'Tentative, TBC, or anything useful for the host.')" @mouseleave="hideTooltip">Notes</th>
+                    <th @mouseenter="showTooltip($event, 'Any games you’d like to bring and share.')" @mouseleave="hideTooltip">Games</th>
+                    <th @mouseenter="showTooltip($event, 'First visit, tentative plans, or anything you’d like the host to know.')" @mouseleave="hideTooltip">Notes</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -154,8 +154,8 @@
                     <td><input v-model="newRows[event.id].name" class="cell-input" :class="{ 'input-error': nameErrors[event.id] }" placeholder="Your name *" autocomplete="off" @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @blur="hideNameAutocompleteSoon" /></td>
                     <td><input v-model="newRows[event.id].eta" type="time" class="cell-input" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, newRows[event.id])" /></td>
                     <td><input v-model="newRows[event.id].amount_spent" type="number" step="0.01" min="10" class="cell-input cell-number" /></td>
-                    <td><textarea v-model="newRows[event.id].bringing_games" class="cell-input cell-area" placeholder="Game title(s)" rows="1" @input="autoResize" /></td>
-                    <td><textarea v-model="newRows[event.id].notes" class="cell-input cell-area" placeholder="Notes" rows="1" @input="autoResize" /></td>
+                    <td><textarea v-model="newRows[event.id].bringing_games" class="cell-input cell-area" placeholder="Games to bring" rows="1" @input="autoResize" /></td>
+                    <td><textarea v-model="newRows[event.id].notes" class="cell-input cell-area" placeholder="Anything the host should know?" rows="1" @input="autoResize" /></td>
                     <td></td>
                   </tr>
                   <tr v-for="attendee in attendeesByEvent[event.id] ?? []" :key="attendee.id">
@@ -175,7 +175,7 @@
                       <textarea v-model="attendee.notes" class="cell-input cell-area" placeholder="—" rows="1" :readonly="!canEditEvent(event)" @input="autoResize" @blur="saveAttendee(attendee, event)" />
                     </td>
                     <td class="td-delete">
-                      <button v-if="canEditEvent(event)" class="btn-delete" @click="confirmDelete(attendee, event.id, event)" title="Remove">
+                      <button v-if="canEditEvent(event)" class="btn-delete" @click="confirmDelete(attendee, event.id, event)" title="Remove this name from the list">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" style="width:0.85em;height:0.85em"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>
                       </button>
                     </td>
@@ -200,11 +200,11 @@
                 </div>
                 <div class="card-field">
                   <span class="card-label">Bringing</span>
-                  <textarea v-model="newRows[event.id].bringing_games" class="card-value-input card-area" placeholder="Game title(s)" rows="1" @input="autoResize" />
+                  <textarea v-model="newRows[event.id].bringing_games" class="card-value-input card-area" placeholder="Games to bring" rows="1" @input="autoResize" />
                 </div>
                 <div class="card-field">
                   <span class="card-label">Notes</span>
-                  <textarea v-model="newRows[event.id].notes" class="card-value-input card-area" placeholder="Notes" rows="1" @input="autoResize" />
+                  <textarea v-model="newRows[event.id].notes" class="card-value-input card-area" placeholder="Anything the host should know?" rows="1" @input="autoResize" />
                 </div>
               </div>
               <div v-for="attendee in attendeesByEvent[event.id] ?? []" :key="attendee.id" class="attendee-card">
@@ -235,7 +235,7 @@
 
           <button v-if="activeTab === 'past'" class="collapse-bar" @click="toggleEvent(event.id)">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" clip-rule="evenodd"/></svg>
-            <span>Collapse</span>
+            <span>Hide details</span>
           </button>
         </template>
       </div>
@@ -270,22 +270,22 @@
 
       <div v-if="pendingDelete" class="modal-overlay" @click.self="cancelDelete">
         <div class="modal-box">
-          <p class="modal-msg">Remove <strong>{{ pendingDelete.attendee.name }}</strong> from the list?</p>
+          <p class="modal-msg">Remove <strong>{{ pendingDelete.attendee.name }}</strong> from this gathering’s sign-up list?</p>
           <div class="modal-actions">
-            <button class="btn-modal-cancel" @click="cancelDelete">Keep them</button>
-            <button class="btn-modal-delete" @click="doDelete">Remove</button>
+            <button class="btn-modal-cancel" @click="cancelDelete">Keep on the list</button>
+            <button class="btn-modal-delete" @click="doDelete">Remove name</button>
           </div>
         </div>
       </div>
 
       <div class="pagination fade-up" v-if="activeTab === 'present' && totalCurrentPages > 1">
-        <button class="page-btn" :disabled="currentPage === 1" @click="prevPage">← Prev</button>
+        <button class="page-btn" :disabled="currentPage === 1" @click="prevPage">← Previous</button>
         <span class="page-info">{{ currentPage }} / {{ totalCurrentPages }}</span>
         <button class="page-btn" :disabled="currentPage === totalCurrentPages" @click="nextPage">Next →</button>
       </div>
 
       <template v-if="loading">
-        <div class="loading-copy">Loading gatherings...</div>
+        <div class="loading-copy">Loading gatherings…</div>
         <div class="event-card" v-for="n in 2" :key="'skel-'+n" style="pointer-events: none;">
           <div class="skel" style="width: 32%; margin-bottom: 18px;"></div>
           <div class="skel" style="width: 55%; height: 30px; margin-bottom: 14px;"></div>
@@ -297,13 +297,19 @@
 
       <div v-if="!loading && currentEvents.length === 0" class="empty-state fade-up">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true" style="width:1em;height:1em;font-size:2rem;margin-bottom:15px;display:block;color:var(--matcha-leaf);opacity:0.5"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.2c-6.3-.3-12.6-.5-19-.5z"/></svg>
-        <p>No gatherings are listed right now.<br>Check back soon for the next date.</p>
+        <p v-if="activeTab === 'past'">No past gatherings are listed yet.<br>Our next get-together could be your first.</p>
+        <p v-else>No upcoming date is listed yet.<br>Check back soon, or say hello on WhatsApp.</p>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
+useHead({
+    title: 'Gatherings | Saujana BGC',
+    meta: [{ name: 'description', content: 'Find your next Saujana board game gathering. Check the date and venue, add your name, and join us. First-time players are welcome.' }],
+})
+
 const supabase = useSupabase()
 
 const PAGE_SIZE = 10
@@ -420,7 +426,7 @@ const currentEvents = computed(() => {
 function switchTab(tab) {
     activeTab.value = tab
     presentPage.value = 1
-    loadEventsForTab(tab).catch(() => showToast('Gatherings are taking longer to load.'))
+    loadEventsForTab(tab).catch(() => showToast('We couldn’t load the gatherings. Please refresh and try again.'))
     resizeAllAreas()
 }
 
@@ -524,7 +530,7 @@ function validateEtaForEvent(event, attendee) {
 
     const prev = attendee.id ? savedPayloads.get(attendee.id) : null
     attendee.eta = prev?.eta || ''
-    showToast(`ETA cannot be earlier than ${startTime}.`)
+    showToast(`Choose an arrival time from ${startTime} onwards.`)
     return false
 }
 
@@ -629,7 +635,7 @@ function validateMinimumSpend(attendee) {
     const numericAmount = Number(amount)
     if (Number.isFinite(numericAmount) && numericAmount >= MINIMUM_SPEND) return true
 
-    showToast('Minimum spend is RM10 when an amount is entered.')
+    showToast('Please enter at least RM10 for your spend, or leave it blank until you’ve ordered.')
     return false
 }
 
@@ -640,7 +646,7 @@ async function saveAttendee(attendee, event = null) {
 
     if (!attendee.name?.trim()) {
         attendee.name = prev?.name || ''
-        showToast('Please add a name.')
+        showToast('Add the name you’d like us to know you by.')
         return
     }
     if (!validateEtaForEvent(attendeeEvent, attendee)) return
@@ -653,18 +659,18 @@ async function saveAttendee(attendee, event = null) {
     const { error } = await supabase.from('attendees').update(payload).eq('id', attendee.id)
     if (error) {
         if (prev) Object.assign(attendee, prev)
-        showToast('Could not save. Please try again.')
+        showToast('Your changes haven’t been saved. Please try again.')
         return
     }
     savedPayloads.set(attendee.id, payload)
     if (attendee.name) localStorage.setItem('saujana_name', attendee.name)
     mergeAttendeeNameOptions([attendee.name])
-    showToast('Saved.')
+    showToast('Your details are saved.')
 }
 
 function confirmDelete(attendee, eventId, event = null) {
     if (!canEditEvent(event ?? findEventById(eventId))) {
-        showToast('This gathering can no longer be edited.')
+        showToast('Sign-ups for this gathering are closed.')
         return
     }
     pendingDelete.value = { attendee, eventId, event }
@@ -685,7 +691,7 @@ async function doDelete() {
     const { attendee, eventId, event } = pendingDelete.value
     if (!canEditEvent(event ?? findEventById(eventId))) {
         pendingDelete.value = null
-        showToast('This gathering can no longer be edited.')
+        showToast('Sign-ups for this gathering are closed.')
         return
     }
 
@@ -727,7 +733,7 @@ async function scrollToNewRow(eventId) {
 
 async function addRow(eventId) {
     if (!canEditEvent(findEventById(eventId))) {
-        showToast('This gathering can no longer be edited.')
+        showToast('Sign-ups for this gathering are closed.')
         return
     }
 
@@ -746,7 +752,7 @@ function cancelNewRow(eventId) {
 async function saveNewRow(eventId) {
     const event = findEventById(eventId)
     if (!canEditEvent(event)) {
-        showToast('This gathering can no longer be edited.')
+        showToast('Sign-ups for this gathering are closed.')
         return
     }
 
@@ -778,10 +784,10 @@ async function saveNewRow(eventId) {
         savedPayloads.set(data.id, buildPayload(data))
         localStorage.setItem('saujana_name', data.name)
         mergeAttendeeNameOptions([data.name])
-        showToast(`You're on the list, ${data.name}.`)
+        showToast(`You’re on the list, ${data.name}. See you there.`)
         delete newRows[eventId]
     } else {
-        showToast('Could not save. Please try again.')
+        showToast('Your changes haven’t been saved. Please try again.')
     }
 }
 
@@ -804,7 +810,7 @@ onMounted(async () => {
             getAttendeeNameOptions(),
         ])
     } catch {
-        showToast('Gatherings are taking longer to load.')
+        showToast('We couldn’t load the gatherings. Please refresh and try again.')
     }
 })
 
