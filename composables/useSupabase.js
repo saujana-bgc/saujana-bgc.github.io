@@ -66,6 +66,11 @@ class SupabaseRestQuery {
         return this
     }
 
+    limit(count) {
+        this.params.push(['limit', count])
+        return this
+    }
+
     eq(column, value) {
         this.params.push([column, `eq.${value}`])
         return this
