@@ -11,7 +11,7 @@
     "test": "tsx --test tests/*.test.mts"
   },
   "dependencies": {
-    "nuxt": "^4.5.2"
+    "nuxt": "^4.6.0"
   },
   "devDependencies": {
     "supabase": "^2.119.0",
