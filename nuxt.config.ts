@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     prerender: {
       routes: [
         '/riichi-open',
-        '/riichi-open/standings',
         '/admin',
         '/admin/birthday-club',
         '/admin/riichi-open',

@@ -1083,7 +1083,7 @@ onBeforeUnmount(() => {
 
 .league-hero {
   width: 100%;
-  padding: 30px 16px 34px;
+  padding: 0 16px 34px;
 }
 
 .league-kicker,
@@ -2062,7 +2062,7 @@ onBeforeUnmount(() => {
   }
 
   .league-hero {
-    padding-top: 30px;
+    padding-top: 0;
   }
 
   .season-card,
@@ -2258,7 +2258,7 @@ onBeforeUnmount(() => {
   .season-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .season-stats > div { padding: 12px 8px; }
   .season-stats span { font-size: .75rem; line-height: 1.45; opacity: .85; }
-  .league-hero { padding: 30px 8px 24px; }
+  .league-hero { padding: 0 8px 24px; }
   .league-intro, .section-heading > p, .rules-card > div > p { font-size: .9rem; opacity: .85; }
   .mobile-week-select { display: grid; gap: 8px; margin: 18px 0; font-size: .9rem; }
   .week-picker { display: none; }

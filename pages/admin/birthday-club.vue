@@ -182,7 +182,7 @@ onMounted(loadBirthdays)
   width: min(1500px, 100%);
   min-height: calc(100vh - 180px);
   margin: 0 auto;
-  padding: 54px clamp(14px, 3vw, 42px) 82px;
+  padding: 0 clamp(14px, 3vw, 42px) 82px;
   box-sizing: border-box;
 }
 
@@ -655,7 +655,7 @@ onMounted(loadBirthdays)
 }
 
 @media (max-width: 820px) {
-  .calendar-page { padding-top: 36px; }
+  .calendar-page { padding-top: 0; }
   .login-wrap { grid-template-columns: 1fr; gap: 34px; min-height: auto; padding: 24px 0; }
   .login-intro { text-align: center; }
   .login-intro > p:last-child { margin-left: auto; margin-right: auto; }

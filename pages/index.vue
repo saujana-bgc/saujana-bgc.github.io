@@ -2,7 +2,6 @@
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <section class="hero-section fade-up">
       <div class="hero-copy">
-        <p class="page-eyebrow">Saujana Board Game Community</p>
         <h1>Pull up a chair.<br><em>Let’s play.</em></h1>
         <p class="hero-description">We’re Saujana, a board game community where new faces become familiar ones. Come on your own or bring a friend. We’ll help you find a game, learn the rules, and settle in.</p>
         <div class="hero-actions">
@@ -177,7 +176,7 @@ const expectations = [
 </script>
 
 <style scoped>
-.hero-section { width: min(1200px, 92%); display: grid; grid-template-columns: 1fr 1.05fr; align-items: center; gap: clamp(28px, 5vw, 72px); padding: 68px 0 52px; }
+.hero-section { width: min(1200px, 92%); display: grid; grid-template-columns: 1fr 1.05fr; align-items: center; gap: clamp(28px, 5vw, 72px); padding: 0 0 52px; }
 .hero-copy .page-eyebrow { justify-content: flex-start; font-size: .6rem; }
 .hero-copy .page-eyebrow::before, .hero-copy .page-eyebrow::after { display: none; }
 .hero-copy h1 { font-family: var(--font-display); font-size: clamp(2.8rem, 4.7vw, 4.4rem); color: var(--matcha-leaf); font-weight: 400; letter-spacing: -.055em; line-height: 1.12; margin: 0; text-wrap: balance; }
@@ -234,7 +233,7 @@ const expectations = [
 .ig-caption { color: white; font-size: .75rem; line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .ig-badge { position: absolute; top: 10px; right: 10px; color: white; }
 @media (max-width: 899px) {
- .hero-section { grid-template-columns: 1fr; gap: 32px; padding: 40px 0 32px; }
+ .hero-section { grid-template-columns: 1fr; gap: 32px; padding: 0 0 32px; }
  .hero-copy { max-width: 640px; }
  .hero-copy h1 { font-size: clamp(2.65rem,7vw,4rem); }
  .hero-description { max-width: 540px; }

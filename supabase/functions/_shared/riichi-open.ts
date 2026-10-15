@@ -45,5 +45,7 @@ export function hashText(value: string) {
 }
 
 export function safeMessage(error: unknown) {
-  return error instanceof Error ? error.message : 'The request could not be completed.'
+  if (error instanceof Error) return error.message
+  if (error && typeof error === 'object' && 'code' in error && error.code === 'P0001' && 'message' in error && typeof error.message === 'string') return error.message
+  return 'The request could not be completed.'
 }

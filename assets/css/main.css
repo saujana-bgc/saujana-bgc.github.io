@@ -39,6 +39,7 @@
     --space-6: 32px;
     --space-7: 40px;
     --section-pad: clamp(var(--space-5), 4vw, var(--space-7));
+    --page-top-inset: 30px;
     --radius-card: 14px;
     --radius-control: 8px;
 }
@@ -123,7 +124,7 @@ button:disabled { cursor: not-allowed; }
 ::selection { background: #dce3d3; color: #253b2d; }
 .site-shell, .page-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .site-shell { min-height: 100vh; }
-.page-content { flex: 1; outline: none; }
+.page-content { flex: 1; outline: none; padding-top: var(--page-top-inset); }
 .skip-link { position: fixed; top: -100px; left: 16px; z-index: 2000; padding: 12px 20px; background: var(--matcha-leaf); color: white; border-radius: 8px; }
 .skip-link:focus { top: 12px; }
 
@@ -143,6 +144,7 @@ button:disabled { cursor: not-allowed; }
 
 /* Editorial page introductions. */
 .page-content header { padding: clamp(40px, 6vw, 72px) 20px 38px; text-align: center; width: 100%; }
+.page-content > * > header:first-child { padding-top: 0; }
 .hero-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4.4rem); font-style: normal; font-weight: 400; color: var(--matcha-leaf); margin: 0; line-height: 1.13; letter-spacing: -.045em; text-wrap: balance; }
 .page-eyebrow { display: flex; justify-content: center; align-items: center; gap: 12px; color: var(--gold-leaf); font-size: .65rem; letter-spacing: .2em; font-weight: 600; text-transform: uppercase; margin: 0 0 18px; }
 .page-eyebrow::before, .page-eyebrow::after { content: ''; width: 26px; height: 1px; background: currentColor; opacity: .5; }
