@@ -40,7 +40,6 @@
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Good games. Good company. See you soon.</p>
       <span class="footer-copyright">&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
-      <NuxtLink class="admin-entry" to="/admin">Organiser sign in</NuxtLink>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
       </ClientOnly>
@@ -134,5 +133,4 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleMenuKeydown))
   opacity: 0.68;
 }
 
-.admin-entry { margin-top: 10px; color: var(--muted); font-size: .72rem; text-underline-offset: 3px; }
 </style>

@@ -11,6 +11,8 @@
     "test": "tsx --test tests/*.test.mts"
   },
   "dependencies": {
+    "dompurify": "3.4.17",
+    "marked": "18.1.1",
     "nuxt": "^4.6.0"
   },
   "devDependencies": {
