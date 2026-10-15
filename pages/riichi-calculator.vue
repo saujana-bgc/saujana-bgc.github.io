@@ -9,52 +9,41 @@
     <div class="calculator-layout">
       <aside class="result-panel" :class="{ 'result-ready': resultReady }" aria-labelledby="result-heading" aria-live="polite">
         <div class="result-inner">
-          <div class="result-heading-row"><span id="result-heading" class="result-kicker">Your score</span><button type="button" class="reset-button" @click="resetCalculator">Start again</button></div>
-          <div v-if="resultReady" class="result-amount">
-            <span>{{ form.winType === 'ron' ? 'Discarder pays' : 'Total from the table' }}</span>
+          <div class="result-heading-row"><span id="result-heading" class="result-kicker">Your score</span><button type="button" class="reset-button" @click="resetCalculator">Next hand</button></div>
+          <div v-if="resultReady && form.winType === 'ron'" class="result-amount">
+            <span>Discarder pays</span>
             <strong>{{ formatPoints(result.points) }}</strong>
-            <p v-if="result.riichiSticks">+ {{ formatPoints(result.riichiSticks) }} riichi sticks</p>
-            <p v-if="result.riichiSticks" class="received-total">You receive <strong>{{ formatPoints(result.totalReceived) }}</strong></p>
           </div>
-          <div v-else class="result-empty">
-            <span class="result-mark" aria-hidden="true">?</span>
-            <p>{{ result.issues.length ? 'Fix the details below to see your score.' : 'Select at least one yaku to see your score.' }}</p>
+          <div v-if="!resultReady" class="result-empty">
+            <p>{{ hasInteracted ? 'Complete the highlighted details below.' : 'Select your yaku to get started.' }}</p>
           </div>
 
           <template v-if="resultReady">
-            <div class="score-summary">
-              <div class="score-metric"><span>Han</span><strong>{{ result.han }}<small> han</small></strong></div>
-              <div class="score-metric"><span>Fu</span><strong>{{ result.isYakuman ? '—' : result.fu }}<small v-if="result.isYakuman">not needed</small></strong></div>
-              <div v-if="result.handName" class="limit-badge">{{ limitName(result.handName) }}</div>
-              <p v-if="result.yakumanUnits > 1" class="yakuman-note">{{ result.yakumanUnits }} yakuman units</p>
-            </div>
-
             <div v-if="result.tsumo" class="payment-list">
               <h3>Each opponent pays</h3>
-              <p v-if="form.isDealer"><span>Each non-dealer</span><strong>{{ formatPoints(result.tsumo.nonDealerPays) }}</strong></p>
+              <p v-if="isDealer"><span>Each non-dealer</span><strong>{{ formatPoints(result.tsumo.nonDealerPays) }}</strong></p>
               <template v-else>
                 <p><span>Dealer</span><strong>{{ formatPoints(result.tsumo.dealerPays) }}</strong></p>
-                <p><span>Other non-dealers</span><strong>{{ formatPoints(result.tsumo.nonDealerPays) }}</strong></p>
+                <p><span>{{ form.playerCount === 3 ? 'Other non-dealer' : 'Each other non-dealer' }}</span><strong>{{ formatPoints(result.tsumo.nonDealerPays) }}</strong></p>
               </template>
             </div>
-            <div v-if="result.fuBreakdown" class="fu-breakdown">
-              <h3>Fu breakdown <span>{{ result.fu }} total</span></h3>
-              <p v-for="line in fuLines" :key="line.label"><span>{{ line.label }}</span><strong>+{{ line.fu }}</strong></p>
+            <p v-if="result.riichiSticks" class="received-total">With {{ formatPoints(result.riichiSticks) }} in sticks: <strong>{{ formatPoints(result.totalReceived) }} received</strong></p>
+            <div class="score-summary">
+              <span v-if="result.isYakuman">{{ result.yakumanUnits > 1 ? `${result.yakumanUnits} × Yakuman` : 'Yakuman' }}</span>
+              <template v-else><span>{{ result.han }} han<span v-if="result.fu"> · {{ result.fu }} fu</span></span><span v-if="result.handName" class="limit-badge">{{ limitName(result.handName) }}</span></template>
+              <button type="button" class="breakdown-button" :aria-expanded="showBreakdown" aria-controls="score-breakdown" @click="toggleBreakdown">{{ showBreakdown ? 'Hide breakdown' : 'View breakdown' }}</button>
             </div>
-            <div class="result-yaku"><h3>Han breakdown</h3><p v-for="yaku in result.yaku" :key="yaku.id"><span>{{ yaku.name }}</span><strong>{{ yaku.han }}</strong></p><p v-if="result.bonusHan"><span>Bonus dora</span><strong>{{ result.bonusHan }}</strong></p></div>
-            <p class="score-note">{{ form.winType === 'ron' ? 'The discarder pays the hand.' : 'Payments are rounded up to the next 100.' }} <template v-if="form.honba">Includes {{ form.honba }} honba.</template></p>
           </template>
-          <p v-if="!resultReady && shouldShowProblems" class="result-help">{{ result.issues[0] }}</p>
         </div>
       </aside>
 
-      <form class="calculator-form" aria-label="Riichi hand details" @submit.prevent>
-        <section class="calc-section" aria-labelledby="win-heading">
+      <form class="calculator-form" aria-label="Riichi hand details" @input="hasInteracted = true" @submit.prevent>
+        <section ref="winSection" class="calc-section win-section" tabindex="-1" aria-labelledby="win-heading">
           <div class="section-heading">
             <span class="step-number">1</span>
             <div>
               <h2 id="win-heading">How did you win?</h2>
-              <p>These details set your seat bonuses and payment.</p>
+              <p>Choose the win, your dealer status and whether you called tiles.</p>
             </div>
           </div>
 
@@ -64,11 +53,27 @@
             </button>
           </div>
 
+          <span class="field-label">Are you the dealer?</span>
+          <div class="choice-row" role="group" aria-label="Dealer status">
+            <button type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="form.seatWind = 'east'">Dealer</button>
+            <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="form.seatWind = isDealer ? 'south' : form.seatWind">Non-dealer</button>
+          </div>
+          <span class="field-label">Your hand</span>
+          <div class="choice-row" role="group" aria-label="Open or closed hand">
+            <button type="button" class="choice-button" :class="{ selected: isClosed }" :aria-pressed="isClosed" @click="form.isClosed = true">Closed</button>
+            <button type="button" class="choice-button" :class="{ selected: !isClosed }" :aria-pressed="!isClosed" @click="form.isClosed = false">Open</button>
+          </div>
+          <p class="field-hint">Chi, pon or an open kan makes the hand open. A concealed kan stays closed.</p>
+
+          <details class="table-settings">
+          <summary>Table settings · {{ form.playerCount }} players · {{ windNames[form.seatWind] }} seat · {{ windNames[form.roundWind] }} round</summary>
+          <span class="field-label">Your seat wind</span>
           <div class="choice-row" role="group" aria-label="Your seat wind">
             <button v-for="option in availableSeatWinds" :key="option.id" type="button" class="choice-button" :class="{ selected: form.seatWind === option.id }" :aria-pressed="form.seatWind === option.id" @click="form.seatWind = option.id">
               <span>{{ option.label }}</span><small v-if="option.id === 'east'">Dealer</small>
             </button>
           </div>
+          <span class="field-label">Round wind</span>
           <div class="choice-row" role="group" aria-label="Round wind">
             <button v-for="option in availableRoundWinds" :key="option.id" type="button" class="choice-button" :class="{ selected: form.roundWind === option.id }" :aria-pressed="form.roundWind === option.id" @click="form.roundWind = option.id">
               {{ option.label }} round
@@ -85,6 +90,7 @@
               <button type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three player</button>
             </div>
           </div>
+          </details>
         </section>
 
         <section class="calc-section" aria-labelledby="yaku-heading">
@@ -92,7 +98,7 @@
             <span class="step-number">2</span>
             <div>
               <h2 id="yaku-heading">Select your yaku</h2>
-              <p>Tap each yaku that applies. Common yaku are open; tap a group for the rest. Han shown for a {{ isClosed ? 'closed' : 'open' }} hand.</p>
+              <p>Tap your yaku. Han shown for your {{ isClosed ? 'closed' : 'open' }} hand.</p>
             </div>
           </div>
 
@@ -124,21 +130,10 @@
             <p v-if="yakuSearch && !filteredYaku.length" class="empty-search">No yaku match that search.</p>
           </div>
 
-          <div v-if="form.handShape === 'standard' && form.selectedYaku.includes('pinfu')" class="shape-confirmation">
-            <label class="checkbox-row">
-              <input v-model="form.allSequencesConfirmed" type="checkbox" />
-              <span>For Pinfu: I confirm all four groups are runs.</span>
-            </label>
-          </div>
+          <p v-if="isPinfu" class="automatic-note">Pinfu includes four runs, a non-value pair and a two-sided wait. {{ form.winType === 'ron' ? '30' : '20' }} fu automatically.</p>
+          <p v-else-if="form.handShape === 'chiitoitsu'" class="automatic-note">Seven Pairs: 25 fu automatically. No pair or wait questions needed.</p>
 
-          <div class="hand-shape-field">
-            <span class="field-label">Hand shape</span>
-            <div class="choice-row" role="group" aria-label="Hand shape">
-              <button v-for="shape in handShapes" :key="shape.id" type="button" class="choice-button" :class="{ selected: form.handShape === shape.id }" :aria-pressed="form.handShape === shape.id" @click="setHandShape(shape.id)">{{ shape.label }}</button>
-            </div>
-          </div>
-
-          <div v-if="selectedYakuman.length" class="variant-panel">
+          <div v-if="hasSpecialWait" class="variant-panel">
             <h3>Special waits</h3>
             <p class="field-hint">These waits double the matching yakuman on the cheat sheet.</p>
             <label v-if="form.selectedYaku.includes('kokushi')" class="checkbox-row">
@@ -154,9 +149,10 @@
               <span>Pure Nine Gates: nine-sided wait <strong>(double yakuman)</strong></span>
             </label>
           </div>
+          <ul v-if="shouldShowProblems && fieldIssues.yaku.length" class="field-problems"><li v-for="issue in fieldIssues.yaku" :key="issue">{{ issue }}</li></ul>
         </section>
 
-        <section class="calc-section" aria-labelledby="dora-heading">
+        <section v-if="!selectedYakuman.length" class="calc-section" aria-labelledby="dora-heading">
           <div class="section-heading">
             <span class="step-number">3</span>
             <div>
@@ -165,14 +161,13 @@
             </div>
           </div>
           <div class="bonus-grid">
-            <div v-for="bonus in bonusFields" :key="bonus.id" class="bonus-control">
+            <div v-for="bonus in visibleBonusFields" :key="bonus.id" class="bonus-control">
               <div class="bonus-copy"><label :for="`bonus-${bonus.id}`">{{ bonus.label }}</label><span>{{ bonus.hint }}</span></div>
               <div class="stepper" role="group" :aria-label="bonus.label">
-                <button type="button" :aria-label="`Remove one ${bonus.label.toLowerCase()}`" :disabled="form.bonusHan[bonus.id] <= 0 || (bonus.id === 'ura' && !canUseUra)" @click="adjustBonus(bonus.id, -1)">−</button>
-                <input :id="`bonus-${bonus.id}`" v-model.number="form.bonusHan[bonus.id]" type="number" inputmode="numeric" min="0" step="1" :disabled="bonus.id === 'ura' && !canUseUra" :aria-describedby="bonus.id === 'ura' && !canUseUra ? 'ura-hint' : undefined" @change="sanitizeBonus(bonus.id)" />
-                <button type="button" :aria-label="`Add one ${bonus.label.toLowerCase()}`" :disabled="bonus.id === 'ura' && !canUseUra" @click="adjustBonus(bonus.id, 1)">+</button>
+                <button type="button" :aria-label="`Remove one ${bonus.label.toLowerCase()}`" :disabled="form.bonusHan[bonus.id] <= 0" @click="adjustBonus(bonus.id, -1)">−</button>
+                <input :id="`bonus-${bonus.id}`" v-model.number="form.bonusHan[bonus.id]" type="number" inputmode="numeric" min="0" step="1" @change="sanitizeBonus(bonus.id)" />
+                <button type="button" :aria-label="`Add one ${bonus.label.toLowerCase()}`" @click="adjustBonus(bonus.id, 1)">+</button>
               </div>
-              <small v-if="bonus.id === 'ura' && !canUseUra" id="ura-hint" class="bonus-note">Riichi in a closed hand is needed.</small>
             </div>
             <div v-if="form.playerCount === 3" class="bonus-control">
               <div class="bonus-copy"><label for="bonus-nuki">North bonus tiles</label><span>One han per declared North tile</span></div>
@@ -182,38 +177,37 @@
                 <button type="button" aria-label="Add one North bonus tile" :disabled="form.bonusHan.nuki >= 4" @click="adjustBonus('nuki', 1, 4)">+</button>
               </div>
             </div>
-            <div class="bonus-control bonus-count">
-              <div class="bonus-copy"><span>Total bonus han</span><span>Dora cannot make a hand valid on its own.</span></div>
-              <strong>{{ result.bonusHan }}</strong>
-            </div>
           </div>
+          <p class="field-hint">{{ result.bonusHan }} bonus han · Dora alone is not a yaku.</p>
         </section>
 
-        <section v-if="needsFuQuestions" class="calc-section" aria-labelledby="fu-heading">
+        <section v-if="showFuSection" class="calc-section" aria-labelledby="fu-heading">
           <div class="section-heading">
-            <span class="step-number">4</span>
+            <span class="step-number">{{ selectedYakuman.length ? 3 : 4 }}</span>
             <div>
-              <h2 id="fu-heading">Count your fu</h2>
-              <p>Choose the pair and winning wait. Add each triplet or kan; runs are worth no fu.</p>
+              <h2 id="fu-heading">{{ needsFuQuestions ? 'Count your fu' : 'Check hand details' }}</h2>
+              <p>{{ needsFuQuestions ? 'Choose the pair and wait. Add triplets and kans; skip runs.' : 'Fu entry is not needed. You can correct previously entered details here.' }}</p>
             </div>
           </div>
 
-          <div class="fu-field">
+          <div v-if="showPairQuestion" class="fu-field">
             <span class="field-label">Your pair</span>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Pair type">
               <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id">{{ pair.label }} <small>+{{ pair.fu }} fu</small></button>
             </div>
             <p class="field-hint">A pair that is both your seat wind and round wind is 4 fu on this sheet.</p>
+            <ul v-if="shouldShowProblems && fieldIssues.pair.length" class="field-problems"><li v-for="issue in fieldIssues.pair" :key="issue">{{ issue }}</li></ul>
           </div>
 
-          <div class="fu-field">
+          <div v-if="showWaitQuestion" class="fu-field">
             <span class="field-label">Winning wait</span>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Winning wait">
-              <button v-for="wait in visibleWaits" :key="wait.id" type="button" class="choice-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id">{{ wait.label }} <small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
+              <button v-for="wait in waits" :key="wait.id" type="button" class="choice-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id">{{ wait.label }} <small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
             </div>
+            <ul v-if="shouldShowProblems && fieldIssues.wait.length" class="field-problems"><li v-for="issue in fieldIssues.wait" :key="issue">{{ issue }}</li></ul>
           </div>
 
-          <div v-if="form.handShape === 'standard'" class="fu-field group-builder">
+          <div v-if="showGroupBuilder" class="fu-field group-builder">
             <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add up to four groups. A winning triplet on ron counts as open for fu only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
@@ -229,6 +223,7 @@
               </div>
             </details>
             <p v-else class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
+            <ul v-if="shouldShowProblems && fieldIssues.groups.length" class="field-problems"><li v-for="issue in fieldIssues.groups" :key="issue">{{ issue }}</li></ul>
           </div>
         </section>
 
@@ -255,9 +250,15 @@
           </div>
         </details>
 
-        <section v-if="shouldShowProblems" class="validation-box" aria-live="polite" aria-labelledby="validation-heading">
-          <h2 id="validation-heading">A few details to check</h2>
-          <ul><li v-for="issue in result.issues" :key="issue">{{ issue }}</li></ul>
+        <section v-if="resultReady && showBreakdown" id="score-breakdown" ref="breakdownSection" class="calc-section score-details" tabindex="-1" aria-labelledby="breakdown-heading">
+          <h2 id="breakdown-heading">Score breakdown</h2>
+          <p class="score-note">{{ formatPoints(result.points) }} from the table<span v-if="form.honba">, including {{ form.honba }} honba</span>.<template v-if="result.riichiSticks"> Plus {{ formatPoints(result.riichiSticks) }} in riichi sticks: {{ formatPoints(result.totalReceived) }} received.</template></p>
+          <div v-if="result.fuBreakdown" class="fu-breakdown">
+            <h3>Fu breakdown <span>{{ result.fu }} total</span></h3>
+            <p v-for="(line, index) in fuLines" :key="index"><span>{{ line.label }}</span><strong>{{ line.fu ? `+${line.fu}` : '—' }}</strong></p>
+          </div>
+          <p v-else class="score-note">Fu does not affect this payment.</p>
+          <div class="result-yaku"><h3>{{ result.isYakuman ? 'Yakuman breakdown' : 'Han breakdown' }}</h3><p v-for="yaku in result.yaku" :key="yaku.id"><span>{{ yaku.name }}</span><strong>{{ result.isYakuman ? `${yaku.han / 13} × Yakuman` : `${yaku.han} han` }}</strong></p><p v-if="result.bonusHan"><span>Bonus dora</span><strong>{{ result.bonusHan }} han</strong></p></div>
         </section>
       </form>
     </div>
@@ -269,6 +270,7 @@ import { MANUAL_YAKU, calculateManualScore } from '~/utils/scoring/manual'
 
 useHead({
   title: 'Riichi Calculator | Saujana BGC',
+  bodyAttrs: { class: 'riichi-calculator-body' },
   meta: [{ name: 'description', content: 'Quickly estimate riichi mahjong han, fu and payments for ron or tsumo.' }],
 })
 
@@ -285,11 +287,6 @@ const winOptions = [
   { id: 'ron', label: 'Ron · from a discard' },
   { id: 'tsumo', label: 'Tsumo · self-drawn' },
 ]
-const handShapes = [
-  { id: 'standard', label: 'Four groups and a pair' },
-  { id: 'chiitoitsu', label: 'Seven pairs' },
-  { id: 'kokushi', label: 'Thirteen orphans' },
-]
 const pairOptions = [
   { id: 'simple', label: 'Number tile', fu: 0 },
   { id: 'non-value-wind', label: 'Non-value wind', fu: 0 },
@@ -304,10 +301,6 @@ const waits = [
   { id: 'kanchan', label: 'Middle', fu: 2 },
   { id: 'tanki', label: 'Pair', fu: 2 },
   { id: 'shanpon', label: 'Triplet', fu: 0 },
-]
-const specialWaits = [
-  { id: 'kokushi-thirteen', label: 'Thirteen-sided Kokushi wait', fu: 0 },
-  { id: 'chuuren-nine', label: 'Nine-sided pure Nine Gates wait', fu: 0 },
 ]
 const bonusFields = [
   { id: 'dora', label: 'Dora', hint: 'Each tile gives 1 han' },
@@ -330,13 +323,12 @@ const initialState = () => ({
   seatWind: 'south',
   roundWind: 'east',
   playerCount: 4,
+  isClosed: true,
   handShape: 'standard',
   selectedYaku: [],
-  allSequencesConfirmed: false,
   pairChoice: null,
   waitType: null,
   groups: [],
-  riichiDeclared: false,
   bonusHan: { dora: 0, red: 0, ura: 0, nuki: 0 },
   doubleYakumanWaits: { kokushi: false, suuankou: false, chuuren: false },
   honba: 0,
@@ -348,6 +340,9 @@ const yakuSearch = ref('')
 const openYakuCategories = ref(new Set(['common']))
 const categoriesBeforeSearch = ref(null)
 const hasInteracted = ref(false)
+const showBreakdown = ref(false)
+const breakdownSection = ref(null)
+const winSection = ref(null)
 let groupId = 0
 
 const windNames = { east: 'East', south: 'South', west: 'West', north: 'North' }
@@ -358,10 +353,13 @@ const availableSeatWinds = computed(() => {
 const availableRoundWinds = computed(() => ['east', 'south'].map(wind => ({ id: wind, label: windNames[wind] })))
 const isDealer = computed(() => form.seatWind === 'east')
 const availablePairOptions = computed(() => pairOptions.filter(pair => pair.id !== 'double-wind' || form.seatWind === form.roundWind))
-const isClosed = computed(() => form.handShape !== 'standard' || form.groups.every(group => group.concealed))
+const isClosed = computed(() => form.isClosed)
+const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
 const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.selectedYaku.includes('double-riichi'))
 const canUseUra = computed(() => isClosed.value && isRiichi.value)
 const selectedYakuman = computed(() => form.selectedYaku.filter(id => MANUAL_YAKU.find(yaku => yaku.id === id)?.yakuman))
+const hasSpecialWait = computed(() => selectedYakuman.value.some(id => ['kokushi', 'suuankou', 'chuuren'].includes(id)))
+const visibleBonusFields = computed(() => bonusFields.filter(bonus => bonus.id !== 'ura' || canUseUra.value))
 const filteredYaku = computed(() => {
   const search = yakuSearch.value.trim().toLowerCase()
   return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yaku.detail}`.toLowerCase().includes(search))
@@ -371,27 +369,6 @@ const visibleCategories = computed(() => categories.filter(category => yakuByCat
 const automaticYaku = computed(() => isClosed.value && form.winType === 'tsumo' && !selectedYakuman.value.length
   ? [{ id: 'menzen-tsumo', name: 'Menzen tsumo', han: 1 }]
   : [])
-const doubleWaits = computed(() => selectedYakuman.value.flatMap(id => {
-  if (id === 'kokushi' && form.doubleYakumanWaits.kokushi) return ['kokushi-thirteen']
-  if (id === 'suuankou' && form.doubleYakumanWaits.suuankou) return ['tanki']
-  if (id === 'chuuren' && form.doubleYakumanWaits.chuuren) return ['chuuren-nine']
-  return []
-}))
-const visibleWaits = computed(() => [...waits, ...specialWaits.filter(wait => doubleWaits.value.includes(wait.id))])
-const needsFuQuestions = computed(() => {
-  const selected = form.selectedYaku.map(id => MANUAL_YAKU.find(yaku => yaku.id === id)).filter(Boolean)
-  const yakumanUnits = selected.filter(yaku => yaku.yakuman).reduce((total, yaku) => {
-    const doubled = (yaku.id === 'kokushi' && form.doubleYakumanWaits.kokushi)
-      || (yaku.id === 'suuankou' && form.doubleYakumanWaits.suuankou)
-      || (yaku.id === 'chuuren' && form.doubleYakumanWaits.chuuren)
-    return total + (doubled ? 2 : 1)
-  }, 0)
-  if (yakumanUnits || form.handShape === 'kokushi') return false
-  const han = selected.reduce((sum, yaku) => sum + (isClosed.value ? yaku.closedHan : (yaku.openHan ?? yaku.closedHan)), 0)
-    + automaticYaku.value.reduce((sum, yaku) => sum + yaku.han, 0)
-    + Math.max(0, Number(form.bonusHan.dora) || 0) + Math.max(0, Number(form.bonusHan.red) || 0) + Math.max(0, Number(form.bonusHan.ura) || 0) + Math.max(0, Number(form.bonusHan.nuki) || 0)
-  return form.handShape === 'chiitoitsu' ? han < 5 : han < 5
-})
 
 function makeScoreInput() {
   const pairOption = pairOptions.find(pair => pair.id === form.pairChoice)
@@ -410,7 +387,6 @@ function makeScoreInput() {
     pairIsValue: pairOption ? pairOption.fu > 0 : null,
     waitType: form.waitType,
     groups: form.groups,
-    allSequencesConfirmed: form.allSequencesConfirmed,
     bonusHan: form.bonusHan,
     doubleYakumanWaits: form.doubleYakumanWaits,
     honba: integerAtLeastZero(form.honba),
@@ -422,6 +398,21 @@ function makeScoreInput() {
 const result = computed(() => calculateManualScore(makeScoreInput()))
 const resultReady = computed(() => result.value.issues.length === 0 && result.value.han > 0)
 const shouldShowProblems = computed(() => hasInteracted.value && result.value.issues.length > 0)
+const needsFuQuestions = computed(() => !result.value.isYakuman && result.value.han > 0 && result.value.han < 5 && form.handShape === 'standard' && !isPinfu.value)
+const showPairQuestion = computed(() => needsFuQuestions.value || (isPinfu.value && (pairOptions.find(pair => pair.id === form.pairChoice)?.fu ?? 0) > 0))
+const showWaitQuestion = computed(() => needsFuQuestions.value || (isPinfu.value && form.waitType !== null && form.waitType !== 'ryanmen'))
+const showGroupBuilder = computed(() => needsFuQuestions.value || fieldIssues.value.groups.length > 0)
+const showFuSection = computed(() => showPairQuestion.value || showWaitQuestion.value || showGroupBuilder.value)
+const fieldIssues = computed(() => {
+  const fields = { yaku: [], pair: [], wait: [], groups: [] }
+  for (const issue of result.value.issues) {
+    if (/^Choose your pair|^Pinfu needs a non-value pair|^A double-wind pair/.test(issue)) fields.pair.push(issue)
+    else if (/^Choose the wait|^Pinfu needs a two-sided wait/.test(issue)) fields.wait.push(issue)
+    else if (/groups|triplets|kans|requires a kan|triplet completed|winning-triplet/i.test(issue)) fields.groups.push(issue)
+    else fields.yaku.push(issue)
+  }
+  return fields
+})
 
 const fuLines = computed(() => {
   const breakdown = result.value.fuBreakdown
@@ -430,7 +421,7 @@ const fuLines = computed(() => {
   if (breakdown.closedRon) lines.push({ label: 'Closed ron', fu: breakdown.closedRon })
   if (breakdown.tsumo) lines.push({ label: 'Self-draw', fu: breakdown.tsumo })
   if (breakdown.pair) lines.push({ label: `Pair · ${pairOptions.find(pair => pair.id === form.pairChoice)?.label}`, fu: breakdown.pair })
-  form.groups.forEach((group, index) => {
+  form.groups.forEach(group => {
     const fu = groupFu(group)
     if (fu) lines.push({ label: groupName(group), fu })
   })
@@ -441,9 +432,7 @@ const fuLines = computed(() => {
 
 function yakuHanLabel(yaku) {
   if (yaku.yakuman) return 'Yakuman'
-  return yaku.openHan !== undefined && yaku.openHan !== yaku.closedHan
-    ? `${yaku.closedHan} / ${yaku.openHan} han`
-    : `${yaku.closedHan} han`
+  return `${isClosed.value ? yaku.closedHan : (yaku.openHan ?? yaku.closedHan)} han`
 }
 
 function isYakuCategoryOpen(categoryId) {
@@ -477,6 +466,8 @@ function isSelected(id) {
 }
 
 function isDisabled(id) {
+  const option = MANUAL_YAKU.find(yaku => yaku.id === id)
+  if (!isClosed.value && option?.requiresClosed) return true
   if (id === 'chiitoitsu') return form.handShape !== 'standard' && form.handShape !== 'chiitoitsu'
   if (id === 'kokushi') return form.handShape !== 'standard' && form.handShape !== 'kokushi'
   if (form.handShape === 'chiitoitsu' && ['pinfu', 'iipeiko', 'ryanpeiko', 'toitoi', 'sanankou', 'suuankou', 'chiitoitsu'].includes(id)) return true
@@ -484,8 +475,7 @@ function isDisabled(id) {
   const selected = new Set(form.selectedYaku)
   if (id === 'double-riichi' && selected.has('riichi')) return true
   if (id === 'riichi' && selected.has('double-riichi')) return true
-  const option = MANUAL_YAKU.find(yaku => yaku.id === id)
-  return option?.incompatible?.some(other => selected.has(other)) ?? false
+  return option?.incompatible?.some(other => selected.has(other)) || [...selected].some(other => MANUAL_YAKU.find(yaku => yaku.id === other)?.incompatible?.includes(id)) || false
 }
 
 function toggleYaku(id) {
@@ -493,7 +483,10 @@ function toggleYaku(id) {
   if (isSelected(id)) {
     form.selectedYaku = form.selectedYaku.filter(selected => selected !== id)
     if (id === 'chiitoitsu' || id === 'kokushi') form.handShape = 'standard'
-    if (id === 'pinfu') form.allSequencesConfirmed = false
+    if (id === 'kokushi' || id === 'suuankou' || id === 'chuuren') {
+      form.doubleYakumanWaits[id] = false
+      if (['kokushi-thirteen', 'chuuren-nine'].includes(form.waitType)) form.waitType = null
+    }
     return
   }
   if (isDisabled(id)) return
@@ -507,7 +500,6 @@ function setHandShape(shape) {
   form.groups = []
   form.pairChoice = null
   form.waitType = null
-  form.allSequencesConfirmed = false
   form.selectedYaku = form.selectedYaku.filter(id => !['chiitoitsu', 'kokushi'].includes(id))
   if (shape === 'chiitoitsu' || shape === 'kokushi') form.selectedYaku.push(shape === 'chiitoitsu' ? 'chiitoitsu' : 'kokushi')
   if (shape === 'chiitoitsu') openYakuCategories.value = new Set([...openYakuCategories.value, 'two-han'])
@@ -529,6 +521,7 @@ function groupFu(group) {
 function addGroup(option) {
   hasInteracted.value = true
   if (form.groups.length >= 4 || form.handShape !== 'standard') return
+  if (!option.concealed) form.isClosed = false
   form.groups.push({ id: ++groupId, type: option.type, tileKind: option.tileKind, concealed: option.concealed, completedByRon: false })
 }
 
@@ -556,16 +549,31 @@ function limitName(name) {
   })[name] ?? name
 }
 
-function resetCalculator() {
-  Object.assign(form, initialState())
+async function resetCalculator() {
+  const table = { playerCount: form.playerCount, seatWind: form.seatWind, roundWind: form.roundWind }
+  Object.assign(form, initialState(), table)
   yakuSearch.value = ''
+  categoriesBeforeSearch.value = null
+  openYakuCategories.value = new Set(['common'])
   hasInteracted.value = false
+  showBreakdown.value = false
+  await nextTick()
+  winSection.value?.focus({ preventScroll: true })
+  winSection.value?.scrollIntoView({ block: 'start', behavior: 'auto' })
+}
+
+async function toggleBreakdown() {
+  showBreakdown.value = !showBreakdown.value
+  if (showBreakdown.value) {
+    await nextTick()
+    breakdownSection.value?.focus({ preventScroll: true })
+    breakdownSection.value?.scrollIntoView({ block: 'start', behavior: 'auto' })
+  }
 }
 
 watch(() => form.playerCount, players => {
   if (players === 3 && form.seatWind === 'north') form.seatWind = 'south'
-  if (players === 4) return
-  form.bonusHan.nuki = Math.min(4, integerAtLeastZero(form.bonusHan.nuki))
+  form.bonusHan.nuki = players === 4 ? 0 : Math.min(4, integerAtLeastZero(form.bonusHan.nuki))
 }, { flush: 'sync' })
 
 watch(isClosed, closed => {
@@ -580,6 +588,12 @@ watch(() => [form.seatWind, form.roundWind], () => {
   if (form.pairChoice === 'double-wind' && form.seatWind !== form.roundWind) form.pairChoice = null
 })
 
+watch(() => [form.winType, form.waitType], () => {
+  if (form.winType !== 'ron' || form.waitType !== 'shanpon') form.groups.forEach(group => { group.completedByRon = false })
+}, { flush: 'sync' })
+
+watch(() => [form.winType, form.isClosed], () => { hasInteracted.value = true }, { flush: 'sync' })
+
 watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   if (search && !previousSearch) categoriesBeforeSearch.value = new Set(openYakuCategories.value)
   if (!search && previousSearch && categoriesBeforeSearch.value) {
@@ -592,15 +606,17 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 </script>
 
 <style scoped>
+:global(body.riichi-calculator-body) { overflow-x: clip; }
 .calculator-page { width: min(1140px, 92%); margin: 0 auto; padding: 0 0 52px; color: var(--clay-text); }
-.calculator-heading { max-width: 700px; margin: 0 auto 32px; padding: 8px 0 0 !important; text-align: center; }
+.calculator-heading { max-width: 700px; margin: 0 auto 22px; padding: 8px 0 0 !important; text-align: center; }
 .calculator-heading .page-eyebrow { margin-bottom: 14px; }
 .calculator-heading .hero-title { font-size: clamp(2.25rem, 5.3vw, 3.7rem); }
 .calculator-heading > p:last-child { max-width: 580px; margin: 14px auto 0; color: var(--muted); font-size: .95rem; line-height: 1.7; }
 .calculator-layout { display: grid; grid-template-areas: "form result"; grid-template-columns: minmax(0, 1fr) minmax(290px, 345px); align-items: start; gap: 22px; }
 .calculator-form { grid-area: form; min-width: 0; display: grid; gap: 16px; }
 .result-panel { grid-area: result; }
-.calc-section, .advanced-settings, .validation-box { min-width: 0; padding: clamp(18px, 3vw, 25px); border: 1px solid var(--line); border-radius: 11px; background: var(--white-pure); box-shadow: var(--shadow-card); }
+.calc-section, .advanced-settings { min-width: 0; padding: clamp(18px, 3vw, 25px); border: 1px solid var(--line); border-radius: 11px; background: var(--white-pure); box-shadow: var(--shadow-card); }
+.win-section { scroll-margin-top: 220px; }
 .section-heading { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
 .step-number { flex: 0 0 29px; width: 29px; height: 29px; display: grid; place-items: center; border-radius: 8px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .77rem; font-weight: 750; }
 .section-heading h2 { margin: 0; color: var(--matcha-leaf); font-size: 1.08rem; letter-spacing: -.015em; }
@@ -614,9 +630,11 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .hand-mode-row, .field-heading-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); }
 .field-label, .bonus-copy label, .bonus-copy > span:first-child { color: var(--matcha-leaf); font-size: .8rem; font-weight: 700; }
 .compact-choice { margin: 0; }
-.hand-shape-field { margin-top: 22px; }
-.hand-shape-field > .choice-row { margin-bottom: 0; }
-.shape-confirmation { margin-top: 16px; padding: 12px 14px; border-radius: 8px; background: var(--surface-soft); }
+.table-settings { margin-top: 18px; padding-top: 10px; border-top: 1px solid var(--line); }
+.table-settings > summary { min-height: 44px; color: var(--matcha-leaf); font-size: .75rem; cursor: pointer; }
+.table-settings[open] > summary { margin-bottom: 10px; }
+.automatic-note { margin: 14px 0 0; padding: 10px 12px; border-radius: 7px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .78rem; line-height: 1.55; }
+.field-problems { display: grid; gap: 5px; margin: 10px 0 0; padding-left: 18px; color: #823f38; font-size: .78rem; line-height: 1.5; }
 .checkbox-row { display: flex; align-items: flex-start; gap: 9px; color: var(--clay-text); font-size: .79rem; line-height: 1.55; cursor: pointer; }
 .checkbox-row > input { flex: 0 0 auto; width: 17px; height: 17px; margin: 2px 0 0; accent-color: var(--matcha-leaf); }
 .search-field { min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
@@ -629,7 +647,10 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .automatic-yaku strong small { opacity: .75; }
 .yaku-groups { display: grid; gap: 18px; margin-top: 20px; }
 .yaku-category { min-width: 0; }
-.yaku-category > summary { min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 2px; color: var(--matcha-leaf); font-size: .78rem; font-weight: 750; letter-spacing: .025em; cursor: pointer; }
+.yaku-category > summary { min-height: 42px; display: flex; align-items: center; gap: 12px; padding: 0 2px; color: var(--matcha-leaf); font-size: .78rem; font-weight: 750; letter-spacing: .025em; cursor: pointer; }
+.yaku-category > summary::before { content: '+'; font-size: 1rem; }
+.yaku-category[open] > summary::before { content: '−'; }
+.yaku-category > summary small { margin-left: auto; }
 .yaku-category > summary::marker { color: var(--gold-leaf); }
 .yaku-category > summary small { color: var(--muted); font-size: .67rem; font-weight: 500; letter-spacing: 0; }
 .yaku-category[open] > summary { margin-bottom: 9px; }
@@ -653,16 +674,13 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .bonus-control { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
 .bonus-copy { display: grid; gap: 3px; min-width: 0; }
 .bonus-copy label { cursor: pointer; }
-.bonus-copy > span:not(:first-child), .bonus-note { color: var(--muted); font-size: .68rem; line-height: 1.4; }
-.bonus-count { background: var(--surface-soft); }
-.bonus-count > strong { color: var(--matcha-leaf); font-size: 1.35rem; }
+.bonus-copy > span:not(:first-child) { color: var(--muted); font-size: .68rem; line-height: 1.4; }
 .stepper { display: flex; align-items: center; min-height: 40px; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
 .stepper button { width: 38px; height: 40px; border: 0; background: var(--surface-soft); color: var(--matcha-leaf); font: 600 1.1rem var(--font-body); cursor: pointer; }
 .stepper button:disabled { opacity: .4; cursor: not-allowed; }
 .stepper input { width: 45px; height: 40px; padding: 4px; border: 0; border-radius: 0; background: white; color: var(--clay-text); text-align: center; font-size: .95rem; font-variant-numeric: tabular-nums; }
 .stepper input::-webkit-inner-spin-button, .stepper input::-webkit-outer-spin-button { appearance: none; margin: 0; }
 .stepper input[type=number] { appearance: textfield; }
-.bonus-note { flex: 1 0 100%; margin-top: -6px; }
 .fu-field + .fu-field { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
 .fu-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .fu-choice-grid .choice-button { min-height: 52px; }
@@ -690,9 +708,6 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .advanced-settings[open] { padding-bottom: 18px; }
 .advanced-content { display: grid; gap: 10px; }
 .advanced-content > p { margin: 3px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.55; }
-.validation-box { border-color: #d5b5a8; background: #fbf5f1; }
-.validation-box h2 { margin: 0 0 8px; color: #823f38; font-size: .88rem; }
-.validation-box ul { display: grid; gap: 6px; margin: 0; padding-left: 19px; color: #70423c; font-size: .78rem; line-height: 1.5; }
 .result-panel { position: sticky; top: 105px; overflow: hidden; border: 1px solid #cdd5c9; border-radius: 12px; background: var(--white-pure); box-shadow: 0 12px 32px rgba(44,55,40,.08); }
 .result-inner { padding: 22px; }
 .result-ready { border-color: var(--matcha-leaf); }
@@ -702,27 +717,23 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .result-amount { margin: 19px 0 17px; }
 .result-amount > span { display: block; color: var(--muted); font-size: .8rem; }
 .result-amount > strong { display: block; margin: 2px 0; color: var(--matcha-leaf); font-size: clamp(2rem, 4vw, 2.8rem); font-variant-numeric: tabular-nums; letter-spacing: -.045em; line-height: 1.15; }
-.result-amount > p { margin: 4px 0 0; color: var(--muted); font-size: .76rem; }
-.received-total { padding-top: 11px; border-top: 1px solid var(--line); }
+.received-total { margin: 8px 0; color: var(--muted); font-size: .76rem; }
 .received-total strong { color: var(--matcha-leaf); font-size: .95rem; }
 .result-empty { display: flex; align-items: center; gap: 11px; margin: 17px 0; color: var(--muted); }
-.result-mark { flex: 0 0 32px; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--matcha-leaf); font-family: var(--font-display); }
 .result-empty p { margin: 0; font-size: .81rem; line-height: 1.55; }
-.score-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.score-metric { flex: 1; min-width: 65px; display: grid; gap: 2px; }
-.score-metric > span { color: var(--muted); font-size: .69rem; }
-.score-metric > strong { color: var(--matcha-leaf); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
-.score-metric > strong small { font-size: .62rem; font-weight: 500; }
+.score-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0 0; margin-top: 10px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--matcha-leaf); }
+.breakdown-button { margin-left: auto; min-height: 36px; padding: 4px 0 4px 6px; border: 0; background: transparent; color: var(--matcha-leaf); font-size: .72rem; text-decoration: underline; cursor: pointer; }
+.score-details { scroll-margin-top: 130px; }
+.score-details h2 { margin: 0; color: var(--matcha-leaf); font-size: 1.08rem; }
 .limit-badge { padding: 5px 9px; border-radius: 5px; background: #eee9d9; color: #695b3c; font-size: .68rem; font-weight: 750; }
-.yakuman-note { flex-basis: 100%; margin: 0; color: var(--muted); font-size: .69rem; }
 .payment-list, .fu-breakdown, .result-yaku { margin-top: 15px; }
 .payment-list h3, .fu-breakdown h3, .result-yaku h3 { display: flex; justify-content: space-between; gap: 10px; margin: 0 0 5px; color: var(--matcha-leaf); font-size: .76rem; }
 .fu-breakdown h3 span { color: var(--muted); font-weight: 500; }
 .payment-list p, .fu-breakdown p, .result-yaku p { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 5px 0; border-bottom: 1px solid #eeece4; color: var(--muted); font-size: .72rem; line-height: 1.4; }
 .payment-list p strong, .fu-breakdown p strong, .result-yaku p strong { color: var(--clay-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.score-note, .result-help { margin: 14px 0 0; color: var(--muted); font-size: .68rem; line-height: 1.55; }
+.score-note { margin: 14px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.55; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.choice-button:focus-visible, .yaku-option:focus-visible, .stepper button:focus-visible, .group-option-grid button:focus-visible, .remove-group:focus-visible, .reset-button:focus-visible, summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
+.choice-button:focus-visible, .yaku-option:focus-visible, .stepper button:focus-visible, .group-option-grid button:focus-visible, .remove-group:focus-visible, .reset-button:focus-visible, .breakdown-button:focus-visible, summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
 @media (max-width: 900px) {
   .calculator-layout { grid-template-columns: minmax(0, 1fr) minmax(260px, 300px); gap: 14px; }
   .result-inner { padding: 17px; }
@@ -730,22 +741,21 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 @media (max-width: 760px) {
   .calculator-page { width: min(620px, calc(100% - 24px)); padding-bottom: 38px; }
   .calculator-heading { margin-bottom: 20px; }
-  .calculator-layout { grid-template-areas: "result" "form"; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .calculator-layout { display: flex; flex-direction: column; gap: 12px; }
+  .calculator-form, .result-panel { width: 100%; box-sizing: border-box; }
   .result-panel { position: sticky; top: 78px; z-index: 5; }
   .result-inner { padding: 12px 15px; }
   .result-heading-row { align-items: center; }
   .result-amount { margin: 8px 0; }
   .result-amount > strong { display: inline; margin-right: 7px; font-size: 1.45rem; }
   .result-amount > span { display: inline; font-size: .72rem; margin-right: 7px; }
-  .result-amount > p { display: inline; font-size: .7rem; }
-  .received-total { padding-left: 9px; border-top: 0; border-left: 1px solid var(--line); }
+  .received-total { margin: 7px 0; padding-top: 0; border: 0; font-size: .7rem; }
   .result-empty { margin: 7px 0 0; }
-  .result-empty .result-mark { display: none; }
-  .score-summary { padding: 7px 0; }
-  .score-metric { display: flex; align-items: baseline; gap: 6px; }
-  .score-metric > strong { font-size: .88rem; }
-  .limit-badge { margin-left: auto; }
-  .payment-list, .fu-breakdown, .result-yaku, .score-note { display: none; }
+  .score-summary { padding: 3px 0 0; margin-top: 7px; font-size: .75rem; }
+  .payment-list { margin-top: 5px; }
+  .payment-list p { padding: 3px 0; }
+  .payment-list p strong { font-size: 1rem; }
+  .score-details { scroll-margin-top: 300px; }
   .yaku-grid { grid-template-columns: minmax(0, 1fr); }
   .fu-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .bonus-grid { grid-template-columns: minmax(0, 1fr); }

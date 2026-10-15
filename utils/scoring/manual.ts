@@ -89,7 +89,6 @@ export interface ManualScoreInput {
   waitType: ManualWait | null;
   pairIsValue: boolean | null;
   groups: ManualGroup[];
-  allSequencesConfirmed: boolean;
   bonusHan: { dora: number; red: number; ura: number; nuki: number };
   doubleYakumanWaits: { kokushi: boolean; suuankou: boolean; chuuren: boolean };
   honba: number;
@@ -163,11 +162,12 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   const issues: string[] = [];
   const selected = new Set(input.selectedYaku);
   const selectedYakuman = input.selectedYaku.filter((id) => selectedOption(id)?.yakuman);
-  const isYakumanHand = selectedYakuman.length > 0;
+  const needsGroupFu = selectedYakuman.length === 0 && manualHandValue(input).han < 5;
   const isSevenPairs = input.handShape === "chiitoitsu" || selected.has("chiitoitsu");
 
-  if (selected.size === 0) issues.push("Select at least one yaku. Dora alone cannot complete a winning hand.");
+  if (selected.size === 0 && !(input.isClosed && input.winType === "tsumo")) issues.push("Select at least one yaku. Dora alone cannot complete a winning hand.");
   if (input.groups.length > 4) issues.push("A hand can have no more than four groups.");
+  if (input.isClosed && input.groups.some((group) => !group.concealed)) issues.push("Called groups require an open hand. Change the hand to open or remove the called groups.");
   if (input.handShape === "kokushi" && input.groups.length) issues.push("Kokushi musou has no sets. Remove the listed groups.");
   if (input.riichiDeclared && !input.isClosed) issues.push("Riichi requires a closed hand.");
   if ((input.bonusHan.ura > 0) && (!input.isClosed || !input.riichiDeclared)) issues.push("Ura dora requires a closed hand with riichi.");
@@ -180,7 +180,7 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (selected.has("rinshan") && input.winType !== "tsumo") issues.push("Rinshan is a self-drawn win.");
   if (selected.has("haitei") && input.winType !== "tsumo") issues.push("Haitei is a self-drawn win.");
   if ((selected.has("chankan") || selected.has("houtei")) && input.winType !== "ron") issues.push("Chankan and houtei require a ron win.");
-  if (selected.has("rinshan") && input.groups.every((group) => group.type !== "kan")) issues.push("Rinshan requires a kan in the winning hand.");
+  if (needsGroupFu && selected.has("rinshan") && input.groups.every((group) => group.type !== "kan")) issues.push("Rinshan requires a kan in the winning hand.");
   if (selected.has("renhou") && input.winType !== "ron") issues.push("Renhou requires a ron win before your first draw.");
 
   for (const id of selected) {
@@ -198,9 +198,9 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     if (otherYaku.length || (input.isClosed && input.winType === "tsumo")) issues.push("The cheat sheet says Renhou does not stack with other yaku.");
   }
   if (selected.has("pinfu")) {
-    if (!input.allSequencesConfirmed || input.groups.length) issues.push("Confirm all four groups are runs for pinfu.");
+    if (input.groups.length) issues.push("Pinfu has only runs. Remove the listed triplets or kans, or deselect Pinfu.");
     if ((input.pairFu !== null && input.pairFu !== 0) || input.pairIsValue === true) issues.push("Pinfu needs a non-value pair.");
-    if (input.waitType !== "ryanmen") issues.push("Pinfu needs a two-sided wait.");
+    if (input.waitType !== null && input.waitType !== "ryanmen") issues.push("Pinfu needs a two-sided wait.");
     if (!input.isClosed) issues.push("Pinfu requires a closed hand.");
   }
   if (input.pairChoice === "double-wind" && input.seatWind !== input.roundWind) {
@@ -211,14 +211,22 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (input.handShape === "chiitoitsu" && !selected.has("chiitoitsu")) issues.push("Seven pairs includes Chiitoitsu; select it as your yaku.");
   if (input.handShape !== "chiitoitsu" && selected.has("chiitoitsu")) issues.push("Choose Seven pairs as the hand shape for Chiitoitsu.");
   if (isSevenPairs && input.groups.length) issues.push("Seven pairs has no triplets, kans or group fu. Remove the listed groups.");
-  if (selected.has("toitoi") && input.groups.length !== 4) issues.push("Toitoi requires four triplets or kans. Add each group to check its fu.");
-  if (selected.has("sankantsu") && input.groups.filter((group) => group.type === "kan").length < 3) issues.push("Sankantsu requires at least three kans. Add each kan.");
-  if (selected.has("suuankantsu") && input.groups.filter((group) => group.type === "kan").length < 4) issues.push("Suukantsu requires four kans. Add each kan.");
-  if (selected.has("sanankou") && input.groups.filter((group) => group.type === "triplet" && group.concealed && !(input.winType === "ron" && group.completedByRon)).length + input.groups.filter((group) => group.type === "kan" && group.concealed).length < 3) {
+  if (needsGroupFu && selected.has("toitoi") && input.groups.length !== 4) issues.push("Toitoi requires four triplets or kans. Add each group to check its fu.");
+  if (needsGroupFu && selected.has("sankantsu") && input.groups.filter((group) => group.type === "kan").length < 3) issues.push("Sankantsu requires at least three kans. Add each kan.");
+  if (needsGroupFu && selected.has("sanankou") && input.groups.filter((group) => group.type === "triplet" && group.concealed && !(input.winType === "ron" && group.completedByRon)).length + input.groups.filter((group) => group.type === "kan" && group.concealed).length < 3) {
     issues.push("Sanankou needs at least three concealed triplets or kans. Mark calls and any triplet completed by ron correctly.");
   }
-  if (selected.has("suuankou") && (input.groups.filter((group) => group.concealed && !(input.winType === "ron" && group.completedByRon)).length < 4 || !input.isClosed)) {
-    issues.push("Suuankou requires four concealed triplets or kans in a closed hand. Mark a ron-completed triplet if needed.");
+  if (!needsGroupFu) {
+    const remainingGroups = Math.max(0, 4 - input.groups.length);
+    const kans = input.groups.filter((group) => group.type === "kan").length;
+    const concealed = input.groups.filter((group) => group.concealed && !(input.winType === "ron" && group.completedByRon)).length;
+    if (selected.has("rinshan") && kans + remainingGroups < 1) issues.push("Rinshan needs a kan. Correct the listed groups or deselect Rinshan.");
+    if (selected.has("sankantsu") && kans + remainingGroups < 3) issues.push("Sankantsu needs three kans. Correct the listed groups or deselect Sankantsu.");
+    if (selected.has("suuankantsu") && kans + remainingGroups < 4) issues.push("Suukantsu needs four kans. Correct the listed groups or deselect Suukantsu.");
+    if (selected.has("sanankou") && concealed + remainingGroups < 3) issues.push("Sanankou needs three concealed groups. Correct the listed groups or deselect Sanankou.");
+  }
+  if (selected.has("suuankou") && input.groups.some((group) => !group.concealed || (input.winType === "ron" && group.completedByRon))) {
+    issues.push("Suuankou needs concealed groups. Remove called groups or any triplet completed by ron.");
   }
   if (selected.has("suuankou") && input.doubleYakumanWaits.suuankou && input.waitType !== "tanki") issues.push("Double Suuankou requires a pair wait (tanki).");
   if (selected.has("kokushi") && input.doubleYakumanWaits.kokushi && input.waitType !== "kokushi-thirteen") issues.push("Double Kokushi requires a thirteen-sided wait.");
@@ -233,9 +241,10 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   return [...new Set(issues)];
 }
 
-export function calculateManualScore(input: ManualScoreInput): ManualScoreResult {
+// Yaku selections declare the hand pattern. Detailed groups are required only
+// when their fu can change the payment; explicit contradictions still validate.
+function manualHandValue(input: ManualScoreInput) {
   const selected = new Set(input.selectedYaku);
-  const yakuman = input.selectedYaku.filter((id) => selectedOption(id)?.yakuman);
   const units = yakumanUnits(input);
   const hasYakuman = units > 0;
   const isSevenPairs = input.handShape === "chiitoitsu";
@@ -271,6 +280,13 @@ export function calculateManualScore(input: ManualScoreInput): ManualScoreResult
 
   const bonus = hasYakuman ? 0 : Math.max(0, input.bonusHan.dora) + Math.max(0, input.bonusHan.red) + Math.max(0, input.bonusHan.ura) + Math.max(0, input.bonusHan.nuki);
   const han = printedYaku.reduce((sum, yaku) => sum + yaku.han, 0) + bonus;
+  return { printedYaku, bonus, han, units, hasYakuman };
+}
+
+export function calculateManualScore(input: ManualScoreInput): ManualScoreResult {
+  const selected = new Set(input.selectedYaku);
+  const isSevenPairs = input.handShape === "chiitoitsu";
+  const { printedYaku, bonus, han, units, hasYakuman } = manualHandValue(input);
   const requiresFu = !hasYakuman && han < 5;
   const issues = manualScoringIssues(input);
 
@@ -278,19 +294,21 @@ export function calculateManualScore(input: ManualScoreInput): ManualScoreResult
   if (requiresFu && isSevenPairs) {
     fuBreakdown = { base: 25, closedRon: 0, tsumo: 0, pair: 0, groups: 0, wait: 0, raw: 25, total: 25 };
   } else if (requiresFu) {
-    if (input.pairFu === null) issues.push("Choose your pair to count fu.");
-    if (input.waitType === null) issues.push("Choose the wait completed by your winning tile.");
     if (selected.has("pinfu")) {
       fuBreakdown = { base: input.winType === "ron" ? 30 : 20, closedRon: 0, tsumo: 0, pair: 0, groups: 0, wait: 0, raw: input.winType === "ron" ? 30 : 20, total: input.winType === "ron" ? 30 : 20 };
-    } else if (input.waitType !== null && input.pairFu !== null && input.pairIsValue !== null) {
-      const groupFu = input.groups.reduce((sum, group) => sum + tripletFu(group), 0);
-      const waitFu = ["penchan", "kanchan", "tanki"].includes(input.waitType) ? 2 : 0;
-      const closedRon = input.winType === "ron" && input.isClosed ? 10 : 0;
-      const tsumo = input.winType === "tsumo" ? 2 : 0;
-      const base = 20;
-      const raw = base + closedRon + tsumo + input.pairFu + groupFu + waitFu;
-      const total = Math.max(30, Math.ceil(raw / 10) * 10);
-      fuBreakdown = { base, closedRon, tsumo, pair: input.pairFu, groups: groupFu, wait: waitFu, raw, total };
+    } else {
+      if (input.pairFu === null) issues.push("Choose your pair to count fu.");
+      if (input.waitType === null) issues.push("Choose the wait completed by your winning tile.");
+      if (input.waitType !== null && input.pairFu !== null) {
+        const groupFu = input.groups.reduce((sum, group) => sum + tripletFu(group), 0);
+        const waitFu = ["penchan", "kanchan", "tanki"].includes(input.waitType) ? 2 : 0;
+        const closedRon = input.winType === "ron" && input.isClosed ? 10 : 0;
+        const tsumo = input.winType === "tsumo" ? 2 : 0;
+        const base = 20;
+        const raw = base + closedRon + tsumo + input.pairFu + groupFu + waitFu;
+        const total = Math.max(30, Math.ceil(raw / 10) * 10);
+        fuBreakdown = { base, closedRon, tsumo, pair: input.pairFu, groups: groupFu, wait: waitFu, raw, total };
+      }
     }
   }
 
