@@ -185,6 +185,7 @@ export function useAdminAuth() {
     if (nextSession.user?.app_metadata?.role !== REQUIRED_ROLE) return false
     if (revision !== authRevision) return false
     saveSession(nextSession, rememberMe ? 'local' : 'session')
+    isRestoring.value = false
     return true
   }
 
