@@ -1,6 +1,6 @@
 <template>
   <main class="admin-root">
-    <section v-if="!auth.isAuthenticated" class="admin-login-wrap">
+    <section v-if="auth.isRestoring || !auth.isAuthenticated" class="admin-login-wrap">
       <div class="admin-login-intro"><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>One organiser sign-in for Birthday Club and Riichi Open.</p></div>
       <form class="admin-login-card" @submit.prevent="submitLogin">
         <label>Username<input v-model="username" autocomplete="username" required></label>
