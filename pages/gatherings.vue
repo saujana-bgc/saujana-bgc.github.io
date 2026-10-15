@@ -96,12 +96,57 @@
               <p>Use the name you’d like us to know you by. Still deciding? Add “tentative” in the notes.</p>
             </div>
 
-            <div v-if="canEditEvent(event)" class="attendees-actions attendees-actions-primary">
-              <button v-if="!newRows[event.id]" @click="addRow(event.id)" class="btn-add">Add my name</button>
-              <template v-else>
-                <button @click="saveNewRow(event.id)" class="btn-save">Join the list</button>
-                <button @click="cancelNewRow(event.id)" class="btn-cancel">Cancel</button>
-              </template>
+            <div v-if="canEditEvent(event)" class="signup-section">
+              <p v-if="signupSuccess[event.id]" class="signup-success" role="status">{{ signupSuccess[event.id] }}</p>
+              <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
+                <button :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }}</button>
+              </div>
+              <form
+                v-else
+                :ref="el => setSignupFormRef(event.id, el)"
+                class="signup-form"
+                :aria-labelledby="`signup-title-${event.id}`"
+                :aria-busy="Boolean(savingRows[event.id])"
+                @submit.prevent="saveNewRow(event.id)"
+              >
+                <div class="signup-form-heading">
+                  <h4 :id="`signup-title-${event.id}`">Your signup</h4>
+                  <p>Only your name is required. Tap “Join the list” below to save your signup.</p>
+                </div>
+                <fieldset class="signup-fields" :disabled="savingRows[event.id]">
+                  <legend class="signup-sr-only">Your details</legend>
+                  <div class="signup-field">
+                    <label :for="`signup-name-${event.id}`">Name <span class="signup-required">(required)</span></label>
+                    <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-error-${event.id}` : undefined" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @blur="hideNameAutocompleteSoon" />
+                    <p v-if="nameErrors[event.id]" :id="`signup-name-error-${event.id}`" class="signup-error" role="alert">Add the name you’d like us to know you by.</p>
+                  </div>
+                  <div class="signup-field">
+                    <label :for="`signup-eta-${event.id}`">Arrival time <span>(optional)</span></label>
+                    <input :id="`signup-eta-${event.id}`" v-model="newRows[event.id].eta" name="eta" type="time" class="signup-input" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, newRows[event.id])" />
+                  </div>
+                  <div class="signup-field">
+                    <label :for="`signup-games-${event.id}`">Games to bring <span>(optional)</span></label>
+                    <textarea :id="`signup-games-${event.id}`" v-model="newRows[event.id].bringing_games" name="bringing_games" class="signup-input signup-area" placeholder="Any games you’d like to share" rows="2" />
+                  </div>
+                  <div class="signup-field">
+                    <label :for="`signup-notes-${event.id}`">Notes <span>(optional)</span></label>
+                    <textarea :id="`signup-notes-${event.id}`" v-model="newRows[event.id].notes" name="notes" class="signup-input signup-area" placeholder="First visit, tentative, bringing a friend…" rows="2" />
+                  </div>
+                  <div class="signup-field signup-field-spend">
+                    <label :for="`signup-spend-${event.id}`">Spent (RM) <span>(optional)</span></label>
+                    <input :id="`signup-spend-${event.id}`" v-model="newRows[event.id].amount_spent" name="amount_spent" type="number" inputmode="decimal" step="0.01" min="10" class="signup-input" placeholder="Leave blank until you’ve ordered" :aria-describedby="`signup-spend-hint-${event.id}`" />
+                    <p :id="`signup-spend-hint-${event.id}`" class="signup-field-hint">Minimum spend is RM10 per person. You can add it to your entry after ordering.</p>
+                  </div>
+                </fieldset>
+                <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
+                <div class="signup-form-footer">
+                  <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your signup…' : 'Your signup hasn’t been saved yet.' }}</p>
+                  <div class="signup-submit-actions">
+                    <button type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Joining…' : 'Join the list' }}</button>
+                    <button type="button" class="btn-cancel" :disabled="savingRows[event.id]" @click="cancelNewRow(event.id)">Cancel</button>
+                  </div>
+                </div>
+              </form>
             </div>
 
             <div class="attendees-header">
@@ -150,14 +195,6 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-if="canEditEvent(event) && newRows[event.id]" :ref="el => setNewRowRef(event.id, el)" class="new-row">
-                    <td><input v-model="newRows[event.id].name" class="cell-input" :class="{ 'input-error': nameErrors[event.id] }" placeholder="Your name *" autocomplete="off" @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @blur="hideNameAutocompleteSoon" /></td>
-                    <td><input v-model="newRows[event.id].eta" type="time" class="cell-input" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, newRows[event.id])" /></td>
-                    <td><input v-model="newRows[event.id].amount_spent" type="number" step="0.01" min="10" class="cell-input cell-number" /></td>
-                    <td><textarea v-model="newRows[event.id].bringing_games" class="cell-input cell-area" placeholder="Games to bring" rows="1" @input="autoResize" /></td>
-                    <td><textarea v-model="newRows[event.id].notes" class="cell-input cell-area" placeholder="Anything the host should know?" rows="1" @input="autoResize" /></td>
-                    <td></td>
-                  </tr>
                   <tr v-for="attendee in attendeesByEvent[event.id] ?? []" :key="attendee.id">
                     <td>
                       <input v-model="attendee.name" class="cell-input" autocomplete="off" :readonly="!canEditEvent(event)" @focus="showNameAutocomplete($event, attendee)" @input="showNameAutocomplete($event, attendee)" @blur="onExistingNameBlur(attendee, event)" />
@@ -186,27 +223,6 @@
 
             <!-- Mobile cards -->
             <div class="attendees-cards">
-              <div v-if="canEditEvent(event) && newRows[event.id]" :ref="el => setNewCardRef(event.id, el)" class="attendee-card new-card">
-                <div class="card-header">
-                  <input v-model="newRows[event.id].name" class="card-name-input" :class="{ 'input-error': nameErrors[event.id] }" placeholder="Your name *" autocomplete="off" @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @blur="hideNameAutocompleteSoon" />
-                </div>
-                <div class="card-field">
-                  <span class="card-label">ETA</span>
-                  <input v-model="newRows[event.id].eta" type="time" class="card-value-input" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, newRows[event.id])" />
-                </div>
-                <div class="card-field">
-                  <span class="card-label">Spent (RM)</span>
-                  <input v-model="newRows[event.id].amount_spent" type="number" step="0.01" min="10" class="card-value-input" />
-                </div>
-                <div class="card-field">
-                  <span class="card-label">Bringing</span>
-                  <textarea v-model="newRows[event.id].bringing_games" class="card-value-input card-area" placeholder="Games to bring" rows="1" @input="autoResize" />
-                </div>
-                <div class="card-field">
-                  <span class="card-label">Notes</span>
-                  <textarea v-model="newRows[event.id].notes" class="card-value-input card-area" placeholder="Anything the host should know?" rows="1" @input="autoResize" />
-                </div>
-              </div>
               <div v-for="attendee in attendeesByEvent[event.id] ?? []" :key="attendee.id" class="attendee-card">
                 <div class="card-header">
                   <input v-model="attendee.name" class="card-name-input" autocomplete="off" :readonly="!canEditEvent(event)" @focus="showNameAutocomplete($event, attendee)" @input="showNameAutocomplete($event, attendee)" @blur="onExistingNameBlur(attendee, event)" />
@@ -324,9 +340,11 @@ const attendeesByEvent = reactive({})
 const savedPayloads = new Map()
 const attendeeEventIds = new Set()
 const newRows = reactive({})
-const newRowRefs = new Map()
-const newCardRefs = new Map()
+const signupFormRefs = new Map()
 const nameErrors = reactive({})
+const savingRows = reactive({})
+const signupErrors = reactive({})
+const signupSuccess = reactive({})
 const attendeeNameOptions = ref([])
 const nameAutocomplete = reactive({ visible: false, row: null, x: 0, y: 0, width: 240 })
 const pendingDelete = ref(null)
@@ -705,30 +723,22 @@ async function doDelete() {
     pendingDelete.value = null
 }
 
-function setNewRowRef(eventId, el) {
-    if (el) newRowRefs.set(eventId, el)
-    else newRowRefs.delete(eventId)
+function setSignupFormRef(eventId, el) {
+    if (el) signupFormRefs.set(eventId, el)
+    else signupFormRefs.delete(eventId)
 }
 
-function setNewCardRef(eventId, el) {
-    if (el) newCardRefs.set(eventId, el)
-    else newCardRefs.delete(eventId)
-}
-
-function isVisible(el) {
-    return Boolean(el?.offsetParent)
-}
-
-async function scrollToNewRow(eventId) {
+async function focusSignupForm(eventId) {
     await nextTick()
-    const target = [newCardRefs.get(eventId), newRowRefs.get(eventId)].find(isVisible)
-        ?? newCardRefs.get(eventId)
-        ?? newRowRefs.get(eventId)
-
-    target?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
-
-    const input = target?.querySelector('input, textarea')
+    const target = signupFormRefs.get(eventId)
+    target?.scrollIntoView({ block: 'start', inline: 'nearest' })
+    const input = target?.querySelector('input[name="name"]')
     input?.focus({ preventScroll: true })
+}
+
+async function focusSignupTrigger(eventId) {
+    await nextTick()
+    document.getElementById(`signup-trigger-${eventId}`)?.focus()
 }
 
 async function addRow(eventId) {
@@ -737,19 +747,28 @@ async function addRow(eventId) {
         return
     }
 
-    const savedName = localStorage.getItem('saujana_name') || ''
+    let savedName = ''
+    try {
+        if (!signupSuccess[eventId]) savedName = localStorage.getItem('saujana_name') || ''
+    } catch {}
+    delete signupSuccess[eventId]
+    delete signupErrors[eventId]
+    delete nameErrors[eventId]
     newRows[eventId] = { name: savedName, eta: '', amount_spent: null, bringing_games: '', notes: '' }
-    await scrollToNewRow(eventId)
+    await focusSignupForm(eventId)
 }
 
 function cancelNewRow(eventId) {
+    if (savingRows[eventId]) return
+    nameAutocomplete.visible = false
     delete newRows[eventId]
     delete nameErrors[eventId]
-    newRowRefs.delete(eventId)
-    newCardRefs.delete(eventId)
+    delete signupErrors[eventId]
+    focusSignupTrigger(eventId)
 }
 
 async function saveNewRow(eventId) {
+    if (savingRows[eventId] || !newRows[eventId]) return
     const event = findEventById(eventId)
     if (!canEditEvent(event)) {
         showToast('Sign-ups for this gathering are closed.')
@@ -759,35 +778,47 @@ async function saveNewRow(eventId) {
     const row = newRows[eventId]
     if (!row.name.trim()) {
         nameErrors[eventId] = true
+        await focusSignupForm(eventId)
         return
     }
     nameErrors[eventId] = false
     if (!validateEtaForEvent(event, row)) return
     if (!validateMinimumSpend(row)) return
 
-    const { data } = await supabase
-        .from('attendees')
-        .insert({
-            event_id: eventId,
-            name: row.name.trim(),
-            eta: row.eta || null,
-            amount_spent: row.amount_spent ? parseFloat(row.amount_spent) : null,
-            bringing_games: row.bringing_games || null,
-            notes: row.notes || null,
-        })
-        .select()
-        .single()
+    savingRows[eventId] = true
+    delete signupErrors[eventId]
+    nameAutocomplete.visible = false
+    try {
+        const { data, error } = await supabase
+            .from('attendees')
+            .insert({
+                event_id: eventId,
+                name: row.name.trim(),
+                eta: row.eta || null,
+                amount_spent: row.amount_spent ? parseFloat(row.amount_spent) : null,
+                bringing_games: row.bringing_games || null,
+                notes: row.notes || null,
+            })
+            .select()
+            .single()
 
-    if (data) {
+        if (error || !data) {
+            signupErrors[eventId] = 'Your signup hasn’t been saved. Your details are still here; please try “Join the list” again.'
+            return
+        }
         if (!attendeesByEvent[eventId]) attendeesByEvent[eventId] = []
         attendeesByEvent[eventId].push(data)
         savedPayloads.set(data.id, buildPayload(data))
-        localStorage.setItem('saujana_name', data.name)
+        // Remembering a name is optional; blocked storage must not hide a successful signup.
+        try { localStorage.setItem('saujana_name', data.name) } catch {}
         mergeAttendeeNameOptions([data.name])
-        showToast(`You’re on the list, ${data.name}. See you there.`)
+        signupSuccess[eventId] = `You’re on the list, ${data.name}. Your signup is saved.`
         delete newRows[eventId]
-    } else {
-        showToast('Your changes haven’t been saved. Please try again.')
+        focusSignupTrigger(eventId)
+    } catch {
+        signupErrors[eventId] = 'We couldn’t save your signup. Check your connection and try “Join the list” again.'
+    } finally {
+        delete savingRows[eventId]
     }
 }
 
@@ -816,7 +847,7 @@ onMounted(async () => {
 
 onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 
-watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' })
+watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 </script>
 
 <style scoped>
@@ -1522,10 +1553,6 @@ watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' }
     background: rgba(201, 190, 239, 0.07);
 }
 
-.attendees-table tbody tr.new-row {
-    background: rgba(107, 122, 104, 0.05);
-}
-
 .cell-input {
     width: 100%;
     border: none;
@@ -1663,11 +1690,6 @@ watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' }
     border-radius: 16px;
     padding: 16px 18px;
     box-shadow: inset 0 2px 0 var(--gold-leaf);
-}
-
-.attendee-card.new-card {
-    background: var(--lavender-mist);
-    box-shadow: inset 0 2px 0 var(--lavender-mid);
 }
 
 .card-header {
@@ -1842,5 +1864,86 @@ watch([attendeesByEvent, newRows], resizeAllAreas, { deep: true, flush: 'post' }
 .stat-lbl, .attendees-title, .card-label { opacity: 1; color: var(--muted); }
 .btn-add, .btn-save, .btn-cancel, .page-btn { min-height: 44px; border-radius: 6px; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 @media (max-width: 600px) { .first-time-panel { padding: 20px; } }
+
+/* Keep signup separate from the attendee list, with the action after the fields. */
+.signup-section { margin-bottom: 28px; }
+.signup-form {
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--matcha-leaf);
+    border-radius: 8px;
+    background: var(--surface-soft);
+    scroll-margin-top: 110px;
+}
+.signup-form-heading h4 { margin: 0 0 6px; font-size: 1.05rem; color: var(--matcha-leaf); }
+.signup-form-heading p, .signup-field-hint, .signup-save-hint {
+    margin: 0;
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.6;
+}
+.signup-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px 20px;
+    min-width: 0;
+    margin: 22px 0;
+    padding: 0;
+    border: 0;
+}
+.signup-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.signup-field label { color: var(--matcha-leaf); font-size: .85rem; font-weight: 700; }
+.signup-field label span { color: var(--muted); font-size: .75rem; font-weight: 400; }
+.signup-field-spend { grid-column: 1 / -1; }
+.signup-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    box-sizing: border-box;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: var(--white-pure);
+    color: var(--clay-text);
+    font: inherit;
+    font-size: 1rem;
+}
+.signup-input::placeholder { color: var(--muted); opacity: 1; }
+.signup-input:focus-visible, .signup-section button:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 3px; }
+.signup-area { resize: vertical; line-height: 1.5; }
+.signup-error { color: #963d54; font-size: .85rem; line-height: 1.6; margin: 0 0 12px; }
+.signup-field .signup-error { margin: 0; }
+.signup-success {
+    border-left: 3px solid var(--matcha-leaf);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin: 0 0 14px;
+    background: var(--surface-soft);
+    color: var(--matcha-leaf);
+    font-size: .9rem;
+    line-height: 1.6;
+}
+.signup-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+}
+.signup-submit-actions { display: flex; align-items: center; gap: 8px; }
+.signup-submit-actions .btn-save { min-width: 150px; }
+.signup-submit-actions .btn-cancel { opacity: 1; color: var(--muted); }
+.signup-submit-actions button:disabled { opacity: .65; cursor: wait; transform: none; }
+.signup-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 767px) {
+    .signup-form { padding: 18px; scroll-margin-top: 88px; }
+    .signup-fields { grid-template-columns: minmax(0, 1fr); gap: 16px; margin: 18px 0; }
+    .signup-form-footer { align-items: stretch; flex-direction: column; }
+    .signup-submit-actions { flex-direction: column; align-items: stretch; }
+    .signup-submit-actions .btn-save { min-height: 48px; }
+    .signup-submit-actions .btn-cancel { border: 1px solid var(--line); }
+}
 
 </style>
