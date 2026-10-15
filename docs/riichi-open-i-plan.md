@@ -2,7 +2,7 @@
 
 Planning date: 15 October 2026. Target repository: `C:/Projects/others/saujana-bgc.github.io`.
 
-Implementation record: the registration and standings pages, shared admin shell, tournament Edge Functions and Supabase migration are in source. The migration has been applied to the configured Supabase project; the two new Edge Functions and the GitHub Pages site have not been deployed yet. Deploy both functions and publish the site before opening public registration.
+Implementation record: the registration and standings pages, shared admin shell, tournament Edge Functions and Supabase migration are deployed. The migration is applied to the configured Supabase project, both Edge Functions are active, and the GitHub Pages deployment is live at `https://saujana-bgc.github.io/`.
 
 ## 1. Confirmed requirements
 
