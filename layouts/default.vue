@@ -35,7 +35,7 @@
       <slot />
     </div>
 
-    <WhatsAppButton v-if="!isAdminRoute" />
+    <WhatsAppButton v-if="!isAdminRoute && !isRiichiCalculatorRoute" />
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Good games. Good company. See you soon.</p>
@@ -55,6 +55,7 @@ const navigation = [
   { name: 'Birthday Club', url: '/birthday-club' },
   { name: 'Play history', url: '/playlog' },
   { name: 'Riichi League', url: '/riichi-league' },
+  { name: 'Riichi calculator', url: '/riichi-calculator' },
   { name: 'Riichi Open', url: '/riichi-open' },
   { name: 'Collection', url: '/collection' }
 ]
@@ -62,6 +63,7 @@ const navigation = [
 const { lastUpdated } = useVersion()
 const route = useRoute()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+const isRiichiCalculatorRoute = computed(() => route.path === '/riichi-calculator')
 const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
 const showVisitorCounter = ref(false)
