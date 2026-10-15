@@ -55,17 +55,24 @@ export function useAdminAuth() {
 
   async function authRequest(path, options = {}) {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), AUTH_REQUEST_TIMEOUT_MS)
+    let timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      timeout = setTimeout(() => {
+        controller.abort()
+        reject(new Error('Authentication request timed out.'))
+      }, AUTH_REQUEST_TIMEOUT_MS)
+    })
     try {
-      return await fetch(`${config.public.supabaseUrl}/auth/v1/${path}`, {
-        ...options,
-        signal: controller.signal,
-        headers: {
-          apikey: config.public.supabaseKey,
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
-      })
+      const request = fetch(`${config.public.supabaseUrl}/auth/v1/${path}`, {
+          ...options,
+          signal: controller.signal,
+          headers: {
+            apikey: config.public.supabaseKey,
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
+        })
+      return await Promise.race([request, timeoutPromise])
     } finally {
       clearTimeout(timeout)
     }
