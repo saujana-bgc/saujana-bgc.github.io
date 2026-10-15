@@ -126,7 +126,9 @@ export function useAdminAuth() {
     isRestoring.value = true
     try {
       if (isAuthenticated.value) {
-        if (await validateSession(session.value)) return true
+        const valid = await validateSession(session.value)
+        if (revision !== authRevision) return isAuthenticated.value
+        if (valid) return true
         if (revision === authRevision) {
           session.value = null
           storageType.value = null
@@ -141,6 +143,7 @@ export function useAdminAuth() {
           method: 'POST',
           body: JSON.stringify({ refresh_token: candidate.refresh_token }),
         })
+        if (revision !== authRevision) return isAuthenticated.value
         if (!response.ok) {
           clearStoredSessions()
           return false
@@ -155,12 +158,16 @@ export function useAdminAuth() {
           method: 'POST',
           body: JSON.stringify({ refresh_token: candidate.refresh_token }),
         })
+        if (revision !== authRevision) return isAuthenticated.value
         if (!response.ok) {
           clearStoredSessions()
           return false
         }
         candidate = await response.json()
-        if (candidate.user?.app_metadata?.role !== REQUIRED_ROLE || !(await validateSession(candidate))) {
+        if (revision !== authRevision) return isAuthenticated.value
+        const valid = candidate.user?.app_metadata?.role === REQUIRED_ROLE && await validateSession(candidate)
+        if (revision !== authRevision) return isAuthenticated.value
+        if (!valid) {
           clearStoredSessions()
           return false
         }
@@ -178,6 +185,13 @@ export function useAdminAuth() {
     } finally {
       isRestoring.value = false
     }
+  }
+
+  function cancelRestore() {
+    authRevision += 1
+    session.value = null
+    storageType.value = null
+    isRestoring.value = false
   }
 
   async function login(username, password, rememberMe = true) {
@@ -236,5 +250,5 @@ export function useAdminAuth() {
     })
   }
 
-  return { session, isAuthenticated, isRestoring, login, logout, restoreSession, refreshSession, authenticatedFetch }
+  return { session, isAuthenticated, isRestoring, login, logout, restoreSession, cancelRestore, refreshSession, authenticatedFetch }
 }

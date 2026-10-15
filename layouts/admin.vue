@@ -32,6 +32,7 @@ const password = ref('')
 const remember = ref(true)
 const error = ref('')
 const busy = ref(false)
+let restoreWatchdog
 function isCurrentPage(to) {
   const [path, hash] = to.split('#')
   if (route.path !== path) return false
@@ -39,7 +40,13 @@ function isCurrentPage(to) {
 }
 
 onMounted(async () => {
+  restoreWatchdog = setTimeout(() => {
+    if (!auth.isRestoring.value) return
+    auth.cancelRestore()
+    error.value = 'Session check timed out. Sign in with your admin username and password.'
+  }, 12000)
   try { await auth.restoreSession() } catch { error.value = 'We could not check your saved session. Please sign in again.' }
+  finally { clearTimeout(restoreWatchdog) }
 })
 
 async function submitLogin() {
