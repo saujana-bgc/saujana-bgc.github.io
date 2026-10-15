@@ -17,7 +17,8 @@ Deno.serve(async (request) => {
       const [registrations,participants,rounds,tables,audit,holds]=await Promise.all([
         client.from('riichi_open_registrations').select('*').eq('event_id',event.id).order('submitted_at',{ascending:false}),
         client.from('riichi_open_participants').select('*').eq('event_id',event.id).order('created_at'),
-        client.from('riichi_open_rounds').select('*').eq('event_id',event.id).order('created_at'),
+        // Rounds do not have created_at; their key is the stable identifier.
+        client.from('riichi_open_rounds').select('*').eq('event_id',event.id).order('round_key'),
         client.from('riichi_open_tables').select('*').eq('event_id',event.id).order('table_number'),
         client.from('riichi_open_audit_log').select('*').eq('event_id',event.id).order('created_at',{ascending:false}).limit(100),
         client.from('riichi_open_registration_holds').select('id',{count:'exact',head:true}).eq('event_id',event.id).eq('status','active').gt('expires_at',new Date().toISOString()),

@@ -3,7 +3,7 @@
     <a class="skip-link" href="#page-content">Skip to content</a>
     <nav v-if="!isAdminRoute" class="site-nav" aria-label="Primary navigation">
       <div class="mobile-nav-bar">
-        <NuxtLink v-if="!isRiichiOpenRoute" to="/" class="mobile-brand" no-prefetch @click="closeMenu">
+        <NuxtLink to="/" class="mobile-brand" aria-label="Saujana Board Game Community home" no-prefetch @click="closeMenu">
           <img class="mobile-brand-logo" src="/favicon.ico" alt="" width="34" height="34" />
           <span class="brand-wordmark">Saujana<span class="brand-caption">Board Game Community</span></span>
         </NuxtLink>
@@ -62,8 +62,6 @@ const navigation = [
 const { lastUpdated } = useVersion()
 const route = useRoute()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
-const isRiichiOpenRoute = computed(() => route.path.replace(/\/+$/, '') === '/riichi-open')
-
 const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
 const showVisitorCounter = ref(false)
