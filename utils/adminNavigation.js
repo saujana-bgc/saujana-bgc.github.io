@@ -1,4 +1,9 @@
 export const adminNavigation = [
+  { id: 'birthday-calendar', title: 'Birthday Calendar', to: '/admin/birthday-club' },
+  { id: 'riichi-overview', title: 'Riichi Open', to: '/admin/riichi-open' },
+]
+
+export const adminDashboardLinks = [
   { id: 'birthday-calendar', title: 'Birthday calendar', description: 'Check birthdays and greeting preferences.', to: '/admin/birthday-club', group: 'Community' },
   { id: 'riichi-overview', title: 'Riichi Open overview', description: 'Review event status and organiser tasks.', to: '/admin/riichi-open', group: 'Riichi Open' },
   { id: 'riichi-registrations', title: 'Registrations and payment verification', description: 'Review receipt uploads and confirm payments.', to: '/admin/riichi-open#registrations', group: 'Riichi Open' },

@@ -24,14 +24,16 @@ Deno.serve(async (request) => {
         client.from('riichi_open_registration_holds').select('id',{count:'exact',head:true}).eq('event_id',event.id).eq('status','active').gt('expires_at',new Date().toISOString()),
       ])
       for(const result of [registrations,participants,rounds,tables,audit,holds]) if(result.error) throw result.error
-      const ids=(rounds.data??[]).map(row=>row.id)
+      const roundOrder:Record<string,number>={qualifier_1:0,qualifier_2:1,final:2}
+      const orderedRounds=[...(rounds.data??[])].sort((a,b)=>(roundOrder[a.round_key]??99)-(roundOrder[b.round_key]??99))
+      const ids=orderedRounds.map(row=>row.id)
       const [seats,results,penalties]=ids.length?await Promise.all([
         client.from('riichi_open_seats').select('*').in('round_id',ids),
         client.from('riichi_open_results').select('*').in('round_id',ids),
         client.from('riichi_open_penalties').select('*').in('round_id',ids),
       ]):[{data:[],error:null},{data:[],error:null},{data:[],error:null}]
       if(seats.error||results.error||penalties.error) throw seats.error||results.error||penalties.error
-      return reply(request,200,{event,registrations:registrations.data,participants:participants.data,rounds:rounds.data,tables:tables.data,seats:seats.data,results:results.data,penalties:penalties.data,audit:audit.data,active_holds:holds.count??0})
+      return reply(request,200,{event,registrations:registrations.data,participants:participants.data,rounds:orderedRounds,tables:tables.data,seats:seats.data,results:results.data,penalties:penalties.data,audit:audit.data,active_holds:holds.count??0})
     }
 
     if(body.action==='receipt_url'){

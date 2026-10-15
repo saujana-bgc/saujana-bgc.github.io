@@ -1,6 +1,7 @@
 <template>
   <main class="standings-page">
-    <header class="standings-header"><p class="eyebrow">Saujana Board Game Community</p><h1>Riichi Open <em>standings</em></h1><p>Only results certified by the organiser appear here. Published table assignments are shown separately from scores.</p><NuxtLink class="back-link" to="/riichi-open">← Event and registration</NuxtLink></header>
+    <RiichiOpenTabs />
+    <header class="standings-header"><p class="eyebrow">Tournament results</p><h1>Riichi Open <em>standings</em></h1><p>Only results certified by the organiser appear here. Published table assignments are shown separately from scores.</p></header>
     <section v-if="error" class="standings-card" role="status"><h2>Standings are temporarily unavailable</h2><p>{{ error }}</p><button @click="load">Try again</button></section>
     <template v-else-if="snapshot">
       <div class="last-certified">Last certified update <strong>{{ formattedUpdate }}</strong><button @click="load">Refresh</button></div>

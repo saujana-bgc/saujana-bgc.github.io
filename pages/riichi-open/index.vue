@@ -1,12 +1,12 @@
 <template>
   <main class="event-page">
+    <RiichiOpenTabs />
     <section class="event-hero">
       <div class="hero-copy">
         <h1>Riichi <em>Open I</em></h1>
         <p class="hero-intro">Two East–South qualifiers. One table for the Top 4. A friendly day of serious mahjong.</p>
         <div class="event-facts"><span>Saturday, 14 November 2026</span><span>Starts at 2:30 pm</span><span>Boardroom Bandit, Ara Damansara</span></div>
         <div class="event-offer"><strong>RM10</strong><span>entry fee</span><i aria-hidden="true"></i><span>A prize for the winner</span></div>
-        <NuxtLink to="/riichi-open/standings" class="text-link">View standings and table assignments →</NuxtLink>
       </div>
       <div class="mika-frame"><img src="/images/riichi-open/mika-one-man.png" alt="Mika holding a one-man mahjong tile and inviting you to join the tournament" width="640" height="800"></div>
     </section>

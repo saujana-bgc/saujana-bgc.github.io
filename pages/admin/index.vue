@@ -15,10 +15,10 @@
 </template>
 
 <script setup>
-import { adminNavigation } from '~/utils/adminNavigation.js'
+import { adminDashboardLinks } from '~/utils/adminNavigation.js'
 definePageMeta({ layout: 'admin' })
 useHead({ title: 'Master admin | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
-const groups = computed(() => ['Community', 'Riichi Open'].map(name => ({ name, items: adminNavigation.filter(item => item.group === name) })))
+const groups = computed(() => ['Community', 'Riichi Open'].map(name => ({ name, items: adminDashboardLinks.filter(item => item.group === name) })))
 </script>
 
 <style scoped>
