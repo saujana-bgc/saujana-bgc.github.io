@@ -4,6 +4,16 @@ export default defineNuxtConfig({
   nitro: {
     // Bundle Nuxt 4.6's renderer so its generated build artifacts resolve in Nitro.
     externals: { inline: ['nuxt/internal'] },
+    prerender: {
+      routes: [
+        '/riichi-open',
+        '/riichi-open/standings',
+        '/admin',
+        '/admin/birthday-club',
+        '/admin/riichi-open',
+        '/birthday-club-calendar',
+      ],
+    },
   },
   runtimeConfig: {
     public: {

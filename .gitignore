@@ -32,6 +32,17 @@ supabase/*
 !supabase/migrations/
 supabase/migrations/*
 !supabase/migrations/*.sql
+!supabase/functions/
+supabase/functions/*
+!supabase/functions/_shared/
+supabase/functions/_shared/*
+!supabase/functions/_shared/*.ts
+!supabase/functions/riichi-open-public/
+supabase/functions/riichi-open-public/*
+!supabase/functions/riichi-open-public/index.ts
+!supabase/functions/riichi-open-admin/
+supabase/functions/riichi-open-admin/*
+!supabase/functions/riichi-open-admin/index.ts
 
 # IDE files
 .vscode/

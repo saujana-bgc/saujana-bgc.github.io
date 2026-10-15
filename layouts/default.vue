@@ -1,7 +1,7 @@
 <template>
   <div class="site-shell">
     <a class="skip-link" href="#page-content">Skip to content</a>
-    <nav class="site-nav" aria-label="Primary navigation">
+    <nav v-if="!isAdminRoute" class="site-nav" aria-label="Primary navigation">
       <div class="mobile-nav-bar">
         <NuxtLink to="/" class="mobile-brand" no-prefetch @click="closeMenu">
           <img class="mobile-brand-logo" src="/favicon.ico" alt="" width="34" height="34" />
@@ -35,11 +35,12 @@
       <slot />
     </div>
 
-    <WhatsAppButton />
+    <WhatsAppButton v-if="!isAdminRoute" />
 
-    <footer ref="footerRef" class="site-meta" aria-label="Site information">
+    <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Good games. Good company. See you soon.</p>
       <span class="footer-copyright">&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
+      <NuxtLink class="admin-entry" to="/admin">Organiser sign in</NuxtLink>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
       </ClientOnly>
@@ -55,11 +56,13 @@ const navigation = [
   { name: 'Birthday Club', url: '/birthday-club' },
   { name: 'Play history', url: '/playlog' },
   { name: 'Riichi League', url: '/riichi-league' },
+  { name: 'Riichi Open', url: '/riichi-open' },
   { name: 'Collection', url: '/collection' }
 ]
 
 const { lastUpdated } = useVersion()
 const route = useRoute()
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
 const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
@@ -130,4 +133,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleMenuKeydown))
   letter-spacing: 2px;
   opacity: 0.68;
 }
+
+.admin-entry { margin-top: 10px; color: var(--muted); font-size: .72rem; text-underline-offset: 3px; }
 </style>
