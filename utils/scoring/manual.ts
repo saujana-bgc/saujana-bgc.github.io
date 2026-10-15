@@ -3,7 +3,7 @@ import { calculatePoints, handName, type HandName } from "./points";
 export type ManualWait = "ryanmen" | "penchan" | "kanchan" | "tanki" | "shanpon" | "kokushi-thirteen" | "chuuren-nine";
 export type ManualGroupType = "triplet" | "kan";
 export type ManualTileKind = "simple" | "terminal-honor";
-export type ManualYakuCategory = "common" | "two-han" | "three-han" | "five-han" | "six-han" | "yakuman";
+export type ManualYakuCategory = "common" | "yakuhai" | "situational" | "one-han" | "two-han" | "three-han" | "five-han" | "six-han" | "yakuman";
 
 export interface ManualGroup {
   id: number;
@@ -29,19 +29,19 @@ export interface ManualYakuOption {
 export const MANUAL_YAKU: ManualYakuOption[] = [
   { id: "riichi", name: "Riichi", detail: "Declared riichi", category: "common", closedHan: 1, requiresClosed: true, incompatible: ["double-riichi"] },
   { id: "double-riichi", name: "Double riichi", detail: "Riichi declared on your first discard", category: "common", closedHan: 2, requiresClosed: true, incompatible: ["riichi"] },
-  { id: "ippatsu", name: "Ippatsu", detail: "Win before your next discard after riichi", category: "common", closedHan: 1, requiresClosed: true },
+  { id: "ippatsu", name: "Ippatsu", detail: "Win before your next discard after riichi", category: "situational", closedHan: 1, requiresClosed: true },
   { id: "pinfu", name: "Pinfu", detail: "Four runs, a non-value pair and a two-sided wait", category: "common", closedHan: 1, requiresClosed: true, incompatible: ["chiitoitsu", "toitoi", "sanankou", "suuankou"] },
-  { id: "iipeiko", name: "Iipeikou", detail: "Two identical runs; closed hand", category: "common", closedHan: 1, requiresClosed: true, incompatible: ["ryanpeiko"] },
+  { id: "iipeiko", name: "Iipeikou", detail: "Two identical runs; closed hand", category: "one-han", closedHan: 1, requiresClosed: true, incompatible: ["ryanpeiko"] },
   { id: "tanyao", name: "Tanyao", detail: "All tiles are 2–8", category: "common", closedHan: 1, openHan: 1 },
-  { id: "yakuhai-haku", name: "White dragon set", detail: "White dragon triplet or kan · 1 han", category: "common", closedHan: 1, openHan: 1 },
-  { id: "yakuhai-hatsu", name: "Green dragon set", detail: "Green dragon triplet or kan · 1 han", category: "common", closedHan: 1, openHan: 1 },
-  { id: "yakuhai-chun", name: "Red dragon set", detail: "Red dragon triplet or kan · 1 han", category: "common", closedHan: 1, openHan: 1 },
-  { id: "yakuhai-seat", name: "Seat-wind set", detail: "Your seat-wind triplet or kan", category: "common", closedHan: 1, openHan: 1 },
-  { id: "yakuhai-round", name: "Round-wind set", detail: "The round-wind triplet or kan", category: "common", closedHan: 1, openHan: 1 },
-  { id: "chankan", name: "Chankan", detail: "Robbed an added kan", category: "common", closedHan: 1, openHan: 1 },
-  { id: "rinshan", name: "Rinshan", detail: "Won on the replacement tile after a kan", category: "common", closedHan: 1, openHan: 1 },
-  { id: "haitei", name: "Haitei", detail: "Won by tsumo on the final live-wall tile", category: "common", closedHan: 1, openHan: 1 },
-  { id: "houtei", name: "Houtei", detail: "Won by ron on the final discard", category: "common", closedHan: 1, openHan: 1 },
+  { id: "yakuhai-haku", name: "White dragon set", detail: "White dragon triplet or kan · 1 han", category: "yakuhai", closedHan: 1, openHan: 1 },
+  { id: "yakuhai-hatsu", name: "Green dragon set", detail: "Green dragon triplet or kan · 1 han", category: "yakuhai", closedHan: 1, openHan: 1 },
+  { id: "yakuhai-chun", name: "Red dragon set", detail: "Red dragon triplet or kan · 1 han", category: "yakuhai", closedHan: 1, openHan: 1 },
+  { id: "yakuhai-seat", name: "Seat-wind set", detail: "Your seat-wind triplet or kan", category: "yakuhai", closedHan: 1, openHan: 1 },
+  { id: "yakuhai-round", name: "Round-wind set", detail: "The round-wind triplet or kan", category: "yakuhai", closedHan: 1, openHan: 1 },
+  { id: "chankan", name: "Chankan", detail: "Robbed an added kan", category: "situational", closedHan: 1, openHan: 1 },
+  { id: "rinshan", name: "Rinshan", detail: "Won on the replacement tile after a kan", category: "situational", closedHan: 1, openHan: 1 },
+  { id: "haitei", name: "Haitei", detail: "Won by tsumo on the final live-wall tile", category: "situational", closedHan: 1, openHan: 1 },
+  { id: "houtei", name: "Houtei", detail: "Won by ron on the final discard", category: "situational", closedHan: 1, openHan: 1 },
 
   { id: "chiitoitsu", name: "Chiitoitsu", detail: "Seven different pairs", category: "two-han", closedHan: 2, requiresClosed: true, incompatible: ["pinfu", "toitoi", "sanankou", "suuankou"] },
   { id: "ittsu", name: "Ittsuu", detail: "123, 456 and 789 in one suit", category: "two-han", closedHan: 2, openHan: 1 },
@@ -215,6 +215,14 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (needsGroupFu && selected.has("sankantsu") && input.groups.filter((group) => group.type === "kan").length < 3) issues.push("Sankantsu requires at least three kans. Add each kan.");
   if (needsGroupFu && selected.has("sanankou") && input.groups.filter((group) => group.type === "triplet" && group.concealed && !(input.winType === "ron" && group.completedByRon)).length + input.groups.filter((group) => group.type === "kan" && group.concealed).length < 3) {
     issues.push("Sanankou needs at least three concealed triplets or kans. Mark calls and any triplet completed by ron correctly.");
+  }
+  if (needsGroupFu) {
+    const yakuhai = [...selected].filter((id) => id.startsWith("yakuhai-"));
+    const hasDoubleWindSet = yakuhai.includes("yakuhai-seat") && yakuhai.includes("yakuhai-round") && input.seatWind === input.roundWind;
+    const requiredYakuhaiGroups = yakuhai.length - (hasDoubleWindSet ? 1 : 0);
+    if (input.groups.length < requiredYakuhaiGroups) {
+      issues.push(`Add the triplet or kan for each selected dragon or wind set to count fu${hasDoubleWindSet ? " (the double-wind set counts for both)" : ""}.`);
+    }
   }
   if (!needsGroupFu) {
     const remainingGroups = Math.max(0, 4 - input.groups.length);

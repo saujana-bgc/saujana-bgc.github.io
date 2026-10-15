@@ -15,7 +15,8 @@
             <strong>{{ formatPoints(result.points) }}</strong>
           </div>
           <div v-if="!resultReady" class="result-empty">
-            <p>{{ hasInteracted ? 'Complete the highlighted details below.' : 'Select your yaku to get started.' }}</p>
+            <p>{{ hasInteracted ? nextStepLabel : 'Select your yaku to get started.' }}</p>
+            <button v-if="hasInteracted" type="button" class="next-step-button" @click="jumpToNextIssue">Go to next step</button>
           </div>
 
           <template v-if="resultReady">
@@ -94,7 +95,7 @@
         </section>
 
         <section class="calc-section" aria-labelledby="yaku-heading">
-          <div class="section-heading">
+          <div ref="yakuSection" class="section-heading" tabindex="-1">
             <span class="step-number">2</span>
             <div>
               <h2 id="yaku-heading">Select your yaku</h2>
@@ -111,6 +112,10 @@
           <div v-if="automaticYaku.length" class="automatic-yaku" aria-live="polite">
             <span>Automatically included</span>
             <strong v-for="yaku in automaticYaku" :key="yaku.id">{{ yaku.name }} <small>+{{ yaku.han }}</small></strong>
+          </div>
+          <div v-if="selectedYakuOptions.length" class="selected-yaku" aria-label="Selected yaku">
+            <span>Selected</span>
+            <button v-for="yaku in selectedYakuOptions" :key="yaku.id" type="button" class="selected-yaku-chip" :aria-label="`Remove ${yaku.name}`" @click="toggleYaku(yaku.id)">{{ yaku.name }} <b aria-hidden="true">×</b></button>
           </div>
 
           <div class="yaku-groups">
@@ -190,7 +195,7 @@
             </div>
           </div>
 
-          <div v-if="showPairQuestion" class="fu-field">
+          <div v-if="showPairQuestion" ref="pairSection" class="fu-field" tabindex="-1">
             <span class="field-label">Your pair</span>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Pair type">
               <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id">{{ pair.label }} <small>+{{ pair.fu }} fu</small></button>
@@ -199,15 +204,15 @@
             <ul v-if="shouldShowProblems && fieldIssues.pair.length" class="field-problems"><li v-for="issue in fieldIssues.pair" :key="issue">{{ issue }}</li></ul>
           </div>
 
-          <div v-if="showWaitQuestion" class="fu-field">
+          <div v-if="showWaitQuestion" ref="waitSection" class="fu-field" tabindex="-1">
             <span class="field-label">Winning wait</span>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Winning wait">
-              <button v-for="wait in waits" :key="wait.id" type="button" class="choice-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id">{{ wait.label }} <small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
+              <button v-for="wait in waits" :key="wait.id" type="button" class="choice-button wait-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id"><span>{{ wait.label }}</span><small class="wait-example">{{ wait.example }}</small><small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
             </div>
             <ul v-if="shouldShowProblems && fieldIssues.wait.length" class="field-problems"><li v-for="issue in fieldIssues.wait" :key="issue">{{ issue }}</li></ul>
           </div>
 
-          <div v-if="showGroupBuilder" class="fu-field group-builder">
+          <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
             <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add up to four groups. A winning triplet on ron counts as open for fu only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
@@ -275,11 +280,14 @@ useHead({
 })
 
 const categories = [
-  { id: 'common', label: 'Everyday yaku' },
-  { id: 'two-han', label: 'Two-han yaku' },
-  { id: 'three-han', label: 'Three-han yaku' },
-  { id: 'five-han', label: 'Five-han yaku' },
-  { id: 'six-han', label: 'Six-han yaku' },
+  { id: 'common', label: 'Common yaku' },
+  { id: 'yakuhai', label: 'Dragon and wind sets' },
+  { id: 'situational', label: 'Situational yaku' },
+  { id: 'one-han', label: '1 han when closed' },
+  { id: 'two-han', label: '2 han when closed' },
+  { id: 'three-han', label: '3 han when closed' },
+  { id: 'five-han', label: '5 han when closed' },
+  { id: 'six-han', label: '6 han when closed' },
   { id: 'yakuman', label: 'Yakuman' },
 ]
 
@@ -296,11 +304,11 @@ const pairOptions = [
   { id: 'double-wind', label: 'Seat + round wind', fu: 4 },
 ]
 const waits = [
-  { id: 'ryanmen', label: 'Two-sided', fu: 0 },
-  { id: 'penchan', label: 'Edge', fu: 2 },
-  { id: 'kanchan', label: 'Middle', fu: 2 },
-  { id: 'tanki', label: 'Pair', fu: 2 },
-  { id: 'shanpon', label: 'Triplet', fu: 0 },
+  { id: 'ryanmen', label: 'Two-sided', example: '2 3 → 1 or 4', fu: 0 },
+  { id: 'penchan', label: 'Edge', example: '1 2 → 3 · 8 9 → 7', fu: 2 },
+  { id: 'kanchan', label: 'Middle', example: '2 _ 4 → 3', fu: 2 },
+  { id: 'tanki', label: 'Pair', example: '5 5 → 5', fu: 2 },
+  { id: 'shanpon', label: 'Two triplets', example: '5 5 · 7 7 → 5 or 7', fu: 0 },
 ]
 const bonusFields = [
   { id: 'dora', label: 'Dora', hint: 'Each tile gives 1 han' },
@@ -343,6 +351,10 @@ const hasInteracted = ref(false)
 const showBreakdown = ref(false)
 const breakdownSection = ref(null)
 const winSection = ref(null)
+const yakuSection = ref(null)
+const pairSection = ref(null)
+const waitSection = ref(null)
+const groupSection = ref(null)
 let groupId = 0
 
 const windNames = { east: 'East', south: 'South', west: 'West', north: 'North' }
@@ -358,6 +370,7 @@ const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
 const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.selectedYaku.includes('double-riichi'))
 const canUseUra = computed(() => isClosed.value && isRiichi.value)
 const selectedYakuman = computed(() => form.selectedYaku.filter(id => MANUAL_YAKU.find(yaku => yaku.id === id)?.yakuman))
+const selectedYakuOptions = computed(() => form.selectedYaku.map(id => MANUAL_YAKU.find(yaku => yaku.id === id)).filter(Boolean))
 const hasSpecialWait = computed(() => selectedYakuman.value.some(id => ['kokushi', 'suuankou', 'chuuren'].includes(id)))
 const visibleBonusFields = computed(() => bonusFields.filter(bonus => bonus.id !== 'ura' || canUseUra.value))
 const filteredYaku = computed(() => {
@@ -408,11 +421,19 @@ const fieldIssues = computed(() => {
   for (const issue of result.value.issues) {
     if (/^Choose your pair|^Pinfu needs a non-value pair|^A double-wind pair/.test(issue)) fields.pair.push(issue)
     else if (/^Choose the wait|^Pinfu needs a two-sided wait/.test(issue)) fields.wait.push(issue)
-    else if (/groups|triplets|kans|requires a kan|triplet completed|winning-triplet/i.test(issue)) fields.groups.push(issue)
+    else if (/groups|triplets|kans|requires a kan|triplet completed|winning-triplet|yakuhai/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
   }
   return fields
 })
+const nextIssueTarget = computed(() => {
+  if (fieldIssues.value.yaku.length || form.selectedYaku.length === 0) return { label: 'Choose or fix a yaku', target: yakuSection.value }
+  if (fieldIssues.value.pair.length || (needsFuQuestions.value && !form.pairChoice)) return { label: 'Choose your pair', target: pairSection.value }
+  if (fieldIssues.value.wait.length || (needsFuQuestions.value && !form.waitType)) return { label: 'Choose your winning wait', target: waitSection.value }
+  if (fieldIssues.value.groups.length) return { label: 'Add or fix a triplet or kan', target: groupSection.value }
+  return null
+})
+const nextStepLabel = computed(() => nextIssueTarget.value?.label ?? 'Review the highlighted details below.')
 
 const fuLines = computed(() => {
   const breakdown = result.value.fuBreakdown
@@ -457,6 +478,12 @@ function selectedYakuCount(categoryId) {
 function categorySummary(categoryId) {
   const selected = selectedYakuCount(categoryId)
   return selected ? `${selected} selected` : `${categoryOptionCount(categoryId)} yaku`
+}
+
+function jumpToNextIssue() {
+  const target = nextIssueTarget.value?.target
+  target?.focus({ preventScroll: true })
+  target?.scrollIntoView({ block: 'start', behavior: 'smooth' })
 }
 
 function isSelected(id) {
@@ -645,6 +672,10 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .automatic-yaku > span { width: 100%; color: var(--muted); font-size: .68rem; }
 .automatic-yaku strong { color: var(--matcha-leaf); }
 .automatic-yaku strong small { opacity: .75; }
+.selected-yaku { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.selected-yaku > span { margin-right: 3px; color: var(--muted); font-size: .68rem; }
+.selected-yaku-chip { min-height: 30px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid #cfd8cc; border-radius: 999px; background: #eff3ec; color: var(--matcha-leaf); font-size: .69rem; cursor: pointer; }
+.selected-yaku-chip b { font-size: .85rem; }
 .yaku-groups { display: grid; gap: 18px; margin-top: 20px; }
 .yaku-category { min-width: 0; }
 .yaku-category > summary { min-height: 42px; display: flex; align-items: center; gap: 12px; padding: 0 2px; color: var(--matcha-leaf); font-size: .78rem; font-weight: 750; letter-spacing: .025em; cursor: pointer; }
@@ -682,9 +713,12 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .stepper input::-webkit-inner-spin-button, .stepper input::-webkit-outer-spin-button { appearance: none; margin: 0; }
 .stepper input[type=number] { appearance: textfield; }
 .fu-field + .fu-field { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.fu-field { scroll-margin-top: 130px; }
 .fu-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .fu-choice-grid .choice-button { min-height: 52px; }
 .fu-choice-grid .choice-button small { text-align: left; }
+.fu-choice-grid .wait-button { min-height: 76px; }
+.fu-choice-grid .wait-example { margin: 4px 0 2px; color: var(--muted); font-size: .62rem; line-height: 1.3; font-variant-numeric: tabular-nums; }
 .group-count { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
 .group-list { display: grid; gap: 7px; margin: 13px 0; }
 .group-row { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); }
@@ -719,8 +753,9 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .result-amount > strong { display: block; margin: 2px 0; color: var(--matcha-leaf); font-size: clamp(2rem, 4vw, 2.8rem); font-variant-numeric: tabular-nums; letter-spacing: -.045em; line-height: 1.15; }
 .received-total { margin: 8px 0; color: var(--muted); font-size: .76rem; }
 .received-total strong { color: var(--matcha-leaf); font-size: .95rem; }
-.result-empty { display: flex; align-items: center; gap: 11px; margin: 17px 0; color: var(--muted); }
-.result-empty p { margin: 0; font-size: .81rem; line-height: 1.55; }
+.result-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin: 17px 0; color: var(--muted); }
+.result-empty p { flex: 1 1 100%; margin: 0; font-size: .81rem; line-height: 1.55; }
+.next-step-button { min-height: 36px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; cursor: pointer; }
 .score-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0 0; margin-top: 10px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--matcha-leaf); }
 .breakdown-button { margin-left: auto; min-height: 36px; padding: 4px 0 4px 6px; border: 0; background: transparent; color: var(--matcha-leaf); font-size: .72rem; text-decoration: underline; cursor: pointer; }
 .score-details { scroll-margin-top: 130px; }
@@ -733,7 +768,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .payment-list p strong, .fu-breakdown p strong, .result-yaku p strong { color: var(--clay-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .score-note { margin: 14px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.55; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-.choice-button:focus-visible, .yaku-option:focus-visible, .stepper button:focus-visible, .group-option-grid button:focus-visible, .remove-group:focus-visible, .reset-button:focus-visible, .breakdown-button:focus-visible, summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
+.choice-button:focus-visible, .yaku-option:focus-visible, .selected-yaku-chip:focus-visible, .stepper button:focus-visible, .group-option-grid button:focus-visible, .remove-group:focus-visible, .reset-button:focus-visible, .breakdown-button:focus-visible, .next-step-button:focus-visible, summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
 @media (max-width: 900px) {
   .calculator-layout { grid-template-columns: minmax(0, 1fr) minmax(260px, 300px); gap: 14px; }
   .result-inner { padding: 17px; }
@@ -751,6 +786,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .result-amount > span { display: inline; font-size: .72rem; margin-right: 7px; }
   .received-total { margin: 7px 0; padding-top: 0; border: 0; font-size: .7rem; }
   .result-empty { margin: 7px 0 0; }
+  .result-empty p { flex-basis: auto; }
   .score-summary { padding: 3px 0 0; margin-top: 7px; font-size: .75rem; }
   .payment-list { margin-top: 5px; }
   .payment-list p { padding: 3px 0; }
@@ -758,6 +794,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .score-details { scroll-margin-top: 300px; }
   .yaku-grid { grid-template-columns: minmax(0, 1fr); }
   .fu-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fu-field { scroll-margin-top: 300px; }
   .bonus-grid { grid-template-columns: minmax(0, 1fr); }
   .group-option-grid { grid-template-columns: minmax(0, 1fr); }
 }
