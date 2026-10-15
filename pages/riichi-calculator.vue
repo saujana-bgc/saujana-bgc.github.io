@@ -213,10 +213,11 @@
           </div>
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
-            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add up to four groups. A winning triplet on ron counts as open for fu only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
+            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add up to four groups. A winning triplet on ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
                 <div><strong>{{ groupName(group) }}</strong><small>{{ groupFu(group) }} fu</small></div>
+                <label v-if="yakuhaiChoices.length || group.yakuId" class="group-yaku-choice"><span>Counts as</span><select v-model="group.yakuId" :aria-label="`Yaku set for ${groupName(group)}`"><option value="">Other set</option><option v-for="option in groupYakuOptions(group)" :key="option.id" :value="option.id">{{ option.label }}</option></select></label>
                 <label v-if="form.winType === 'ron' && form.waitType === 'shanpon' && group.type === 'triplet' && group.concealed" class="winning-group"><input v-model="group.completedByRon" type="checkbox" /><span>Won on this triplet</span></label>
                 <button type="button" class="remove-group" :aria-label="`Remove ${groupName(group)}`" @click="form.groups.splice(index, 1)">×</button>
               </div>
@@ -280,14 +281,11 @@ useHead({
 })
 
 const categories = [
-  { id: 'common', label: 'Common yaku' },
+  { id: 'common', label: 'Everyday yaku' },
   { id: 'yakuhai', label: 'Dragon and wind sets' },
+  { id: 'patterns', label: 'Runs, triplets and pairs' },
+  { id: 'suits', label: 'Suit and terminal patterns' },
   { id: 'situational', label: 'Situational yaku' },
-  { id: 'one-han', label: '1 han when closed' },
-  { id: 'two-han', label: '2 han when closed' },
-  { id: 'three-han', label: '3 han when closed' },
-  { id: 'five-han', label: '5 han when closed' },
-  { id: 'six-han', label: '6 han when closed' },
   { id: 'yakuman', label: 'Yakuman' },
 ]
 
@@ -304,11 +302,11 @@ const pairOptions = [
   { id: 'double-wind', label: 'Seat + round wind', fu: 4 },
 ]
 const waits = [
-  { id: 'ryanmen', label: 'Two-sided', example: '2 3 → 1 or 4', fu: 0 },
-  { id: 'penchan', label: 'Edge', example: '1 2 → 3 · 8 9 → 7', fu: 2 },
-  { id: 'kanchan', label: 'Middle', example: '2 _ 4 → 3', fu: 2 },
-  { id: 'tanki', label: 'Pair', example: '5 5 → 5', fu: 2 },
-  { id: 'shanpon', label: 'Two triplets', example: '5 5 · 7 7 → 5 or 7', fu: 0 },
+  { id: 'ryanmen', label: 'Two-sided', example: '2 3 + [1 or 4]', fu: 0 },
+  { id: 'penchan', label: 'Edge', example: '1 2 + [3] · 8 9 + [7]', fu: 2 },
+  { id: 'kanchan', label: 'Middle', example: '2 _ 4 + [3]', fu: 2 },
+  { id: 'tanki', label: 'Pair wait', example: '5 + [5] → pair', fu: 2 },
+  { id: 'shanpon', label: 'Triplet wait', example: '55 / 77 + [5 or 7]', fu: 0 },
 ]
 const bonusFields = [
   { id: 'dora', label: 'Dora', hint: 'Each tile gives 1 han' },
@@ -371,6 +369,14 @@ const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.sel
 const canUseUra = computed(() => isClosed.value && isRiichi.value)
 const selectedYakuman = computed(() => form.selectedYaku.filter(id => MANUAL_YAKU.find(yaku => yaku.id === id)?.yakuman))
 const selectedYakuOptions = computed(() => form.selectedYaku.map(id => MANUAL_YAKU.find(yaku => yaku.id === id)).filter(Boolean))
+const yakuhaiChoices = computed(() => {
+  const selected = form.selectedYaku.filter(id => id.startsWith('yakuhai-'))
+  const hasDoubleWind = selected.includes('yakuhai-seat') && selected.includes('yakuhai-round') && form.seatWind === form.roundWind
+  return [
+    ...selected.filter(id => !(hasDoubleWind && ['yakuhai-seat', 'yakuhai-round'].includes(id))).map(id => ({ id, label: MANUAL_YAKU.find(yaku => yaku.id === id)?.name ?? id })),
+    ...(hasDoubleWind ? [{ id: 'yakuhai-double-wind', label: 'Seat + round wind set' }] : []),
+  ]
+})
 const hasSpecialWait = computed(() => selectedYakuman.value.some(id => ['kokushi', 'suuankou', 'chuuren'].includes(id)))
 const visibleBonusFields = computed(() => bonusFields.filter(bonus => bonus.id !== 'ura' || canUseUra.value))
 const filteredYaku = computed(() => {
@@ -421,13 +427,13 @@ const fieldIssues = computed(() => {
   for (const issue of result.value.issues) {
     if (/^Choose your pair|^Pinfu needs a non-value pair|^A double-wind pair/.test(issue)) fields.pair.push(issue)
     else if (/^Choose the wait|^Pinfu needs a two-sided wait/.test(issue)) fields.wait.push(issue)
-    else if (/groups|triplets|kans|requires a kan|triplet completed|winning-triplet|yakuhai/i.test(issue)) fields.groups.push(issue)
+    else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
   }
   return fields
 })
 const nextIssueTarget = computed(() => {
-  if (fieldIssues.value.yaku.length || form.selectedYaku.length === 0) return { label: 'Choose or fix a yaku', target: yakuSection.value }
+  if (fieldIssues.value.yaku.length || (form.selectedYaku.length === 0 && automaticYaku.value.length === 0)) return { label: 'Choose or fix a yaku', target: yakuSection.value }
   if (fieldIssues.value.pair.length || (needsFuQuestions.value && !form.pairChoice)) return { label: 'Choose your pair', target: pairSection.value }
   if (fieldIssues.value.wait.length || (needsFuQuestions.value && !form.waitType)) return { label: 'Choose your winning wait', target: waitSection.value }
   if (fieldIssues.value.groups.length) return { label: 'Add or fix a triplet or kan', target: groupSection.value }
@@ -529,13 +535,23 @@ function setHandShape(shape) {
   form.waitType = null
   form.selectedYaku = form.selectedYaku.filter(id => !['chiitoitsu', 'kokushi'].includes(id))
   if (shape === 'chiitoitsu' || shape === 'kokushi') form.selectedYaku.push(shape === 'chiitoitsu' ? 'chiitoitsu' : 'kokushi')
-  if (shape === 'chiitoitsu') openYakuCategories.value = new Set([...openYakuCategories.value, 'two-han'])
+  if (shape === 'chiitoitsu') openYakuCategories.value = new Set([...openYakuCategories.value, 'patterns'])
   if (shape === 'kokushi') openYakuCategories.value = new Set([...openYakuCategories.value, 'yakuman'])
   if (shape !== 'kokushi') form.doubleYakumanWaits.kokushi = false
 }
 
 function groupName(group) {
   return `${group.type === 'kan' ? 'Kan' : 'Triplet'} · ${group.concealed ? 'concealed' : 'called'} · ${group.tileKind === 'simple' ? 'simple' : 'terminal or honour'}`
+}
+
+function groupYakuOptions(group) {
+  const assignedElsewhere = new Set(form.groups.filter(other => other.id !== group.id).map(other => other.yakuId).filter(Boolean))
+  const options = yakuhaiChoices.value.filter(option => !assignedElsewhere.has(option.id) || option.id === group.yakuId)
+  if (group.yakuId && !options.some(option => option.id === group.yakuId)) {
+    const label = group.yakuId === 'yakuhai-double-wind' ? 'Seat + round wind set (update)' : `${MANUAL_YAKU.find(yaku => yaku.id === group.yakuId)?.name ?? 'Set'} (update)`
+    options.push({ id: group.yakuId, label })
+  }
+  return options
 }
 
 function groupFu(group) {
@@ -549,7 +565,7 @@ function addGroup(option) {
   hasInteracted.value = true
   if (form.groups.length >= 4 || form.handShape !== 'standard') return
   if (!option.concealed) form.isClosed = false
-  form.groups.push({ id: ++groupId, type: option.type, tileKind: option.tileKind, concealed: option.concealed, completedByRon: false })
+  form.groups.push({ id: ++groupId, type: option.type, tileKind: option.tileKind, concealed: option.concealed, completedByRon: false, yakuId: null })
 }
 
 function adjustBonus(id, amount, max = Infinity) {
@@ -721,11 +737,13 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .fu-choice-grid .wait-example { margin: 4px 0 2px; color: var(--muted); font-size: .62rem; line-height: 1.3; font-variant-numeric: tabular-nums; }
 .group-count { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
 .group-list { display: grid; gap: 7px; margin: 13px 0; }
-.group-row { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); }
+.group-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); }
 .group-row > div { flex: 1; min-width: 0; }
 .group-row > div > strong, .group-row > div > small { display: block; }
 .group-row > div > strong { color: var(--matcha-leaf); font-size: .76rem; overflow-wrap: anywhere; }
 .group-row > div > small { color: var(--muted); font-size: .68rem; }
+.group-yaku-choice { display: grid; gap: 3px; min-width: 130px; color: var(--muted); font-size: .65rem; }
+.group-yaku-choice select { min-height: 35px; max-width: 190px; padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--clay-text); font: inherit; }
 .winning-group { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: .68rem; }
 .winning-group input { accent-color: var(--matcha-leaf); }
 .remove-group { flex: 0 0 32px; width: 32px; height: 34px; border: 1px solid var(--line); border-radius: 6px; background: white; color: #824249; font-size: 1.1rem; cursor: pointer; }

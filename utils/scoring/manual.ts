@@ -3,7 +3,7 @@ import { calculatePoints, handName, type HandName } from "./points";
 export type ManualWait = "ryanmen" | "penchan" | "kanchan" | "tanki" | "shanpon" | "kokushi-thirteen" | "chuuren-nine";
 export type ManualGroupType = "triplet" | "kan";
 export type ManualTileKind = "simple" | "terminal-honor";
-export type ManualYakuCategory = "common" | "yakuhai" | "situational" | "one-han" | "two-han" | "three-han" | "five-han" | "six-han" | "yakuman";
+export type ManualYakuCategory = "common" | "yakuhai" | "patterns" | "suits" | "situational" | "yakuman";
 
 export interface ManualGroup {
   id: number;
@@ -12,6 +12,8 @@ export interface ManualGroup {
   concealed: boolean;
   /** A concealed triplet completed on ron is open for fu only. */
   completedByRon: boolean;
+  /** The selected dragon or wind yaku represented by this set, when applicable. */
+  yakuId?: string | null;
 }
 
 export interface ManualYakuOption {
@@ -31,7 +33,7 @@ export const MANUAL_YAKU: ManualYakuOption[] = [
   { id: "double-riichi", name: "Double riichi", detail: "Riichi declared on your first discard", category: "common", closedHan: 2, requiresClosed: true, incompatible: ["riichi"] },
   { id: "ippatsu", name: "Ippatsu", detail: "Win before your next discard after riichi", category: "situational", closedHan: 1, requiresClosed: true },
   { id: "pinfu", name: "Pinfu", detail: "Four runs, a non-value pair and a two-sided wait", category: "common", closedHan: 1, requiresClosed: true, incompatible: ["chiitoitsu", "toitoi", "sanankou", "suuankou"] },
-  { id: "iipeiko", name: "Iipeikou", detail: "Two identical runs; closed hand", category: "one-han", closedHan: 1, requiresClosed: true, incompatible: ["ryanpeiko"] },
+  { id: "iipeiko", name: "Iipeikou", detail: "Two identical runs; closed hand", category: "patterns", closedHan: 1, requiresClosed: true, incompatible: ["ryanpeiko"] },
   { id: "tanyao", name: "Tanyao", detail: "All tiles are 2–8", category: "common", closedHan: 1, openHan: 1 },
   { id: "yakuhai-haku", name: "White dragon set", detail: "White dragon triplet or kan · 1 han", category: "yakuhai", closedHan: 1, openHan: 1 },
   { id: "yakuhai-hatsu", name: "Green dragon set", detail: "Green dragon triplet or kan · 1 han", category: "yakuhai", closedHan: 1, openHan: 1 },
@@ -43,22 +45,22 @@ export const MANUAL_YAKU: ManualYakuOption[] = [
   { id: "haitei", name: "Haitei", detail: "Won by tsumo on the final live-wall tile", category: "situational", closedHan: 1, openHan: 1 },
   { id: "houtei", name: "Houtei", detail: "Won by ron on the final discard", category: "situational", closedHan: 1, openHan: 1 },
 
-  { id: "chiitoitsu", name: "Chiitoitsu", detail: "Seven different pairs", category: "two-han", closedHan: 2, requiresClosed: true, incompatible: ["pinfu", "toitoi", "sanankou", "suuankou"] },
-  { id: "ittsu", name: "Ittsuu", detail: "123, 456 and 789 in one suit", category: "two-han", closedHan: 2, openHan: 1 },
-  { id: "sanshoku-doujun", name: "Sanshoku doujun", detail: "The same run in all three suits", category: "two-han", closedHan: 2, openHan: 1 },
-  { id: "sanshoku-doukou", name: "Sanshoku doukou", detail: "The same triplet in all three suits", category: "two-han", closedHan: 2, openHan: 2 },
-  { id: "toitoi", name: "Toitoi", detail: "Four triplets or kans; no runs", category: "two-han", closedHan: 2, openHan: 2, incompatible: ["pinfu", "chiitoitsu"] },
-  { id: "sanankou", name: "Sanankou", detail: "Three concealed triplets or kans", category: "two-han", closedHan: 2, openHan: 2, incompatible: ["pinfu", "chiitoitsu", "suuankou"] },
-  { id: "sankantsu", name: "Sankantsu", detail: "Three kans", category: "two-han", closedHan: 2, openHan: 2 },
-  { id: "chanta", name: "Chanta", detail: "Every group contains a terminal or honour", category: "two-han", closedHan: 2, openHan: 1, incompatible: ["junchan"] },
-  { id: "honroutou", name: "Honroutou", detail: "Only terminals and honours", category: "two-han", closedHan: 2, openHan: 2 },
-  { id: "shousangen", name: "Shousangen", detail: "Two dragon sets and a pair of the third dragon", category: "two-han", closedHan: 2, openHan: 2 },
+  { id: "chiitoitsu", name: "Chiitoitsu", detail: "Seven different pairs", category: "patterns", closedHan: 2, requiresClosed: true, incompatible: ["pinfu", "toitoi", "sanankou", "suuankou"] },
+  { id: "ittsu", name: "Ittsuu", detail: "123, 456 and 789 in one suit", category: "patterns", closedHan: 2, openHan: 1 },
+  { id: "sanshoku-doujun", name: "Sanshoku doujun", detail: "The same run in all three suits", category: "patterns", closedHan: 2, openHan: 1 },
+  { id: "sanshoku-doukou", name: "Sanshoku doukou", detail: "The same triplet in all three suits", category: "patterns", closedHan: 2, openHan: 2 },
+  { id: "toitoi", name: "Toitoi", detail: "Four triplets or kans; no runs", category: "patterns", closedHan: 2, openHan: 2, incompatible: ["pinfu", "chiitoitsu"] },
+  { id: "sanankou", name: "Sanankou", detail: "Three concealed triplets or kans", category: "patterns", closedHan: 2, openHan: 2, incompatible: ["pinfu", "chiitoitsu", "suuankou"] },
+  { id: "sankantsu", name: "Sankantsu", detail: "Three kans", category: "patterns", closedHan: 2, openHan: 2 },
+  { id: "chanta", name: "Chanta", detail: "Every group contains a terminal or honour", category: "suits", closedHan: 2, openHan: 1, incompatible: ["junchan"] },
+  { id: "honroutou", name: "Honroutou", detail: "Only terminals and honours", category: "suits", closedHan: 2, openHan: 2 },
+  { id: "shousangen", name: "Shousangen", detail: "Two dragon sets and a pair of the third dragon", category: "patterns", closedHan: 2, openHan: 2 },
 
-  { id: "ryanpeiko", name: "Ryanpeikou", detail: "Two pairs of identical runs; closed hand", category: "three-han", closedHan: 3, requiresClosed: true, incompatible: ["iipeiko"] },
-  { id: "honitsu", name: "Honitsu", detail: "One suit and honours", category: "three-han", closedHan: 3, openHan: 2, incompatible: ["chinitsu"] },
-  { id: "junchan", name: "Junchan", detail: "Every group contains 1 or 9; no honours", category: "three-han", closedHan: 3, openHan: 2, incompatible: ["chanta"] },
-  { id: "renhou", name: "Renhou", detail: "Non-dealer win before your first draw", category: "five-han", closedHan: 5, requiresClosed: true, incompatible: ["pinfu", "iipeiko", "ryanpeiko", "riichi", "double-riichi", "ippatsu", "tanyao", "ittsu", "sanshoku-doujun", "sanshoku-doukou", "toitoi", "sanankou", "sankantsu", "chanta", "junchan", "honroutou", "shousangen", "honitsu", "chinitsu"] },
-  { id: "chinitsu", name: "Chinitsu", detail: "One suit, no honours", category: "six-han", closedHan: 6, openHan: 5, incompatible: ["honitsu"] },
+  { id: "ryanpeiko", name: "Ryanpeikou", detail: "Two pairs of identical runs; closed hand", category: "patterns", closedHan: 3, requiresClosed: true, incompatible: ["iipeiko"] },
+  { id: "honitsu", name: "Honitsu", detail: "One suit and honours", category: "suits", closedHan: 3, openHan: 2, incompatible: ["chinitsu"] },
+  { id: "junchan", name: "Junchan", detail: "Every group contains 1 or 9; no honours", category: "suits", closedHan: 3, openHan: 2, incompatible: ["chanta"] },
+  { id: "renhou", name: "Renhou", detail: "Non-dealer win before your first draw", category: "situational", closedHan: 5, requiresClosed: true, incompatible: ["pinfu", "iipeiko", "ryanpeiko", "riichi", "double-riichi", "ippatsu", "tanyao", "ittsu", "sanshoku-doujun", "sanshoku-doukou", "toitoi", "sanankou", "sankantsu", "chanta", "junchan", "honroutou", "shousangen", "honitsu", "chinitsu"] },
+  { id: "chinitsu", name: "Chinitsu", detail: "One suit, no honours", category: "suits", closedHan: 6, openHan: 5, incompatible: ["honitsu"] },
 
   { id: "tenhou", name: "Tenhou", detail: "Dealer wins on the opening draw", category: "yakuman", closedHan: 13, requiresClosed: true, yakuman: true },
   { id: "chiihou", name: "Chiihou", detail: "Non-dealer wins on the first draw before any call", category: "yakuman", closedHan: 13, requiresClosed: true, yakuman: true },
@@ -219,9 +221,22 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (needsGroupFu) {
     const yakuhai = [...selected].filter((id) => id.startsWith("yakuhai-"));
     const hasDoubleWindSet = yakuhai.includes("yakuhai-seat") && yakuhai.includes("yakuhai-round") && input.seatWind === input.roundWind;
-    const requiredYakuhaiGroups = yakuhai.length - (hasDoubleWindSet ? 1 : 0);
-    if (input.groups.length < requiredYakuhaiGroups) {
-      issues.push(`Add the triplet or kan for each selected dragon or wind set to count fu${hasDoubleWindSet ? " (the double-wind set counts for both)" : ""}.`);
+    const requiredYakuhai = new Set(yakuhai);
+    if (hasDoubleWindSet) {
+      requiredYakuhai.delete("yakuhai-seat");
+      requiredYakuhai.delete("yakuhai-round");
+      requiredYakuhai.add("yakuhai-double-wind");
+    }
+    const assignedYakuhai = input.groups.map((group) => group.yakuId).filter((id): id is string => Boolean(id));
+    if (new Set(assignedYakuhai).size !== assignedYakuhai.length) issues.push("Assign each dragon or wind yaku to a different group.");
+    for (const group of input.groups) {
+      if (group.yakuId && (!requiredYakuhai.has(group.yakuId) || group.tileKind !== "terminal-honor")) {
+        issues.push("Match the selected dragon or wind yaku to its honour triplet or kan, or mark this as another set.");
+        break;
+      }
+    }
+    if ([...requiredYakuhai].some((id) => !assignedYakuhai.includes(id))) {
+      issues.push("Assign each selected dragon or wind set to its matching triplet or kan to count fu.");
     }
   }
   if (!needsGroupFu) {
