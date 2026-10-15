@@ -2,7 +2,9 @@ const STORAGE_KEY = 'saujana_admin_session'
 const LEGACY_STORAGE_KEY = 'saujana_birthday_admin_session'
 const ADMIN_EMAIL = 'birthday-calendar-admin@saujana-bgc.com'
 const REQUIRED_ROLE = 'birthday_admin'
+const AUTH_REQUEST_TIMEOUT_MS = 8000
 let sharedRefreshPromise = null
+let authRevision = 0
 
 export function useAdminAuth() {
   const config = useRuntimeConfig()
@@ -52,14 +54,21 @@ export function useAdminAuth() {
   }
 
   async function authRequest(path, options = {}) {
-    return fetch(`${config.public.supabaseUrl}/auth/v1/${path}`, {
-      ...options,
-      headers: {
-        apikey: config.public.supabaseKey,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    })
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), AUTH_REQUEST_TIMEOUT_MS)
+    try {
+      return await fetch(`${config.public.supabaseUrl}/auth/v1/${path}`, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          apikey: config.public.supabaseKey,
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      })
+    } finally {
+      clearTimeout(timeout)
+    }
   }
 
   async function validateSession(candidate) {
@@ -75,24 +84,30 @@ export function useAdminAuth() {
   async function refreshSession() {
     if (!session.value?.refresh_token) return false
     if (sharedRefreshPromise) return sharedRefreshPromise
+    const revision = authRevision
     sharedRefreshPromise = (async () => {
       const response = await authRequest('token?grant_type=refresh_token', {
         method: 'POST',
         body: JSON.stringify({ refresh_token: session.value.refresh_token }),
       })
       if (!response.ok) {
-        clearStoredSessions()
-        session.value = null
-        storageType.value = null
+        if (revision === authRevision) {
+          clearStoredSessions()
+          session.value = null
+          storageType.value = null
+        }
         return false
       }
       const nextSession = await response.json()
       if (nextSession.user?.app_metadata?.role !== REQUIRED_ROLE) {
-        clearStoredSessions()
-        session.value = null
-        storageType.value = null
+        if (revision === authRevision) {
+          clearStoredSessions()
+          session.value = null
+          storageType.value = null
+        }
         return false
       }
+      if (revision !== authRevision) return false
       saveSession(nextSession, storageType.value ?? 'session')
       return true
     })()
@@ -100,27 +115,67 @@ export function useAdminAuth() {
   }
 
   async function restoreSession() {
-    if (isAuthenticated.value && await validateSession(session.value)) return true
-    const stored = loadStoredSession()
-    if (!stored?.session?.access_token) return false
-    session.value = stored.session
-    storageType.value = stored.type
-    const expiresSoon = Number(stored.session.expires_at ?? 0) <= Math.floor(Date.now() / 1000) + 30
-    if (expiresSoon && !(await refreshSession())) return false
-    if (!(await validateSession(session.value))) {
-      if (!(await refreshSession()) || !(await validateSession(session.value))) {
-        clearStoredSessions()
+    const revision = authRevision
+    isRestoring.value = true
+    try {
+      if (isAuthenticated.value) {
+        if (await validateSession(session.value)) return true
+        if (revision === authRevision) {
+          session.value = null
+          storageType.value = null
+        }
+      }
+      const stored = loadStoredSession()
+      if (!stored?.session?.access_token) return false
+      let candidate = stored.session
+      const expiresSoon = Number(candidate.expires_at ?? 0) <= Math.floor(Date.now() / 1000) + 30
+      if (expiresSoon) {
+        const response = await authRequest('token?grant_type=refresh_token', {
+          method: 'POST',
+          body: JSON.stringify({ refresh_token: candidate.refresh_token }),
+        })
+        if (!response.ok) {
+          clearStoredSessions()
+          return false
+        }
+        candidate = await response.json()
+        if (candidate.user?.app_metadata?.role !== REQUIRED_ROLE) {
+          clearStoredSessions()
+          return false
+        }
+      } else if (!(await validateSession(candidate))) {
+        const response = await authRequest('token?grant_type=refresh_token', {
+          method: 'POST',
+          body: JSON.stringify({ refresh_token: candidate.refresh_token }),
+        })
+        if (!response.ok) {
+          clearStoredSessions()
+          return false
+        }
+        candidate = await response.json()
+        if (candidate.user?.app_metadata?.role !== REQUIRED_ROLE || !(await validateSession(candidate))) {
+          clearStoredSessions()
+          return false
+        }
+      }
+      if (revision !== authRevision) return isAuthenticated.value
+      saveSession(candidate, stored.type)
+      return true
+    } catch (error) {
+      // A failed session check must never leave token-shaped state authenticated.
+      if (revision === authRevision) {
         session.value = null
         storageType.value = null
-        return false
       }
+      throw error
+    } finally {
+      isRestoring.value = false
     }
-    if (stored.legacy) saveSession(session.value, stored.type)
-    return true
   }
 
   async function login(username, password, rememberMe = true) {
     if (username.trim().toLowerCase() !== 'admin') return false
+    const revision = ++authRevision
     const response = await authRequest('token?grant_type=password', {
       method: 'POST',
       body: JSON.stringify({ email: ADMIN_EMAIL, password }),
@@ -128,11 +183,13 @@ export function useAdminAuth() {
     if (!response.ok) return false
     const nextSession = await response.json()
     if (nextSession.user?.app_metadata?.role !== REQUIRED_ROLE) return false
+    if (revision !== authRevision) return false
     saveSession(nextSession, rememberMe ? 'local' : 'session')
     return true
   }
 
   async function logout() {
+    authRevision += 1
     const token = session.value?.access_token
     if (token) {
       try {
@@ -164,6 +221,7 @@ export function useAdminAuth() {
     window.__saujanaAdminStorageListener = true
     window.addEventListener('storage', (event) => {
       if ([STORAGE_KEY, LEGACY_STORAGE_KEY].includes(event.key) && !event.newValue) {
+        authRevision += 1
         session.value = null
         storageType.value = null
       }

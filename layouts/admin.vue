@@ -1,14 +1,12 @@
 <template>
   <main class="admin-root">
-    <section v-if="auth.isRestoring" class="admin-login-card" aria-live="polite">
-      <p class="eyebrow">Saujana organisers</p><h1>Opening your workspace</h1><p>Please wait while we check your session.</p>
-    </section>
-    <section v-else-if="!auth.isAuthenticated" class="admin-login-wrap">
+    <section v-if="!auth.isAuthenticated" class="admin-login-wrap">
       <div class="admin-login-intro"><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>One organiser sign-in for Birthday Club and Riichi Open.</p></div>
       <form class="admin-login-card" @submit.prevent="submitLogin">
         <label>Username<input v-model="username" autocomplete="username" required></label>
         <label>Password<input v-model="password" type="password" autocomplete="current-password" required></label>
         <label class="remember"><input v-model="remember" type="checkbox"> Remember me on this device</label>
+        <p v-if="auth.isRestoring" class="admin-help" role="status">Checking for a saved session. You can sign in here if needed.</p>
         <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
         <button class="admin-primary" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</button>
         <p class="admin-help">Use the existing Birthday Club admin username and password.</p>
@@ -41,9 +39,7 @@ function isCurrentPage(to) {
 }
 
 onMounted(async () => {
-  auth.isRestoring.value = true
-  try { await auth.restoreSession() } catch { /* The sign-in form remains available. */ }
-  finally { auth.isRestoring.value = false }
+  try { await auth.restoreSession() } catch { error.value = 'We could not check your saved session. Please sign in again.' }
 })
 
 async function submitLogin() {
