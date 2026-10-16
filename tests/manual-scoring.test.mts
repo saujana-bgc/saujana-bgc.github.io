@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { calculateManualScore, type ManualScoreInput } from '../utils/scoring/manual.ts'
+import { calculateManualHanFuScore, calculateManualScore, type ManualScoreInput } from '../utils/scoring/manual.ts'
 
 function hand(overrides: Partial<ManualScoreInput> = {}): ManualScoreInput {
   return {
@@ -82,4 +82,42 @@ test('automatic Menzen Tsumo counts as a yaku and dealer payments include honba'
   assert.equal(result.han, 1)
   assert.deepEqual(result.tsumo, { dealerPays: 600, nonDealerPays: 600 })
   assert.equal(result.points, 1800)
+})
+
+test('quick han and fu entry scores known totals and validates special fu totals', () => {
+  const ron = calculateManualHanFuScore({ han: 2, fu: 30, isClosed: true, isDealer: false, winType: 'ron', playerCount: 4, honba: 0 })
+  assert.deepEqual(ron.issues, [])
+  assert.equal(ron.points, 2000)
+
+  const pinfuTsumo = calculateManualHanFuScore({ han: 2, fu: 20, isClosed: true, isDealer: false, winType: 'tsumo', playerCount: 4, honba: 0 })
+  assert.deepEqual(pinfuTsumo.issues, [])
+  assert.deepEqual(pinfuTsumo.tsumo, { dealerPays: 700, nonDealerPays: 400 })
+
+  const ronTwentyFu = calculateManualHanFuScore({ han: 2, fu: 20, isClosed: true, isDealer: false, winType: 'ron', playerCount: 4, honba: 0 })
+  assert.ok(ronTwentyFu.issues.some(issue => issue.includes('only possible on tsumo')))
+  assert.equal(ronTwentyFu.points, 0)
+
+  const openTwentyFu = calculateManualHanFuScore({ han: 2, fu: 20, isClosed: false, isDealer: false, winType: 'tsumo', playerCount: 4, honba: 0 })
+  assert.ok(openTwentyFu.issues.some(issue => issue.includes('closed hand with Pinfu')))
+
+  const oneHanTwentyFiveFu = calculateManualHanFuScore({ han: 1, fu: 25, isClosed: true, isDealer: false, winType: 'ron', playerCount: 4, honba: 0 })
+  assert.ok(oneHanTwentyFiveFu.issues.some(issue => issue.includes('at least 2 han')))
+
+  const mangan = calculateManualHanFuScore({ han: 5, fu: 0, isClosed: false, isDealer: true, winType: 'ron', playerCount: 4, honba: 0 })
+  assert.deepEqual(mangan.issues, [])
+  assert.equal(mangan.fu, null)
+  assert.equal(mangan.points, 12000)
+})
+
+test('win-method and dealer-only yaku are rejected when the hand does not match', () => {
+  const chankanTsumo = calculateManualScore(hand({ selectedYaku: ['chankan'], winType: 'tsumo' }))
+  assert.ok(chankanTsumo.issues.some(issue => issue.includes('requires ron')))
+  assert.equal(chankanTsumo.points, 0)
+
+  const haiteiRon = calculateManualScore(hand({ selectedYaku: ['haitei'], winType: 'ron' }))
+  assert.ok(haiteiRon.issues.some(issue => issue.includes('requires tsumo')))
+
+  const tenhouNonDealer = calculateManualScore(hand({ selectedYaku: ['tenhou'], winType: 'tsumo' }))
+  assert.ok(tenhouNonDealer.issues.some(issue => issue.includes('requires the dealer')))
+  assert.equal(tenhouNonDealer.points, 0)
 })

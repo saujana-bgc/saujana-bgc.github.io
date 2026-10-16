@@ -175,6 +175,56 @@ export interface ManualScoreResult {
   bonusHan: number;
 }
 
+export interface ManualHanFuInput {
+  han: number;
+  fu: number;
+  isClosed: boolean;
+  isDealer: boolean;
+  winType: "ron" | "tsumo";
+  playerCount: 3 | 4;
+  honba: number;
+  kiriageMangan?: boolean;
+}
+
+/** Score a hand when its total han and fu are already known. */
+export function calculateManualHanFuScore(input: ManualHanFuInput): ManualScoreResult {
+  const issues: string[] = [];
+  const validHan = Number.isSafeInteger(input.han) && input.han >= 1;
+  const validFu = new Set([20, 25, ...Array.from({ length: 9 }, (_, index) => 30 + index * 10)]).has(input.fu);
+  if (!validHan) issues.push("Enter a whole number of han greater than zero. A hand needs a yaku to win.");
+  if (!Number.isSafeInteger(input.honba) || input.honba < 0) issues.push("Honba must be a whole number of zero or more.");
+
+  if (validHan && input.han < 5) {
+    if (!validFu) issues.push("Choose a valid fu total.");
+    if (input.fu === 20 && input.winType !== "tsumo") issues.push("20 fu is only possible on tsumo.");
+    if (input.fu === 20 && input.han < 2) issues.push("20 fu requires at least 2 han.");
+    if (input.fu === 20 && !input.isClosed) issues.push("20 fu requires a closed hand with Pinfu on tsumo.");
+    if (input.fu === 25 && input.han < 2) issues.push("25 fu is Seven Pairs, which is worth at least 2 han.");
+    if (input.fu === 25 && !input.isClosed) issues.push("25 fu is Seven Pairs and requires a closed hand.");
+    if (input.han === 1 && input.fu < 30) issues.push("A 1-han hand cannot score below 30 fu.");
+  }
+
+  const fu = validHan && input.han >= 5 ? 30 : input.fu;
+  const name = validHan ? handName(input.han, fu, 0, input.kiriageMangan ?? false) : undefined;
+  const payments = issues.length === 0
+    ? calculatePoints(input.han, fu, input.isDealer, input.winType, 0, input.kiriageMangan ?? false, input.honba, input.playerCount)
+    : null;
+  return {
+    issues,
+    isYakuman: false,
+    han: validHan ? input.han : 0,
+    yakumanUnits: 0,
+    fu: validHan && input.han < 5 ? fu : null,
+    fuBreakdown: null,
+    handName: name,
+    points: payments?.total ?? 0,
+    ron: payments?.ron ?? 0,
+    tsumo: payments?.tsumo,
+    yaku: [],
+    bonusHan: 0,
+  };
+}
+
 function tripletFu(group: ManualGroup): number {
   const terminal = group.tileKind === "terminal-honor";
   if (group.type === "kan") {
