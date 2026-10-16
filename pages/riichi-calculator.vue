@@ -10,7 +10,7 @@
       <aside v-show="!keyboardOpen" class="result-panel" :class="{ 'result-ready': resultReady, 'result-tsumo': resultReady && Boolean(result.tsumo) }" aria-labelledby="result-heading">
         <p class="sr-only" aria-live="polite">{{ resultAnnouncement }}</p>
         <div class="result-inner">
-          <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><button v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</button><button type="button" class="reset-button" @click="resetCalculator">Clear hand</button></div></div>
+          <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><button v-if="resultReady" type="button" class="reset-button" @click="copyResult">{{ copyLabel }}</button><button v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</button><button type="button" class="reset-button" @click="resetCalculator">Clear hand</button></div></div>
           <div v-if="resultReady && form.winType === 'ron'" class="result-amount">
             <span>{{ result.pao ? 'Total payment' : 'Discarder pays' }}</span>
             <strong>{{ formatPoints(result.points) }}</strong>
@@ -329,7 +329,7 @@
           </div>
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
-            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('shousangen')" class="field-hint">Mark the two different dragon sets. They must not match the dragon pair.</p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p><p v-else-if="form.selectedYaku.includes('junchan') || form.selectedYaku.includes('chinroutou')" class="field-hint">Use terminal triplets and kans only.</p><p v-else-if="form.selectedYaku.includes('tsuuiisou')" class="field-hint">Use honour triplets and kans only.</p><p v-else-if="form.selectedYaku.some(id => ['chanta', 'honroutou'].includes(id))" class="field-hint">Use terminal or honour triplets and kans only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
+            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('shousangen')" class="field-hint">Mark the two different dragon sets. They must not match the dragon pair.</p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p><p v-else-if="form.selectedYaku.includes('junchan') || form.selectedYaku.includes('chinroutou')" class="field-hint">Use terminal triplets and kans only.</p><p v-else-if="form.selectedYaku.includes('tsuuiisou')" class="field-hint">Use honour triplets and kans only.</p><p v-else-if="form.selectedYaku.some(id => ['chanta', 'honroutou'].includes(id))" class="field-hint">Use terminal or honour triplets and kans only.</p></div><span class="group-count">{{ form.groups.length }} / 4<span v-if="fuPreview"> · {{ fuPreview }}</span></span></div>
             <p v-if="form.groups.some(group => !group.concealed) && selectedYakuOptions.some(yaku => yaku.requiresClosed)" class="field-problems">A called group opens the hand, which conflicts with the selected closed-only yaku. Remove the call or that yaku.</p>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
@@ -500,6 +500,7 @@ const openYakuCategories = ref(new Set(['common']))
 const categoriesBeforeSearch = ref(null)
 const hasInteracted = ref(false)
 const showBreakdown = ref(false)
+const copyLabel = ref('Copy')
 const showGroupOptions = ref(false)
 const groupTypeFilter = ref('triplet')
 const breakdownSection = ref(null)
@@ -518,6 +519,7 @@ const keyboardOpen = ref(false)
 let groupId = 0
 let nextIssueHighlightTimer
 let persistTimer
+let copyLabelTimer
 
 watch(form, () => { if (undoSnapshot.value) undoSnapshot.value = null }, { deep: true, flush: 'sync' })
 watch(entryMode, () => { if (undoSnapshot.value) undoSnapshot.value = null }, { flush: 'sync' })
@@ -776,6 +778,37 @@ const paoTsumoTotal = computed(() => {
   return total
 })
 const headlinePoints = computed(() => form.winType === 'tsumo' && result.value.pao ? paoTsumoTotal.value : result.value.points)
+const resultShareText = computed(() => {
+  const score = result.value
+  const method = form.winType === 'ron' ? 'Ron' : 'Tsumo'
+  const seat = isDealer.value ? 'Dealer' : 'Non-dealer'
+  const value = score.isYakuman
+    ? (score.yakumanUnits > 1 ? `${score.yakumanUnits} × Yakuman` : 'Yakuman')
+    : `${score.han} han${score.fu ? ` ${score.fu} fu` : ''}`
+  const honba = form.honba ? ` · ${form.honba} honba` : ''
+  if (form.winType === 'ron') {
+    const payer = score.pao
+      ? `Responsible ${formatPoints(score.pao.responsiblePays)}${score.pao.discarderPays ? ` · Discarder ${formatPoints(score.pao.discarderPays)}` : ''}`
+      : `Discarder pays ${formatPoints(score.points)}`
+    return `${method} · ${seat} · ${value} — ${payer}${honba}`
+  }
+  if (score.pao?.otherTsumo) {
+    const others = (isDealer.value || score.pao.responsibleIsDealer)
+      ? `Each other ${formatPoints(score.pao.otherTsumo.nonDealerPays)}`
+      : `Dealer ${formatPoints(score.pao.otherTsumo.dealerPays)} · Other ${formatPoints(score.pao.otherTsumo.nonDealerPays)}`
+    return `${method} · ${seat} · ${value} — Responsible ${formatPoints(score.pao.responsiblePays)} · ${others}${honba}`
+  }
+  if (score.pao) return `${method} · ${seat} · ${value} — Responsible pays ${formatPoints(score.pao.responsiblePays)}${honba}`
+  const split = isDealer.value
+    ? `Each pays ${formatPoints(score.tsumo.nonDealerPays)}`
+    : `Dealer ${formatPoints(score.tsumo.dealerPays)} · Others ${formatPoints(score.tsumo.nonDealerPays)}`
+  return `${method} · ${seat} · ${value} — Total ${formatPoints(score.points)} · ${split}${honba}`
+})
+const fuPreview = computed(() => {
+  const breakdown = result.value.fuBreakdown
+  if (!breakdown) return ''
+  return breakdown.raw < breakdown.total ? `${breakdown.total} fu (from ${breakdown.raw})` : `${breakdown.total} fu`
+})
 const resultAnnouncement = computed(() => {
   if (!resultReady.value) return hasInteracted.value ? nextStepLabel.value : ''
   const score = result.value
@@ -1026,7 +1059,37 @@ function groupTileExamples(group) {
 
 function selectTsumoFromSearch() {
   form.winType = 'tsumo'
+  winSection.value?.focus({ preventScroll: true })
   winSection.value?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+}
+
+async function copyResult() {
+  if (!resultReady.value) return
+  const text = resultShareText.value
+  let copied = false
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      copied = true
+    } else {
+      throw new Error('Clipboard API unavailable.')
+    }
+  } catch {
+    try {
+      const area = document.createElement('textarea')
+      area.value = text
+      area.setAttribute('readonly', '')
+      area.style.position = 'fixed'
+      area.style.opacity = '0'
+      document.body.appendChild(area)
+      area.select()
+      copied = document.execCommand('copy')
+      document.body.removeChild(area)
+    } catch { copied = false }
+  }
+  copyLabel.value = copied ? 'Copied' : 'Copy failed'
+  window.clearTimeout(copyLabelTimer)
+  copyLabelTimer = window.setTimeout(() => { copyLabel.value = 'Copy' }, 1600)
 }
 
 function isConcealedKanBack(group, index) {
@@ -1143,6 +1206,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   window.clearTimeout(nextIssueHighlightTimer)
+  window.clearTimeout(copyLabelTimer)
   window.clearTimeout(persistTimer)
   flushSessionPersist()
   window.visualViewport?.removeEventListener('resize', updateKeyboardState)
