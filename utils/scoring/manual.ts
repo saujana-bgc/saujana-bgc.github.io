@@ -315,6 +315,9 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     if (input.groups.some((group) => group.tileKind !== "simple")) {
       issues.push("Tanyao cannot include terminal or honour triplets and kans. Remove those groups or deselect Tanyao.");
     }
+    if (input.waitType === "penchan") {
+      issues.push("Tanyao cannot use an edge wait because it needs a 1 or 9. Choose another wait or deselect Tanyao.");
+    }
   }
   if (input.pairChoice === "double-wind" && input.seatWind !== input.roundWind) {
     issues.push("A double-wind pair must match both your seat wind and the round wind.");

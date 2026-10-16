@@ -233,7 +233,7 @@
             <span class="step-number">{{ selectedYakuman.length ? 3 : 4 }}</span>
             <div>
               <h2 id="fu-heading">{{ needsFuQuestions ? 'Count your fu' : 'Check hand details' }}</h2>
-            <p>{{ needsFuQuestions ? 'Choose the pair and wait. Add triplets and kans; skip runs.' : 'Fu entry is not needed. You can correct previously entered details here.' }}</p>
+              <p>{{ needsFuQuestions ? (form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple' ? 'Tanyao has a number-tile pair worth 0 fu. Choose the wait and add any triplets or kans.' : 'Choose the pair and wait. Add triplets and kans; skip runs.') : 'Fu entry is not needed. You can correct previously entered details here.' }}</p>
             </div>
           </div>
 
@@ -248,21 +248,23 @@
               <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id"><span>{{ pair.label }}</span><span v-if="pair.tiles?.length" class="tile-strip" aria-hidden="true"><img v-for="tile in pair.tiles" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><small>+{{ pair.fu }} fu</small></button>
             </div>
             <p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">Tanyao uses only number tiles 2–8, including the pair.</p>
-            <p class="field-hint">A pair that is both your seat wind and round wind is 4 fu on this sheet.</p>
+            <p v-else class="field-hint">A pair that is both your seat wind and round wind is 4 fu on this sheet.</p>
             <ul v-if="shouldShowProblems && fieldIssues.pair.length" class="field-problems"><li v-for="issue in fieldIssues.pair" :key="issue">{{ issue }}</li></ul>
           </div>
 
           <div v-if="showWaitQuestion" ref="waitSection" class="fu-field" tabindex="-1">
             <span class="field-label">Winning wait</span>
             <p class="field-hint winning-tile-hint">The gold-outlined tile completes the hand.</p>
+            <p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">Tanyao cannot use an edge wait because it needs a 1 or 9.</p>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Winning wait">
-              <button v-for="wait in waits" :key="wait.id" type="button" class="choice-button wait-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id"><span>{{ wait.label }}</span><span v-for="example in wait.examples" :key="example.caption" class="wait-example"><span class="tile-strip" aria-hidden="true"><img v-for="(tile, index) in example.tiles" :key="`${tile}-${index}`" :src="`/tiles/${tile}.svg`" alt="" :class="{ 'winning-tile': index === example.tiles.length - 1 }" /></span><small>{{ example.caption }}</small></span><small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
+              <button v-for="wait in availableWaitOptions" :key="wait.id" type="button" class="choice-button wait-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id"><span>{{ wait.label }}</span><span v-for="example in wait.examples" :key="example.caption" class="wait-example"><span class="tile-strip" aria-hidden="true"><img v-for="(tile, index) in example.tiles" :key="`${tile}-${index}`" :src="`/tiles/${tile}.svg`" alt="" :class="{ 'winning-tile': index === example.tiles.length - 1 }" /></span><small>{{ example.caption }}</small></span><small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
             </div>
             <ul v-if="shouldShowProblems && fieldIssues.wait.length" class="field-problems"><li v-for="issue in fieldIssues.wait" :key="issue">{{ issue }}</li></ul>
           </div>
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
             <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
+            <p v-if="form.groups.some(group => !group.concealed) && selectedYakuOptions.some(yaku => yaku.requiresClosed)" class="field-problems">A called group opens the hand, which conflicts with the selected closed-only yaku. Remove the call or that yaku.</p>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
                 <div class="group-row-main"><strong>{{ groupName(group) }}</strong><small>{{ groupFu(group) }} fu</small><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, tileIndex) in groupTileExamples(group)" :key="`${tile}-${tileIndex}`"><span v-if="isConcealedKanBack(group, tileIndex)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span></div>
@@ -424,6 +426,9 @@ const keyboardOpen = ref(false)
 let groupId = 0
 let nextIssueHighlightTimer
 
+watch(form, () => { undoSnapshot.value = null }, { deep: true, flush: 'sync' })
+watch(entryMode, () => { undoSnapshot.value = null }, { flush: 'sync' })
+
 const directFuOptions = computed(() => {
   const han = integerAtLeastZero(form.directHan)
   return [20, 25, ...Array.from({ length: 9 }, (_, index) => 30 + index * 10)]
@@ -477,6 +482,7 @@ const availablePairOptions = computed(() => pairOptions
 const groupOptionsForPicker = computed(() => groupOptions.filter(option => option.type === groupTypeFilter.value && (!form.selectedYaku.includes('tanyao') || option.tileKind === 'simple')))
 const isClosed = computed(() => form.isClosed)
 const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
+const availableWaitOptions = computed(() => waits.filter(wait => !form.selectedYaku.includes('tanyao') || wait.id !== 'penchan' || form.waitType === 'penchan'))
 const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.selectedYaku.includes('double-riichi'))
 const selectedYakuman = computed(() => form.selectedYaku.filter(id => MANUAL_YAKU.find(yaku => yaku.id === id)?.yakuman))
 const selectedYakuOptions = computed(() => form.selectedYaku.map(id => MANUAL_YAKU.find(yaku => yaku.id === id)).filter(Boolean))
@@ -534,12 +540,12 @@ const resultReady = computed(() => entryMode.value === 'yaku'
 const shouldShowProblems = computed(() => entryMode.value === 'yaku' && hasInteracted.value && result.value.issues.some(issue => !/^Choose your pair|^Choose the wait|^Select at least one yaku/.test(issue)))
 const needsSetConfirmation = computed(() => entryMode.value === 'yaku' && needsFuQuestions.value && form.groups.length < 4 && !form.groupsConfirmed)
 const needsFuQuestions = computed(() => !result.value.isYakuman && result.value.han > 0 && result.value.han < 5 && form.handShape === 'standard' && !isPinfu.value)
-const showPairQuestion = computed(() => needsFuQuestions.value || fieldIssues.value.pair.some(issue => !issue.startsWith('Choose your pair')))
+const showPairQuestion = computed(() => (needsFuQuestions.value && !(form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple')) || fieldIssues.value.pair.some(issue => !issue.startsWith('Choose your pair')))
 const showWaitQuestion = computed(() => needsFuQuestions.value || fieldIssues.value.wait.some(issue => !issue.startsWith('Choose the wait')))
-const showGroupBuilder = computed(() => needsFuQuestions.value || fieldIssues.value.groups.length > 0)
+const showGroupBuilder = computed(() => needsFuQuestions.value || form.groups.length > 0 || fieldIssues.value.groups.length > 0)
 const showFuSection = computed(() => showPairQuestion.value || showWaitQuestion.value || showGroupBuilder.value)
 const needsYakuWindConfirmation = computed(() => form.selectedYaku.some(id => ['yakuhai-seat', 'yakuhai-round'].includes(id)))
-const needsPairWindConfirmation = computed(() => needsFuQuestions.value && ['seat-wind', 'round-wind', 'double-wind'].includes(form.pairChoice))
+const needsPairWindConfirmation = computed(() => needsFuQuestions.value && !form.selectedYaku.includes('tanyao') && ['seat-wind', 'round-wind', 'double-wind'].includes(form.pairChoice))
 const tableWindsNeeded = computed(() => needsPairWindConfirmation.value || needsYakuWindConfirmation.value)
 const seatWindConfirmed = computed(() => form.isDealer || form.seatWindConfirmed)
 const roundWindConfirmed = computed(() => form.roundWindConfirmed)
@@ -553,7 +559,7 @@ const fieldIssues = computed(() => {
     else if (/^Suuankou on ron|^Suuankou needs a pair wait|^Double (Suuankou|Kokushi|Nine Gates)/.test(issue)) fields.special.push(issue)
     else if (/^Choose your pair/.test(issue) && needsWindsConfirmation.value) continue
     else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair/.test(issue)) fields.pair.push(issue)
-    else if (/^Choose the wait|^Pinfu needs a two-sided wait/.test(issue)) fields.wait.push(issue)
+    else if (/^Choose the wait|^Pinfu needs a two-sided wait|^Tanyao cannot use an edge wait/.test(issue)) fields.wait.push(issue)
     else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai|Tanyao cannot include terminal or honour triplets and kans/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
   }
@@ -727,7 +733,10 @@ function toggleYaku(id) {
   }
   if (isDisabled(id)) return
   if (id === 'chiitoitsu' || id === 'kokushi') setHandShape(id)
-  else form.selectedYaku.push(id)
+  else {
+    form.selectedYaku.push(id)
+    if (id === 'tanyao' && !form.pairChoice) form.pairChoice = 'simple'
+  }
 }
 
 function setHandShape(shape) {
@@ -811,7 +820,8 @@ function limitName(name) {
 }
 
 async function resetCalculator() {
-  undoSnapshot.value = JSON.parse(JSON.stringify({ form: toRaw(form), entryMode: entryMode.value }))
+  const previousHand = JSON.parse(JSON.stringify({ form: toRaw(form), entryMode: entryMode.value }))
+  undoSnapshot.value = null
   const table = { playerCount: form.playerCount, seatWind: form.seatWind, seatWindConfirmed: form.seatWindConfirmed, roundWind: form.roundWind, roundWindConfirmed: form.roundWindConfirmed, isDealer: form.isDealer, honba: form.honba }
   const currentEntryMode = entryMode.value
   Object.assign(form, initialState(), table)
@@ -823,6 +833,7 @@ async function resetCalculator() {
   showBreakdown.value = false
   showGroupOptions.value = false
   await nextTick()
+  undoSnapshot.value = previousHand
   const focusTarget = entryMode.value === 'hanfu' ? directHanInput.value : winSection.value
   focusTarget?.focus({ preventScroll: true })
   focusTarget?.scrollIntoView({ block: 'start', behavior: 'auto' })
@@ -830,9 +841,10 @@ async function resetCalculator() {
 
 async function undoClear() {
   if (!undoSnapshot.value) return
-  Object.assign(form, undoSnapshot.value.form)
-  entryMode.value = undoSnapshot.value.entryMode
+  const previousHand = undoSnapshot.value
   undoSnapshot.value = null
+  Object.assign(form, previousHand.form)
+  entryMode.value = previousHand.entryMode
   await nextTick()
   const focusTarget = entryMode.value === 'hanfu' ? directHanInput.value : winSection.value
   focusTarget?.focus({ preventScroll: true })
