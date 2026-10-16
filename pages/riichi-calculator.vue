@@ -47,7 +47,7 @@
           <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect 5 han and above.</p></div></div>
           <div class="direct-fields">
             <div class="direct-field"><label for="direct-han">Total han</label><p class="field-hint">{{ form.directHan ? 'Include yaku and bonus han' : 'Tap + or enter the total han' }}</p><div class="stepper" role="group" aria-label="Total han"><button type="button" aria-label="Remove one han" :disabled="form.directHan <= 0" @click="adjustDirect('directHan', -1)">−</button><input id="direct-han" ref="directHanInput" v-model.number="form.directHan" type="number" inputmode="numeric" min="0" max="99" @change="sanitizeDirect('directHan', 99)" /><button type="button" aria-label="Add one han" @click="adjustDirect('directHan', 1, 99)">+</button></div></div>
-            <div v-if="form.directHan > 0 && form.directHan < 5" class="direct-field"><label for="direct-fu">Fu</label><p class="field-hint">Choose the rounded fu total</p><select id="direct-fu" v-model.number="form.directFu"><option v-for="fu in directFuOptions" :key="fu" :value="fu">{{ fu }} fu</option></select></div>
+            <div v-if="form.directHan > 0 && form.directHan < 5" class="direct-field"><label for="direct-fu">Fu</label><p class="field-hint">Choose the rounded fu total</p><select id="direct-fu" v-model.number="form.directFu"><option v-if="!directFuOptions.includes(form.directFu)" :value="form.directFu">{{ form.directFu }} fu · check selection</option><option v-for="fu in directFuOptions" :key="fu" :value="fu">{{ fu }} fu</option></select></div>
           </div>
           <div v-if="form.directHan > 0 && form.directHan < 5 && [20, 25].includes(form.directFu)" class="direct-closed-control">
             <span class="field-label">Is the hand closed?</span>
@@ -482,7 +482,14 @@ const availablePairOptions = computed(() => pairOptions
 const groupOptionsForPicker = computed(() => groupOptions.filter(option => option.type === groupTypeFilter.value && (!form.selectedYaku.includes('tanyao') || option.tileKind === 'simple')))
 const isClosed = computed(() => form.isClosed)
 const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
-const availableWaitOptions = computed(() => waits.filter(wait => !form.selectedYaku.includes('tanyao') || wait.id !== 'penchan' || form.waitType === 'penchan'))
+const availableWaitOptions = computed(() => waits
+  .filter(wait => !form.selectedYaku.includes('tanyao') || wait.id !== 'penchan' || form.waitType === 'penchan')
+  .map(wait => form.selectedYaku.includes('tanyao') && wait.id === 'ryanmen'
+    ? { ...wait, examples: [
+      { tiles: ['Man3', 'Man4', 'Man2'], caption: '2 completes' },
+      { tiles: ['Man3', 'Man4', 'Man5'], caption: '5 completes' },
+    ] }
+    : wait))
 const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.selectedYaku.includes('double-riichi'))
 const selectedYakuman = computed(() => form.selectedYaku.filter(id => MANUAL_YAKU.find(yaku => yaku.id === id)?.yakuman))
 const selectedYakuOptions = computed(() => form.selectedYaku.map(id => MANUAL_YAKU.find(yaku => yaku.id === id)).filter(Boolean))
@@ -845,6 +852,7 @@ async function undoClear() {
   undoSnapshot.value = null
   Object.assign(form, previousHand.form)
   entryMode.value = previousHand.entryMode
+  hasInteracted.value = true
   await nextTick()
   const focusTarget = entryMode.value === 'hanfu' ? directHanInput.value : winSection.value
   focusTarget?.focus({ preventScroll: true })
@@ -880,10 +888,6 @@ watch(() => [form.winType, form.waitType], () => {
 }, { flush: 'sync' })
 
 watch(() => [form.winType, form.isClosed], () => { hasInteracted.value = true }, { flush: 'sync' })
-
-watch(() => [form.winType, form.directHan], () => {
-  if (!directFuOptions.value.includes(form.directFu)) form.directFu = directFuOptions.value[0] ?? 30
-})
 
 onMounted(() => {
   window.visualViewport?.addEventListener('resize', updateKeyboardState)
@@ -926,6 +930,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .choice-button { min-height: 42px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 7px; background: #fff; color: var(--clay-text); font-size: .8rem; line-height: 1.35; cursor: pointer; transition: background-color .16s, border-color .16s, color .16s; }
 .choice-button:hover { border-color: var(--matcha-leaf); }
 .choice-button.selected { border-color: var(--matcha-leaf); background: var(--matcha-leaf); color: white; }
+.wait-button.selected .wait-example, .wait-button.selected .wait-example small { color: white; }
+.wait-button.selected .tile-strip { padding: 2px; border-radius: 3px; background: white; }
 .choice-button > span, .choice-button > small { display: block; }
 .choice-button > small { margin-top: 2px; font-size: .65rem; opacity: .75; }
 .hand-mode-row, .field-heading-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); }
