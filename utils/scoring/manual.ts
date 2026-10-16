@@ -78,6 +78,9 @@ export const MANUAL_YAKU: ManualYakuOption[] = [
   { id: "daisuushi", name: "Daisuushi", detail: "A set of all four winds", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true, incompatible: ["kokushi", "shousuushi"] },
 ];
 
+/** Yaku whose pattern spans several groups, so every triplet and kan must be listed to check them. */
+export const STRUCTURAL_GROUP_YAKU = ["chanta", "junchan", "honitsu", "honroutou", "toitoi", "sanankou", "sankantsu", "sanshoku-doukou", "suuankou", "suuankantsu", "daisangen", "daisuushi", "shousuushi", "ryuuiisou", "chinroutou", "tsuuiisou"];
+
 const additionalYakuConflicts: Record<string, string[]> = {
   "yakuhai-haku": ["tanyao", "pinfu", "chiitoitsu", "junchan", "chinitsu", "kokushi", "chuuren", "chinroutou"],
   "yakuhai-hatsu": ["tanyao", "pinfu", "chiitoitsu", "junchan", "chinitsu", "kokushi", "chuuren", "chinroutou"],
@@ -264,7 +267,8 @@ export function calculateManualHanFuScore(input: ManualHanFuInput): ManualScoreR
   };
 }
 
-function tripletFu(group: ManualGroup): number {
+/** Fu for one triplet or kan, including the opened-by-ron rule for concealed triplets. */
+export function tripletFu(group: ManualGroup): number {
   const terminal = group.tileKind !== "simple";
   if (group.type === "kan") {
     if (group.concealed) return terminal ? 32 : 16;
@@ -307,7 +311,7 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   const isSevenPairs = input.handShape === "chiitoitsu" || selected.has("chiitoitsu");
   const allGroupsKnown = input.groups.length === 4 || input.groupsConfirmed === true;
   const requiresCompleteGroups = input.handShape === "standard"
-    && ["chanta", "junchan", "honitsu", "honroutou", "toitoi", "sanankou", "sankantsu", "sanshoku-doukou", "suuankou", "suuankantsu", "daisangen", "daisuushi", "shousuushi", "ryuuiisou", "chinroutou", "tsuuiisou"].some(id => selected.has(id));
+    && STRUCTURAL_GROUP_YAKU.some(id => selected.has(id));
   const possibleUnlistedGroups = input.groupsConfirmed
     ? 0
     : Math.max(0, 4 - input.groups.length);
