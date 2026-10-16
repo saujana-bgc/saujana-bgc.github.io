@@ -86,6 +86,10 @@
             <button type="button" class="choice-button" :class="{ selected: isClosed }" :aria-pressed="isClosed" @click="form.isClosed = true">Closed</button>
             <button type="button" class="choice-button" :class="{ selected: !isClosed }" :aria-pressed="!isClosed" @click="form.isClosed = false">Open</button>
             </div>
+            <div v-if="!form.isClosed && !form.groups.some(group => !group.concealed) && selectedYakuOptions.some(yaku => yaku.requiresClosed)" class="closed-hand-correction">
+              <p class="field-hint">If this was your only call and you have no open runs, mark the hand closed to score this yaku.</p>
+              <button type="button" class="choice-button" @click="form.isClosed = true">Mark hand closed</button>
+            </div>
             <details class="hand-help"><summary>What makes a hand open?</summary><p>Chi, pon or an open kan makes the hand open. A concealed kan stays closed. Closed tsumo adds Menzen tsumo automatically; open tsumo needs another yaku.</p></details>
           </template>
 
@@ -405,6 +409,7 @@ const initialState = () => ({
 const form = reactive(initialState())
 const entryMode = ref('yaku')
 const undoSnapshot = ref(null)
+const standardHandDraft = ref(null)
 const yakuSearch = ref('')
 const openYakuCategories = ref(new Set(['common']))
 const categoriesBeforeSearch = ref(null)
@@ -657,12 +662,10 @@ function setRoundWind(wind) {
 
 function adjustDirect(key, amount, max = Infinity) {
   form[key] = Math.min(max, Math.max(0, integerAtLeastZero(form[key]) + amount))
-  if (key === 'directHan' && form.directHan >= 2 && form.directFu === 30) form.directFu = 30
 }
 
 function sanitizeDirect(key, max) {
   form[key] = Math.min(max, integerAtLeastZero(form[key]))
-  if (key === 'directHan' && !directFuOptions.value.includes(form.directFu)) form.directFu = directFuOptions.value[0] ?? 30
 }
 
 function isYakuCategoryOpen(categoryId) {
@@ -730,8 +733,11 @@ function yakuUnavailableReason(id) {
 function toggleYaku(id) {
   hasInteracted.value = true
   if (isSelected(id)) {
+    if (id === 'chiitoitsu' || id === 'kokushi') {
+      setHandShape('standard')
+      return
+    }
     form.selectedYaku = form.selectedYaku.filter(selected => selected !== id)
-    if (id === 'chiitoitsu' || id === 'kokushi') form.handShape = 'standard'
     if (id === 'kokushi' || id === 'suuankou' || id === 'chuuren') {
       form.doubleYakumanWaits[id] = false
       if (['kokushi-thirteen', 'chuuren-nine'].includes(form.waitType)) form.waitType = null
@@ -748,13 +754,25 @@ function toggleYaku(id) {
 
 function setHandShape(shape) {
   hasInteracted.value = true
+  if (shape === form.handShape) return
+  if (form.handShape === 'standard') {
+    standardHandDraft.value = JSON.parse(JSON.stringify({
+      groups: form.groups,
+      pairChoice: form.pairChoice,
+      waitType: form.waitType,
+      groupsConfirmed: form.groupsConfirmed,
+    }))
+  }
+  const restoredStandard = shape === 'standard' ? standardHandDraft.value : null
   form.handShape = shape
-  form.groups = []
+  form.groups = restoredStandard?.groups ?? []
   showGroupOptions.value = false
-  form.pairChoice = null
-  form.waitType = null
+  form.pairChoice = restoredStandard?.pairChoice ?? null
+  form.waitType = restoredStandard?.waitType ?? null
+  form.groupsConfirmed = restoredStandard?.groupsConfirmed ?? false
   form.selectedYaku = form.selectedYaku.filter(id => !['chiitoitsu', 'kokushi'].includes(id))
   if (shape === 'chiitoitsu' || shape === 'kokushi') form.selectedYaku.push(shape === 'chiitoitsu' ? 'chiitoitsu' : 'kokushi')
+  if (shape === 'standard') standardHandDraft.value = null
   if (shape === 'chiitoitsu') openYakuCategories.value = new Set([...openYakuCategories.value, 'patterns'])
   if (shape === 'kokushi') openYakuCategories.value = new Set([...openYakuCategories.value, 'yakuman'])
   if (shape !== 'kokushi') form.doubleYakumanWaits.kokushi = false
@@ -827,11 +845,12 @@ function limitName(name) {
 }
 
 async function resetCalculator() {
-  const previousHand = JSON.parse(JSON.stringify({ form: toRaw(form), entryMode: entryMode.value }))
+  const previousHand = JSON.parse(JSON.stringify({ form: toRaw(form), entryMode: entryMode.value, standardHandDraft: standardHandDraft.value }))
   undoSnapshot.value = null
   const table = { playerCount: form.playerCount, seatWind: form.seatWind, seatWindConfirmed: form.seatWindConfirmed, roundWind: form.roundWind, roundWindConfirmed: form.roundWindConfirmed, isDealer: form.isDealer, honba: form.honba }
   const currentEntryMode = entryMode.value
   Object.assign(form, initialState(), table)
+  standardHandDraft.value = null
   entryMode.value = currentEntryMode
   yakuSearch.value = ''
   categoriesBeforeSearch.value = null
@@ -852,6 +871,7 @@ async function undoClear() {
   undoSnapshot.value = null
   Object.assign(form, previousHand.form)
   entryMode.value = previousHand.entryMode
+  standardHandDraft.value = previousHand.standardHandDraft ?? null
   hasInteracted.value = true
   await nextTick()
   const focusTarget = entryMode.value === 'hanfu' ? directHanInput.value : winSection.value
@@ -960,6 +980,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .no-sets-confirm { margin-top: 13px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: #faf9f6; }
 .automatic-note { margin: 14px 0 0; padding: 10px 12px; border-radius: 7px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .78rem; line-height: 1.55; }
 .field-problems { display: grid; gap: 5px; margin: 10px 0 0; padding-left: 18px; color: #823f38; font-size: .78rem; line-height: 1.5; }
+.closed-hand-correction { display: grid; justify-items: start; gap: 8px; margin: 10px 0 0; }
+.closed-hand-correction .field-hint { margin: 0; }
 .checkbox-row { display: flex; align-items: flex-start; gap: 9px; color: var(--clay-text); font-size: .79rem; line-height: 1.55; cursor: pointer; }
 .checkbox-row > input { flex: 0 0 auto; width: 17px; height: 17px; margin: 2px 0 0; accent-color: var(--matcha-leaf); }
 .search-field { min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
