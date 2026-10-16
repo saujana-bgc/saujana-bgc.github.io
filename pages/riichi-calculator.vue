@@ -58,6 +58,7 @@
             <button type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="form.seatWind = 'east'">Yes</button>
             <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="form.seatWind = isDealer ? 'south' : form.seatWind">No</button>
           </div>
+          <p class="field-hint">Your seat is {{ windNames[form.seatWind] }}; this is the {{ windNames[form.roundWind] }} round. Change either in Table settings.</p>
           <span class="field-label">Your hand</span>
           <div class="choice-row" role="group" aria-label="Open or closed hand">
             <button type="button" class="choice-button" :class="{ selected: isClosed }" :aria-pressed="isClosed" @click="form.isClosed = true">Closed</button>
@@ -164,16 +165,16 @@
             <span class="step-number">3</span>
             <div>
               <h2 id="dora-heading">Add bonus han</h2>
-              <p>Count all dora tiles in your winning hand, including red fives. Include ura dora only after riichi.</p>
+              <p>Enter your total han from dora and red fives. Add ura dora only after riichi; one tile can count for multiple bonuses.</p>
             </div>
           </div>
           <div class="bonus-grid">
             <div class="bonus-control">
-              <div class="bonus-copy"><label for="bonus-dora">Dora</label><span>One han per dora tile</span></div>
-              <div class="stepper" role="group" aria-label="Dora count">
-                <button type="button" aria-label="Remove one dora" :disabled="form.bonusHan.dora <= 0" @click="adjustBonus('dora', -1)">−</button>
+              <div class="bonus-copy"><label for="bonus-dora">Total dora han</label><span>Count all dora bonuses together</span></div>
+              <div class="stepper" role="group" aria-label="Total dora han">
+                <button type="button" aria-label="Remove one dora han" :disabled="form.bonusHan.dora <= 0" @click="adjustBonus('dora', -1)">−</button>
                 <input id="bonus-dora" v-model.number="form.bonusHan.dora" type="number" inputmode="numeric" min="0" step="1" @change="sanitizeBonus('dora')" />
-                <button type="button" aria-label="Add one dora" @click="adjustBonus('dora', 1)">+</button>
+                <button type="button" aria-label="Add one dora han" @click="adjustBonus('dora', 1)">+</button>
               </div>
             </div>
             <div v-if="form.playerCount === 3" class="bonus-control">
@@ -201,7 +202,7 @@
           <div v-if="showPairQuestion" ref="pairSection" class="fu-field" tabindex="-1">
             <span class="field-label">Your pair</span>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Pair type">
-              <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id">{{ pair.label }} <small>+{{ pair.fu }} fu</small></button>
+              <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id"><span>{{ pair.label }}</span><span v-if="pair.tiles?.length" class="tile-strip" aria-hidden="true"><img v-for="tile in pair.tiles" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><small>+{{ pair.fu }} fu</small></button>
             </div>
             <p class="field-hint">A pair that is both your seat wind and round wind is 4 fu on this sheet.</p>
             <ul v-if="shouldShowProblems && fieldIssues.pair.length" class="field-problems"><li v-for="issue in fieldIssues.pair" :key="issue">{{ issue }}</li></ul>
@@ -210,13 +211,13 @@
           <div v-if="showWaitQuestion" ref="waitSection" class="fu-field" tabindex="-1">
             <span class="field-label">Winning wait</span>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Winning wait">
-              <button v-for="wait in waits" :key="wait.id" type="button" class="choice-button wait-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id"><span>{{ wait.label }}</span><small class="wait-example">{{ wait.example }}</small><small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
+              <button v-for="wait in waits" :key="wait.id" type="button" class="choice-button wait-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id"><span>{{ wait.label }}</span><span v-for="example in wait.examples" :key="example.caption" class="wait-example"><span class="tile-strip" aria-hidden="true"><img v-for="(tile, index) in example.tiles" :key="`${tile}-${index}`" :src="`/tiles/${tile}.svg`" alt="" :class="{ 'winning-tile': index === example.tiles.length - 1 }" /></span><small>{{ example.caption }}</small></span><small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
             </div>
             <ul v-if="shouldShowProblems && fieldIssues.wait.length" class="field-problems"><li v-for="issue in fieldIssues.wait" :key="issue">{{ issue }}</li></ul>
           </div>
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
-            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add up to four groups. A winning triplet on ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
+            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add up to four groups; leave empty if your hand has only runs. A winning triplet on ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
                 <div><strong>{{ groupName(group) }}</strong><small>{{ groupFu(group) }} fu</small></div>
@@ -228,7 +229,7 @@
             <details v-if="form.groups.length < 4" class="add-group-menu">
               <summary>Add a group</summary>
               <div class="group-option-grid">
-                <button v-for="option in groupOptions" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
+                <button v-for="option in groupOptions" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><img v-for="tile in option.tileExamples" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
               </div>
             </details>
             <p v-else class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
@@ -237,18 +238,18 @@
         </section>
 
         <details ref="advancedSection" class="advanced-settings" :open="fieldIssues.table.length > 0" tabindex="-1">
-          <summary>More scoring details</summary>
+          <summary>Honba · {{ form.honba }}</summary>
           <div class="advanced-content">
             <ul v-if="shouldShowProblems && fieldIssues.table.length" class="field-problems"><li v-for="issue in fieldIssues.table" :key="issue">{{ issue }}</li></ul>
             <div class="bonus-control">
-              <div class="bonus-copy"><label for="honba-count">Honba on the table</label><span>+300 on ron, or +100 per player on tsumo</span></div>
+              <div class="bonus-copy"><label for="honba-count">Honba on the table</label><span>+300 on ron; +100 from each payer on tsumo</span></div>
               <div class="stepper" role="group" aria-label="Honba">
                 <button type="button" aria-label="Remove one honba" :disabled="form.honba <= 0" @click="form.honba = Math.max(0, form.honba - 1)">−</button>
                 <input id="honba-count" v-model.number="form.honba" type="number" inputmode="numeric" min="0" step="1" @change="form.honba = integerAtLeastZero(form.honba)" />
                 <button type="button" aria-label="Add one honba" @click="form.honba += 1">+</button>
               </div>
             </div>
-            <p>The Saujana table uses kiriage mangan off and 4 fu for a double-wind pair. Honba is included in payments.</p>
+            <p>The Saujana table uses kiriage mangan off and 4 fu for a double-wind pair.</p>
           </div>
         </details>
 
@@ -284,35 +285,61 @@ const categories = [
   { id: 'situational', label: 'Situational yaku' },
   { id: 'yakuman', label: 'Yakuman' },
 ]
+const yakuSearchAliases = {
+  riichi: ['reach', 'ready hand'],
+  'double-riichi': ['double reach', 'double riichi'],
+  tanyao: ['all simples', 'no terminals or honours'],
+  chiitoitsu: ['seven pairs'],
+  ittsu: ['pure straight', 'straight in one suit'],
+  'sanshoku-doujun': ['three colour straight', 'mixed triple sequence'],
+  'sanshoku-doukou': ['three colour triplets', 'triple triplets'],
+  honroutou: ['terminals and honours only', 'all terminals and honours'],
+  honitsu: ['half flush', 'one suit and honours'],
+  chinitsu: ['full flush', 'pure flush', 'one suit no honours'],
+  renhou: ['hand of man'],
+  tenhou: ['heavenly hand'],
+  chiihou: ['earthly hand'],
+  kokushi: ['thirteen orphans', 'thirteen terminals and honours'],
+  chuuren: ['nine gates'],
+  ryuuiisou: ['all green'],
+  suuankou: ['four concealed triplets', 'four concealed sets'],
+  suuankantsu: ['four kans', 'four quads'],
+  chinroutou: ['all terminals'],
+  tsuuiisou: ['all honours'],
+  daisangen: ['big three dragons'],
+  shousangen: ['little three dragons'],
+  shousuushi: ['little four winds'],
+  daisuushi: ['big four winds'],
+}
 
 const winOptions = [
   { id: 'ron', label: 'Ron · from a discard' },
   { id: 'tsumo', label: 'Tsumo · self-drawn' },
 ]
 const pairOptions = [
-  { id: 'simple', label: 'Number tile', fu: 0 },
-  { id: 'non-value-wind', label: 'Non-value wind', fu: 0 },
-  { id: 'dragon', label: 'Dragon', fu: 2 },
+  { id: 'simple', label: 'Number tile', fu: 0, tiles: ['Man5'] },
+  { id: 'non-value-wind', label: 'Other wind', fu: 0 },
+  { id: 'dragon', label: 'Dragon', fu: 2, tiles: ['Haku', 'Hatsu', 'Chun'] },
   { id: 'seat-wind', label: 'Seat wind', fu: 2 },
   { id: 'round-wind', label: 'Round wind', fu: 2 },
   { id: 'double-wind', label: 'Seat + round wind', fu: 4 },
 ]
 const waits = [
-  { id: 'ryanmen', label: 'Two-sided', example: '2 3 + [1 or 4]', fu: 0 },
-  { id: 'penchan', label: 'Edge', example: '1 2 + [3] · 8 9 + [7]', fu: 2 },
-  { id: 'kanchan', label: 'Middle', example: '2 _ 4 + [3]', fu: 2 },
-  { id: 'tanki', label: 'Pair wait', example: '5 + [5] → pair', fu: 2 },
-  { id: 'shanpon', label: 'Triplet wait', example: '55 / 77 + [5 or 7]', fu: 0 },
+  { id: 'ryanmen', label: 'Two-sided', examples: [{ tiles: ['Man2', 'Man3', 'Man1'], caption: '1 completes' }, { tiles: ['Man2', 'Man3', 'Man4'], caption: '4 completes' }], fu: 0 },
+  { id: 'penchan', label: 'Edge', examples: [{ tiles: ['Man1', 'Man2', 'Man3'], caption: '1–2 wait for 3' }, { tiles: ['Man8', 'Man9', 'Man7'], caption: '8–9 wait for 7' }], fu: 2 },
+  { id: 'kanchan', label: 'Middle', examples: [{ tiles: ['Man2', 'Man4', 'Man3'], caption: '2–4 wait for 3' }], fu: 2 },
+  { id: 'tanki', label: 'Pair wait', examples: [{ tiles: ['Man5', 'Man5'], caption: '5 completes the pair' }], fu: 2 },
+  { id: 'shanpon', label: 'Triplet wait', examples: [{ tiles: ['Man5', 'Man5', 'Man7', 'Man7', 'Man5'], caption: '5 completes 55' }, { tiles: ['Man5', 'Man5', 'Man7', 'Man7', 'Man7'], caption: '7 completes 77' }], fu: 0 },
 ]
 const groupOptions = [
-  { id: 'triplet-called-simple', type: 'triplet', tileKind: 'simple', concealed: false, label: 'Called triplet · simple', detail: '2–8 tile · 2 fu' , fu: 2 },
-  { id: 'triplet-called-terminal-honor', type: 'triplet', tileKind: 'terminal-honor', concealed: false, label: 'Called triplet · terminal or honour', detail: '1, 9 or honour · 4 fu', fu: 4 },
-  { id: 'triplet-concealed-simple', type: 'triplet', tileKind: 'simple', concealed: true, label: 'Concealed triplet · simple', detail: '2–8 tile · 4 fu', fu: 4 },
-  { id: 'triplet-concealed-terminal-honor', type: 'triplet', tileKind: 'terminal-honor', concealed: true, label: 'Concealed triplet · terminal or honour', detail: '1, 9 or honour · 8 fu', fu: 8 },
-  { id: 'kan-called-simple', type: 'kan', tileKind: 'simple', concealed: false, label: 'Called kan · simple', detail: '2–8 tile · 8 fu', fu: 8 },
-  { id: 'kan-called-terminal-honor', type: 'kan', tileKind: 'terminal-honor', concealed: false, label: 'Called kan · terminal or honour', detail: '1, 9 or honour · 16 fu', fu: 16 },
-  { id: 'kan-concealed-simple', type: 'kan', tileKind: 'simple', concealed: true, label: 'Concealed kan · simple', detail: '2–8 tile · 16 fu', fu: 16 },
-  { id: 'kan-concealed-terminal-honor', type: 'kan', tileKind: 'terminal-honor', concealed: true, label: 'Concealed kan · terminal or honour', detail: '1, 9 or honour · 32 fu', fu: 32 },
+  { id: 'triplet-called-simple', type: 'triplet', tileKind: 'simple', concealed: false, label: 'Called triplet · simple', detail: '2–8 tile · 2 fu', tileExamples: ['Man5', 'Man5', 'Man5'], fu: 2 },
+  { id: 'triplet-called-terminal-honor', type: 'triplet', tileKind: 'terminal-honor', concealed: false, label: 'Called triplet · terminal or honour', detail: '1, 9 or honour · 4 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 4 },
+  { id: 'triplet-concealed-simple', type: 'triplet', tileKind: 'simple', concealed: true, label: 'Concealed triplet · simple', detail: '2–8 tile · 4 fu', tileExamples: ['Man5', 'Man5', 'Man5'], fu: 4 },
+  { id: 'triplet-concealed-terminal-honor', type: 'triplet', tileKind: 'terminal-honor', concealed: true, label: 'Concealed triplet · terminal or honour', detail: '1, 9 or honour · 8 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 8 },
+  { id: 'kan-called-simple', type: 'kan', tileKind: 'simple', concealed: false, label: 'Called kan · simple', detail: '2–8 tile · 8 fu', tileExamples: ['Man5', 'Man5', 'Man5', 'Man5'], fu: 8 },
+  { id: 'kan-called-terminal-honor', type: 'kan', tileKind: 'terminal-honor', concealed: false, label: 'Called kan · terminal or honour', detail: '1, 9 or honour · 16 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 16 },
+  { id: 'kan-concealed-simple', type: 'kan', tileKind: 'simple', concealed: true, label: 'Concealed kan · simple', detail: '2–8 tile · 16 fu', tileExamples: ['Man5', 'Man5', 'Man5', 'Man5'], fu: 16 },
+  { id: 'kan-concealed-terminal-honor', type: 'kan', tileKind: 'terminal-honor', concealed: true, label: 'Concealed kan · terminal or honour', detail: '1, 9 or honour · 32 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 32 },
 ]
 
 const initialState = () => ({
@@ -349,15 +376,36 @@ const advancedSection = ref(null)
 let groupId = 0
 
 const windNames = { east: 'East', south: 'South', west: 'West', north: 'North' }
+const windTileNames = { east: 'Ton', south: 'Nan', west: 'Shaa', north: 'Pei' }
 const availableSeatWinds = computed(() => {
   const winds = ['east', 'south', 'west', 'north']
   return winds.filter(wind => form.playerCount === 4 || wind !== 'north').map(wind => ({ id: wind, label: windNames[wind] }))
 })
 const availableRoundWinds = computed(() => ['east', 'south'].map(wind => ({ id: wind, label: windNames[wind] })))
+const seatWindName = computed(() => windNames[form.seatWind])
+const roundWindName = computed(() => windNames[form.roundWind])
 const isDealer = computed(() => form.seatWind === 'east')
-const availablePairOptions = computed(() => pairOptions.filter(pair => form.seatWind === form.roundWind
-  ? !['seat-wind', 'round-wind'].includes(pair.id)
-  : pair.id !== 'double-wind'))
+const availablePairOptions = computed(() => pairOptions
+  .filter(pair => form.seatWind === form.roundWind
+    ? !['seat-wind', 'round-wind'].includes(pair.id)
+    : pair.id !== 'double-wind')
+  .map(pair => ({
+    ...pair,
+    label: pair.id === 'seat-wind' ? `${seatWindName.value} · seat wind`
+      : pair.id === 'round-wind' ? `${roundWindName.value} · round wind`
+        : pair.id === 'double-wind' ? `${seatWindName.value} pair (seat + round)`
+          : pair.id === 'non-value-wind' ? Object.keys(windNames)
+            .filter(wind => wind !== form.seatWind && wind !== form.roundWind)
+            .map(wind => windNames[wind]).join(' or ') || 'Other wind'
+            : pair.label,
+    tiles: pair.id === 'seat-wind' ? [windTileNames[form.seatWind]]
+      : pair.id === 'round-wind' ? [windTileNames[form.roundWind]]
+        : pair.id === 'double-wind' ? [...new Set([windTileNames[form.seatWind], windTileNames[form.roundWind]])]
+          : pair.id === 'non-value-wind' ? Object.keys(windNames)
+            .filter(wind => wind !== form.seatWind && wind !== form.roundWind)
+            .map(wind => windTileNames[wind])
+            : pair.tiles,
+  })))
 const isClosed = computed(() => form.isClosed)
 const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
 const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.selectedYaku.includes('double-riichi'))
@@ -375,7 +423,7 @@ const yakuhaiChoices = computed(() => {
 const hasSpecialWait = computed(() => selectedYakuman.value.some(id => ['kokushi', 'suuankou', 'chuuren'].includes(id)))
 const filteredYaku = computed(() => {
   const search = yakuSearch.value.trim().toLowerCase()
-  return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yaku.detail}`.toLowerCase().includes(search))
+  return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yaku.detail} ${(yakuSearchAliases[yaku.id] ?? []).join(' ')}`.toLowerCase().includes(search))
 })
 const yakuByCategory = computed(() => Object.fromEntries(categories.map(category => [category.id, filteredYaku.value.filter(yaku => yaku.category === category.id)])) )
 const visibleCategories = computed(() => categories.filter(category => yakuByCategory.value[category.id]?.length))
@@ -691,7 +739,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .automatic-yaku strong small { opacity: .75; }
 .selected-yaku { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .selected-yaku > span { margin-right: 3px; color: var(--muted); font-size: .68rem; }
-.selected-yaku-chip { min-height: 30px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid #cfd8cc; border-radius: 999px; background: #eff3ec; color: var(--matcha-leaf); font-size: .69rem; cursor: pointer; }
+.selected-yaku-chip { min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border: 1px solid #cfd8cc; border-radius: 999px; background: #eff3ec; color: var(--matcha-leaf); font-size: .73rem; cursor: pointer; }
 .selected-yaku-chip b { font-size: .85rem; }
 .yaku-groups { display: grid; gap: 18px; margin-top: 20px; }
 .yaku-category { min-width: 0; }
@@ -714,8 +762,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .yaku-selected .yaku-check { border-color: var(--matcha-leaf); background: var(--matcha-leaf); color: white; font-weight: 750; }
 .yaku-copy { min-width: 0; }
 .yaku-copy strong { display: block; color: var(--matcha-leaf); font-size: .78rem; line-height: 1.3; }
-.yaku-copy small { display: block; margin-top: 2px; color: var(--muted); font-size: .66rem; line-height: 1.35; }
-.yaku-han { color: var(--gold-leaf); font-size: .67rem; font-weight: 750; white-space: nowrap; }
+.yaku-copy small { display: block; margin-top: 2px; color: var(--muted); font-size: .72rem; line-height: 1.4; }
+.yaku-han { color: var(--gold-leaf); font-size: .72rem; font-weight: 750; white-space: nowrap; }
 .empty-search { margin: 0; color: var(--muted); font-size: .84rem; }
 .variant-panel { display: grid; gap: 10px; margin-top: 17px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
 .variant-panel h3 { margin: 0; color: var(--matcha-leaf); font-size: .83rem; }
@@ -726,10 +774,10 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .bonus-copy { display: grid; gap: 3px; min-width: 0; }
 .bonus-copy label { cursor: pointer; }
 .bonus-copy > span:not(:first-child) { color: var(--muted); font-size: .68rem; line-height: 1.4; }
-.stepper { display: flex; align-items: center; min-height: 40px; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
-.stepper button { width: 38px; height: 40px; border: 0; background: var(--surface-soft); color: var(--matcha-leaf); font: 600 1.1rem var(--font-body); cursor: pointer; }
+.stepper { display: flex; align-items: center; min-height: 44px; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.stepper button { width: 44px; height: 44px; border: 0; background: var(--surface-soft); color: var(--matcha-leaf); font: 600 1.1rem var(--font-body); cursor: pointer; }
 .stepper button:disabled { opacity: .4; cursor: not-allowed; }
-.stepper input { width: 45px; height: 40px; padding: 4px; border: 0; border-radius: 0; background: white; color: var(--clay-text); text-align: center; font-size: .95rem; font-variant-numeric: tabular-nums; }
+.stepper input { width: 48px; height: 44px; padding: 4px; border: 0; border-radius: 0; background: white; color: var(--clay-text); text-align: center; font-size: .95rem; font-variant-numeric: tabular-nums; }
 .stepper input::-webkit-inner-spin-button, .stepper input::-webkit-outer-spin-button { appearance: none; margin: 0; }
 .stepper input[type=number] { appearance: textfield; }
 .fu-field + .fu-field { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
@@ -738,8 +786,12 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .fu-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .fu-choice-grid .choice-button { min-height: 52px; }
 .fu-choice-grid .choice-button small { text-align: left; }
-.fu-choice-grid .wait-button { min-height: 76px; }
-.fu-choice-grid .wait-example { margin: 4px 0 2px; color: var(--muted); font-size: .62rem; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.fu-choice-grid .wait-button { min-height: 112px; align-content: center; }
+.choice-button > .wait-example { display: grid; justify-items: center; gap: 2px; margin: 4px 0 2px; color: var(--muted); font-size: .7rem; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.tile-strip { display: inline-flex; align-items: flex-end; justify-content: center; gap: 2px; min-height: 32px; }
+.choice-button .tile-strip { display: inline-flex; }
+.tile-strip img { display: block; width: 21px; height: 29px; object-fit: contain; }
+.tile-strip img.winning-tile { filter: drop-shadow(0 2px 0 var(--gold-leaf)); transform: translateY(-2px); }
 .group-count { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
 .group-list { display: grid; gap: 7px; margin: 13px 0; }
 .group-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); }
@@ -756,11 +808,13 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .add-group-menu > summary, .advanced-settings > summary { min-height: 44px; display: flex; align-items: center; gap: 7px; color: var(--matcha-leaf); font-size: .8rem; font-weight: 700; cursor: pointer; }
 .add-group-menu > summary::marker, .advanced-settings > summary::marker { color: var(--gold-leaf); }
 .group-option-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 8px; }
-.group-option-grid button { min-height: 59px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3px 8px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: white; color: var(--clay-text); text-align: left; cursor: pointer; }
+.group-option-grid button { min-height: 68px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto auto; align-items: center; gap: 3px 8px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: white; color: var(--clay-text); text-align: left; cursor: pointer; }
 .group-option-grid button:hover { border-color: var(--matcha-leaf); }
 .group-option-grid button strong { color: var(--matcha-leaf); font-size: .72rem; }
-.group-option-grid button span { color: var(--muted); font-size: .66rem; }
-.group-option-grid button b { grid-column: 2; grid-row: 1 / span 2; color: var(--gold-leaf); font-size: .68rem; white-space: nowrap; }
+.group-option-grid button > span:not(.group-tile-samples) { color: var(--muted); font-size: .72rem; }
+.group-option-grid button .group-tile-samples { grid-column: 2; grid-row: 1 / span 2; display: inline-flex; align-items: flex-end; gap: 1px; }
+.group-tile-samples img { width: 16px; height: 23px; object-fit: contain; }
+.group-option-grid button b { grid-column: 3; grid-row: 1 / span 2; color: var(--gold-leaf); font-size: .72rem; white-space: nowrap; }
 .advanced-settings { padding: 8px 20px; }
 .advanced-settings[open] { padding-bottom: 18px; }
 .advanced-content { display: grid; gap: 10px; }
@@ -818,6 +872,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .variant-panel, .section-heading[tabindex], .calc-section[tabindex], .advanced-settings { scroll-margin-top: 300px; }
   .bonus-grid { grid-template-columns: minmax(0, 1fr); }
   .group-option-grid { grid-template-columns: minmax(0, 1fr); }
+  .group-option-grid button { grid-template-columns: minmax(0, 1fr) auto auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .choice-button { transition: none; }
