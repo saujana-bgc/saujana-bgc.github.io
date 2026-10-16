@@ -78,7 +78,7 @@
           </template>
 
           <details class="table-settings">
-          <summary>Table settings · {{ form.playerCount }} players · {{ isDealer ? 'East' : (seatWindConfirmed ? windNames[form.seatWind] : 'seat not set') }} seat · {{ roundWindConfirmed ? windNames[form.roundWind] : 'round not set' }} round</summary>
+          <summary>Table settings · {{ form.playerCount }} players · {{ isDealer ? 'East seat' : (seatWindConfirmed ? `${windNames[form.seatWind]} seat` : 'Seat not set') }} · {{ roundWindConfirmed ? `${windNames[form.roundWind]} round` : 'Round not set' }}</summary>
           <span class="field-label">Your seat wind</span>
           <div class="choice-row" role="group" aria-label="Your seat wind">
             <button v-for="option in availableSeatWinds" :key="option.id" type="button" class="choice-button" :class="{ selected: form.seatWind === option.id && seatWindConfirmed }" :aria-pressed="form.seatWind === option.id && seatWindConfirmed" @click="setSeatWind(option.id)">
@@ -102,7 +102,18 @@
               <button type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three player</button>
             </div>
           </div>
+          <details class="hand-help"><summary>Table scoring rules</summary><p>The Saujana table uses kiriage mangan off and 4 fu for a double-wind pair.</p></details>
           </details>
+
+          <div ref="honbaSection" class="bonus-control honba-control" tabindex="-1" aria-labelledby="honba-count-label">
+            <div class="bonus-copy"><label id="honba-count-label" for="honba-count">Honba · repeat counter</label><span>+300 on ron; +100 from each payer on tsumo</span></div>
+            <div class="stepper" role="group" aria-label="Honba">
+              <button type="button" aria-label="Remove one honba" :disabled="form.honba <= 0" @click="form.honba = Math.max(0, form.honba - 1)">−</button>
+              <input id="honba-count" v-model.number="form.honba" type="number" inputmode="numeric" min="0" step="1" @change="form.honba = integerAtLeastZero(form.honba)" />
+              <button type="button" aria-label="Add one honba" @click="form.honba += 1">+</button>
+            </div>
+            <ul v-if="shouldShowProblems && fieldIssues.table.length" class="field-problems"><li v-for="issue in fieldIssues.table" :key="issue">{{ issue }}</li></ul>
+          </div>
         </section>
 
         <section v-if="entryMode === 'hanfu'" class="calc-section direct-entry" aria-labelledby="direct-heading">
@@ -245,41 +256,23 @@
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
             <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
-            <label v-if="needsFuQuestions && form.groups.length < 4" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
-                <div><strong>{{ groupName(group) }}</strong><small>{{ groupFu(group) }} fu</small></div>
+                <div class="group-row-main"><strong>{{ groupName(group) }}</strong><small>{{ groupFu(group) }} fu</small><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, tileIndex) in groupTileExamples(group)" :key="`${tile}-${tileIndex}`"><span v-if="isConcealedKanBack(group, tileIndex)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span></div>
                 <label v-if="yakuhaiChoices.length || group.yakuId" class="group-yaku-choice"><span>Counts as</span><select v-model="group.yakuId" :aria-label="`Yaku set for ${groupName(group)}`"><option value="">Other set</option><option v-for="option in groupYakuOptions(group)" :key="option.id" :value="option.id">{{ option.label }}</option></select></label>
                 <label v-if="form.winType === 'ron' && form.waitType === 'shanpon' && group.type === 'triplet' && group.concealed" class="winning-group"><input v-model="group.completedByRon" type="checkbox" /><span>Won on this triplet</span></label>
                 <button type="button" class="remove-group" :aria-label="`Remove ${groupName(group)}`" @click="form.groups.splice(index, 1); form.groupsConfirmed = false">×</button>
               </div>
             </div>
-            <details v-if="form.groups.length < 4" class="add-group-menu">
-              <summary>Add a group</summary>
-              <div class="group-option-grid">
-                <button v-for="option in groupOptions" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><img v-for="tile in option.tileExamples" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
-              </div>
-            </details>
-            <p v-else class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
+            <button v-if="form.groups.length < 4" type="button" class="add-group-button" :aria-expanded="showGroupOptions" aria-controls="group-options" @click="showGroupOptions = !showGroupOptions"><span aria-hidden="true">＋</span>{{ form.groups.length ? 'Add another triplet or kan' : 'Add a triplet or kan' }}<span class="add-group-chevron" aria-hidden="true">{{ showGroupOptions ? '−' : '⌄' }}</span></button>
+            <div v-show="showGroupOptions && form.groups.length < 4" id="group-options" class="group-option-grid">
+              <button v-for="option in groupOptions" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, index) in option.tileExamples" :key="`${tile}-${index}`"><span v-if="isConcealedKanOptionBack(option, index)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
+            </div>
+            <label v-if="needsFuQuestions && form.groups.length < 4" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
+            <p v-if="form.groups.length === 4" class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
             <ul v-if="shouldShowProblems && fieldIssues.groups.length" class="field-problems"><li v-for="issue in fieldIssues.groups" :key="issue">{{ issue }}</li></ul>
           </div>
         </section>
-
-        <details ref="advancedSection" class="advanced-settings" :open="fieldIssues.table.length > 0" tabindex="-1">
-          <summary>Honba · {{ form.honba }}</summary>
-          <div class="advanced-content">
-            <ul v-if="shouldShowProblems && fieldIssues.table.length" class="field-problems"><li v-for="issue in fieldIssues.table" :key="issue">{{ issue }}</li></ul>
-            <div class="bonus-control">
-              <div class="bonus-copy"><label for="honba-count">Honba on the table</label><span>+300 on ron; +100 from each payer on tsumo</span></div>
-              <div class="stepper" role="group" aria-label="Honba">
-                <button type="button" aria-label="Remove one honba" :disabled="form.honba <= 0" @click="form.honba = Math.max(0, form.honba - 1)">−</button>
-                <input id="honba-count" v-model.number="form.honba" type="number" inputmode="numeric" min="0" step="1" @change="form.honba = integerAtLeastZero(form.honba)" />
-                <button type="button" aria-label="Add one honba" @click="form.honba += 1">+</button>
-              </div>
-            </div>
-            <p>The Saujana table uses kiriage mangan off and 4 fu for a double-wind pair.</p>
-          </div>
-        </details>
 
         <section v-if="resultReady && showBreakdown" id="score-breakdown" ref="breakdownSection" class="calc-section score-details" tabindex="-1" aria-labelledby="breakdown-heading">
           <h2 id="breakdown-heading">Score breakdown</h2>
@@ -401,6 +394,7 @@ const openYakuCategories = ref(new Set(['common']))
 const categoriesBeforeSearch = ref(null)
 const hasInteracted = ref(false)
 const showBreakdown = ref(false)
+const showGroupOptions = ref(false)
 const breakdownSection = ref(null)
 const winSection = ref(null)
 const yakuSection = ref(null)
@@ -409,7 +403,7 @@ const waitSection = ref(null)
 const groupSection = ref(null)
 const specialWaitSection = ref(null)
 const bonusSection = ref(null)
-const advancedSection = ref(null)
+const honbaSection = ref(null)
 const keyboardOpen = ref(false)
 let groupId = 0
 
@@ -550,11 +544,11 @@ const nextIssueTarget = computed(() => {
   if (needsWindsConfirmation.value) return { label: 'Confirm the seat and round winds', target: winSection.value }
   if (fieldIssues.value.special.length) return { label: 'Check the special wait', target: specialWaitSection.value }
   if (fieldIssues.value.bonus.length) return { label: 'Check bonus han', target: bonusSection.value }
-  if (fieldIssues.value.table.length) return { label: 'Check table counters', target: advancedSection.value }
+  if (fieldIssues.value.table.length) return { label: 'Check table counters', target: honbaSection.value }
   if (fieldIssues.value.pair.length || (needsFuQuestions.value && !form.pairChoice)) return { label: 'Choose your pair', target: pairSection.value }
   if (fieldIssues.value.wait.length || (needsFuQuestions.value && !form.waitType)) return { label: 'Choose your winning wait', target: waitSection.value }
   if (fieldIssues.value.groups.length) return { label: 'Add or fix a triplet or kan', target: groupSection.value }
-  if (needsSetConfirmation.value) return { label: 'Confirm there are no triplets or kans', target: groupSection.value }
+  if (needsSetConfirmation.value) return { label: form.groups.length ? 'Confirm the group list is complete' : 'Confirm there are no triplets or kans', target: groupSection.value }
   return null
 })
 const nextStepLabel = computed(() => nextIssueTarget.value?.label ?? 'Review the highlighted details below.')
@@ -714,6 +708,7 @@ function setHandShape(shape) {
   hasInteracted.value = true
   form.handShape = shape
   form.groups = []
+  showGroupOptions.value = false
   form.pairChoice = null
   form.waitType = null
   form.selectedYaku = form.selectedYaku.filter(id => !['chiitoitsu', 'kokushi'].includes(id))
@@ -744,12 +739,25 @@ function groupFu(group) {
   return terminal ? 4 : 2
 }
 
+function groupTileExamples(group) {
+  return groupOptions.find(option => option.type === group.type && option.tileKind === group.tileKind && option.concealed === group.concealed)?.tileExamples ?? []
+}
+
+function isConcealedKanBack(group, index) {
+  return group.type === 'kan' && group.concealed && (index === 0 || index === 3)
+}
+
+function isConcealedKanOptionBack(option, index) {
+  return option.type === 'kan' && option.concealed && (index === 0 || index === 3)
+}
+
 function addGroup(option) {
   hasInteracted.value = true
   if (form.groups.length >= 4 || form.handShape !== 'standard') return
   if (!option.concealed) form.isClosed = false
   form.groups.push({ id: ++groupId, type: option.type, tileKind: option.tileKind, concealed: option.concealed, completedByRon: false, yakuId: null })
   form.groupsConfirmed = false
+  showGroupOptions.value = false
 }
 
 function adjustBonus(id, amount, max = Infinity) {
@@ -786,6 +794,7 @@ async function resetCalculator() {
   openYakuCategories.value = new Set(['common'])
   hasInteracted.value = false
   showBreakdown.value = false
+  showGroupOptions.value = false
   await nextTick()
   winSection.value?.focus({ preventScroll: true })
   winSection.value?.scrollIntoView({ block: 'start', behavior: 'auto' })
@@ -865,7 +874,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .calculator-layout { display: grid; grid-template-areas: "form result"; grid-template-columns: minmax(0, 1fr) minmax(290px, 345px); align-items: start; gap: 22px; }
 .calculator-form { grid-area: form; min-width: 0; display: grid; gap: 16px; }
 .result-panel { grid-area: result; }
-.calc-section, .advanced-settings { min-width: 0; padding: clamp(18px, 3vw, 25px); border: 1px solid var(--line); border-radius: 11px; background: var(--white-pure); box-shadow: var(--shadow-card); }
+.calc-section { min-width: 0; padding: clamp(18px, 3vw, 25px); border: 1px solid var(--line); border-radius: 11px; background: var(--white-pure); box-shadow: var(--shadow-card); }
 .win-section { scroll-margin-top: 220px; }
 .section-heading { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
 .step-number { flex: 0 0 29px; width: 29px; height: 29px; display: grid; place-items: center; border-radius: 8px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .77rem; font-weight: 750; }
@@ -958,7 +967,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .stepper input[type=number] { appearance: textfield; }
 .fu-field + .fu-field { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
 .fu-field { scroll-margin-top: 130px; }
-.variant-panel, .section-heading[tabindex], .calc-section[tabindex], .advanced-settings { scroll-margin-top: 130px; }
+.variant-panel, .section-heading[tabindex], .calc-section[tabindex], .honba-control { scroll-margin-top: 130px; }
 .fu-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .fu-choice-grid .choice-button { min-height: 52px; }
 .fu-choice-grid .choice-button small { text-align: left; }
@@ -971,18 +980,21 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .group-count { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
 .group-list { display: grid; gap: 7px; margin: 13px 0; }
 .group-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); }
-.group-row > div { flex: 1; min-width: 0; }
-.group-row > div > strong, .group-row > div > small { display: block; }
-.group-row > div > strong { color: var(--matcha-leaf); font-size: .76rem; overflow-wrap: anywhere; }
-.group-row > div > small { color: var(--muted); font-size: .68rem; }
+.group-row-main { flex: 1; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 8px; }
+.group-row-main > strong, .group-row-main > small { display: block; }
+.group-row-main > strong { color: var(--matcha-leaf); font-size: .76rem; overflow-wrap: anywhere; }
+.group-row-main > small { color: var(--muted); font-size: .68rem; }
+.group-row-main .group-tile-samples { grid-column: 2; grid-row: 1 / span 2; }
 .group-yaku-choice { display: grid; gap: 3px; min-width: 130px; color: var(--muted); font-size: .65rem; }
 .group-yaku-choice select { min-height: 35px; max-width: 190px; padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--clay-text); font: inherit; }
 .winning-group { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: .68rem; }
 .winning-group input { accent-color: var(--matcha-leaf); }
 .remove-group { flex: 0 0 32px; width: 32px; height: 34px; border: 1px solid var(--line); border-radius: 6px; background: white; color: #824249; font-size: 1.1rem; cursor: pointer; }
-.add-group-menu { margin-top: 13px; }
-.add-group-menu > summary, .advanced-settings > summary { min-height: 44px; display: flex; align-items: center; gap: 7px; color: var(--matcha-leaf); font-size: .8rem; font-weight: 700; cursor: pointer; }
-.add-group-menu > summary::marker, .advanced-settings > summary::marker { color: var(--gold-leaf); }
+.add-group-button { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: flex-start; gap: 9px; margin-top: 13px; padding: 10px 13px; border: 1px solid var(--matcha-leaf); border-radius: 8px; background: #edf1e9; color: var(--matcha-leaf); font: 700 .8rem var(--font-body); text-align: left; cursor: pointer; }
+.add-group-button:hover { background: #e4ebdf; }
+.add-group-button:focus-visible { outline: 2px solid var(--gold-leaf); outline-offset: 2px; }
+.add-group-button > span:first-child { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: var(--matcha-leaf); color: white; font-size: 1rem; }
+.add-group-button .add-group-chevron { margin-left: auto; color: var(--muted); font-size: 1rem; }
 .group-option-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 8px; }
 .group-option-grid button { min-height: 68px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto auto; align-items: center; gap: 3px 8px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: white; color: var(--clay-text); text-align: left; cursor: pointer; }
 .group-option-grid button:hover { border-color: var(--matcha-leaf); }
@@ -990,11 +1002,11 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .group-option-grid button > span:not(.group-tile-samples) { color: var(--muted); font-size: .72rem; }
 .group-option-grid button .group-tile-samples { grid-column: 2; grid-row: 1 / span 2; display: inline-flex; align-items: flex-end; gap: 1px; }
 .group-tile-samples img { width: 16px; height: 23px; object-fit: contain; }
+.group-tile-samples .tile-back { width: 16px; height: 23px; flex: 0 0 auto; border: 1px solid #536c58; border-radius: 2px; background: repeating-linear-gradient(135deg, #93a78b 0 2px, #849b7d 2px 4px); box-shadow: inset 0 0 0 2px #f7f5eb; }
 .group-option-grid button b { grid-column: 3; grid-row: 1 / span 2; color: var(--gold-leaf); font-size: .72rem; white-space: nowrap; }
-.advanced-settings { padding: 8px 20px; }
-.advanced-settings[open] { padding-bottom: 18px; }
-.advanced-content { display: grid; gap: 10px; }
-.advanced-content > p { margin: 3px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.55; }
+.group-row-main .group-tile-samples .tile-back { width: 16px; height: 23px; }
+.honba-control { margin-top: 18px; }
+.honba-control .field-problems { flex-basis: 100%; }
 .result-panel { position: sticky; top: 105px; overflow: hidden; border: 1px solid #cdd5c9; border-radius: 12px; background: var(--white-pure); box-shadow: 0 12px 32px rgba(44,55,40,.08); }
 .result-inner { padding: 22px; }
 .result-ready { border-color: var(--matcha-leaf); }
@@ -1050,12 +1062,12 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .entry-mode button { min-height: 58px; padding: 7px 9px; }
   .entry-mode strong { font-size: .75rem; }
   .entry-mode small { font-size: .64rem; line-height: 1.35; }
-  .calc-section, .advanced-settings { padding: 15px; }
+  .calc-section { padding: 15px; }
   .choice-row { gap: 7px; }
   .choice-button { min-height: 48px; padding: 8px 11px; }
   .reset-button { min-height: 44px; }
   .selected-yaku-chip { min-height: 44px; }
-  .table-settings > summary, .yaku-category > summary, .add-group-menu > summary, .advanced-settings > summary { min-height: 48px; }
+  .table-settings > summary, .yaku-category > summary { min-height: 48px; }
   .remove-group { flex-basis: 44px; width: 44px; height: 44px; }
   .group-option-grid button { min-height: 76px; }
   .direct-fields { grid-template-columns: minmax(0, 1fr); }
@@ -1065,7 +1077,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .yaku-grid { grid-template-columns: minmax(0, 1fr); }
   .fu-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fu-field { scroll-margin-top: 300px; }
-  .variant-panel, .section-heading[tabindex], .calc-section[tabindex], .advanced-settings { scroll-margin-top: 300px; }
+  .variant-panel, .section-heading[tabindex], .calc-section[tabindex], .honba-control { scroll-margin-top: 300px; }
   .bonus-grid { grid-template-columns: minmax(0, 1fr); }
   .group-option-grid { grid-template-columns: minmax(0, 1fr); }
   .group-option-grid button { grid-template-columns: minmax(0, 1fr) auto auto; }
@@ -1082,6 +1094,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 @media (min-width: 381px) and (max-width: 760px) {
   .tile-strip img { width: 26px; height: 36px; }
   .group-tile-samples img { width: 20px; height: 29px; }
+  .group-tile-samples .tile-back { width: 20px; height: 29px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .choice-button { transition: none; }
