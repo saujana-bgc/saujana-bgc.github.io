@@ -258,7 +258,8 @@
             <div class="choice-row fu-choice-grid" role="group" aria-label="Pair type">
               <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id"><span>{{ pair.label }}</span><span v-if="pair.tiles?.length" class="tile-strip" aria-hidden="true"><img v-for="tile in pair.tiles" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><small>+{{ pair.fu }} fu</small></button>
             </div>
-            <p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">Tanyao uses only number tiles 2–8, including the pair.</p>
+            <p v-if="form.selectedYaku.includes('shousangen')" class="field-hint">Choose the dragon used for your pair. The two other dragons must be triplets or kans.</p>
+            <p v-else-if="form.selectedYaku.includes('tanyao')" class="field-hint">Tanyao uses only number tiles 2–8, including the pair.</p>
             <p v-else-if="form.selectedYaku.includes('junchan') || form.selectedYaku.includes('chinroutou')" class="field-hint">This yaku needs a 1 or 9 pair. Honour pairs are not allowed.</p>
             <p v-else-if="form.selectedYaku.some(id => ['chanta', 'honroutou'].includes(id))" class="field-hint">This yaku needs a terminal (1 or 9) or honour pair.</p>
             <p v-else-if="form.selectedYaku.includes('tsuuiisou')" class="field-hint">All tiles, including the pair, must be honours.</p>
@@ -277,7 +278,7 @@
           </div>
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
-            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p><p v-else-if="form.selectedYaku.includes('junchan') || form.selectedYaku.includes('chinroutou')" class="field-hint">Use terminal triplets and kans only.</p><p v-else-if="form.selectedYaku.includes('tsuuiisou')" class="field-hint">Use honour triplets and kans only.</p><p v-else-if="form.selectedYaku.some(id => ['chanta', 'honroutou'].includes(id))" class="field-hint">Use terminal or honour triplets and kans only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
+            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('shousangen')" class="field-hint">Mark the two different dragon sets. They must not match the dragon pair.</p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p><p v-else-if="form.selectedYaku.includes('junchan') || form.selectedYaku.includes('chinroutou')" class="field-hint">Use terminal triplets and kans only.</p><p v-else-if="form.selectedYaku.includes('tsuuiisou')" class="field-hint">Use honour triplets and kans only.</p><p v-else-if="form.selectedYaku.some(id => ['chanta', 'honroutou'].includes(id))" class="field-hint">Use terminal or honour triplets and kans only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
             <p v-if="form.groups.some(group => !group.concealed) && selectedYakuOptions.some(yaku => yaku.requiresClosed)" class="field-problems">A called group opens the hand, which conflicts with the selected closed-only yaku. Remove the call or that yaku.</p>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
@@ -294,7 +295,7 @@
               </div>
               <button v-for="option in groupOptionsForPicker" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, index) in option.tileExamples" :key="`${tile}-${index}`"><span v-if="isConcealedKanOptionBack(option, index)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
             </div>
-            <label v-if="needsFuQuestions && form.groups.length < 4" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
+            <label v-if="needsFuQuestions && form.groups.length < 4 && (!form.selectedYaku.includes('shousangen') || form.groups.length >= 2)" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
             <p v-if="form.groups.length === 4" class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
             <ul v-if="shouldShowProblems && fieldIssues.groups.length" class="field-problems"><li v-for="issue in fieldIssues.groups" :key="issue">{{ issue }}</li></ul>
           </div>
@@ -372,6 +373,11 @@ const pairOptions = [
   { id: 'seat-wind', label: 'Seat wind', fu: 2 },
   { id: 'round-wind', label: 'Round wind', fu: 2 },
   { id: 'double-wind', label: 'Seat + round wind', fu: 4 },
+]
+const shousangenPairs = [
+  { id: 'dragon-haku', label: 'White dragon', fu: 2, tiles: ['Haku', 'Haku'] },
+  { id: 'dragon-hatsu', label: 'Green dragon', fu: 2, tiles: ['Hatsu', 'Hatsu'] },
+  { id: 'dragon-chun', label: 'Red dragon', fu: 2, tiles: ['Chun', 'Chun'] },
 ]
 const waits = [
   { id: 'ryanmen', label: 'Two-sided', examples: [{ tiles: ['Man2', 'Man3', 'Man1'], caption: '1 completes' }, { tiles: ['Man2', 'Man3', 'Man4'], caption: '4 completes' }], fu: 0 },
@@ -479,11 +485,11 @@ const promptSeatWinds = computed(() => availableSeatWinds.value.filter(wind => f
 const seatWindName = computed(() => windNames[form.seatWind])
 const roundWindName = computed(() => windNames[form.roundWind])
 const isDealer = computed(() => form.isDealer)
-const availablePairOptions = computed(() => pairOptions
+const availablePairOptions = computed(() => pairOptions.flatMap(pair => pair.id === 'dragon' && form.selectedYaku.includes('shousangen') ? shousangenPairs : [pair])
   .filter(pair => !form.selectedYaku.includes('tanyao') || pair.id === 'simple')
   .filter(pair => !form.selectedYaku.includes('junchan') || pair.id === 'terminal-number')
   .filter(pair => !form.selectedYaku.includes('chinroutou') || pair.id === 'terminal-number')
-  .filter(pair => !form.selectedYaku.includes('tsuuiisou') || ['non-value-wind', 'dragon', 'seat-wind', 'round-wind', 'double-wind'].includes(pair.id))
+  .filter(pair => !form.selectedYaku.includes('tsuuiisou') || ['non-value-wind', 'dragon', 'seat-wind', 'round-wind', 'double-wind'].includes(pair.id) || pair.id.startsWith('dragon-'))
   .filter(pair => !['honroutou', 'chanta'].some(id => form.selectedYaku.includes(id)) || pair.id !== 'simple')
   .filter(pair => !seatWindConfirmed.value || !roundWindConfirmed.value || (form.seatWind === form.roundWind
     ? !['seat-wind', 'round-wind'].includes(pair.id)
@@ -532,6 +538,7 @@ const yakuhaiChoices = computed(() => {
   const hasDoubleWind = selected.includes('yakuhai-seat') && selected.includes('yakuhai-round') && form.seatWind === form.roundWind
   return [
     ...selected.filter(id => !(hasDoubleWind && ['yakuhai-seat', 'yakuhai-round'].includes(id))).map(id => ({ id, label: MANUAL_YAKU.find(yaku => yaku.id === id)?.name ?? id })),
+    ...(form.selectedYaku.includes('shousangen') ? ['yakuhai-haku', 'yakuhai-hatsu', 'yakuhai-chun'].filter(id => !selected.includes(id)).map(id => ({ id, label: MANUAL_YAKU.find(yaku => yaku.id === id)?.name ?? id })) : []),
     ...(hasDoubleWind ? [{ id: 'yakuhai-double-wind', label: 'Seat + round wind set' }] : []),
   ]
 })
@@ -548,7 +555,7 @@ const automaticYaku = computed(() => isClosed.value && form.winType === 'tsumo' 
   : [])
 
 function makeScoreInput() {
-  const pairOption = pairOptions.find(pair => pair.id === form.pairChoice)
+  const pairOption = availablePairOptions.value.find(pair => pair.id === form.pairChoice) ?? pairOptions.find(pair => pair.id === form.pairChoice) ?? shousangenPairs.find(pair => pair.id === form.pairChoice)
   return {
     selectedYaku: form.selectedYaku,
     isClosed: isClosed.value,
@@ -601,9 +608,12 @@ const fieldIssues = computed(() => {
     else if (/requires (?:the dealer|a non-dealer)/i.test(issue)) fields.dealer.push(issue)
     else if (/^Suuankou on ron|^Suuankou needs a pair wait|^Double (Suuankou|Kokushi|Nine Gates)/.test(issue)) fields.special.push(issue)
     else if (/^Honroutou needs four terminal or honour triplets or kans/.test(issue)) fields.groups.push(issue)
+    else if (/^Junchan needs at least one run/.test(issue)) fields.groups.push(issue)
+    else if (/^Choose the winning wait to check whether Chankan/.test(issue)) fields.wait.push(issue)
+    else if (/^This Chankan wait already holds a copy/.test(issue)) fields.wait.push(issue)
     else if (/^Choose your pair/.test(issue) && needsWindsConfirmation.value) continue
     else if (/no runs, so it cannot use a run wait|^Choose the wait|^Pinfu needs a two-sided wait|^Tanyao cannot use an edge wait/.test(issue)) fields.wait.push(issue)
-    else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair|^(?:Junchan|Chanta|Honroutou|Chinroutou|Tsuuiisou) needs/.test(issue)) fields.pair.push(issue)
+    else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a specific dragon pair|^(?:Junchan|Chanta|Honroutou|Chinroutou|Tsuuiisou) needs/.test(issue)) fields.pair.push(issue)
     else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai|Tanyao cannot include terminal or honour triplets and kans/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
   }
@@ -633,7 +643,7 @@ const fuLines = computed(() => {
   const lines = [{ label: 'Winning hand', fu: breakdown.base }]
   if (breakdown.closedRon) lines.push({ label: 'Closed ron', fu: breakdown.closedRon })
   if (breakdown.tsumo) lines.push({ label: 'Self-draw', fu: breakdown.tsumo })
-  if (breakdown.pair) lines.push({ label: `Pair · ${pairOptions.find(pair => pair.id === form.pairChoice)?.label}`, fu: breakdown.pair })
+  if (breakdown.pair) lines.push({ label: `Pair · ${availablePairOptions.value.find(pair => pair.id === form.pairChoice)?.label ?? shousangenPairs.find(pair => pair.id === form.pairChoice)?.label ?? pairOptions.find(pair => pair.id === form.pairChoice)?.label}`, fu: breakdown.pair })
   form.groups.forEach(group => {
     const fu = groupFu(group)
     if (fu) lines.push({ label: groupName(group), fu })
@@ -770,6 +780,10 @@ function toggleYaku(id) {
       return
     }
     form.selectedYaku = form.selectedYaku.filter(selected => selected !== id)
+    if (id === 'shousangen') {
+      if (form.pairChoice?.startsWith('dragon-')) form.pairChoice = 'dragon'
+      form.groups.forEach(group => { if (group.yakuId?.startsWith('yakuhai-') && !form.selectedYaku.includes(group.yakuId)) group.yakuId = null })
+    }
     if (id === 'kokushi' || id === 'suuankou' || id === 'chuuren') {
       form.doubleYakumanWaits[id] = false
       if (['kokushi-thirteen', 'chuuren-nine'].includes(form.waitType)) form.waitType = null

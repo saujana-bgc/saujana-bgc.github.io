@@ -49,14 +49,14 @@ export const MANUAL_YAKU: ManualYakuOption[] = [
 
   { id: "chiitoitsu", name: "Chiitoitsu", detail: "Seven different pairs", category: "patterns", closedHan: 2, requiresClosed: true, incompatible: ["pinfu", "toitoi", "sanankou", "suuankou"] },
   { id: "ittsu", name: "Ittsuu", detail: "123, 456 and 789 in one suit", category: "patterns", closedHan: 2, openHan: 1 },
-  { id: "sanshoku-doujun", name: "Sanshoku doujun", detail: "The same run in all three suits", category: "patterns", closedHan: 2, openHan: 1 },
-  { id: "sanshoku-doukou", name: "Sanshoku doukou", detail: "The same triplet in all three suits", category: "patterns", closedHan: 2, openHan: 2 },
+  { id: "sanshoku-doujun", name: "Sanshoku doujun", detail: "The same run in all three suits", category: "patterns", closedHan: 2, openHan: 1, incompatible: ["honitsu", "chinitsu"] },
+  { id: "sanshoku-doukou", name: "Sanshoku doukou", detail: "The same triplet in all three suits", category: "patterns", closedHan: 2, openHan: 2, incompatible: ["honitsu", "chinitsu"] },
   { id: "toitoi", name: "Toitoi", detail: "Four triplets or kans; no runs", category: "patterns", closedHan: 2, openHan: 2, incompatible: ["pinfu", "chiitoitsu"] },
   { id: "sanankou", name: "Sanankou", detail: "Three concealed triplets or kans", category: "patterns", closedHan: 2, openHan: 2, incompatible: ["pinfu", "chiitoitsu", "suuankou"] },
   { id: "sankantsu", name: "Sankantsu", detail: "Three kans", category: "patterns", closedHan: 2, openHan: 2 },
   { id: "chanta", name: "Chanta", detail: "Every group contains a terminal or honour", category: "suits", closedHan: 2, openHan: 1, incompatible: ["junchan"] },
   { id: "honroutou", name: "Honroutou", detail: "Only terminals and honours; combines with All Triplets or Seven Pairs", category: "suits", closedHan: 2, openHan: 2 },
-  { id: "shousangen", name: "Shousangen", detail: "Two dragon sets and a pair of the third dragon", category: "patterns", closedHan: 2, openHan: 2 },
+  { id: "shousangen", name: "Shousangen", detail: "Two dragon sets and a pair of the third dragon · plus 2 Yakuhai han", category: "patterns", closedHan: 2, openHan: 2 },
 
   { id: "ryanpeiko", name: "Ryanpeikou", detail: "Two pairs of identical runs; closed hand", category: "patterns", closedHan: 3, requiresClosed: true, incompatible: ["iipeiko"] },
   { id: "honitsu", name: "Honitsu", detail: "One suit and honours", category: "suits", closedHan: 3, openHan: 2, incompatible: ["chinitsu"] },
@@ -88,11 +88,18 @@ const additionalYakuConflicts: Record<string, string[]> = {
   tanyao: ["chanta", "junchan", "honroutou", "shousangen", "kokushi", "chuuren", "chinroutou", "tsuuiisou", "daisangen", "shousuushi", "daisuushi"],
   honroutou: ["pinfu", "iipeiko", "ryanpeiko", "ittsu", "sanshoku-doujun", "chanta", "junchan", "ryuuiisou"],
   toitoi: ["pinfu", "chiitoitsu", "iipeiko", "ryanpeiko", "ittsu", "sanshoku-doujun", "chanta", "junchan"],
-  "sanshoku-doukou": ["pinfu", "chiitoitsu"],
+  "sanshoku-doukou": ["pinfu", "chiitoitsu", "honitsu", "chinitsu"],
+  "sanshoku-doujun": ["honitsu", "chinitsu"],
   tsuuiisou: ["pinfu", "iipeiko", "ryanpeiko", "ittsu", "sanshoku-doujun", "sanshoku-doukou", "chanta", "junchan", "chinitsu", "chuuren", "chinroutou", "ryuuiisou"],
   ryuuiisou: ["chanta", "junchan", "chinroutou"],
   chuuren: ["kokushi", "suuankantsu", "daisangen", "shousuushi", "daisuushi", "tsuuiisou", "chinroutou", "ryuuiisou"],
   chinroutou: ["tsuuiisou", "ryuuiisou", "daisangen", "shousuushi", "daisuushi"],
+};
+const dragonYakuIds = ["yakuhai-haku", "yakuhai-hatsu", "yakuhai-chun"];
+const shousangenPairToYaku: Record<string, string> = {
+  "dragon-haku": "yakuhai-haku",
+  "dragon-hatsu": "yakuhai-hatsu",
+  "dragon-chun": "yakuhai-chun",
 };
 for (const [id, conflicts] of Object.entries(additionalYakuConflicts)) {
   const option = MANUAL_YAKU.find((yaku) => yaku.id === id);
@@ -304,6 +311,12 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     issues.push("This hand shape cannot contain a kan. Remove the kan or change the selected hand shape or yaku.");
   }
   if (selected.has("chuuren") && selected.has("rinshan")) issues.push("Nine Gates cannot include a kan or a Rinshan win.");
+  if (selected.has("chankan")) {
+    if (input.waitType === null) issues.push("Choose the winning wait to check whether Chankan could use a fifth copy of the robbed tile.");
+    if (input.handShape === "chiitoitsu" || selected.has("chuuren") || input.waitType === "tanki" || input.waitType === "shanpon" || (selected.has("kokushi") && (input.doubleYakumanWaits.kokushi || input.waitType === "kokushi-thirteen"))) {
+      issues.push("This Chankan wait already holds a copy of the robbed tile, so the added kan would require a fifth copy. Use a wait where your hand holds none of that tile.");
+    }
+  }
   if (needsGroupFu && selected.has("rinshan") && input.groups.every((group) => group.type !== "kan")) issues.push("Rinshan requires a kan in the winning hand.");
   if (selected.has("renhou") && input.winType !== "ron") issues.push("Renhou requires a ron win before your first draw.");
 
@@ -337,23 +350,31 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   }
   const suitedPattern = selected.has("chanta") || selected.has("junchan");
   if (suitedPattern) {
-    const allowedPair = selected.has("junchan") ? input.pairChoice === "terminal-number" : ["terminal-number", "non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice ?? "");
+    const allowedPair = selected.has("junchan") ? input.pairChoice === "terminal-number" : ["terminal-number", "non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice ?? "") || input.pairChoice?.startsWith("dragon-") === true;
     if (input.pairChoice && !allowedPair) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} needs a terminal or honour pair. Choose a valid pair or deselect the yaku.`);
     const invalidGroup = input.groups.some((group) => selected.has("junchan") ? group.tileKind !== "terminal" : group.tileKind === "simple");
     if (invalidGroup) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} cannot include ${selected.has("junchan") ? "honour or simple" : "simple"} triplets and kans.`);
     if (input.groups.length === 4) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} needs at least one run. Four entered triplets or kans leave no run.`);
+    if (selected.has("chanta") && input.pairChoice === "terminal-number" && !input.groups.some((group) => group.tileKind === "honor") && input.groups.length >= 3) {
+      issues.push("Chanta needs at least one honour pair or group as well as a terminal. The remaining sets must include a run.");
+    }
   }
   if (selected.has("honroutou")) {
-    if (input.pairChoice && !["terminal-number", "non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice)) issues.push("Honroutou needs a terminal or honour pair.");
+    if (input.pairChoice && !["terminal-number", "non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice) && !input.pairChoice.startsWith("dragon-")) issues.push("Honroutou needs a terminal or honour pair.");
     if (input.groups.some((group) => group.tileKind === "simple")) issues.push("Honroutou cannot include simple triplets or kans.");
     if (needsGroupFu && !isSevenPairs && input.groups.length !== 4) issues.push("Honroutou needs four terminal or honour triplets or kans. Add all four groups to check its fu.");
+    if (input.groups.length === 4 && !isSevenPairs && input.pairChoice !== null) {
+      const hasTerminal = input.pairChoice === "terminal-number" || input.groups.some((group) => group.tileKind === "terminal");
+      const hasHonor = input.pairChoice !== "terminal-number" && Boolean(input.pairChoice) || input.groups.some((group) => group.tileKind === "honor");
+      if (!hasTerminal || !hasHonor) issues.push("Honroutou needs at least one terminal and one honour. Check the pair and all four groups.");
+    }
   }
   if (selected.has("chinroutou")) {
     if (input.pairChoice && input.pairChoice !== "terminal-number") issues.push("Chinroutou needs a terminal-number pair.");
     if (input.groups.some((group) => group.tileKind !== "terminal")) issues.push("Chinroutou cannot include simple tiles or honours in its triplets and kans.");
   }
   if (selected.has("tsuuiisou")) {
-    if (input.pairChoice && !["non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice)) issues.push("Tsuuiisou needs an honour pair.");
+    if (input.pairChoice && !["non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice) && !input.pairChoice.startsWith("dragon-")) issues.push("Tsuuiisou needs an honour pair.");
     if (input.groups.some((group) => group.tileKind !== "honor")) issues.push("Tsuuiisou cannot include suited tiles in its triplets and kans.");
   }
   const noRunPattern = ["toitoi", "honroutou", "chinroutou", "tsuuiisou"].some((id) => selected.has(id)) || isSevenPairs;
@@ -378,8 +399,17 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (input.seatWind === input.roundWind && ["seat-wind", "round-wind"].includes(input.pairChoice ?? "")) {
     issues.push("A double-wind pair is worth 4 fu here. Choose Seat + round wind.");
   }
-  if (selected.has("shousangen") && input.pairChoice !== "dragon") {
-    issues.push("Shousangen needs a dragon pair.");
+  if (selected.has("shousangen")) {
+    const pairDragon = shousangenPairToYaku[input.pairChoice ?? ""];
+    const dragonYaku = [...selected].filter((id) => dragonYakuIds.includes(id));
+    const markedDragonSets = input.groups.map((group) => group.yakuId).filter((id): id is string => Boolean(id) && dragonYakuIds.includes(id as string));
+    const validMarkedDragonGroups = input.groups.filter((group) => group.tileKind === "honor" && (group.type === "triplet" || group.type === "kan") && dragonYakuIds.includes(group.yakuId ?? ""));
+    if (!pairDragon) issues.push("Shousangen needs a specific dragon pair: White, Green, or Red.");
+    if (dragonYaku.length > 2) issues.push("Shousangen has two dragon sets and a pair of the third dragon. Remove the third dragon-set yaku.");
+    if (markedDragonSets.length > 2 || new Set(markedDragonSets).size !== markedDragonSets.length || (pairDragon && markedDragonSets.includes(pairDragon))) {
+      issues.push("Shousangen needs two different dragon sets, each different from the pair. Mark the matching dragon groups.");
+    }
+    if (validMarkedDragonGroups.length !== 2) issues.push("Shousangen needs two dragon triplets or kans. Add both groups and mark the matching dragons.");
   }
   if (input.handShape === "kokushi" && !selected.has("kokushi")) issues.push("Select Kokushi musou for a Thirteen Orphans hand.");
   if (input.handShape !== "kokushi" && selected.has("kokushi")) issues.push("Choose Thirteen Orphans as the hand shape for Kokushi musou.");
@@ -391,7 +421,7 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (needsGroupFu && selected.has("sanankou") && input.groups.filter((group) => group.type === "triplet" && group.concealed && !(input.winType === "ron" && group.completedByRon)).length + input.groups.filter((group) => group.type === "kan" && group.concealed).length < 3) {
     issues.push("Sanankou needs at least three concealed triplets or kans. Mark calls and any triplet completed by ron correctly.");
   }
-  if (needsGroupFu) {
+  {
     const yakuhai = [...selected].filter((id) => id.startsWith("yakuhai-"));
     const hasDoubleWindSet = yakuhai.includes("yakuhai-seat") && yakuhai.includes("yakuhai-round") && input.seatWind === input.roundWind;
     const requiredYakuhai = new Set(yakuhai);
@@ -403,19 +433,30 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     const assignedYakuhai = input.groups.map((group) => group.yakuId).filter((id): id is string => Boolean(id));
     if (new Set(assignedYakuhai).size !== assignedYakuhai.length) issues.push("Assign each dragon or wind yaku to a different group.");
     for (const group of input.groups) {
-      if (group.yakuId && (!requiredYakuhai.has(group.yakuId) || group.tileKind !== "honor")) {
+      const inferredShousangenDragon = selected.has("shousangen") && dragonYakuIds.includes(group.yakuId ?? "");
+      if (group.yakuId && ((!requiredYakuhai.has(group.yakuId) && !inferredShousangenDragon) || group.tileKind !== "honor")) {
         issues.push("Match the selected dragon or wind yaku to its honour triplet or kan, or mark this as another set.");
         break;
       }
     }
-    if ([...requiredYakuhai].some((id) => !assignedYakuhai.includes(id))) {
+    if (needsGroupFu && [...requiredYakuhai].some((id) => !assignedYakuhai.includes(id))) {
       issues.push("Assign each selected dragon or wind set to its matching triplet or kan to count fu.");
+    }
+    const remainingGroups = Math.max(0, 4 - input.groups.length);
+    const unresolvedYakuhai = [...requiredYakuhai].filter((id) => !assignedYakuhai.includes(id));
+    if (unresolvedYakuhai.length > remainingGroups) {
+      issues.push("The listed groups leave too few sets for the selected dragon or wind yaku.");
     }
   }
   if (!needsGroupFu) {
     const remainingGroups = Math.max(0, 4 - input.groups.length);
     const kans = input.groups.filter((group) => group.type === "kan").length;
     const concealed = input.groups.filter((group) => group.concealed && !(input.winType === "ron" && group.completedByRon)).length;
+    const yakuhai = [...selected].filter((id) => id.startsWith("yakuhai-"));
+    const doubleWind = yakuhai.includes("yakuhai-seat") && yakuhai.includes("yakuhai-round") && input.seatWind === input.roundWind;
+    const requiredYakuhaiCount = yakuhai.length - (doubleWind ? 1 : 0);
+    const unresolvedYakuhai = requiredYakuhaiCount - input.groups.filter((group) => group.yakuId).length;
+    if (unresolvedYakuhai > remainingGroups) issues.push("The listed groups leave too few sets for the selected dragon or wind yaku.");
     if (selected.has("rinshan") && kans + remainingGroups < 1) issues.push("Rinshan needs a kan. Correct the listed groups or deselect Rinshan.");
     if (selected.has("sankantsu") && kans + remainingGroups < 3) issues.push("Sankantsu needs three kans. Correct the listed groups or deselect Sankantsu.");
     if (selected.has("suuankantsu") && kans + remainingGroups < 4) issues.push("Suukantsu needs four kans. Correct the listed groups or deselect Suukantsu.");
@@ -473,6 +514,11 @@ function manualHandValue(input: ManualScoreInput) {
   }
   if (selected.has("honroutou") && !isSevenPairs && !selected.has("toitoi")) {
     regularYaku.push({ id: "toitoi", name: selectedOption("toitoi")?.name ?? "Toitoi", han: 2 });
+  }
+  if (selected.has("shousangen")) {
+    const selectedDragonSets = input.selectedYaku.filter((id) => ["yakuhai-haku", "yakuhai-hatsu", "yakuhai-chun"].includes(id)).length;
+    const impliedDragonHan = Math.max(0, 2 - selectedDragonSets);
+    if (impliedDragonHan > 0) regularYaku.push({ id: "shousangen-dragon-sets", name: "Dragon sets (Shousangen)", han: impliedDragonHan });
   }
   if (input.isClosed && input.winType === "tsumo" && !hasYakuman) {
     regularYaku.push({ id: "menzen-tsumo", name: "Menzen tsumo", han: 1 });
