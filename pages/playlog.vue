@@ -2,7 +2,7 @@
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
       <p class="page-eyebrow">One game leads to another</p>
-      <h1 class="hero-title">Play history</h1>
+      <h1 class="hero-title">Play History</h1>
       <div class="stats-container">A record of what we’ve played and who joined in. Look back at a gathering, or see which favourites keep making it to the table.</div>
     </header>
 
