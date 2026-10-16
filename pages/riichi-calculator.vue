@@ -33,6 +33,7 @@
               <template v-else><span>{{ result.han }} han<span v-if="result.fu"> · {{ result.fu }} fu</span></span><span v-if="result.handName" class="limit-badge">{{ limitName(result.handName) }}</span></template>
               <button type="button" class="breakdown-button" :aria-expanded="showBreakdown" aria-controls="score-breakdown" @click="toggleBreakdown">{{ showBreakdown ? 'Hide breakdown' : 'View breakdown' }}</button>
             </div>
+            <p class="payment-context">{{ form.winType === 'ron' ? 'Ron' : 'Tsumo' }} · {{ isDealer ? 'Dealer' : 'Non-dealer' }} · {{ form.honba }} honba included</p>
           </template>
         </div>
       </aside>
@@ -246,6 +247,7 @@
             <div class="choice-row fu-choice-grid" role="group" aria-label="Pair type">
               <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id"><span>{{ pair.label }}</span><span v-if="pair.tiles?.length" class="tile-strip" aria-hidden="true"><img v-for="tile in pair.tiles" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><small>+{{ pair.fu }} fu</small></button>
             </div>
+            <p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">Tanyao uses only number tiles 2–8, including the pair.</p>
             <p class="field-hint">A pair that is both your seat wind and round wind is 4 fu on this sheet.</p>
             <ul v-if="shouldShowProblems && fieldIssues.pair.length" class="field-problems"><li v-for="issue in fieldIssues.pair" :key="issue">{{ issue }}</li></ul>
           </div>
@@ -260,7 +262,7 @@
           </div>
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
-            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
+            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
                 <div class="group-row-main"><strong>{{ groupName(group) }}</strong><small>{{ groupFu(group) }} fu</small><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, tileIndex) in groupTileExamples(group)" :key="`${tile}-${tileIndex}`"><span v-if="isConcealedKanBack(group, tileIndex)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span></div>
@@ -271,7 +273,10 @@
             </div>
             <button v-if="form.groups.length < 4" type="button" class="add-group-button" :aria-expanded="showGroupOptions" aria-controls="group-options" @click="showGroupOptions = !showGroupOptions"><span aria-hidden="true">＋</span>{{ form.groups.length ? 'Add another triplet or kan' : 'Add a triplet or kan' }}<span class="add-group-chevron" aria-hidden="true">{{ showGroupOptions ? '−' : '⌄' }}</span></button>
             <div v-show="showGroupOptions && form.groups.length < 4" id="group-options" class="group-option-grid">
-              <button v-for="option in groupOptions" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, index) in option.tileExamples" :key="`${tile}-${index}`"><span v-if="isConcealedKanOptionBack(option, index)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
+              <div class="group-type-tabs" role="group" aria-label="Group type">
+                <button v-for="type in groupTypes" :key="type.id" type="button" class="choice-button" :class="{ selected: groupTypeFilter === type.id }" :aria-pressed="groupTypeFilter === type.id" @click="groupTypeFilter = type.id">{{ type.label }}</button>
+              </div>
+              <button v-for="option in groupOptionsForPicker" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, index) in option.tileExamples" :key="`${tile}-${index}`"><span v-if="isConcealedKanOptionBack(option, index)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
             </div>
             <label v-if="needsFuQuestions && form.groups.length < 4" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
             <p v-if="form.groups.length === 4" class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
@@ -368,6 +373,10 @@ const groupOptions = [
   { id: 'kan-concealed-simple', type: 'kan', tileKind: 'simple', concealed: true, label: 'Concealed kan · simple', detail: '2–8 tile · 16 fu', tileExamples: ['Man5', 'Man5', 'Man5', 'Man5'], fu: 16 },
   { id: 'kan-concealed-terminal-honor', type: 'kan', tileKind: 'terminal-honor', concealed: true, label: 'Concealed kan · terminal or honour', detail: '1, 9 or honour · 32 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 32 },
 ]
+const groupTypes = [
+  { id: 'triplet', label: 'Triplet' },
+  { id: 'kan', label: 'Kan' },
+]
 
 const initialState = () => ({
   winType: 'ron',
@@ -400,6 +409,7 @@ const categoriesBeforeSearch = ref(null)
 const hasInteracted = ref(false)
 const showBreakdown = ref(false)
 const showGroupOptions = ref(false)
+const groupTypeFilter = ref('triplet')
 const breakdownSection = ref(null)
 const winSection = ref(null)
 const yakuSection = ref(null)
@@ -412,6 +422,7 @@ const honbaSection = ref(null)
 const directHanInput = ref(null)
 const keyboardOpen = ref(false)
 let groupId = 0
+let nextIssueHighlightTimer
 
 const directFuOptions = computed(() => {
   const han = integerAtLeastZero(form.directHan)
@@ -442,6 +453,7 @@ const seatWindName = computed(() => windNames[form.seatWind])
 const roundWindName = computed(() => windNames[form.roundWind])
 const isDealer = computed(() => form.isDealer)
 const availablePairOptions = computed(() => pairOptions
+  .filter(pair => !form.selectedYaku.includes('tanyao') || pair.id === 'simple')
   .filter(pair => !seatWindConfirmed.value || !roundWindConfirmed.value || (form.seatWind === form.roundWind
     ? !['seat-wind', 'round-wind'].includes(pair.id)
     : pair.id !== 'double-wind'))
@@ -462,6 +474,7 @@ const availablePairOptions = computed(() => pairOptions
             .map(wind => windTileNames[wind]) : []
             : pair.tiles,
   })))
+const groupOptionsForPicker = computed(() => groupOptions.filter(option => option.type === groupTypeFilter.value && (!form.selectedYaku.includes('tanyao') || option.tileKind === 'simple')))
 const isClosed = computed(() => form.isClosed)
 const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
 const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.selectedYaku.includes('double-riichi'))
@@ -539,9 +552,9 @@ const fieldIssues = computed(() => {
     else if (/^honba must be/.test(issue)) fields.table.push(issue)
     else if (/^Suuankou on ron|^Suuankou needs a pair wait|^Double (Suuankou|Kokushi|Nine Gates)/.test(issue)) fields.special.push(issue)
     else if (/^Choose your pair/.test(issue) && needsWindsConfirmation.value) continue
-    else if (/^Choose your pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair/.test(issue)) fields.pair.push(issue)
+    else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair/.test(issue)) fields.pair.push(issue)
     else if (/^Choose the wait|^Pinfu needs a two-sided wait/.test(issue)) fields.wait.push(issue)
-    else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai/i.test(issue)) fields.groups.push(issue)
+    else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai|Tanyao cannot include terminal or honour triplets and kans/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
   }
   return fields
@@ -665,7 +678,13 @@ function categorySummary(categoryId) {
 
 function jumpToNextIssue() {
   const target = nextIssueTarget.value?.target
+  if (!target) return
   target?.focus({ preventScroll: true })
+  target.classList.remove('issue-target-flash')
+  void target.offsetWidth
+  target.classList.add('issue-target-flash')
+  window.clearTimeout(nextIssueHighlightTimer)
+  nextIssueHighlightTimer = window.setTimeout(() => target.classList.remove('issue-target-flash'), 1200)
   target?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
 }
 
@@ -859,6 +878,7 @@ onMounted(() => {
   window.addEventListener('resize', updateKeyboardState)
 })
 onBeforeUnmount(() => {
+  window.clearTimeout(nextIssueHighlightTimer)
   window.visualViewport?.removeEventListener('resize', updateKeyboardState)
   window.removeEventListener('resize', updateKeyboardState)
 })
@@ -1007,6 +1027,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .add-group-button > span:first-child { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: var(--matcha-leaf); color: white; font-size: 1rem; }
 .add-group-button .add-group-chevron { margin-left: auto; color: var(--muted); font-size: 1rem; }
 .group-option-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 8px; }
+.group-type-tabs { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.group-type-tabs .choice-button { min-height: 44px; }
 .group-option-grid button { min-height: 68px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto auto; align-items: center; gap: 3px 8px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: white; color: var(--clay-text); text-align: left; cursor: pointer; }
 .group-option-grid button:hover { border-color: var(--matcha-leaf); }
 .group-option-grid button strong { color: var(--matcha-leaf); font-size: .72rem; }
@@ -1031,6 +1053,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .result-empty p { flex: 1 1 100%; margin: 0; font-size: .81rem; line-height: 1.55; }
 .next-step-button { min-height: 44px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; cursor: pointer; }
 .score-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0 0; margin-top: 10px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--matcha-leaf); }
+.payment-context { margin: 3px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
 .breakdown-button { margin-left: auto; min-height: 44px; padding: 4px 0 4px 6px; border: 0; background: transparent; color: var(--matcha-leaf); font-size: .72rem; text-decoration: underline; cursor: pointer; }
 .score-details { scroll-margin-top: 130px; }
 .score-details h2 { margin: 0; color: var(--matcha-leaf); font-size: 1.08rem; }
@@ -1043,6 +1066,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .score-note { margin: 14px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.55; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .choice-button:focus-visible, .yaku-option:focus-visible, .selected-yaku-chip:focus-visible, .stepper button:focus-visible, .group-option-grid button:focus-visible, .remove-group:focus-visible, .reset-button:focus-visible, .breakdown-button:focus-visible, .next-step-button:focus-visible, summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
+.issue-target-flash { animation: issue-target-pulse 1.1s ease-out; border-radius: 9px; }
+@keyframes issue-target-pulse { from { box-shadow: 0 0 0 3px rgba(53, 76, 62, .32); } to { box-shadow: 0 0 0 0 rgba(53, 76, 62, 0); } }
 @media (max-width: 900px) {
   .calculator-layout { grid-template-columns: minmax(0, 1fr) minmax(260px, 300px); gap: 14px; }
   .result-inner { padding: 17px; }
@@ -1072,6 +1097,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .result-tsumo .payment-list p { display: grid; justify-items: center; gap: 1px; padding: 2px 0; border: 0; font-size: .68rem; text-align: center; }
   .result-tsumo .payment-list p strong { font-size: 1rem; }
   .result-tsumo .payment-list p:only-of-type { grid-column: 1 / -1; }
+  .payment-context { font-size: .72rem; }
   .score-details { scroll-margin-top: 300px; }
   .entry-mode { gap: 6px; }
   .entry-mode button { min-height: 58px; padding: 7px 9px; }
@@ -1093,11 +1119,12 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .no-sets-confirm { min-height: 48px; align-items: center; }
   .yaku-grid { grid-template-columns: minmax(0, 1fr); }
   .fu-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .fu-field { scroll-margin-top: 300px; }
-  .variant-panel, .section-heading[tabindex], .calc-section[tabindex], .honba-control { scroll-margin-top: 300px; }
+  .win-section, .fu-field, .variant-panel, .section-heading[tabindex], .calc-section[tabindex], .honba-control { scroll-margin-top: 92px; }
   .bonus-grid { grid-template-columns: minmax(0, 1fr); }
   .group-option-grid { grid-template-columns: minmax(0, 1fr); }
+  .group-type-tabs { grid-column: auto; }
   .group-option-grid button { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .search-field input, .stepper input, .direct-field select { font-size: 16px; }
 }
 @media (max-width: 380px) {
   .result-panel { inset-inline: 6px; width: calc(100% - 12px); }
@@ -1115,5 +1142,6 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 }
 @media (prefers-reduced-motion: reduce) {
   .choice-button { transition: none; }
+  .issue-target-flash { animation: none; }
 }
 </style>

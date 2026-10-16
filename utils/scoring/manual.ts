@@ -308,6 +308,14 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     if (input.waitType !== null && input.waitType !== "ryanmen") issues.push("Pinfu needs a two-sided wait.");
     if (!input.isClosed) issues.push("Pinfu requires a closed hand.");
   }
+  if (selected.has("tanyao")) {
+    if (input.pairChoice && input.pairChoice !== "simple") {
+      issues.push("Tanyao needs a number-tile pair. Change the pair or deselect Tanyao.");
+    }
+    if (input.groups.some((group) => group.tileKind !== "simple")) {
+      issues.push("Tanyao cannot include terminal or honour triplets and kans. Remove those groups or deselect Tanyao.");
+    }
+  }
   if (input.pairChoice === "double-wind" && input.seatWind !== input.roundWind) {
     issues.push("A double-wind pair must match both your seat wind and the round wind.");
   }
