@@ -15,6 +15,10 @@
             <span>{{ result.pao ? 'Total payment' : 'Discarder pays' }}</span>
             <strong>{{ formatPoints(result.points) }}</strong>
           </div>
+          <div v-else-if="resultReady && form.winType === 'tsumo'" class="result-amount">
+            <span>{{ result.pao ? 'Total payment' : 'You receive' }}</span>
+            <strong>{{ formatPoints(result.pao ? paoTsumoTotal : result.points) }}</strong>
+          </div>
           <div v-if="!resultReady" class="result-empty">
             <p>{{ hasInteracted && entryMode === 'hanfu' && directEntryIssue ? 'Review the highlighted hand value.' : hasInteracted ? nextStepLabel : (entryMode === 'yaku' ? 'Choose how you want to enter the hand.' : 'Enter han and fu to see the payment.') }}</p>
             <button v-if="hasInteracted && entryMode === 'hanfu' && directEntryIssue" type="button" class="next-step-button" @click="jumpToNextIssue">Review hand value</button>
@@ -255,7 +259,7 @@
           </div>
         </section>
 
-        <section v-if="entryMode === 'yaku' && (!selectedYakuman.length || form.bonusHan.nuki > 0)" ref="bonusSection" class="calc-section" tabindex="-1" aria-labelledby="dora-heading">
+        <section v-if="showBonusSection" ref="bonusSection" class="calc-section" tabindex="-1" aria-labelledby="dora-heading">
           <div class="section-heading">
             <span class="step-number">3</span>
             <div>
@@ -282,12 +286,13 @@
             </div>
           </div>
           <p class="field-hint">{{ result.bonusHan }} bonus han · Dora alone is not a yaku.</p>
+          <p v-if="selectedYakuman.length" class="field-hint">Dora does not change a yakuman payment.</p>
           <ul v-if="shouldShowProblems && fieldIssues.bonus.length" class="field-problems"><li v-for="issue in fieldIssues.bonus" :key="issue">{{ issue }}</li></ul>
         </section>
 
         <section v-if="entryMode === 'yaku' && showFuSection" class="calc-section" aria-labelledby="fu-heading">
           <div class="section-heading">
-            <span class="step-number">{{ selectedYakuman.length ? 3 : 4 }}</span>
+            <span class="step-number">{{ showBonusSection ? 4 : 3 }}</span>
             <div>
               <h2 id="fu-heading">{{ needsFuQuestions ? 'Count your fu' : 'Check hand details' }}</h2>
               <p>{{ needsFuQuestions ? (form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple' ? 'Tanyao has a number-tile pair worth 0 fu. Choose the wait and add any triplets or kans.' : 'Choose the pair and wait. Add triplets and kans; skip runs.') : needsPatternCompletenessConfirmation ? 'Enter the required pair and groups for this yaku. Fu does not change this payment.' : 'Fu does not change this payment. Check any details needed for your selected yaku.' }}</p>
@@ -709,6 +714,7 @@ const showPairQuestion = computed(() => form.handShape === 'standard' && !form.s
 const showWaitQuestion = computed(() => needsFuQuestions.value || fieldIssues.value.wait.some(issue => !issue.startsWith('Choose the wait')))
 const showGroupBuilder = computed(() => needsFuQuestions.value || needsPatternCompletenessConfirmation.value || form.groups.length > 0 || fieldIssues.value.groups.length > 0)
 const showFuSection = computed(() => showPairQuestion.value || showWaitQuestion.value || showGroupBuilder.value)
+const showBonusSection = computed(() => entryMode.value === 'yaku' && (!selectedYakuman.value.length || form.bonusHan.nuki > 0))
 const needsYakuWindConfirmation = computed(() => form.selectedYaku.some(id => ['yakuhai-seat', 'yakuhai-round'].includes(id)))
 const needsPairWindConfirmation = computed(() => needsFuQuestions.value && !form.selectedYaku.includes('tanyao') && ['seat-wind', 'round-wind', 'double-wind'].includes(form.pairChoice))
 const tableWindsNeeded = computed(() => needsPairWindConfirmation.value || needsYakuWindConfirmation.value)
@@ -757,13 +763,26 @@ const nextIssueTarget = computed(() => {
 })
 const nextStepLabel = computed(() => nextIssueTarget.value?.label ?? 'Review the highlighted details below.')
 const canJumpToNextIssue = computed(() => Boolean(nextIssueTarget.value?.target))
+const paoTsumoTotal = computed(() => {
+  const pao = result.value.pao
+  if (form.winType !== 'tsumo' || !pao) return null
+  let total = pao.responsiblePays
+  if (pao.otherTsumo) {
+    const otherPayers = form.playerCount - 2
+    total += (isDealer.value || pao.responsibleIsDealer)
+      ? pao.otherTsumo.nonDealerPays * otherPayers
+      : pao.otherTsumo.dealerPays + pao.otherTsumo.nonDealerPays * (otherPayers - 1)
+  }
+  return total
+})
+const headlinePoints = computed(() => form.winType === 'tsumo' && result.value.pao ? paoTsumoTotal.value : result.value.points)
 const resultAnnouncement = computed(() => {
   if (!resultReady.value) return hasInteracted.value ? nextStepLabel.value : ''
   const score = result.value
   const summary = score.isYakuman
     ? (score.yakumanUnits > 1 ? `${score.yakumanUnits} × Yakuman` : 'Yakuman')
     : `${score.han} han${score.fu ? ` · ${score.fu} fu` : ''}`
-  return `${summary} · ${formatPoints(score.points)}`
+  return `${summary} · ${formatPoints(headlinePoints.value ?? 0)}`
 })
 
 const fuLines = computed(() => {
@@ -1021,7 +1040,7 @@ function addGroup(option) {
   if (!option.concealed) form.isClosed = false
   form.groups.push({ id: ++groupId, type: option.type, tileKind: option.tileKind, concealed: option.concealed, completedByRon: false, yakuId: null })
   form.groupsConfirmed = false
-  showGroupOptions.value = false
+  showGroupOptions.value = form.groups.length < 4
 }
 
 function adjustBonus(id, amount, max = Infinity) {
@@ -1290,7 +1309,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .group-option-grid button b { grid-column: 3; grid-row: 1 / span 2; color: var(--gold-leaf); font-size: .72rem; white-space: nowrap; }
 .honba-control { margin-top: 18px; }
 .honba-control .field-problems { flex-basis: 100%; }
-.result-panel { position: sticky; top: 105px; overflow: hidden; border: 1px solid #cdd5c9; border-radius: 12px; background: var(--white-pure); box-shadow: 0 12px 32px rgba(44,55,40,.08); }
+.result-panel { position: sticky; top: 105px; max-height: calc(100vh - 125px); overflow: auto; border: 1px solid #cdd5c9; border-radius: 12px; background: var(--white-pure); box-shadow: 0 12px 32px rgba(44,55,40,.08); }
 .result-inner { padding: 22px; }
 .result-ready { border-color: var(--matcha-leaf); }
 .result-heading-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
