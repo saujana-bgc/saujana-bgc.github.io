@@ -204,6 +204,13 @@ test('quick han and fu entry scores known totals and validates special fu totals
   const oneHanTwentyFiveFu = calculateManualHanFuScore({ han: 1, fu: 25, isClosed: true, isDealer: false, winType: 'ron', playerCount: 4, honba: 0 })
   assert.ok(oneHanTwentyFiveFu.issues.some(issue => issue.includes('at least 2 han')))
 
+  const invalidSevenPairsTsumo = calculateManualHanFuScore({ han: 2, fu: 25, isClosed: true, isDealer: false, winType: 'tsumo', playerCount: 4, honba: 0 })
+  assert.ok(invalidSevenPairsTsumo.issues.some(issue => /25 fu on tsumo needs at least 3 han/.test(issue)))
+  assert.equal(invalidSevenPairsTsumo.points, 0)
+  const validSevenPairsTsumo = calculateManualHanFuScore({ han: 3, fu: 25, isClosed: true, isDealer: false, winType: 'tsumo', playerCount: 4, honba: 0 })
+  assert.deepEqual(validSevenPairsTsumo.issues, [])
+  assert.equal(validSevenPairsTsumo.points, 3200)
+
   const mangan = calculateManualHanFuScore({ han: 5, fu: 0, isClosed: false, isDealer: true, winType: 'ron', playerCount: 4, honba: 0 })
   assert.deepEqual(mangan.issues, [])
   assert.equal(mangan.fu, null)
@@ -221,4 +228,48 @@ test('win-method and dealer-only yaku are rejected when the hand does not match'
   const tenhouNonDealer = calculateManualScore(hand({ selectedYaku: ['tenhou'], winType: 'tsumo' }))
   assert.ok(tenhouNonDealer.issues.some(issue => issue.includes('requires the dealer')))
   assert.equal(tenhouNonDealer.points, 0)
+})
+
+test('Renhou stays mangan and excludes bonus han', () => {
+  const result = calculateManualScore(hand({
+    selectedYaku: ['renhou'], bonusHan: { dora: 3, nuki: 0 },
+  }))
+  assert.deepEqual(result.issues, [])
+  assert.equal(result.han, 5)
+  assert.equal(result.bonusHan, 0)
+  assert.equal(result.points, 8000)
+})
+
+test('Honroutou requires four triplet groups for fu and adds its All Triplets yaku', () => {
+  const incomplete = calculateManualScore(hand({
+    selectedYaku: ['honroutou'], pairChoice: 'terminal-number', pairFu: 0, pairIsValue: false, waitType: 'tanki',
+  }))
+  assert.ok(incomplete.issues.some(issue => /Honroutou needs four terminal or honour triplets or kans/.test(issue)))
+  assert.equal(incomplete.points, 0)
+
+  const groups = Array.from({ length: 4 }, (_, index) => ({
+    id: index + 1, type: 'triplet' as const, tileKind: 'terminal' as const, concealed: true, completedByRon: false,
+  }))
+  const complete = calculateManualScore(hand({
+    selectedYaku: ['honroutou'], pairChoice: 'terminal-number', pairFu: 0, pairIsValue: false, waitType: 'tanki', groups,
+  }))
+  assert.deepEqual(complete.issues, [])
+  assert.ok(complete.yaku.some(yaku => yaku.id === 'toitoi' && yaku.han === 2))
+  assert.equal(complete.points, 8000)
+})
+
+test('Chankan cannot combine with Houtei, and impossible kan yaku combinations are rejected', () => {
+  const chankanHoutei = hand({ selectedYaku: ['chankan', 'houtei'] })
+  assert.match(manualYakuUnavailableReason('houtei', chankanHoutei) ?? '', /cannot be scored alongside Chankan/)
+  const conflictingWin = calculateManualScore(chankanHoutei)
+  assert.ok(conflictingWin.issues.some(issue => /cannot be scored alongside/.test(issue)))
+  assert.equal(conflictingWin.points, 0)
+
+  for (const selectedYaku of [['tenhou', 'sankantsu'], ['chuuren', 'sankantsu']]) {
+    const impossibleKanWin = calculateManualScore(hand({
+      selectedYaku, isDealer: selectedYaku.includes('tenhou'), winType: selectedYaku.includes('tenhou') ? 'tsumo' : 'ron',
+    }))
+    assert.ok(impossibleKanWin.issues.some(issue => /cannot be scored alongside Sankantsu/.test(issue)), selectedYaku.join(', '))
+    assert.equal(impossibleKanWin.points, 0, selectedYaku.join(', '))
+  }
 })

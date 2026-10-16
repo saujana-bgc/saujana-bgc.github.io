@@ -56,7 +56,6 @@ const navigation = [
   { name: 'Play History', url: '/playlog' },
   { name: 'Riichi League', url: '/riichi-league' },
   { name: 'Riichi Calculator', url: '/riichi-calculator' },
-  { name: 'Riichi Open', url: '/riichi-open' },
   { name: 'Collection', url: '/collection' }
 ]
 

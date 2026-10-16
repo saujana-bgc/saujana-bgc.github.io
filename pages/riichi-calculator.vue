@@ -454,7 +454,7 @@ watch(entryMode, () => { undoSnapshot.value = null }, { flush: 'sync' })
 const directFuOptions = computed(() => {
   const han = integerAtLeastZero(form.directHan)
   return [20, 25, ...Array.from({ length: 9 }, (_, index) => 30 + index * 10)]
-    .filter(fu => (fu !== 20 || form.winType === 'tsumo') && (fu !== 25 || han >= 2) && (fu !== 20 || han >= 2))
+    .filter(fu => (fu !== 20 || form.winType === 'tsumo') && (fu !== 25 || han >= (form.winType === 'tsumo' ? 3 : 2)) && (fu !== 20 || han >= 2))
 })
 const quickScore = computed(() => calculateManualHanFuScore({
   han: form.directHan,
@@ -600,9 +600,10 @@ const fieldIssues = computed(() => {
     else if (/requires (?:ron|tsumo)/i.test(issue)) fields.win.push(issue)
     else if (/requires (?:the dealer|a non-dealer)/i.test(issue)) fields.dealer.push(issue)
     else if (/^Suuankou on ron|^Suuankou needs a pair wait|^Double (Suuankou|Kokushi|Nine Gates)/.test(issue)) fields.special.push(issue)
+    else if (/^Honroutou needs four terminal or honour triplets or kans/.test(issue)) fields.groups.push(issue)
     else if (/^Choose your pair/.test(issue) && needsWindsConfirmation.value) continue
+    else if (/no runs, so it cannot use a run wait|^Choose the wait|^Pinfu needs a two-sided wait|^Tanyao cannot use an edge wait/.test(issue)) fields.wait.push(issue)
     else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair|^(?:Junchan|Chanta|Honroutou|Chinroutou|Tsuuiisou) needs/.test(issue)) fields.pair.push(issue)
-    else if (/^Choose the wait|^Pinfu needs a two-sided wait|^Tanyao cannot use an edge wait/.test(issue)) fields.wait.push(issue)
     else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai|Tanyao cannot include terminal or honour triplets and kans/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
   }
@@ -620,7 +621,7 @@ const nextIssueTarget = computed(() => {
   if (fieldIssues.value.table.length) return { label: 'Check table counters', target: honbaSection.value }
   if (fieldIssues.value.pair.length || (needsFuQuestions.value && !form.pairChoice)) return { label: 'Choose your pair', target: pairSection.value }
   if (fieldIssues.value.wait.length || (needsFuQuestions.value && !form.waitType)) return { label: 'Choose your winning wait', target: waitSection.value }
-  if (fieldIssues.value.groups.length) return { label: 'Add or fix a triplet or kan', target: groupSection.value }
+  if (fieldIssues.value.groups.length) return { label: fieldIssues.value.groups.some(issue => /needs four terminal or honour triplets or kans/.test(issue)) ? 'Add all four triplets or kans' : 'Review groups or selected yaku', target: groupSection.value }
   if (needsSetConfirmation.value) return { label: form.groups.length ? 'Confirm the group list is complete' : 'Confirm there are no triplets or kans', target: groupSection.value }
   return null
 })
