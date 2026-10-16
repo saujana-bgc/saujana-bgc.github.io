@@ -7,7 +7,7 @@
     </header>
 
     <div class="calculator-layout">
-      <aside v-show="!keyboardOpen" class="result-panel" :class="{ 'result-ready': resultReady }" aria-labelledby="result-heading" aria-live="polite">
+      <aside v-show="!keyboardOpen" class="result-panel" :class="{ 'result-ready': resultReady, 'result-tsumo': resultReady && Boolean(result.tsumo) }" aria-labelledby="result-heading" aria-live="polite">
         <div class="result-inner">
           <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><button v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</button><button type="button" class="reset-button" @click="resetCalculator">Clear hand</button></div></div>
           <div v-if="resultReady && form.winType === 'ron'" class="result-amount">
@@ -15,7 +15,7 @@
             <strong>{{ formatPoints(result.points) }}</strong>
           </div>
           <div v-if="!resultReady" class="result-empty">
-            <p>{{ hasInteracted ? nextStepLabel : (entryMode === 'yaku' ? 'Choose how you want to enter the hand.' : 'Enter han and fu to see the payment.') }}</p>
+            <p>{{ hasInteracted && entryMode === 'hanfu' && directEntryIssue ? 'Check the hand value below.' : hasInteracted ? nextStepLabel : (entryMode === 'yaku' ? 'Choose how you want to enter the hand.' : 'Enter han and fu to see the payment.') }}</p>
             <button v-if="hasInteracted && entryMode === 'yaku'" type="button" class="next-step-button" @click="jumpToNextIssue">Go to next step</button>
           </div>
 
@@ -42,9 +42,25 @@
           <button type="button" :class="{ selected: entryMode === 'yaku' }" :aria-pressed="entryMode === 'yaku'" @click="setEntryMode('yaku')"><strong>Count from yaku</strong><small>Guided · checks hand rules</small></button>
           <button type="button" :class="{ selected: entryMode === 'hanfu' }" :aria-pressed="entryMode === 'hanfu'" @click="setEntryMode('hanfu')"><strong>Enter han &amp; fu</strong><small>Quick · assumes the hand is valid</small></button>
         </div>
+        <section v-if="entryMode === 'hanfu'" class="calc-section direct-entry" aria-labelledby="direct-heading">
+          <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect 5 han and above.</p></div></div>
+          <div class="direct-fields">
+            <div class="direct-field"><label for="direct-han">Total han</label><p class="field-hint">{{ form.directHan ? 'Include yaku and bonus han' : 'Tap + or enter the total han' }}</p><div class="stepper" role="group" aria-label="Total han"><button type="button" aria-label="Remove one han" :disabled="form.directHan <= 0" @click="adjustDirect('directHan', -1)">−</button><input id="direct-han" ref="directHanInput" v-model.number="form.directHan" type="number" inputmode="numeric" min="0" max="99" @change="sanitizeDirect('directHan', 99)" /><button type="button" aria-label="Add one han" @click="adjustDirect('directHan', 1, 99)">+</button></div></div>
+            <div v-if="form.directHan > 0 && form.directHan < 5" class="direct-field"><label for="direct-fu">Fu</label><p class="field-hint">Choose the rounded fu total</p><select id="direct-fu" v-model.number="form.directFu"><option v-for="fu in directFuOptions" :key="fu" :value="fu">{{ fu }} fu</option></select></div>
+          </div>
+          <div v-if="form.directHan > 0 && form.directHan < 5 && [20, 25].includes(form.directFu)" class="direct-closed-control">
+            <span class="field-label">Is the hand closed?</span>
+            <div class="choice-row" role="group" aria-label="Is the hand closed?">
+              <button type="button" class="choice-button" :class="{ selected: form.isClosed }" :aria-pressed="form.isClosed" @click="form.isClosed = true">Yes</button>
+              <button type="button" class="choice-button" :class="{ selected: !form.isClosed }" :aria-pressed="!form.isClosed" @click="form.isClosed = false">No</button>
+            </div>
+          </div>
+          <p v-if="directEntryIssue" class="field-problems" role="status">{{ directEntryIssue }}</p>
+          <p v-else-if="form.directHan >= 5" class="field-hint">Fu is ignored at 5 han and above.</p>
+        </section>
         <section ref="winSection" class="calc-section win-section" tabindex="-1" aria-labelledby="win-heading">
           <div class="section-heading">
-            <span class="step-number">1</span>
+            <span class="step-number">{{ entryMode === 'hanfu' ? 2 : 1 }}</span>
             <div>
               <h2 id="win-heading">How did you win?</h2>
               <p>Choose the win and dealer status.</p>
@@ -63,11 +79,6 @@
             <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="setDealer(false)">No</button>
           </div>
           <p class="field-hint">Set the actual winds when fu or wind yaku needs them.</p>
-          <div v-if="tableWindsNeeded && needsWindsConfirmation" class="wind-prompt">
-            <p>Confirm the winds shown on your table so wind yaku and pair fu are counted correctly.</p>
-            <template v-if="!seatWindConfirmed"><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind"><button v-for="wind in promptSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</button></div></template>
-            <template v-if="!roundWindConfirmed"><span class="field-label">Round wind</span><div class="choice-row" role="group" aria-label="Confirm round wind"><button v-for="wind in availableRoundWinds" :key="wind.id" type="button" class="choice-button" @click="setRoundWind(wind.id)">{{ wind.label }}</button></div></template>
-          </div>
           <template v-if="entryMode === 'yaku'">
             <span class="field-label">Your hand</span>
             <div class="choice-row" role="group" aria-label="Open or closed hand">
@@ -116,23 +127,6 @@
           </div>
         </section>
 
-        <section v-if="entryMode === 'hanfu'" class="calc-section direct-entry" aria-labelledby="direct-heading">
-          <div class="section-heading"><span class="step-number">2</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Use the total han including all dora. Fu is ignored at 5 han and above.</p></div></div>
-          <div class="direct-fields">
-            <div class="direct-field"><label for="direct-han">Total han</label><p class="field-hint">Include yaku and bonus han</p><div class="stepper" role="group" aria-label="Total han"><button type="button" aria-label="Remove one han" :disabled="form.directHan <= 0" @click="adjustDirect('directHan', -1)">−</button><input id="direct-han" v-model.number="form.directHan" type="number" inputmode="numeric" min="0" max="99" @change="sanitizeDirect('directHan', 99)" /><button type="button" aria-label="Add one han" @click="adjustDirect('directHan', 1, 99)">+</button></div></div>
-            <div v-if="form.directHan > 0 && form.directHan < 5" class="direct-field"><label for="direct-fu">Fu</label><p class="field-hint">Choose the rounded fu total</p><select id="direct-fu" v-model.number="form.directFu"><option v-for="fu in directFuOptions" :key="fu" :value="fu">{{ fu }} fu</option></select></div>
-          </div>
-          <div v-if="form.directHan > 0 && form.directHan < 5 && [20, 25].includes(form.directFu)" class="direct-closed-control">
-            <span class="field-label">Is the hand closed?</span>
-            <div class="choice-row" role="group" aria-label="Is the hand closed?">
-              <button type="button" class="choice-button" :class="{ selected: form.isClosed }" :aria-pressed="form.isClosed" @click="form.isClosed = true">Yes</button>
-              <button type="button" class="choice-button" :class="{ selected: !form.isClosed }" :aria-pressed="!form.isClosed" @click="form.isClosed = false">No</button>
-            </div>
-          </div>
-          <p v-if="directEntryIssue" class="field-problems" role="status">{{ directEntryIssue }}</p>
-          <p v-else class="field-hint">5 han or more is a limit hand; fu does not change the payment.</p>
-        </section>
-
         <section v-if="entryMode === 'yaku'" class="calc-section" aria-labelledby="yaku-heading">
           <div ref="yakuSection" class="section-heading" tabindex="-1">
             <span class="step-number">2</span>
@@ -155,6 +149,11 @@
           <div v-if="selectedYakuOptions.length" class="selected-yaku" aria-label="Selected yaku">
             <span>Selected</span>
             <button v-for="yaku in selectedYakuOptions" :key="yaku.id" type="button" class="selected-yaku-chip" :class="{ 'chip-conflict': unavailableReasons[yaku.id] }" :aria-label="`Remove ${yaku.name}${unavailableReasons[yaku.id] ? `: ${unavailableReasons[yaku.id]}` : ''}`" @click="toggleYaku(yaku.id)"><span v-if="unavailableReasons[yaku.id]" aria-hidden="true">!</span>{{ yaku.name }} <b aria-hidden="true">×</b></button>
+          </div>
+          <div v-if="needsYakuWindConfirmation && needsWindsConfirmation" class="wind-prompt">
+            <p>Confirm the seat and round winds to score this wind yaku.</p>
+            <template v-if="!seatWindConfirmed"><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind"><button v-for="wind in promptSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</button></div></template>
+            <template v-if="!roundWindConfirmed"><span class="field-label">Round wind</span><div class="choice-row" role="group" aria-label="Confirm round wind"><button v-for="wind in availableRoundWinds" :key="wind.id" type="button" class="choice-button" @click="setRoundWind(wind.id)">{{ wind.label }}</button></div></template>
           </div>
           <p v-if="selectedYakuman.length" class="automatic-note">Yakuman sets the hand’s payment; bonus han do not add to it. Compatible yakuman can stack.</p>
           <ul v-if="shouldShowProblems && fieldIssues.yaku.length" class="field-problems"><li v-for="issue in fieldIssues.yaku" :key="issue">{{ issue }}</li></ul>
@@ -239,7 +238,12 @@
 
           <div v-if="showPairQuestion" ref="pairSection" class="fu-field" tabindex="-1">
             <span class="field-label">Your pair</span>
-            <div v-if="!needsWindsConfirmation" class="choice-row fu-choice-grid" role="group" aria-label="Pair type">
+            <div v-if="needsPairWindConfirmation && needsWindsConfirmation && !needsYakuWindConfirmation" class="wind-prompt">
+              <p>Confirm the seat and round winds so the pair’s fu is correct.</p>
+              <template v-if="!seatWindConfirmed"><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind"><button v-for="wind in promptSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</button></div></template>
+              <template v-if="!roundWindConfirmed"><span class="field-label">Round wind</span><div class="choice-row" role="group" aria-label="Confirm round wind"><button v-for="wind in availableRoundWinds" :key="wind.id" type="button" class="choice-button" @click="setRoundWind(wind.id)">{{ wind.label }}</button></div></template>
+            </div>
+            <div class="choice-row fu-choice-grid" role="group" aria-label="Pair type">
               <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id"><span>{{ pair.label }}</span><span v-if="pair.tiles?.length" class="tile-strip" aria-hidden="true"><img v-for="tile in pair.tiles" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><small>+{{ pair.fu }} fu</small></button>
             </div>
             <p class="field-hint">A pair that is both your seat wind and round wind is 4 fu on this sheet.</p>
@@ -248,6 +252,7 @@
 
           <div v-if="showWaitQuestion" ref="waitSection" class="fu-field" tabindex="-1">
             <span class="field-label">Winning wait</span>
+            <p class="field-hint winning-tile-hint">The gold-outlined tile completes the hand.</p>
             <div class="choice-row fu-choice-grid" role="group" aria-label="Winning wait">
               <button v-for="wait in waits" :key="wait.id" type="button" class="choice-button wait-button" :class="{ selected: form.waitType === wait.id }" :aria-pressed="form.waitType === wait.id" @click="form.waitType = wait.id"><span>{{ wait.label }}</span><span v-for="example in wait.examples" :key="example.caption" class="wait-example"><span class="tile-strip" aria-hidden="true"><img v-for="(tile, index) in example.tiles" :key="`${tile}-${index}`" :src="`/tiles/${tile}.svg`" alt="" :class="{ 'winning-tile': index === example.tiles.length - 1 }" /></span><small>{{ example.caption }}</small></span><small>{{ wait.fu ? `+${wait.fu} fu` : 'no wait fu' }}</small></button>
             </div>
@@ -404,6 +409,7 @@ const groupSection = ref(null)
 const specialWaitSection = ref(null)
 const bonusSection = ref(null)
 const honbaSection = ref(null)
+const directHanInput = ref(null)
 const keyboardOpen = ref(false)
 let groupId = 0
 
@@ -422,7 +428,7 @@ const quickScore = computed(() => calculateManualHanFuScore({
   honba: integerAtLeastZero(form.honba),
   kiriageMangan: false,
 }))
-const directEntryIssue = computed(() => quickScore.value.issues[0] ?? '')
+const directEntryIssue = computed(() => form.directHan > 0 ? (quickScore.value.issues[0] ?? '') : '')
 
 const windNames = { east: 'East', south: 'South', west: 'West', north: 'North' }
 const windTileNames = { east: 'Ton', south: 'Nan', west: 'Shaa', north: 'Pei' }
@@ -436,24 +442,24 @@ const seatWindName = computed(() => windNames[form.seatWind])
 const roundWindName = computed(() => windNames[form.roundWind])
 const isDealer = computed(() => form.isDealer)
 const availablePairOptions = computed(() => pairOptions
-  .filter(pair => form.seatWind === form.roundWind
+  .filter(pair => !seatWindConfirmed.value || !roundWindConfirmed.value || (form.seatWind === form.roundWind
     ? !['seat-wind', 'round-wind'].includes(pair.id)
-    : pair.id !== 'double-wind')
+    : pair.id !== 'double-wind'))
   .map(pair => ({
     ...pair,
-    label: pair.id === 'seat-wind' ? `${seatWindName.value} · seat wind`
-      : pair.id === 'round-wind' ? `${roundWindName.value} · round wind`
-        : pair.id === 'double-wind' ? `${seatWindName.value} pair (seat + round)`
-          : pair.id === 'non-value-wind' ? Object.keys(windNames)
+    label: pair.id === 'seat-wind' ? (seatWindConfirmed.value ? `${seatWindName.value} · seat wind` : 'Seat wind')
+      : pair.id === 'round-wind' ? (roundWindConfirmed.value ? `${roundWindName.value} · round wind` : 'Round wind')
+        : pair.id === 'double-wind' ? (seatWindConfirmed.value && roundWindConfirmed.value ? `${seatWindName.value} + ${roundWindName.value} wind pair` : 'Seat + round wind')
+          : pair.id === 'non-value-wind' ? seatWindConfirmed.value && roundWindConfirmed.value ? Object.keys(windNames)
             .filter(wind => wind !== form.seatWind && wind !== form.roundWind)
-            .map(wind => windNames[wind]).join(' or ') || 'Other wind'
+            .map(wind => windNames[wind]).join(' or ') || 'Other wind' : 'Other wind'
             : pair.label,
-    tiles: pair.id === 'seat-wind' ? [windTileNames[form.seatWind]]
-      : pair.id === 'round-wind' ? [windTileNames[form.roundWind]]
-        : pair.id === 'double-wind' ? [...new Set([windTileNames[form.seatWind], windTileNames[form.roundWind]])]
-          : pair.id === 'non-value-wind' ? Object.keys(windNames)
+    tiles: pair.id === 'seat-wind' ? (seatWindConfirmed.value ? [windTileNames[form.seatWind]] : [])
+      : pair.id === 'round-wind' ? (roundWindConfirmed.value ? [windTileNames[form.roundWind]] : [])
+        : pair.id === 'double-wind' ? seatWindConfirmed.value && roundWindConfirmed.value ? [...new Set([windTileNames[form.seatWind], windTileNames[form.roundWind]])] : []
+          : pair.id === 'non-value-wind' ? seatWindConfirmed.value && roundWindConfirmed.value ? Object.keys(windNames)
             .filter(wind => wind !== form.seatWind && wind !== form.roundWind)
-            .map(wind => windTileNames[wind])
+            .map(wind => windTileNames[wind]) : []
             : pair.tiles,
   })))
 const isClosed = computed(() => form.isClosed)
@@ -512,14 +518,16 @@ const result = computed(() => {
 const resultReady = computed(() => entryMode.value === 'yaku'
   ? result.value.issues.length === 0 && result.value.han > 0 && !needsSetConfirmation.value && !needsWindsConfirmation.value
   : result.value.issues.length === 0 && result.value.han > 0)
-const shouldShowProblems = computed(() => entryMode.value === 'yaku' && hasInteracted.value && result.value.issues.length > 0)
+const shouldShowProblems = computed(() => entryMode.value === 'yaku' && hasInteracted.value && result.value.issues.some(issue => !/^Choose your pair|^Choose the wait|^Select at least one yaku/.test(issue)))
 const needsSetConfirmation = computed(() => entryMode.value === 'yaku' && needsFuQuestions.value && form.groups.length < 4 && !form.groupsConfirmed)
 const needsFuQuestions = computed(() => !result.value.isYakuman && result.value.han > 0 && result.value.han < 5 && form.handShape === 'standard' && !isPinfu.value)
 const showPairQuestion = computed(() => needsFuQuestions.value || fieldIssues.value.pair.some(issue => !issue.startsWith('Choose your pair')))
 const showWaitQuestion = computed(() => needsFuQuestions.value || fieldIssues.value.wait.some(issue => !issue.startsWith('Choose the wait')))
 const showGroupBuilder = computed(() => needsFuQuestions.value || fieldIssues.value.groups.length > 0)
 const showFuSection = computed(() => showPairQuestion.value || showWaitQuestion.value || showGroupBuilder.value)
-const tableWindsNeeded = computed(() => needsFuQuestions.value || form.selectedYaku.some(id => ['yakuhai-seat', 'yakuhai-round'].includes(id)))
+const needsYakuWindConfirmation = computed(() => form.selectedYaku.some(id => ['yakuhai-seat', 'yakuhai-round'].includes(id)))
+const needsPairWindConfirmation = computed(() => needsFuQuestions.value && ['seat-wind', 'round-wind', 'double-wind'].includes(form.pairChoice))
+const tableWindsNeeded = computed(() => needsPairWindConfirmation.value || needsYakuWindConfirmation.value)
 const seatWindConfirmed = computed(() => form.isDealer || form.seatWindConfirmed)
 const roundWindConfirmed = computed(() => form.roundWindConfirmed)
 const needsWindsConfirmation = computed(() => tableWindsNeeded.value && (!seatWindConfirmed.value || !roundWindConfirmed.value))
@@ -541,7 +549,7 @@ const fieldIssues = computed(() => {
 const nextIssueTarget = computed(() => {
   if (entryMode.value === 'hanfu') return { label: directEntryIssue.value || 'Enter han and fu', target: null }
   if (fieldIssues.value.yaku.length || (form.selectedYaku.length === 0 && automaticYaku.value.length === 0)) return { label: 'Choose or fix a yaku', target: yakuSection.value }
-  if (needsWindsConfirmation.value) return { label: 'Confirm the seat and round winds', target: winSection.value }
+  if (needsWindsConfirmation.value) return { label: 'Confirm the seat and round winds', target: needsYakuWindConfirmation.value ? yakuSection.value : pairSection.value }
   if (fieldIssues.value.special.length) return { label: 'Check the special wait', target: specialWaitSection.value }
   if (fieldIssues.value.bonus.length) return { label: 'Check bonus han', target: bonusSection.value }
   if (fieldIssues.value.table.length) return { label: 'Check table counters', target: honbaSection.value }
@@ -597,27 +605,26 @@ function setEntryMode(mode) {
 }
 
 function setDealer(value) {
+  hasInteracted.value = true
   form.isDealer = value
   if (value) {
-    if (form.seatWind !== 'east') form.pairChoice = null
     form.seatWind = 'east'
     form.seatWindConfirmed = true
   } else if (form.seatWind === 'east') {
-    form.pairChoice = null
     form.seatWind = 'south'
     form.seatWindConfirmed = false
   }
 }
 
 function setSeatWind(wind) {
-  if (form.seatWind !== wind) form.pairChoice = null
+  hasInteracted.value = true
   form.seatWind = wind
   form.seatWindConfirmed = true
   form.isDealer = wind === 'east'
 }
 
 function setRoundWind(wind) {
-  if (form.roundWind !== wind) form.pairChoice = null
+  hasInteracted.value = true
   form.roundWind = wind
   form.roundWindConfirmed = true
 }
@@ -786,9 +793,10 @@ function limitName(name) {
 
 async function resetCalculator() {
   undoSnapshot.value = JSON.parse(JSON.stringify({ form: toRaw(form), entryMode: entryMode.value }))
-  const table = { playerCount: form.playerCount, seatWind: form.seatWind, seatWindConfirmed: form.seatWindConfirmed, roundWind: form.roundWind, roundWindConfirmed: form.roundWindConfirmed, isDealer: form.isDealer }
+  const table = { playerCount: form.playerCount, seatWind: form.seatWind, seatWindConfirmed: form.seatWindConfirmed, roundWind: form.roundWind, roundWindConfirmed: form.roundWindConfirmed, isDealer: form.isDealer, honba: form.honba }
+  const currentEntryMode = entryMode.value
   Object.assign(form, initialState(), table)
-  entryMode.value = 'yaku'
+  entryMode.value = currentEntryMode
   yakuSearch.value = ''
   categoriesBeforeSearch.value = null
   openYakuCategories.value = new Set(['common'])
@@ -796,8 +804,9 @@ async function resetCalculator() {
   showBreakdown.value = false
   showGroupOptions.value = false
   await nextTick()
-  winSection.value?.focus({ preventScroll: true })
-  winSection.value?.scrollIntoView({ block: 'start', behavior: 'auto' })
+  const focusTarget = entryMode.value === 'hanfu' ? directHanInput.value : winSection.value
+  focusTarget?.focus({ preventScroll: true })
+  focusTarget?.scrollIntoView({ block: 'start', behavior: 'auto' })
 }
 
 async function undoClear() {
@@ -806,8 +815,9 @@ async function undoClear() {
   entryMode.value = undoSnapshot.value.entryMode
   undoSnapshot.value = null
   await nextTick()
-  winSection.value?.focus({ preventScroll: true })
-  winSection.value?.scrollIntoView({ block: 'start', behavior: 'auto' })
+  const focusTarget = entryMode.value === 'hanfu' ? directHanInput.value : winSection.value
+  focusTarget?.focus({ preventScroll: true })
+  focusTarget?.scrollIntoView({ block: 'start', behavior: 'auto' })
 }
 
 function updateKeyboardState() {
@@ -976,7 +986,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .tile-strip { display: inline-flex; align-items: flex-end; justify-content: center; gap: 2px; min-height: 32px; }
 .choice-button .tile-strip { display: inline-flex; }
 .tile-strip img { display: block; width: 21px; height: 29px; object-fit: contain; }
-.tile-strip img.winning-tile { filter: drop-shadow(0 2px 0 var(--gold-leaf)); transform: translateY(-2px); }
+.tile-strip img.winning-tile { outline: 2px solid var(--gold-leaf); outline-offset: 1px; border-radius: 2px; filter: drop-shadow(0 2px 0 var(--gold-leaf)); transform: translateY(-2px); }
+.winning-tile-hint { margin-bottom: 7px; }
 .group-count { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
 .group-list { display: grid; gap: 7px; margin: 13px 0; }
 .group-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); }
@@ -984,7 +995,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .group-row-main > strong, .group-row-main > small { display: block; }
 .group-row-main > strong { color: var(--matcha-leaf); font-size: .76rem; overflow-wrap: anywhere; }
 .group-row-main > small { color: var(--muted); font-size: .68rem; }
-.group-row-main .group-tile-samples { grid-column: 2; grid-row: 1 / span 2; }
+.group-row-main .group-tile-samples { grid-column: 2; grid-row: 1 / span 2; display: inline-flex; align-items: flex-end; gap: 1px; }
 .group-yaku-choice { display: grid; gap: 3px; min-width: 130px; color: var(--muted); font-size: .65rem; }
 .group-yaku-choice select { min-height: 35px; max-width: 190px; padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--clay-text); font: inherit; }
 .winning-group { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: .68rem; }
@@ -1004,7 +1015,6 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .group-tile-samples img { width: 16px; height: 23px; object-fit: contain; }
 .group-tile-samples .tile-back { width: 16px; height: 23px; flex: 0 0 auto; border: 1px solid #536c58; border-radius: 2px; background: repeating-linear-gradient(135deg, #93a78b 0 2px, #849b7d 2px 4px); box-shadow: inset 0 0 0 2px #f7f5eb; }
 .group-option-grid button b { grid-column: 3; grid-row: 1 / span 2; color: var(--gold-leaf); font-size: .72rem; white-space: nowrap; }
-.group-row-main .group-tile-samples .tile-back { width: 16px; height: 23px; }
 .honba-control { margin-top: 18px; }
 .honba-control .field-problems { flex-basis: 100%; }
 .result-panel { position: sticky; top: 105px; overflow: hidden; border: 1px solid #cdd5c9; border-radius: 12px; background: var(--white-pure); box-shadow: 0 12px 32px rgba(44,55,40,.08); }
@@ -1019,9 +1029,9 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .result-amount > strong { display: block; margin: 2px 0; color: var(--matcha-leaf); font-size: clamp(2rem, 4vw, 2.8rem); font-variant-numeric: tabular-nums; letter-spacing: -.045em; line-height: 1.15; }
 .result-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin: 17px 0; color: var(--muted); }
 .result-empty p { flex: 1 1 100%; margin: 0; font-size: .81rem; line-height: 1.55; }
-.next-step-button { min-height: 36px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; cursor: pointer; }
+.next-step-button { min-height: 44px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; cursor: pointer; }
 .score-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0 0; margin-top: 10px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--matcha-leaf); }
-.breakdown-button { margin-left: auto; min-height: 36px; padding: 4px 0 4px 6px; border: 0; background: transparent; color: var(--matcha-leaf); font-size: .72rem; text-decoration: underline; cursor: pointer; }
+.breakdown-button { margin-left: auto; min-height: 44px; padding: 4px 0 4px 6px; border: 0; background: transparent; color: var(--matcha-leaf); font-size: .72rem; text-decoration: underline; cursor: pointer; }
 .score-details { scroll-margin-top: 130px; }
 .score-details h2 { margin: 0; color: var(--matcha-leaf); font-size: 1.08rem; }
 .limit-badge { padding: 5px 9px; border-radius: 5px; background: #eee9d9; color: #695b3c; font-size: .68rem; font-weight: 750; }
@@ -1057,11 +1067,17 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .payment-list { margin-top: 5px; }
   .payment-list p { padding: 3px 0; }
   .payment-list p strong { font-size: 1rem; }
+  .result-tsumo .payment-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; }
+  .result-tsumo .payment-list h3 { display: none; }
+  .result-tsumo .payment-list p { display: grid; justify-items: center; gap: 1px; padding: 2px 0; border: 0; font-size: .68rem; text-align: center; }
+  .result-tsumo .payment-list p strong { font-size: 1rem; }
+  .result-tsumo .payment-list p:only-of-type { grid-column: 1 / -1; }
   .score-details { scroll-margin-top: 300px; }
   .entry-mode { gap: 6px; }
   .entry-mode button { min-height: 58px; padding: 7px 9px; }
   .entry-mode strong { font-size: .75rem; }
-  .entry-mode small { font-size: .64rem; line-height: 1.35; }
+  .entry-mode small { font-size: .72rem; line-height: 1.35; }
+  .field-hint, .group-count, .group-row-main > small, .group-option-grid button > span:not(.group-tile-samples), .group-yaku-choice { font-size: .76rem; }
   .calc-section { padding: 15px; }
   .choice-row { gap: 7px; }
   .choice-button { min-height: 48px; padding: 8px 11px; }
@@ -1070,6 +1086,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .table-settings > summary, .yaku-category > summary { min-height: 48px; }
   .remove-group { flex-basis: 44px; width: 44px; height: 44px; }
   .group-option-grid button { min-height: 76px; }
+  .next-step-button, .breakdown-button { min-height: 44px; }
   .direct-fields { grid-template-columns: minmax(0, 1fr); }
   .direct-field .stepper { justify-content: space-between; width: 100%; }
   .direct-field .stepper input { flex: 1; }
