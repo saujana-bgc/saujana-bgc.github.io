@@ -11,7 +11,7 @@
         <div class="result-inner">
           <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><button v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</button><button type="button" class="reset-button" @click="resetCalculator">Clear hand</button></div></div>
           <div v-if="resultReady && form.winType === 'ron'" class="result-amount">
-            <span>Discarder pays</span>
+            <span>{{ result.pao ? 'Total payment' : 'Discarder pays' }}</span>
             <strong>{{ formatPoints(result.points) }}</strong>
           </div>
           <div v-if="!resultReady" class="result-empty">
@@ -21,7 +21,20 @@
           </div>
 
           <template v-if="resultReady">
-            <div v-if="result.tsumo" class="payment-list">
+            <div v-if="result.pao" class="payment-list pao-payment" aria-label="Pao payment">
+              <h3>Pao · {{ form.winType === 'tsumo' || !result.pao.discarderPays ? 'responsible player pays' : 'split between responsible player and discarder' }}</h3>
+              <p><span>Responsible player</span><strong>{{ formatPoints(result.pao.responsiblePays) }}</strong></p>
+              <p v-if="result.pao.discarderPays"><span>Discarder (including honba)</span><strong>{{ formatPoints(result.pao.discarderPays) }}</strong></p>
+              <template v-if="result.pao.otherTsumo">
+                <h3>Other opponents · remaining yakuman</h3>
+                <p v-if="isDealer || result.pao.responsibleIsDealer"><span>Each non-dealer opponent</span><strong>{{ formatPoints(result.pao.otherTsumo.nonDealerPays) }}</strong></p>
+                <template v-else>
+                  <p><span>Dealer</span><strong>{{ formatPoints(result.pao.otherTsumo.dealerPays) }}</strong></p>
+                  <p v-if="form.playerCount === 4"><span>Other non-dealer</span><strong>{{ formatPoints(result.pao.otherTsumo.nonDealerPays) }}</strong></p>
+                </template>
+              </template>
+            </div>
+            <div v-if="result.tsumo && !result.pao" class="payment-list">
               <h3>Each opponent pays</h3>
               <p v-if="isDealer"><span>Each non-dealer</span><strong>{{ formatPoints(result.tsumo.nonDealerPays) }}</strong></p>
               <template v-else>
@@ -59,6 +72,7 @@
           </div>
           <p v-if="directEntryIssue" class="field-problems" role="status">{{ directEntryIssue }}</p>
           <p v-else-if="form.directHan >= 5" class="field-hint">Fu is ignored at 5 han and above.</p>
+          <p v-if="form.directHan >= 13" class="field-hint">For Daisangen/Daisuushi pao, stacked yakuman or a double yakuman, use guided entry so each yakuman is settled correctly.</p>
         </section>
         <section ref="winSection" class="calc-section win-section" tabindex="-1" aria-labelledby="win-heading">
           <div class="section-heading">
@@ -167,6 +181,38 @@
             <template v-if="!roundWindConfirmed"><span class="field-label">Round wind</span><div class="choice-row" role="group" aria-label="Confirm round wind"><button v-for="wind in availableRoundWinds" :key="wind.id" type="button" class="choice-button" @click="setRoundWind(wind.id)">{{ wind.label }}</button></div></template>
           </div>
           <p v-if="selectedYakuman.length" class="automatic-note">Yakuman sets the hand’s payment; bonus han do not add to it. Compatible yakuman can stack.</p>
+          <div v-if="form.selectedYaku.some(id => ['daisangen', 'daisuushi'].includes(id))" class="pao-control">
+            <label class="checkbox-row"><input v-model="form.paoApplies" type="checkbox" /><span>Pao applies to this yakuman under the league rules</span></label>
+            <p class="field-hint">Use pao when you fed the final dragon or wind set that completed the yakuman.</p>
+            <template v-if="form.paoApplies && form.winType === 'ron'">
+              <span class="field-label">Did the responsible player also discard the winning tile?</span>
+              <div class="choice-row" role="group" aria-label="Was the pao-responsible player the discarder?">
+                <button type="button" class="choice-button" :class="{ selected: form.paoResponsibleAlsoDiscarder === true }" :aria-pressed="form.paoResponsibleAlsoDiscarder === true" @click="form.paoResponsibleAlsoDiscarder = true">Yes</button>
+                <button type="button" class="choice-button" :class="{ selected: form.paoResponsibleAlsoDiscarder === false }" :aria-pressed="form.paoResponsibleAlsoDiscarder === false" @click="form.paoResponsibleAlsoDiscarder = false">No</button>
+              </div>
+            </template>
+            <template v-if="form.paoApplies && form.winType === 'tsumo' && result.yakumanUnits > 1 && !isDealer">
+              <span class="field-label">Is the pao-responsible player the dealer?</span>
+              <div class="choice-row" role="group" aria-label="Is the pao-responsible player the dealer?">
+                <button type="button" class="choice-button" :class="{ selected: form.paoResponsibleIsDealer === true }" :aria-pressed="form.paoResponsibleIsDealer === true" @click="form.paoResponsibleIsDealer = true">Yes</button>
+                <button type="button" class="choice-button" :class="{ selected: form.paoResponsibleIsDealer === false }" :aria-pressed="form.paoResponsibleIsDealer === false" @click="form.paoResponsibleIsDealer = false">No</button>
+              </div>
+            </template>
+          </div>
+          <div v-if="form.handShape === 'chiitoitsu' && form.selectedYaku.includes('honitsu')" class="rule-confirmation seven-pairs-honitsu" aria-label="Honour pairs in Seven Pairs">
+            <span class="field-label">Do any of your seven pairs contain a wind or dragon?</span>
+            <div class="choice-row" role="group" aria-label="Does Seven Pairs include an honour pair?">
+              <button type="button" class="choice-button" :class="{ selected: form.sevenPairsHasHonor === true }" :aria-pressed="form.sevenPairsHasHonor === true" @click="form.sevenPairsHasHonor = true">Yes</button>
+              <button type="button" class="choice-button" :class="{ selected: form.sevenPairsHasHonor === false }" :aria-pressed="form.sevenPairsHasHonor === false" @click="form.sevenPairsHasHonor = false">No</button>
+            </div>
+          </div>
+          <div v-if="form.selectedYaku.includes('ryuuiisou')" class="rule-confirmation" aria-label="All Green tile check">
+            <span class="field-label">Are all suited tiles bamboo 2, 3, 4, 6 or 8, with only Green dragons as honours?</span>
+            <div class="choice-row" role="group" aria-label="Do all All Green tiles match the allowed tiles?">
+              <button type="button" class="choice-button" :class="{ selected: form.ryuuiisouTilesConfirmed === true }" :aria-pressed="form.ryuuiisouTilesConfirmed === true" @click="form.ryuuiisouTilesConfirmed = true">Yes</button>
+              <button type="button" class="choice-button" :class="{ selected: form.ryuuiisouTilesConfirmed === false }" :aria-pressed="form.ryuuiisouTilesConfirmed === false" @click="form.ryuuiisouTilesConfirmed = false">No</button>
+            </div>
+          </div>
           <ul v-if="shouldShowProblems && fieldIssues.yaku.length" class="field-problems"><li v-for="issue in fieldIssues.yaku" :key="issue">{{ issue }}</li></ul>
           <ul v-if="shouldShowProblems && (fieldIssues.win.length || fieldIssues.dealer.length)" class="field-problems"><li v-for="issue in [...fieldIssues.win, ...fieldIssues.dealer]" :key="issue">{{ issue }}</li></ul>
 
@@ -295,7 +341,7 @@
               </div>
               <button v-for="option in groupOptionsForPicker" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, index) in option.tileExamples" :key="`${tile}-${index}`"><span v-if="isConcealedKanOptionBack(option, index)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
             </div>
-            <label v-if="needsGroupCompletenessConfirmation && form.groups.length < 4 && (!form.selectedYaku.includes('shousangen') || form.groups.length >= 2)" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
+            <label v-if="needsGroupCompletenessConfirmation && form.groups.length < 4" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
             <p v-if="form.groups.length === 4" class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
             <ul v-if="shouldShowProblems && fieldIssues.groups.length" class="field-problems"><li v-for="issue in fieldIssues.groups" :key="issue">{{ issue }}</li></ul>
           </div>
@@ -417,11 +463,16 @@ const initialState = () => ({
   handShape: 'standard',
   selectedYaku: [],
   pairChoice: null,
+  sevenPairsHasHonor: null,
+  ryuuiisouTilesConfirmed: null,
   waitType: null,
   groups: [],
   bonusHan: { dora: 0, nuki: 0 },
   doubleYakumanWaits: { kokushi: false, suuankou: false, chuuren: false },
   honba: 0,
+  paoApplies: false,
+  paoResponsibleAlsoDiscarder: null,
+  paoResponsibleIsDealer: null,
   directHan: 0,
   directFu: 30,
   groupsConfirmed: false,
@@ -485,10 +536,17 @@ const promptSeatWinds = computed(() => availableSeatWinds.value.filter(wind => f
 const seatWindName = computed(() => windNames[form.seatWind])
 const roundWindName = computed(() => windNames[form.roundWind])
 const isDealer = computed(() => form.isDealer)
-const availablePairOptions = computed(() => pairOptions.flatMap(pair => pair.id === 'dragon' && form.selectedYaku.includes('shousangen') ? shousangenPairs : [pair])
+const availablePairOptions = computed(() => [
+  ...pairOptions.flatMap(pair => pair.id === 'dragon' && form.selectedYaku.some(id => ['shousangen', 'ryuuiisou', 'daisangen'].includes(id)) ? shousangenPairs : [pair]),
+  ...(form.selectedYaku.includes('shousuushi') ? ['east', 'south', 'west', 'north'].map(wind => ({ id: `wind-${wind}`, label: `${windNames[wind]} wind`, fu: Number(wind === form.seatWind) * 2 + Number(wind === form.roundWind) * 2 })) : []),
+]
   .filter(pair => !form.selectedYaku.includes('tanyao') || pair.id === 'simple')
   .filter(pair => !form.selectedYaku.includes('junchan') || pair.id === 'terminal-number')
   .filter(pair => !form.selectedYaku.includes('chinroutou') || pair.id === 'terminal-number')
+  .filter(pair => !form.selectedYaku.includes('ryuuiisou') || !['dragon-haku', 'dragon-chun', 'dragon'].includes(pair.id))
+  .filter(pair => !form.selectedYaku.includes('daisangen') || !['dragon-haku', 'dragon-hatsu', 'dragon-chun'].includes(pair.id))
+  .filter(pair => !form.selectedYaku.includes('daisuushi') || !['non-value-wind', 'seat-wind', 'round-wind', 'double-wind'].includes(pair.id))
+  .filter(pair => !form.selectedYaku.includes('shousuushi') || pair.id.startsWith('wind-'))
   .filter(pair => !form.selectedYaku.includes('tsuuiisou') || ['non-value-wind', 'dragon', 'seat-wind', 'round-wind', 'double-wind'].includes(pair.id) || pair.id.startsWith('dragon-'))
   .filter(pair => !['honroutou', 'chanta'].some(id => form.selectedYaku.includes(id)) || pair.id !== 'simple')
   .filter(pair => !seatWindConfirmed.value || !roundWindConfirmed.value || (form.seatWind === form.roundWind
@@ -539,6 +597,9 @@ const yakuhaiChoices = computed(() => {
   return [
     ...selected.filter(id => !(hasDoubleWind && ['yakuhai-seat', 'yakuhai-round'].includes(id))).map(id => ({ id, label: MANUAL_YAKU.find(yaku => yaku.id === id)?.name ?? id })),
     ...(form.selectedYaku.includes('shousangen') ? ['yakuhai-haku', 'yakuhai-hatsu', 'yakuhai-chun'].filter(id => !selected.includes(id)).map(id => ({ id, label: MANUAL_YAKU.find(yaku => yaku.id === id)?.name ?? id })) : []),
+    ...(form.selectedYaku.includes('daisangen') ? ['yakuhai-haku', 'yakuhai-hatsu', 'yakuhai-chun'].filter(id => !selected.includes(id)).map(id => ({ id, label: MANUAL_YAKU.find(yaku => yaku.id === id)?.name ?? id })) : []),
+    ...(form.selectedYaku.includes('ryuuiisou') && !selected.includes('yakuhai-hatsu') ? [{ id: 'yakuhai-hatsu', label: MANUAL_YAKU.find(yaku => yaku.id === 'yakuhai-hatsu')?.name ?? 'Green dragon set' }] : []),
+    ...(form.selectedYaku.some(id => ['daisuushi', 'shousuushi'].includes(id)) ? ['east', 'south', 'west', 'north'].map(wind => ({ id: `wind-${wind}`, label: `${windNames[wind]} wind` })) : []),
     ...(hasDoubleWind ? [{ id: 'yakuhai-double-wind', label: 'Seat + round wind set' }] : []),
   ]
 })
@@ -568,6 +629,8 @@ function makeScoreInput() {
     riichiDeclared: isRiichi.value,
     pairFu: pairOption?.fu ?? null,
     pairChoice: form.pairChoice,
+    sevenPairsHasHonor: form.sevenPairsHasHonor,
+    ryuuiisouTilesConfirmed: form.ryuuiisouTilesConfirmed,
     pairIsValue: pairOption ? pairOption.fu > 0 : null,
     waitType: form.waitType,
     groups: form.groups,
@@ -575,6 +638,9 @@ function makeScoreInput() {
     bonusHan: form.bonusHan,
     doubleYakumanWaits: form.doubleYakumanWaits,
     honba: integerAtLeastZero(form.honba),
+    paoApplies: form.paoApplies,
+    paoResponsibleAlsoDiscarder: form.paoResponsibleAlsoDiscarder,
+    paoResponsibleIsDealer: form.paoResponsibleIsDealer,
     kiriageMangan: false,
   }
 }
@@ -587,14 +653,12 @@ const resultReady = computed(() => entryMode.value === 'yaku'
   ? result.value.issues.length === 0 && result.value.han > 0 && !needsSetConfirmation.value && !needsWindsConfirmation.value
   : result.value.issues.length === 0 && result.value.han > 0)
 const shouldShowProblems = computed(() => entryMode.value === 'yaku' && hasInteracted.value && result.value.issues.some(issue => !/^Choose your pair|^Choose the wait|^Select at least one yaku/.test(issue)))
-const needsPatternCompletenessConfirmation = computed(() => form.handShape === 'standard'
-  && ['chanta', 'honitsu'].some(id => form.selectedYaku.includes(id))
-  && !(['non-value-wind', 'dragon', 'seat-wind', 'round-wind', 'double-wind'].includes(form.pairChoice) || form.pairChoice?.startsWith('dragon-'))
-  && !form.groups.some(group => group.tileKind === 'honor'))
+const structuralGroupYaku = ['chanta', 'junchan', 'honitsu', 'honroutou', 'toitoi', 'sanankou', 'sankantsu', 'sanshoku-doukou', 'suuankou', 'suuankantsu', 'daisangen', 'daisuushi', 'shousuushi', 'ryuuiisou', 'chinroutou', 'tsuuiisou']
+const needsPatternCompletenessConfirmation = computed(() => form.handShape === 'standard' && structuralGroupYaku.some(id => form.selectedYaku.includes(id)))
 const needsGroupCompletenessConfirmation = computed(() => needsFuQuestions.value || needsPatternCompletenessConfirmation.value)
 const needsSetConfirmation = computed(() => entryMode.value === 'yaku' && needsGroupCompletenessConfirmation.value && form.groups.length < 4 && !form.groupsConfirmed)
 const needsFuQuestions = computed(() => !result.value.isYakuman && result.value.han > 0 && result.value.han < 5 && form.handShape === 'standard' && !isPinfu.value)
-const showPairQuestion = computed(() => (needsFuQuestions.value && !(form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple')) || form.selectedYaku.some(id => ['shousangen', 'chanta', 'honitsu'].includes(id)) || fieldIssues.value.pair.some(issue => !issue.startsWith('Choose your pair')))
+const showPairQuestion = computed(() => form.handShape === 'standard' && !form.selectedYaku.includes('chiitoitsu') && ((needsFuQuestions.value && !(form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple')) || form.selectedYaku.some(id => ['shousangen', 'chanta', 'junchan', 'honitsu', 'honroutou', 'chinroutou', 'tsuuiisou', 'ryuuiisou', 'daisangen', 'daisuushi', 'shousuushi'].includes(id)) || fieldIssues.value.pair.some(issue => !issue.startsWith('Choose your pair'))))
 const showWaitQuestion = computed(() => needsFuQuestions.value || fieldIssues.value.wait.some(issue => !issue.startsWith('Choose the wait')))
 const showGroupBuilder = computed(() => needsFuQuestions.value || needsPatternCompletenessConfirmation.value || form.groups.length > 0 || fieldIssues.value.groups.length > 0)
 const showFuSection = computed(() => showPairQuestion.value || showWaitQuestion.value || showGroupBuilder.value)
@@ -793,6 +857,17 @@ function toggleYaku(id) {
       if (form.pairChoice?.startsWith('dragon-')) form.pairChoice = 'dragon'
       form.groups.forEach(group => { if (group.yakuId?.startsWith('yakuhai-') && !form.selectedYaku.includes(group.yakuId)) group.yakuId = null })
     }
+    if (id === 'daisangen' && !form.selectedYaku.includes('shousangen')) {
+      form.groups.forEach(group => { if (['yakuhai-haku', 'yakuhai-hatsu', 'yakuhai-chun'].includes(group.yakuId)) group.yakuId = null })
+    }
+    if (['daisuushi', 'shousuushi'].includes(id) && !form.selectedYaku.some(selected => ['daisuushi', 'shousuushi'].includes(selected))) {
+      form.groups.forEach(group => { if (group.yakuId?.startsWith('wind-')) group.yakuId = null })
+    }
+    if (['daisangen', 'daisuushi'].includes(id) && !form.selectedYaku.some(selected => ['daisangen', 'daisuushi'].includes(selected))) {
+      form.paoApplies = false
+      form.paoResponsibleAlsoDiscarder = null
+      form.paoResponsibleIsDealer = null
+    }
     if (id === 'kokushi' || id === 'suuankou' || id === 'chuuren') {
       form.doubleYakumanWaits[id] = false
       if (['kokushi-thirteen', 'chuuren-nine'].includes(form.waitType)) form.waitType = null
@@ -810,6 +885,7 @@ function toggleYaku(id) {
 function setHandShape(shape) {
   hasInteracted.value = true
   if (shape === form.handShape) return
+  if (form.handShape === 'chiitoitsu' || shape === 'chiitoitsu') form.sevenPairsHasHonor = null
   if (form.handShape === 'standard') {
     standardHandDraft.value = JSON.parse(JSON.stringify({
       groups: form.groups,
@@ -857,6 +933,11 @@ function groupFu(group) {
 }
 
 function groupTileExamples(group) {
+  if (group.tileKind === 'honor' && group.yakuId?.startsWith('wind-')) {
+    const wind = group.yakuId.slice('wind-'.length)
+    const tile = windTileNames[wind]
+    if (tile) return Array.from({ length: group.type === 'kan' ? 4 : 3 }, () => tile)
+  }
   if (group.tileKind === 'honor' && group.yakuId) {
     const yakuhaiTiles = {
       'yakuhai-haku': 'Haku',
@@ -1097,6 +1178,9 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .yaku-han { color: var(--gold-leaf); font-size: .72rem; font-weight: 750; white-space: nowrap; }
 .empty-search { margin: 0; color: var(--muted); font-size: .84rem; }
 .variant-panel { display: grid; gap: 10px; margin-top: 17px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.pao-control, .rule-confirmation { display: grid; gap: 8px; margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.pao-control .checkbox-row { margin: 0; }
+.pao-payment { border-color: var(--gold-leaf); }
 .variant-panel h3 { margin: 0; color: var(--matcha-leaf); font-size: .83rem; }
 .variant-panel .field-hint { margin-top: -8px; }
 .variant-panel .checkbox-row + .checkbox-row { padding-top: 8px; border-top: 1px solid var(--line); }

@@ -114,7 +114,8 @@ export interface TsumoPayment {
 
 export interface PointsBreakdown {
   total: number;
-  tsumo?: TsumoPayment; // present when winType === 'tsumo'
+  /** Per-seat tsumo amounts; with pao, these are the remaining opponents' amounts after liability is redirected. */
+  tsumo?: TsumoPayment;
   ron?: number;         // present when winType === 'ron'
   /**
    * Amount the pao-responsible player pays. For a pao tsumo — or a pao ron
@@ -124,6 +125,8 @@ export interface PointsBreakdown {
   responsiblePays?: number;
   /** Amount the discarder pays when a pao ron splits the payment between the responsible player and the discarder. */
   discarderPays?: number;
+  /** Aggregate tsumo amount paid by opponents other than the pao-responsible player. */
+  otherPlayersPay?: number;
 }
 
 // Named hand thresholds

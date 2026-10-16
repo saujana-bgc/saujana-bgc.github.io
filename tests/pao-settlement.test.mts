@@ -33,6 +33,7 @@ test('pao tsumo: the responsible player pays the full amount', () => {
   assert.equal(withoutPao.points.responsiblePays, undefined)
   assert.equal(withPao.valid, true)
   assert.equal(withPao.points.responsiblePays, withPao.points.total, 'pao tsumo = full responsibility')
+  assert.equal(withPao.points.otherPlayersPay, 0)
   assert.equal(withPao.points.discarderPays, undefined)
   // The underlying tsumo math is unchanged; pao only redirects who pays.
   assert.equal(withPao.points.total, withoutPao.points.total)
@@ -89,8 +90,56 @@ test('honba is part of a split pao ron and each half rounds up to 100', () => {
 
   assert.equal(result.valid, true)
   assert.equal(result.points.total, 32300, '32000 + 300 honba')
-  assert.equal(result.points.responsiblePays, 16200, 'each half rounds up independently')
-  assert.equal(result.points.discarderPays, 16200)
+  assert.equal(result.points.responsiblePays, 16000, 'only the liable yakuman is split')
+  assert.equal(result.points.discarderPays, 16300, 'discarder pays the other half and all ron honba')
+})
+
+test('stacked yakuman ron splits only the liable yakuman', () => {
+  const stackedHand = daisangenHand({
+    closedTiles: [honor('north')],
+    winningTile: honor('north'),
+    melds: [ponMeld('haku'), ponMeld('hatsu'), ponMeld('chun'), ponMeld('east')],
+    winType: 'ron',
+    paoResponsibleSeat: 'west',
+    ronDiscarderSeat: 'east',
+    honba: 1,
+  })
+  const result = score(stackedHand)
+
+  assert.equal(result.valid, true)
+  assert.equal(result.yaku.some((y) => y.name === 'daisangen'), true)
+  assert.equal(result.yaku.some((y) => y.name === 'tsuuiisou'), true)
+  assert.equal(result.points.total, 64300, 'double yakuman ron plus one honba')
+  assert.equal(result.points.responsiblePays, 16000, 'responsible player pays half of Daisangen only')
+  assert.equal(result.points.discarderPays, 48300, 'discarder pays other half, Tsuuiisou, and honba')
+})
+
+test('stacked yakuman tsumo redirects only the liable yakuman', () => {
+  const result = score(daisangenHand({
+    closedTiles: [honor('north')],
+    winningTile: honor('north'),
+    melds: [ponMeld('haku'), ponMeld('hatsu'), ponMeld('chun'), ponMeld('east')],
+    paoResponsibleSeat: 'west',
+    honba: 1,
+  }))
+
+  assert.equal(result.valid, true)
+  assert.equal(result.yaku.some((y) => y.name === 'tsuuiisou'), true)
+  assert.equal(result.points.total, 64300)
+  assert.equal(result.points.responsiblePays, 40100, 'Daisangen is liable; responsible player also pays their Tsuuiisou share and honba')
+  assert.equal(result.points.otherPlayersPay, 24200)
+  assert.deepEqual(result.points.tsumo, { dealerPays: 16100, nonDealerPays: 8100 })
+})
+
+test('pao tsumo honba is paid per opponent instead of all by the liable player', () => {
+  const result = score(daisangenHand({ paoResponsibleSeat: 'west', honba: 1 }))
+
+  assert.equal(result.valid, true)
+  assert.equal(result.points.total, 32300)
+  assert.equal(result.points.responsiblePays, 32100, 'liable player pays the yakuman and their own honba share')
+  assert.equal(result.points.otherPlayersPay, 200, 'the other two opponents pay their honba shares')
+  assert.equal(result.points.responsiblePays + (result.points.otherPlayersPay ?? 0), result.points.total)
+  assert.deepEqual(result.points.tsumo, { dealerPays: 100, nonDealerPays: 100 })
 })
 
 test('daisuushii pao settles the same way', () => {

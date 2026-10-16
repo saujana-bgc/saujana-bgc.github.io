@@ -27,22 +27,65 @@ function paoProblem(hand: Hand): string | null {
   return null;
 }
 
-/**
- * Pao (Daisangen/Daisuushii liability) settlement:
- *  - tsumo: the responsible player alone pays the full winning amount;
- *  - ron where the responsible player is also the discarder: that player pays everything;
- *  - ron where the discarder differs: each pays half, each half rounded up
- *    to 100 (the same rounding the rest of the settlement table uses).
- */
-function applyPao(hand: Hand, yaku: Yaku[], points: ScoreResult["points"]): ScoreResult["points"] {
+/** Apply pao to only the yakuman whose final set was fed. Honba and any other
+ * yakuman remain the discarder’s / ordinary tsumo payers’ responsibility. */
+function applyPao(
+  hand: Hand,
+  yaku: Yaku[],
+  points: ScoreResult["points"],
+  playerCount: 3 | 4,
+): ScoreResult["points"] {
   const responsibleSeat: WindValue | undefined = hand.paoResponsibleSeat;
-  if (!responsibleSeat || !yaku.some((y) => PAO_YAKU.has(y.name))) return points;
+  const liableUnits = Math.round(yaku
+    .filter((y) => PAO_YAKU.has(y.name))
+    .reduce((sum, y) => sum + y.han, 0) / 13);
+  if (!responsibleSeat || liableUnits === 0) return points;
+
+  const honba = hand.honba ?? 0;
+  const isDealer = hand.seatWind === "east";
+  const otherUnits = Math.max(0, yakumanUnits(yaku) - liableUnits);
 
   if (hand.winType === "ron" && hand.ronDiscarderSeat !== responsibleSeat) {
-    const half = roundUp100(points.total / 2);
-    return { ...points, responsiblePays: half, discarderPays: half };
+    const liableRon = calculatePoints(0, 30, isDealer, "ron", liableUnits, false, 0, playerCount).total;
+    const half = roundUp100(liableRon / 2);
+    const otherRon = otherUnits > 0
+      ? calculatePoints(0, 30, isDealer, "ron", otherUnits, false, 0, playerCount).total
+      : 0;
+    return {
+      ...points,
+      responsiblePays: half,
+      // Only the discarder pays honba on ron, plus any non-liable yakuman.
+      discarderPays: half + otherRon + 300 * honba,
+    };
   }
-  return { ...points, responsiblePays: points.total };
+
+  if (hand.winType === "ron") return { ...points, responsiblePays: points.total };
+
+  const liableTsumo = calculatePoints(0, 30, isDealer, "tsumo", liableUnits, false, 0, playerCount).total;
+  const otherTsumo = otherUnits > 0
+    ? calculatePoints(0, 30, isDealer, "tsumo", otherUnits, false, 0, playerCount)
+    : undefined;
+  const responsibleShare = isDealer
+    ? otherTsumo?.tsumo?.nonDealerPays ?? 0
+    : responsibleSeat === "east"
+      ? otherTsumo?.tsumo?.dealerPays ?? 0
+      : otherTsumo?.tsumo?.nonDealerPays ?? 0;
+  const perOtherDealerPayment = isDealer || responsibleSeat === "east"
+    ? 0
+    : (otherTsumo?.tsumo?.dealerPays ?? 0) + 100 * honba;
+  const perOtherNonDealerPayment = (otherTsumo?.tsumo?.nonDealerPays ?? 0) + 100 * honba;
+  const otherDealerCount = isDealer || responsibleSeat === "east" ? 0 : 1;
+  const otherNonDealerCount = isDealer
+    ? playerCount - 2
+    : playerCount - 2 - (responsibleSeat === "east" ? 0 : 1);
+  const otherPlayersPay = otherDealerCount * perOtherDealerPayment
+    + otherNonDealerCount * perOtherNonDealerPayment;
+  return {
+    ...points,
+    responsiblePays: liableTsumo + responsibleShare + 100 * honba,
+    otherPlayersPay,
+    tsumo: { dealerPays: perOtherDealerPayment, nonDealerPays: perOtherNonDealerPayment },
+  };
 }
 
 function specialWinProblem(hand: Hand): string | null {
@@ -138,7 +181,13 @@ function scoreStandardInterpretations(
   const totalHan = structuralHan + doraCount + akaDoraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan);
-  const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));
+  const playerCount = rules.playerCount ?? 4;
+  const points = applyPao(
+    hand,
+    allYaku,
+    calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, playerCount),
+    playerCount,
+  );
 
   return {
     valid: true,
@@ -317,7 +366,12 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
   const totalHan = structuralHan + doraCount + akaDoraCount + uraDoraCount + nukiDoraCount;
   const units = yakumanUnits(allYaku);
   const name = handName(totalHan, fu.total, units, rules.kiriagemangan);
-  const points = applyPao(hand, allYaku, calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, rules.playerCount ?? 4));
+  const points = applyPao(
+    hand,
+    allYaku,
+    calculatePoints(totalHan, fu.total, isDealer, hand.winType, units, rules.kiriagemangan, hand.honba ?? 0, playerCount),
+    playerCount,
+  );
 
   return {
     valid: true,

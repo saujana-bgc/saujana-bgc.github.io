@@ -31,6 +31,25 @@ test('Pinfu and Seven Pairs calculate without redundant pair, wait or confirmati
   assert.equal(sevenPairs.points, 1600)
 })
 
+test('Seven Pairs with Honitsu asks for an honour-pair confirmation instead of standard fu details', () => {
+  const missing = calculateManualScore(hand({ selectedYaku: ['chiitoitsu', 'honitsu'], handShape: 'chiitoitsu' }))
+  assert.ok(missing.issues.some(issue => /Seven Pairs with Honitsu needs at least one honour pair/.test(issue)))
+
+  const noHonourPair = calculateManualScore(hand({
+    selectedYaku: ['chiitoitsu', 'honitsu'], handShape: 'chiitoitsu', sevenPairsHasHonor: false,
+  }))
+  assert.ok(noHonourPair.issues.some(issue => /this Seven Pairs hand has none/.test(issue)))
+  assert.equal(noHonourPair.points, 0)
+
+  const valid = calculateManualScore(hand({
+    selectedYaku: ['chiitoitsu', 'honitsu'], handShape: 'chiitoitsu', sevenPairsHasHonor: true,
+  }))
+  assert.deepEqual(valid.issues, [])
+  assert.equal(valid.fu, 25)
+  assert.equal(valid.han, 5)
+  assert.equal(valid.points, 8000)
+})
+
 test('an open hand with only called runs scores without entering triplets or kans', () => {
   const result = calculateManualScore(hand({ selectedYaku: ['chinitsu'], isClosed: false }))
   assert.deepEqual(result.issues, [])
@@ -40,15 +59,27 @@ test('an open hand with only called runs scores without entering triplets or kan
 
 test('limit hands do not demand hidden group inputs, but lower hands still need group fu', () => {
   for (const yaku of ['toitoi', 'sanankou', 'sankantsu', 'rinshan']) {
-    const input = hand({ selectedYaku: [yaku], winType: yaku === 'rinshan' ? 'tsumo' : 'ron' })
+    const group = (id: number, type: 'triplet' | 'kan' = 'triplet') => ({ id, type, tileKind: 'simple' as const, concealed: true, completedByRon: false })
+    const groups = yaku === 'toitoi'
+      ? [group(1), group(2), group(3), group(4)]
+      : yaku === 'sanankou'
+        ? [group(1), group(2), group(3)]
+        : yaku === 'sankantsu'
+          ? [group(1, 'kan'), group(2, 'kan'), group(3, 'kan')]
+          : [group(1, 'kan')]
+    const input = hand({ selectedYaku: [yaku], winType: yaku === 'rinshan' ? 'tsumo' : 'ron', groups, groupsConfirmed: true })
     const low = calculateManualScore(input)
-    assert.ok(low.issues.some(issue => /triplets|kans|requires a kan/.test(issue)), yaku)
+    assert.ok(low.issues.length > 0, yaku)
     const limit = calculateManualScore({ ...input, bonusHan: { ...input.bonusHan, dora: 4 } })
     assert.deepEqual(limit.issues, [], yaku)
     assert.ok(limit.points > 0, yaku)
   }
   for (const yaku of ['suuankou', 'suuankantsu']) {
-    const result = calculateManualScore(hand({ selectedYaku: [yaku], winType: 'tsumo' }))
+    const groups = Array.from({ length: 4 }, (_, index) => ({
+      id: index + 1, type: yaku === 'suuankantsu' ? 'kan' as const : 'triplet' as const,
+      tileKind: 'simple' as const, concealed: true, completedByRon: false,
+    }))
+    const result = calculateManualScore(hand({ selectedYaku: [yaku], winType: 'tsumo', groups }))
     assert.deepEqual(result.issues, [], yaku)
     assert.equal(result.isYakuman, true)
     assert.equal(result.points, 32000)
@@ -322,6 +353,196 @@ test('Sanshoku yaku cannot combine with either flush', () => {
       assert.equal(result.points, 0)
     }
   }
+})
+
+test('structurally impossible yaku combinations are rejected even at yakuman values', () => {
+  const impossible = [
+    ['ryuuiisou', 'daisangen'],
+    ['ryuuiisou', 'daisuushi'],
+    ['chuuren', 'suuankou'],
+    ['daisangen', 'daisuushi'],
+    ['daisangen', 'shousuushi'],
+  ]
+  for (const selectedYaku of impossible) {
+    const result = calculateManualScore(hand({ selectedYaku, isDealer: false, winType: 'ron' }))
+    assert.ok(result.issues.length > 0, selectedYaku.join(' + '))
+    assert.equal(result.points, 0, selectedYaku.join(' + '))
+  }
+
+  // These two yakuman can share four groups and remain a valid double yakuman.
+  const validStack = calculateManualScore(hand({
+    selectedYaku: ['tsuuiisou', 'daisangen', 'suuankou'],
+    isClosed: true,
+    winType: 'tsumo',
+    pairChoice: 'non-value-wind',
+    waitType: 'tanki',
+    doubleYakumanWaits: { kokushi: false, suuankou: true, chuuren: false },
+    groups: [
+      { id: 1, type: 'triplet', tileKind: 'honor', concealed: true, completedByRon: false, yakuId: 'yakuhai-haku' },
+      { id: 2, type: 'triplet', tileKind: 'honor', concealed: true, completedByRon: false, yakuId: 'yakuhai-hatsu' },
+      { id: 3, type: 'triplet', tileKind: 'honor', concealed: true, completedByRon: false, yakuId: 'yakuhai-chun' },
+      { id: 4, type: 'triplet', tileKind: 'honor', concealed: true, completedByRon: false },
+    ],
+  }))
+  assert.deepEqual(validStack.issues, [])
+  assert.equal(validStack.yakumanUnits, 4)
+})
+
+test('ordinary yaku conflicts that exceed the four-group structure are rejected', () => {
+  const impossible = [
+    ['tanyao', 'ittsu'],
+    ['ittsu', 'chanta'],
+    ['ittsu', 'junchan'],
+    ['ittsu', 'sanshoku-doujun'],
+    ['ittsu', 'ryanpeiko'],
+    ['ryanpeiko', 'sanshoku-doujun'],
+    ['pinfu', 'sankantsu'],
+    ['iipeiko', 'sanankou'],
+    ['iipeiko', 'sankantsu'],
+  ]
+  for (const selectedYaku of impossible) {
+    const result = calculateManualScore(hand({ selectedYaku, bonusHan: { dora: 4, nuki: 0 } }))
+    assert.ok(result.issues.length > 0, selectedYaku.join(' + '))
+    assert.equal(result.points, 0, selectedYaku.join(' + '))
+  }
+})
+
+test('complete group confirmation is enforced regardless of han or fu', () => {
+  for (const selectedYaku of ['toitoi', 'sankantsu', 'sanshoku-doukou']) {
+    const result = calculateManualScore(hand({
+      selectedYaku: [selectedYaku], groupsConfirmed: true,
+      pairChoice: 'simple', pairFu: 0, pairIsValue: false, waitType: 'tanki',
+      bonusHan: { dora: 4, nuki: 0 },
+    }))
+    assert.ok(result.issues.length > 0, selectedYaku)
+    assert.equal(result.points, 0, selectedYaku)
+  }
+
+  const kan = (id: number) => ({ id, type: 'kan' as const, tileKind: 'simple' as const, concealed: true, completedByRon: false })
+  const completeSankantsu = calculateManualScore(hand({
+    selectedYaku: ['sankantsu'], groups: [kan(1), kan(2), kan(3)], groupsConfirmed: true,
+    pairChoice: 'simple', pairFu: 0, pairIsValue: false, waitType: 'tanki',
+  }))
+  assert.deepEqual(completeSankantsu.issues, [])
+})
+
+test('fully described flushes and yakuman pairs must fit their tile sets', () => {
+  const group = (id: number, tileKind: 'simple' | 'terminal' | 'honor', yakuId?: string) => ({
+    id, type: 'triplet' as const, tileKind, concealed: true, completedByRon: false, yakuId,
+  })
+  const honitsuWithoutHonours = calculateManualScore(hand({
+    selectedYaku: ['honitsu'], groups: Array.from({ length: 4 }, (_, index) => group(index + 1, 'simple')),
+    groupsConfirmed: true, pairChoice: 'simple', pairFu: 0, pairIsValue: false, waitType: 'tanki',
+  }))
+  assert.ok(honitsuWithoutHonours.issues.some(issue => /Honitsu needs at least one honour/.test(issue)))
+
+  const allGreenTerminal = calculateManualScore(hand({
+    selectedYaku: ['ryuuiisou'], groups: [group(1, 'terminal')], groupsConfirmed: true, pairChoice: 'simple',
+  }))
+  assert.ok(allGreenTerminal.issues.some(issue => /All Green cannot include terminal/.test(issue)))
+
+  const bigDragonsWithDragonPair = calculateManualScore(hand({
+    selectedYaku: ['daisangen'], pairChoice: 'dragon-haku', groupsConfirmed: true,
+    groups: [group(1, 'honor', 'yakuhai-haku'), group(2, 'honor', 'yakuhai-hatsu'), group(3, 'honor', 'yakuhai-chun')],
+  }))
+  assert.ok(bigDragonsWithDragonPair.issues.some(issue => /pair other than the three dragon sets/.test(issue)))
+
+  const validAllGreen = calculateManualScore(hand({
+    selectedYaku: ['ryuuiisou'], pairChoice: 'simple', ryuuiisouTilesConfirmed: true,
+    groups: Array.from({ length: 4 }, (_, index) => group(index + 1, 'simple')),
+  }))
+  assert.deepEqual(validAllGreen.issues, [])
+  assert.equal(validAllGreen.points, 32000)
+})
+
+test('sanma rejects an open only-runs hand and Renhou rejects a concealed kan', () => {
+  const openOnlyRuns = calculateManualScore(hand({
+    selectedYaku: ['tanyao'], isClosed: false, playerCount: 3, groupsConfirmed: true,
+    pairChoice: 'simple', pairFu: 0, pairIsValue: false, waitType: 'tanki',
+  }))
+  assert.ok(openOnlyRuns.issues.some(issue => /Three-player mahjong has no chi/.test(issue)))
+
+  const openWithOnlyConcealedSets = calculateManualScore(hand({
+    selectedYaku: ['tanyao'], isClosed: false, playerCount: 3,
+    groups: [{ id: 1, type: 'triplet', tileKind: 'simple', concealed: true, completedByRon: false }],
+  }))
+  assert.ok(openWithOnlyConcealedSets.issues.some(issue => /open hand must include a called triplet or kan/.test(issue)))
+
+  const concealedKan = calculateManualScore(hand({
+    selectedYaku: ['renhou'], groups: [{ id: 1, type: 'kan', tileKind: 'simple', concealed: true, completedByRon: false }],
+  }))
+  assert.ok(concealedKan.issues.some(issue => /first-draw win cannot include a kan/.test(issue)))
+})
+
+test('extracted North tiles cannot consume copies required by Kokushi or Seven Pairs All Honours', () => {
+  const kokushi = calculateManualScore(hand({
+    selectedYaku: ['kokushi'], handShape: 'kokushi', playerCount: 3, bonusHan: { dora: 0, nuki: 4 },
+  }))
+  assert.ok(kokushi.issues.some(issue => /Kokushi needs a North tile/.test(issue)))
+
+  const sevenHonours = calculateManualScore(hand({
+    selectedYaku: ['chiitoitsu', 'tsuuiisou'], handShape: 'chiitoitsu', playerCount: 3, bonusHan: { dora: 0, nuki: 3 },
+  }))
+  assert.ok(sevenHonours.issues.some(issue => /Seven Pairs plus All Honours needs a North pair/.test(issue)))
+})
+
+test('manual pao splits ron yakuman and assigns honba to the discarder', () => {
+  const result = calculateManualScore(hand({
+    selectedYaku: ['daisangen'], isClosed: false, isDealer: false, winType: 'ron', honba: 1,
+    pairChoice: 'simple', pairFu: 0, pairIsValue: false, groupsConfirmed: true,
+    groups: [
+      { id: 1, type: 'triplet', tileKind: 'honor', concealed: false, completedByRon: false, yakuId: 'yakuhai-haku' },
+      { id: 2, type: 'triplet', tileKind: 'honor', concealed: false, completedByRon: false, yakuId: 'yakuhai-hatsu' },
+      { id: 3, type: 'triplet', tileKind: 'honor', concealed: false, completedByRon: false, yakuId: 'yakuhai-chun' },
+    ],
+    paoApplies: true, paoResponsibleAlsoDiscarder: false,
+  }))
+  assert.deepEqual(result.issues, [])
+  assert.equal(result.points, 32300)
+  assert.deepEqual(result.pao, { responsiblePays: 16000, discarderPays: 16300 })
+
+  const unspecifiedDiscarder = calculateManualScore(hand({ selectedYaku: ['daisangen'], paoApplies: true }))
+  assert.ok(unspecifiedDiscarder.issues.some(issue => /Choose whether the pao-responsible player also discarded/.test(issue)))
+
+  const sameDiscarder = calculateManualScore(hand({
+    selectedYaku: ['daisangen'], isClosed: false, pairChoice: 'simple', groupsConfirmed: true,
+    groups: [
+      { id: 1, type: 'triplet', tileKind: 'honor', concealed: false, completedByRon: false, yakuId: 'yakuhai-haku' },
+      { id: 2, type: 'triplet', tileKind: 'honor', concealed: false, completedByRon: false, yakuId: 'yakuhai-hatsu' },
+      { id: 3, type: 'triplet', tileKind: 'honor', concealed: false, completedByRon: false, yakuId: 'yakuhai-chun' },
+    ],
+    paoApplies: true, paoResponsibleAlsoDiscarder: true,
+  }))
+  assert.deepEqual(sameDiscarder.issues, [])
+  assert.deepEqual(sameDiscarder.pao, { responsiblePays: 32000 })
+})
+
+test('manual pao applies only to its yakuman when yakuman stack', () => {
+  const groups = [
+    { id: 1, type: 'triplet' as const, tileKind: 'honor' as const, concealed: false, completedByRon: false, yakuId: 'yakuhai-haku' },
+    { id: 2, type: 'triplet' as const, tileKind: 'honor' as const, concealed: false, completedByRon: false, yakuId: 'yakuhai-hatsu' },
+    { id: 3, type: 'triplet' as const, tileKind: 'honor' as const, concealed: false, completedByRon: false, yakuId: 'yakuhai-chun' },
+    { id: 4, type: 'triplet' as const, tileKind: 'honor' as const, concealed: false, completedByRon: false },
+  ]
+  const ron = calculateManualScore(hand({
+    selectedYaku: ['daisangen', 'tsuuiisou'], isClosed: false, winType: 'ron', honba: 1,
+    pairChoice: 'non-value-wind', groups, paoApplies: true, paoResponsibleAlsoDiscarder: false,
+  }))
+  assert.deepEqual(ron.issues, [])
+  assert.equal(ron.points, 64300)
+  assert.deepEqual(ron.pao, { responsiblePays: 16000, discarderPays: 48300 })
+
+  const tsumo = calculateManualScore(hand({
+    selectedYaku: ['daisangen', 'tsuuiisou'], isClosed: false, winType: 'tsumo', honba: 1,
+    pairChoice: 'non-value-wind', groups, paoApplies: true, paoResponsibleIsDealer: false,
+  }))
+  assert.deepEqual(tsumo.issues, [])
+  assert.equal(tsumo.points, 64300)
+  assert.deepEqual(tsumo.pao, {
+    responsiblePays: 40100,
+    otherTsumo: { dealerPays: 16100, nonDealerPays: 8100 },
+    responsibleIsDealer: false,
+  })
 })
 
 test('Chankan rejects waits that would require a fifth copy of the robbed tile', () => {
