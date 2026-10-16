@@ -53,9 +53,9 @@ const navigation = [
   { name: 'Home', url: '/' },
   { name: 'Gatherings', url: '/gatherings' },
   { name: 'Birthday Club', url: '/birthday-club' },
-  { name: 'Play history', url: '/playlog' },
+  { name: 'Play History', url: '/playlog' },
   { name: 'Riichi League', url: '/riichi-league' },
-  { name: 'Riichi calculator', url: '/riichi-calculator' },
+  { name: 'Riichi Calculator', url: '/riichi-calculator' },
   { name: 'Riichi Open', url: '/riichi-open' },
   { name: 'Collection', url: '/collection' }
 ]

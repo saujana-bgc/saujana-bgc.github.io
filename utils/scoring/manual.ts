@@ -143,10 +143,9 @@ export interface ManualScoreInput {
   waitType: ManualWait | null;
   pairIsValue: boolean | null;
   groups: ManualGroup[];
-  bonusHan: { dora: number; red: number; ura: number; nuki: number };
+  bonusHan: { dora: number; nuki: number };
   doubleYakumanWaits: { kokushi: boolean; suuankou: boolean; chuuren: boolean };
   honba: number;
-  riichiSticks: number;
   kiriageMangan?: boolean;
 }
 
@@ -170,8 +169,6 @@ export interface ManualScoreResult {
   fuBreakdown: ManualFuBreakdown | null;
   handName?: HandName;
   points: number;
-  riichiSticks: number;
-  totalReceived: number;
   ron: number;
   tsumo?: { dealerPays: number; nonDealerPays: number };
   yaku: { id: string; name: string; han: number }[];
@@ -223,11 +220,8 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
 
   for (const [label, value] of Object.entries({
     dora: input.bonusHan.dora,
-    "red dora": input.bonusHan.red,
-    "ura dora": input.bonusHan.ura,
     "North bonus": input.bonusHan.nuki,
     honba: input.honba,
-    "riichi sticks": input.riichiSticks,
   })) {
     if (!Number.isSafeInteger(value) || value < 0) issues.push(`${label} must be a non-negative whole number.`);
   }
@@ -240,7 +234,6 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (input.isClosed && input.groups.some((group) => !group.concealed)) issues.push("Called groups require an open hand. Change the hand to open or remove the called groups.");
   if (input.handShape === "kokushi" && input.groups.length) issues.push("Kokushi musou has no sets. Remove the listed groups.");
   if (input.riichiDeclared && !input.isClosed) issues.push("Riichi requires a closed hand.");
-  if ((input.bonusHan.ura > 0) && (!input.isClosed || !input.riichiDeclared)) issues.push("Ura dora requires a closed hand with riichi.");
   if (selected.has("ippatsu") && !selected.has("riichi") && !selected.has("double-riichi")) issues.push("Ippatsu requires riichi or double riichi.");
   if (selected.has("ippatsu") && (!input.isClosed || input.groups.some((group) => !group.concealed))) issues.push("Ippatsu requires a closed hand with no calls.");
   if (selected.has("double-riichi") && !input.isClosed) issues.push("Double riichi requires a closed hand.");
@@ -383,7 +376,7 @@ function manualHandValue(input: ManualScoreInput) {
       ? [{ id: "renhou", name: "Renhou", han: 5 }]
       : regularYaku;
 
-  const bonus = hasYakuman ? 0 : Math.max(0, input.bonusHan.dora) + Math.max(0, input.bonusHan.red) + Math.max(0, input.bonusHan.ura) + Math.max(0, input.bonusHan.nuki);
+  const bonus = hasYakuman ? 0 : Math.max(0, input.bonusHan.dora) + Math.max(0, input.bonusHan.nuki);
   const han = printedYaku.reduce((sum, yaku) => sum + yaku.han, 0) + bonus;
   return { printedYaku, bonus, han, units, hasYakuman };
 }
@@ -424,8 +417,6 @@ export function calculateManualScore(input: ManualScoreInput): ManualScoreResult
     ? calculatePoints(han, fu, input.isDealer, input.winType, units, input.kiriageMangan ?? false, Math.max(0, input.honba), input.playerCount)
     : null;
   const pointTotal = payments?.total ?? 0;
-  const sticks = payments ? Math.max(0, input.riichiSticks) * 1000 : 0;
-
   return {
     issues: [...new Set(issues)],
     isYakuman: hasYakuman,
@@ -435,8 +426,6 @@ export function calculateManualScore(input: ManualScoreInput): ManualScoreResult
     fuBreakdown: requiresFu ? fuBreakdown : null,
     handName: name,
     points: pointTotal,
-    riichiSticks: sticks,
-    totalReceived: pointTotal + sticks,
     ron: payments?.ron ?? 0,
     tsumo: payments?.tsumo,
     yaku: printedYaku,

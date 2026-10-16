@@ -28,7 +28,6 @@
                 <p><span>{{ form.playerCount === 3 ? 'Other non-dealer' : 'Each other non-dealer' }}</span><strong>{{ formatPoints(result.tsumo.nonDealerPays) }}</strong></p>
               </template>
             </div>
-            <p v-if="result.riichiSticks" class="received-total">With {{ formatPoints(result.riichiSticks) }} in sticks: <strong>{{ formatPoints(result.totalReceived) }} received</strong></p>
             <div class="score-summary">
               <span v-if="result.isYakuman">{{ result.yakumanUnits > 1 ? `${result.yakumanUnits} × Yakuman` : 'Yakuman' }}</span>
               <template v-else><span>{{ result.han }} han<span v-if="result.fu"> · {{ result.fu }} fu</span></span><span v-if="result.handName" class="limit-badge">{{ limitName(result.handName) }}</span></template>
@@ -56,8 +55,8 @@
 
           <span class="field-label">Are you the dealer?</span>
           <div class="choice-row" role="group" aria-label="Dealer status">
-            <button type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="form.seatWind = 'east'">Dealer</button>
-            <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="form.seatWind = isDealer ? 'south' : form.seatWind">Non-dealer</button>
+            <button type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="form.seatWind = 'east'">Yes</button>
+            <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="form.seatWind = isDealer ? 'south' : form.seatWind">No</button>
           </div>
           <span class="field-label">Your hand</span>
           <div class="choice-row" role="group" aria-label="Open or closed hand">
@@ -165,16 +164,16 @@
             <span class="step-number">3</span>
             <div>
               <h2 id="dora-heading">Add bonus han</h2>
-              <p>Count the dora tiles in your winning hand, not the indicators.</p>
+              <p>Count all dora tiles in your winning hand, including red fives. Include ura dora only after riichi.</p>
             </div>
           </div>
           <div class="bonus-grid">
-            <div v-for="bonus in visibleBonusFields" :key="bonus.id" class="bonus-control">
-              <div class="bonus-copy"><label :for="`bonus-${bonus.id}`">{{ bonus.label }}</label><span>{{ bonus.hint }}</span></div>
-              <div class="stepper" role="group" :aria-label="bonus.label">
-                <button type="button" :aria-label="`Remove one ${bonus.label.toLowerCase()}`" :disabled="form.bonusHan[bonus.id] <= 0" @click="adjustBonus(bonus.id, -1)">−</button>
-                <input :id="`bonus-${bonus.id}`" v-model.number="form.bonusHan[bonus.id]" type="number" inputmode="numeric" min="0" step="1" @change="sanitizeBonus(bonus.id)" />
-                <button type="button" :aria-label="`Add one ${bonus.label.toLowerCase()}`" @click="adjustBonus(bonus.id, 1)">+</button>
+            <div class="bonus-control">
+              <div class="bonus-copy"><label for="bonus-dora">Dora</label><span>One han per dora tile</span></div>
+              <div class="stepper" role="group" aria-label="Dora count">
+                <button type="button" aria-label="Remove one dora" :disabled="form.bonusHan.dora <= 0" @click="adjustBonus('dora', -1)">−</button>
+                <input id="bonus-dora" v-model.number="form.bonusHan.dora" type="number" inputmode="numeric" min="0" step="1" @change="sanitizeBonus('dora')" />
+                <button type="button" aria-label="Add one dora" @click="adjustBonus('dora', 1)">+</button>
               </div>
             </div>
             <div v-if="form.playerCount === 3" class="bonus-control">
@@ -249,27 +248,19 @@
                 <button type="button" aria-label="Add one honba" @click="form.honba += 1">+</button>
               </div>
             </div>
-            <div class="bonus-control">
-              <div class="bonus-copy"><label for="riichi-sticks">Riichi sticks you receive</label><span>Added to your winnings at 1,000 points per stick</span></div>
-              <div class="stepper" role="group" aria-label="Riichi sticks">
-                <button type="button" aria-label="Remove one riichi stick" :disabled="form.riichiSticks <= 0" @click="form.riichiSticks = Math.max(0, form.riichiSticks - 1)">−</button>
-                <input id="riichi-sticks" v-model.number="form.riichiSticks" type="number" inputmode="numeric" min="0" step="1" @change="form.riichiSticks = integerAtLeastZero(form.riichiSticks)" />
-                <button type="button" aria-label="Add one riichi stick" @click="form.riichiSticks += 1">+</button>
-              </div>
-            </div>
-            <p>The Saujana table uses kiriage mangan off, and 4 fu for a double-wind pair. Riichi sticks go to the winner; other players pay the hand and any honba.</p>
+            <p>The Saujana table uses kiriage mangan off and 4 fu for a double-wind pair. Honba is included in payments.</p>
           </div>
         </details>
 
         <section v-if="resultReady && showBreakdown" id="score-breakdown" ref="breakdownSection" class="calc-section score-details" tabindex="-1" aria-labelledby="breakdown-heading">
           <h2 id="breakdown-heading">Score breakdown</h2>
-          <p class="score-note">{{ formatPoints(result.points) }} from the table<span v-if="form.honba">, including {{ form.honba }} honba</span>.<template v-if="result.riichiSticks"> Plus {{ formatPoints(result.riichiSticks) }} in riichi sticks: {{ formatPoints(result.totalReceived) }} received.</template></p>
+          <p class="score-note">{{ formatPoints(result.points) }} from the table<span v-if="form.honba">, including {{ form.honba }} honba</span>.</p>
           <div v-if="result.fuBreakdown" class="fu-breakdown">
             <h3>Fu breakdown <span>{{ result.fu }} total</span></h3>
             <p v-for="(line, index) in fuLines" :key="index"><span>{{ line.label }}</span><strong>{{ line.fu ? `+${line.fu}` : '—' }}</strong></p>
           </div>
           <p v-else class="score-note">Fu does not affect this payment.</p>
-          <div class="result-yaku"><h3>{{ result.isYakuman ? 'Yakuman breakdown' : 'Han breakdown' }}</h3><p v-for="yaku in result.yaku" :key="yaku.id"><span>{{ yaku.name }}</span><strong>{{ result.isYakuman ? `${yaku.han / 13} × Yakuman` : `${yaku.han} han` }}</strong></p><p v-if="result.bonusHan"><span>Bonus dora</span><strong>{{ result.bonusHan }} han</strong></p></div>
+          <div class="result-yaku"><h3>{{ result.isYakuman ? 'Yakuman breakdown' : 'Han breakdown' }}</h3><p v-for="yaku in result.yaku" :key="yaku.id"><span>{{ yaku.name }}</span><strong>{{ result.isYakuman ? `${yaku.han / 13} × Yakuman` : `${yaku.han} han` }}</strong></p><p v-if="result.bonusHan"><span>Bonus han</span><strong>{{ result.bonusHan }} han</strong></p></div>
         </section>
       </form>
     </div>
@@ -313,11 +304,6 @@ const waits = [
   { id: 'tanki', label: 'Pair wait', example: '5 + [5] → pair', fu: 2 },
   { id: 'shanpon', label: 'Triplet wait', example: '55 / 77 + [5 or 7]', fu: 0 },
 ]
-const bonusFields = [
-  { id: 'dora', label: 'Dora', hint: 'Each tile gives 1 han' },
-  { id: 'red', label: 'Red fives', hint: 'Each red tile gives 1 han' },
-  { id: 'ura', label: 'Ura dora', hint: 'Only after riichi' },
-]
 const groupOptions = [
   { id: 'triplet-called-simple', type: 'triplet', tileKind: 'simple', concealed: false, label: 'Called triplet · simple', detail: '2–8 tile · 2 fu' , fu: 2 },
   { id: 'triplet-called-terminal-honor', type: 'triplet', tileKind: 'terminal-honor', concealed: false, label: 'Called triplet · terminal or honour', detail: '1, 9 or honour · 4 fu', fu: 4 },
@@ -340,10 +326,9 @@ const initialState = () => ({
   pairChoice: null,
   waitType: null,
   groups: [],
-  bonusHan: { dora: 0, red: 0, ura: 0, nuki: 0 },
+  bonusHan: { dora: 0, nuki: 0 },
   doubleYakumanWaits: { kokushi: false, suuankou: false, chuuren: false },
   honba: 0,
-  riichiSticks: 0,
 })
 
 const form = reactive(initialState())
@@ -376,7 +361,6 @@ const availablePairOptions = computed(() => pairOptions.filter(pair => form.seat
 const isClosed = computed(() => form.isClosed)
 const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
 const isRiichi = computed(() => form.selectedYaku.includes('riichi') || form.selectedYaku.includes('double-riichi'))
-const canUseUra = computed(() => isClosed.value && isRiichi.value)
 const selectedYakuman = computed(() => form.selectedYaku.filter(id => MANUAL_YAKU.find(yaku => yaku.id === id)?.yakuman))
 const selectedYakuOptions = computed(() => form.selectedYaku.map(id => MANUAL_YAKU.find(yaku => yaku.id === id)).filter(Boolean))
 const unavailableReasons = computed(() => Object.fromEntries(MANUAL_YAKU.map(yaku => [yaku.id, yakuUnavailableReason(yaku.id)])))
@@ -389,7 +373,6 @@ const yakuhaiChoices = computed(() => {
   ]
 })
 const hasSpecialWait = computed(() => selectedYakuman.value.some(id => ['kokushi', 'suuankou', 'chuuren'].includes(id)))
-const visibleBonusFields = computed(() => bonusFields.filter(bonus => bonus.id !== 'ura' || canUseUra.value))
 const filteredYaku = computed(() => {
   const search = yakuSearch.value.trim().toLowerCase()
   return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yaku.detail}`.toLowerCase().includes(search))
@@ -420,7 +403,6 @@ function makeScoreInput() {
     bonusHan: form.bonusHan,
     doubleYakumanWaits: form.doubleYakumanWaits,
     honba: integerAtLeastZero(form.honba),
-    riichiSticks: integerAtLeastZero(form.riichiSticks),
     kiriageMangan: false,
   }
 }
@@ -437,8 +419,8 @@ const fieldIssues = computed(() => {
   const fields = { yaku: [], pair: [], wait: [], groups: [], special: [], bonus: [], table: [] }
   for (const issue of result.value.issues) {
     if (/^North bonus/.test(issue)) fields.bonus.push(issue)
-    else if (/^(dora|red dora|ura dora|North bonus) must be/.test(issue)) fields.bonus.push(issue)
-    else if (/^(honba|riichi sticks) must be/.test(issue)) fields.table.push(issue)
+    else if (/^(dora|North bonus) must be/.test(issue)) fields.bonus.push(issue)
+    else if (/^honba must be/.test(issue)) fields.table.push(issue)
     else if (/^Suuankou on ron|^Suuankou needs a pair wait|^Double (Suuankou|Kokushi|Nine Gates)/.test(issue)) fields.special.push(issue)
     else if (/^Choose your pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair/.test(issue)) fields.pair.push(issue)
     else if (/^Choose the wait|^Pinfu needs a two-sided wait/.test(issue)) fields.wait.push(issue)
@@ -645,14 +627,6 @@ watch(() => form.playerCount, players => {
   form.bonusHan.nuki = players === 4 ? 0 : Math.min(4, integerAtLeastZero(form.bonusHan.nuki))
 }, { flush: 'sync' })
 
-watch(isClosed, closed => {
-  if (!closed) form.bonusHan.ura = 0
-})
-
-watch(isRiichi, riichi => {
-  if (!riichi) form.bonusHan.ura = 0
-})
-
 watch(() => [form.seatWind, form.roundWind], () => {
   if (form.pairChoice === 'double-wind' && form.seatWind !== form.roundWind) form.pairChoice = null
   if (form.seatWind === form.roundWind && ['seat-wind', 'round-wind'].includes(form.pairChoice)) form.pairChoice = 'double-wind'
@@ -800,8 +774,6 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .result-amount { margin: 19px 0 17px; }
 .result-amount > span { display: block; color: var(--muted); font-size: .8rem; }
 .result-amount > strong { display: block; margin: 2px 0; color: var(--matcha-leaf); font-size: clamp(2rem, 4vw, 2.8rem); font-variant-numeric: tabular-nums; letter-spacing: -.045em; line-height: 1.15; }
-.received-total { margin: 8px 0; color: var(--muted); font-size: .76rem; }
-.received-total strong { color: var(--matcha-leaf); font-size: .95rem; }
 .result-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin: 17px 0; color: var(--muted); }
 .result-empty p { flex: 1 1 100%; margin: 0; font-size: .81rem; line-height: 1.55; }
 .next-step-button { min-height: 36px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; cursor: pointer; }
@@ -833,7 +805,6 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .result-amount { margin: 8px 0; }
   .result-amount > strong { display: inline; margin-right: 7px; font-size: 1.45rem; }
   .result-amount > span { display: inline; font-size: .72rem; margin-right: 7px; }
-  .received-total { margin: 7px 0; padding-top: 0; border: 0; font-size: .7rem; }
   .result-empty { margin: 7px 0 0; }
   .result-empty p { flex-basis: auto; }
   .score-summary { padding: 3px 0 0; margin-top: 7px; font-size: .75rem; }

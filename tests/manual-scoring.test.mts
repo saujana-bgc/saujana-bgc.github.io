@@ -8,9 +8,9 @@ function hand(overrides: Partial<ManualScoreInput> = {}): ManualScoreInput {
     seatWind: 'south', roundWind: 'east', winType: 'ron', playerCount: 4,
     handShape: 'standard', riichiDeclared: false,
     pairFu: null, pairChoice: null, pairIsValue: null, waitType: null, groups: [],
-    bonusHan: { dora: 0, red: 0, ura: 0, nuki: 0 },
+    bonusHan: { dora: 0, nuki: 0 },
     doubleYakumanWaits: { kokushi: false, suuankou: false, chuuren: false },
-    honba: 0, riichiSticks: 0, ...overrides,
+    honba: 0, ...overrides,
   }
 }
 
@@ -72,15 +72,14 @@ test('simplified questions still reject contradictory explicit details', () => {
   assert.equal(fourKansWithTriplet.points, 0)
 })
 
-test('automatic Menzen Tsumo counts as a yaku and dealer payments include table bonuses', () => {
+test('automatic Menzen Tsumo counts as a yaku and dealer payments include honba', () => {
   const result = calculateManualScore(hand({
     winType: 'tsumo', isDealer: true, seatWind: 'east',
     pairFu: 0, pairIsValue: false, pairChoice: 'simple', waitType: 'ryanmen',
-    honba: 1, riichiSticks: 2,
+    honba: 1,
   }))
   assert.deepEqual(result.issues, [])
   assert.equal(result.han, 1)
   assert.deepEqual(result.tsumo, { dealerPays: 600, nonDealerPays: 600 })
   assert.equal(result.points, 1800)
-  assert.equal(result.totalReceived, 3800)
 })
