@@ -152,6 +152,11 @@
             <span>Automatically included</span>
             <strong v-for="yaku in automaticYaku" :key="yaku.id">{{ yaku.name }} <small>+{{ yaku.han }}</small></strong>
           </div>
+          <div v-if="showTsumoSearchHelp" class="automatic-yaku tsumo-search-help" aria-live="polite">
+            <span>Self-draw tip</span>
+            <p>Menzen tsumo is added automatically when a closed hand wins by tsumo.</p>
+            <button v-if="form.winType !== 'tsumo'" type="button" class="choice-button" @click="selectTsumoFromSearch">Set win to Tsumo</button>
+          </div>
           <div v-if="selectedYakuOptions.length" class="selected-yaku" aria-label="Selected yaku">
             <span>Selected</span>
             <button v-for="yaku in selectedYakuOptions" :key="yaku.id" type="button" class="selected-yaku-chip" :class="{ 'chip-conflict': unavailableReasons[yaku.id] }" :aria-label="`Remove ${yaku.name}${unavailableReasons[yaku.id] ? `: ${unavailableReasons[yaku.id]}` : ''}`" @click="toggleYaku(yaku.id)"><span v-if="unavailableReasons[yaku.id]" aria-hidden="true">!</span>{{ yaku.name }} <b aria-hidden="true">×</b></button>
@@ -163,6 +168,7 @@
           </div>
           <p v-if="selectedYakuman.length" class="automatic-note">Yakuman sets the hand’s payment; bonus han do not add to it. Compatible yakuman can stack.</p>
           <ul v-if="shouldShowProblems && fieldIssues.yaku.length" class="field-problems"><li v-for="issue in fieldIssues.yaku" :key="issue">{{ issue }}</li></ul>
+          <ul v-if="shouldShowProblems && (fieldIssues.win.length || fieldIssues.dealer.length)" class="field-problems"><li v-for="issue in [...fieldIssues.win, ...fieldIssues.dealer]" :key="issue">{{ issue }}</li></ul>
 
           <div class="yaku-groups">
             <details v-for="category in visibleCategories" :key="category.id" class="yaku-category" :open="isYakuCategoryOpen(category.id)" @toggle="toggleYakuCategory(category.id, $event)">
@@ -253,6 +259,9 @@
               <button v-for="pair in availablePairOptions" :key="pair.id" type="button" class="choice-button" :class="{ selected: form.pairChoice === pair.id }" :aria-pressed="form.pairChoice === pair.id" @click="form.pairChoice = pair.id"><span>{{ pair.label }}</span><span v-if="pair.tiles?.length" class="tile-strip" aria-hidden="true"><img v-for="tile in pair.tiles" :key="tile" :src="`/tiles/${tile}.svg`" alt="" /></span><small>+{{ pair.fu }} fu</small></button>
             </div>
             <p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">Tanyao uses only number tiles 2–8, including the pair.</p>
+            <p v-else-if="form.selectedYaku.includes('junchan') || form.selectedYaku.includes('chinroutou')" class="field-hint">This yaku needs a 1 or 9 pair. Honour pairs are not allowed.</p>
+            <p v-else-if="form.selectedYaku.some(id => ['chanta', 'honroutou'].includes(id))" class="field-hint">This yaku needs a terminal (1 or 9) or honour pair.</p>
+            <p v-else-if="form.selectedYaku.includes('tsuuiisou')" class="field-hint">All tiles, including the pair, must be honours.</p>
             <p v-else class="field-hint">A pair that is both your seat wind and round wind is 4 fu on this sheet.</p>
             <ul v-if="shouldShowProblems && fieldIssues.pair.length" class="field-problems"><li v-for="issue in fieldIssues.pair" :key="issue">{{ issue }}</li></ul>
           </div>
@@ -268,7 +277,7 @@
           </div>
 
           <div v-if="showGroupBuilder" ref="groupSection" class="fu-field group-builder" tabindex="-1">
-            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
+            <div class="field-heading-row"><div><span class="field-label">Triplets and kans</span><p class="field-hint">Add each triplet or kan; runs do not add fu. A triplet completed by ron counts as open for fu only.<template v-if="yakuhaiChoices.length"> Mark the matching dragon or wind set.</template></p><p v-if="form.selectedYaku.includes('tanyao')" class="field-hint">For Tanyao, use simple number tiles only.</p><p v-else-if="form.selectedYaku.includes('junchan') || form.selectedYaku.includes('chinroutou')" class="field-hint">Use terminal triplets and kans only.</p><p v-else-if="form.selectedYaku.includes('tsuuiisou')" class="field-hint">Use honour triplets and kans only.</p><p v-else-if="form.selectedYaku.some(id => ['chanta', 'honroutou'].includes(id))" class="field-hint">Use terminal or honour triplets and kans only.</p></div><span class="group-count">{{ form.groups.length }} / 4</span></div>
             <p v-if="form.groups.some(group => !group.concealed) && selectedYakuOptions.some(yaku => yaku.requiresClosed)" class="field-problems">A called group opens the hand, which conflicts with the selected closed-only yaku. Remove the call or that yaku.</p>
             <div v-if="form.groups.length" class="group-list">
               <div v-for="(group, index) in form.groups" :key="group.id" class="group-row">
@@ -357,6 +366,7 @@ const winOptions = [
 ]
 const pairOptions = [
   { id: 'simple', label: 'Number tile', fu: 0, tiles: ['Man5'] },
+  { id: 'terminal-number', label: 'Terminal number tile · 1 or 9', fu: 0, tiles: ['Man1'] },
   { id: 'non-value-wind', label: 'Other wind', fu: 0 },
   { id: 'dragon', label: 'Dragon', fu: 2, tiles: ['Haku', 'Hatsu', 'Chun'] },
   { id: 'seat-wind', label: 'Seat wind', fu: 2 },
@@ -372,13 +382,17 @@ const waits = [
 ]
 const groupOptions = [
   { id: 'triplet-called-simple', type: 'triplet', tileKind: 'simple', concealed: false, label: 'Called triplet · simple', detail: '2–8 tile · 2 fu', tileExamples: ['Man5', 'Man5', 'Man5'], fu: 2 },
-  { id: 'triplet-called-terminal-honor', type: 'triplet', tileKind: 'terminal-honor', concealed: false, label: 'Called triplet · terminal or honour', detail: '1, 9 or honour · 4 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 4 },
+  { id: 'triplet-called-terminal', type: 'triplet', tileKind: 'terminal', concealed: false, label: 'Called triplet · terminal', detail: '1 or 9 · 4 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 4 },
+  { id: 'triplet-called-honor', type: 'triplet', tileKind: 'honor', concealed: false, label: 'Called triplet · honour', detail: 'Wind or dragon · 4 fu', tileExamples: ['Haku', 'Haku', 'Haku'], fu: 4 },
   { id: 'triplet-concealed-simple', type: 'triplet', tileKind: 'simple', concealed: true, label: 'Concealed triplet · simple', detail: '2–8 tile · 4 fu', tileExamples: ['Man5', 'Man5', 'Man5'], fu: 4 },
-  { id: 'triplet-concealed-terminal-honor', type: 'triplet', tileKind: 'terminal-honor', concealed: true, label: 'Concealed triplet · terminal or honour', detail: '1, 9 or honour · 8 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 8 },
+  { id: 'triplet-concealed-terminal', type: 'triplet', tileKind: 'terminal', concealed: true, label: 'Concealed triplet · terminal', detail: '1 or 9 · 8 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 8 },
+  { id: 'triplet-concealed-honor', type: 'triplet', tileKind: 'honor', concealed: true, label: 'Concealed triplet · honour', detail: 'Wind or dragon · 8 fu', tileExamples: ['Haku', 'Haku', 'Haku'], fu: 8 },
   { id: 'kan-called-simple', type: 'kan', tileKind: 'simple', concealed: false, label: 'Called kan · simple', detail: '2–8 tile · 8 fu', tileExamples: ['Man5', 'Man5', 'Man5', 'Man5'], fu: 8 },
-  { id: 'kan-called-terminal-honor', type: 'kan', tileKind: 'terminal-honor', concealed: false, label: 'Called kan · terminal or honour', detail: '1, 9 or honour · 16 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 16 },
+  { id: 'kan-called-terminal', type: 'kan', tileKind: 'terminal', concealed: false, label: 'Called kan · terminal', detail: '1 or 9 · 16 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 16 },
+  { id: 'kan-called-honor', type: 'kan', tileKind: 'honor', concealed: false, label: 'Called kan · honour', detail: 'Wind or dragon · 16 fu', tileExamples: ['Haku', 'Haku', 'Haku', 'Haku'], fu: 16 },
   { id: 'kan-concealed-simple', type: 'kan', tileKind: 'simple', concealed: true, label: 'Concealed kan · simple', detail: '2–8 tile · 16 fu', tileExamples: ['Man5', 'Man5', 'Man5', 'Man5'], fu: 16 },
-  { id: 'kan-concealed-terminal-honor', type: 'kan', tileKind: 'terminal-honor', concealed: true, label: 'Concealed kan · terminal or honour', detail: '1, 9 or honour · 32 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 32 },
+  { id: 'kan-concealed-terminal', type: 'kan', tileKind: 'terminal', concealed: true, label: 'Concealed kan · terminal', detail: '1 or 9 · 32 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 32 },
+  { id: 'kan-concealed-honor', type: 'kan', tileKind: 'honor', concealed: true, label: 'Concealed kan · honour', detail: 'Wind or dragon · 32 fu', tileExamples: ['Haku', 'Haku', 'Haku', 'Haku'], fu: 32 },
 ]
 const groupTypes = [
   { id: 'triplet', label: 'Triplet' },
@@ -467,6 +481,10 @@ const roundWindName = computed(() => windNames[form.roundWind])
 const isDealer = computed(() => form.isDealer)
 const availablePairOptions = computed(() => pairOptions
   .filter(pair => !form.selectedYaku.includes('tanyao') || pair.id === 'simple')
+  .filter(pair => !form.selectedYaku.includes('junchan') || pair.id === 'terminal-number')
+  .filter(pair => !form.selectedYaku.includes('chinroutou') || pair.id === 'terminal-number')
+  .filter(pair => !form.selectedYaku.includes('tsuuiisou') || ['non-value-wind', 'dragon', 'seat-wind', 'round-wind', 'double-wind'].includes(pair.id))
+  .filter(pair => !['honroutou', 'chanta'].some(id => form.selectedYaku.includes(id)) || pair.id !== 'simple')
   .filter(pair => !seatWindConfirmed.value || !roundWindConfirmed.value || (form.seatWind === form.roundWind
     ? !['seat-wind', 'round-wind'].includes(pair.id)
     : pair.id !== 'double-wind'))
@@ -487,7 +505,14 @@ const availablePairOptions = computed(() => pairOptions
             .map(wind => windTileNames[wind]) : []
             : pair.tiles,
   })))
-const groupOptionsForPicker = computed(() => groupOptions.filter(option => option.type === groupTypeFilter.value && (!form.selectedYaku.includes('tanyao') || option.tileKind === 'simple')))
+const groupOptionsForPicker = computed(() => groupOptions.filter(option => {
+  if (option.type !== groupTypeFilter.value) return false
+  if (form.selectedYaku.includes('tanyao')) return option.tileKind === 'simple'
+  if (form.selectedYaku.includes('tsuuiisou')) return option.tileKind === 'honor'
+  if (form.selectedYaku.includes('chinroutou') || form.selectedYaku.includes('junchan')) return option.tileKind === 'terminal'
+  if (form.selectedYaku.some(id => ['honroutou', 'chanta'].includes(id))) return option.tileKind !== 'simple'
+  return true
+}))
 const isClosed = computed(() => form.isClosed)
 const isPinfu = computed(() => form.selectedYaku.includes('pinfu'))
 const availableWaitOptions = computed(() => waits
@@ -515,6 +540,7 @@ const filteredYaku = computed(() => {
   const search = yakuSearch.value.trim().toLowerCase()
   return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yakuDisplayName(yaku)} ${yaku.detail} ${(yakuSearchAliases[yaku.id] ?? []).join(' ')}`.toLowerCase().includes(search))
 })
+const showTsumoSearchHelp = computed(() => /tsumo|self.?draw|menzen/i.test(yakuSearch.trim()) && automaticYaku.value.length === 0)
 const yakuByCategory = computed(() => Object.fromEntries(categories.map(category => [category.id, filteredYaku.value.filter(yaku => yaku.category === category.id)])) )
 const visibleCategories = computed(() => categories.filter(category => yakuByCategory.value[category.id]?.length))
 const automaticYaku = computed(() => isClosed.value && form.winType === 'tsumo' && !selectedYakuman.value.length
@@ -566,14 +592,16 @@ const seatWindConfirmed = computed(() => form.isDealer || form.seatWindConfirmed
 const roundWindConfirmed = computed(() => form.roundWindConfirmed)
 const needsWindsConfirmation = computed(() => tableWindsNeeded.value && (!seatWindConfirmed.value || !roundWindConfirmed.value))
 const fieldIssues = computed(() => {
-  const fields = { yaku: [], pair: [], wait: [], groups: [], special: [], bonus: [], table: [] }
+  const fields = { yaku: [], pair: [], wait: [], groups: [], special: [], bonus: [], table: [], win: [], dealer: [] }
   for (const issue of result.value.issues) {
     if (/^North bonus/.test(issue)) fields.bonus.push(issue)
     else if (/^(dora|North bonus) must be/.test(issue)) fields.bonus.push(issue)
     else if (/^honba must be/.test(issue)) fields.table.push(issue)
+    else if (/requires (?:ron|tsumo)/i.test(issue)) fields.win.push(issue)
+    else if (/requires (?:the dealer|a non-dealer)/i.test(issue)) fields.dealer.push(issue)
     else if (/^Suuankou on ron|^Suuankou needs a pair wait|^Double (Suuankou|Kokushi|Nine Gates)/.test(issue)) fields.special.push(issue)
     else if (/^Choose your pair/.test(issue) && needsWindsConfirmation.value) continue
-    else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair/.test(issue)) fields.pair.push(issue)
+    else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a dragon pair|^(?:Junchan|Chanta|Honroutou|Chinroutou|Tsuuiisou) needs/.test(issue)) fields.pair.push(issue)
     else if (/^Choose the wait|^Pinfu needs a two-sided wait|^Tanyao cannot use an edge wait/.test(issue)) fields.wait.push(issue)
     else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai|Tanyao cannot include terminal or honour triplets and kans/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
@@ -583,6 +611,8 @@ const fieldIssues = computed(() => {
 const nextIssueTarget = computed(() => {
   if (entryMode.value === 'hanfu') return { label: directEntryIssue.value || 'Enter han and fu', target: directFuInput.value ?? directHanInput.value }
   if (fieldIssues.value.yaku.some(issue => /requires a closed hand/i.test(issue)) && closedHandCorrection.value) return { label: 'Mark the hand closed', target: closedHandCorrection.value }
+  if (fieldIssues.value.win.length) return { label: 'Check the winning method', target: winSection.value }
+  if (fieldIssues.value.dealer.length) return { label: 'Check dealer status', target: winSection.value }
   if (fieldIssues.value.yaku.length || (form.selectedYaku.length === 0 && automaticYaku.value.length === 0)) return { label: 'Choose or fix a yaku', target: yakuSection.value }
   if (needsWindsConfirmation.value) return { label: 'Confirm the seat and round winds', target: needsYakuWindConfirmation.value ? yakuSection.value : pairSection.value }
   if (fieldIssues.value.special.length) return { label: 'Check the special wait', target: specialWaitSection.value }
@@ -720,7 +750,6 @@ function isDisabled(id) {
   if (id === 'chiitoitsu') return form.handShape !== 'standard' && form.handShape !== 'chiitoitsu'
   if (id === 'kokushi') return form.handShape !== 'standard' && form.handShape !== 'kokushi'
   if (form.handShape === 'chiitoitsu' && ['pinfu', 'iipeiko', 'ryanpeiko', 'toitoi', 'sanankou', 'suuankou', 'chiitoitsu'].includes(id)) return true
-  if (form.handShape === 'kokushi' && id !== 'kokushi') return true
   return false
 }
 
@@ -729,9 +758,7 @@ function yakuUnavailableReason(id) {
   if (!option) return null
   if (id === 'chiitoitsu' && form.handShape === 'kokushi') return 'Choose a standard hand before selecting Seven Pairs.'
   if (id === 'kokushi' && form.handShape === 'chiitoitsu') return 'Choose a standard hand before selecting Kokushi.'
-  if (form.handShape === 'kokushi' && id !== 'kokushi') return 'Kokushi has no sets; remove it to select another yaku.'
-  if (form.handShape === 'chiitoitsu' && ['pinfu', 'iipeiko', 'ryanpeiko', 'toitoi', 'sanankou', 'suuankou'].includes(id)) return 'This hand is set as Seven Pairs.'
-  return manualYakuUnavailableReason(id, { selectedYaku: form.selectedYaku, isClosed: isClosed.value, isDealer: isDealer.value, winType: form.winType })
+  return manualYakuUnavailableReason(id, { selectedYaku: form.selectedYaku, isClosed: isClosed.value, isDealer: isDealer.value, winType: form.winType, handShape: form.handShape })
 }
 
 function toggleYaku(id) {
@@ -783,11 +810,12 @@ function setHandShape(shape) {
 }
 
 function groupName(group) {
-  return `${group.type === 'kan' ? 'Kan' : 'Triplet'} · ${group.concealed ? 'concealed' : 'called'} · ${group.tileKind === 'simple' ? 'simple' : 'terminal or honour'}`
+  const tileKind = group.tileKind === 'simple' ? 'simple' : group.tileKind === 'terminal' ? 'terminal' : 'honour'
+  return `${group.type === 'kan' ? 'Kan' : 'Triplet'} · ${group.concealed ? 'concealed' : 'called'} · ${tileKind}`
 }
 
 function groupYakuOptions(group) {
-  if (group.tileKind !== 'terminal-honor' && !group.yakuId) return []
+  if (group.tileKind !== 'honor' && !group.yakuId) return []
   const assignedElsewhere = new Set(form.groups.filter(other => other.id !== group.id).map(other => other.yakuId).filter(Boolean))
   const options = yakuhaiChoices.value.filter(option => !assignedElsewhere.has(option.id) || option.id === group.yakuId)
   if (group.yakuId && !options.some(option => option.id === group.yakuId)) {
@@ -798,14 +826,14 @@ function groupYakuOptions(group) {
 }
 
 function groupFu(group) {
-  const terminal = group.tileKind === 'terminal-honor'
+  const terminal = group.tileKind !== 'simple'
   if (group.type === 'kan') return group.concealed ? (terminal ? 32 : 16) : (terminal ? 16 : 8)
   if (group.concealed && !(form.winType === 'ron' && group.completedByRon)) return terminal ? 8 : 4
   return terminal ? 4 : 2
 }
 
 function groupTileExamples(group) {
-  if (group.tileKind === 'terminal-honor' && group.yakuId) {
+  if (group.tileKind === 'honor' && group.yakuId) {
     const yakuhaiTiles = {
       'yakuhai-haku': 'Haku',
       'yakuhai-hatsu': 'Hatsu',
@@ -818,6 +846,11 @@ function groupTileExamples(group) {
     if (tile) return Array.from({ length: group.type === 'kan' ? 4 : 3 }, () => tile)
   }
   return groupOptions.find(option => option.type === group.type && option.tileKind === group.tileKind && option.concealed === group.concealed)?.tileExamples ?? []
+}
+
+function selectTsumoFromSearch() {
+  form.winType = 'tsumo'
+  winSection.value?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
 }
 
 function isConcealedKanBack(group, index) {
@@ -1009,6 +1042,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
 .automatic-yaku > span { width: 100%; color: var(--muted); font-size: .68rem; }
 .automatic-yaku strong { color: var(--matcha-leaf); }
 .automatic-yaku strong small { opacity: .75; }
+.tsumo-search-help { align-items: flex-start; }
+.tsumo-search-help p { flex: 1 1 100%; margin: 0; color: var(--clay-text); line-height: 1.5; }
 .selected-yaku { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .selected-yaku > span { margin-right: 3px; color: var(--muted); font-size: .68rem; }
 .selected-yaku-chip { min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border: 1px solid #cfd8cc; border-radius: 999px; background: #eff3ec; color: var(--matcha-leaf); font-size: .73rem; cursor: pointer; }

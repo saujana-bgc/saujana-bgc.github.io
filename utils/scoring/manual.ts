@@ -2,7 +2,7 @@ import { calculatePoints, handName, type HandName } from "./points";
 
 export type ManualWait = "ryanmen" | "penchan" | "kanchan" | "tanki" | "shanpon" | "kokushi-thirteen" | "chuuren-nine";
 export type ManualGroupType = "triplet" | "kan";
-export type ManualTileKind = "simple" | "terminal-honor";
+export type ManualTileKind = "simple" | "terminal" | "honor";
 export type ManualYakuCategory = "common" | "yakuhai" | "patterns" | "suits" | "situational" | "yakuman";
 
 export interface ManualGroup {
@@ -64,13 +64,13 @@ export const MANUAL_YAKU: ManualYakuOption[] = [
   { id: "renhou", name: "Renhou", detail: "Non-dealer win before your first draw", category: "situational", closedHan: 5, requiresClosed: true, winMethod: "ron", requiresDealer: false, incompatible: ["pinfu", "iipeiko", "ryanpeiko", "riichi", "double-riichi", "ippatsu", "tanyao", "ittsu", "sanshoku-doujun", "sanshoku-doukou", "toitoi", "sanankou", "sankantsu", "chanta", "junchan", "honroutou", "shousangen", "honitsu", "chinitsu"] },
   { id: "chinitsu", name: "Chinitsu", detail: "One suit, no honours", category: "suits", closedHan: 6, openHan: 5, incompatible: ["honitsu"] },
 
-  { id: "tenhou", name: "Tenhou", detail: "Dealer wins on the opening draw", category: "yakuman", closedHan: 13, requiresClosed: true, winMethod: "tsumo", requiresDealer: true, yakuman: true },
-  { id: "chiihou", name: "Chiihou", detail: "Non-dealer wins on the first draw before any call", category: "yakuman", closedHan: 13, requiresClosed: true, winMethod: "tsumo", requiresDealer: false, yakuman: true },
+  { id: "tenhou", name: "Tenhou", detail: "Dealer wins on the opening draw", category: "yakuman", closedHan: 13, requiresClosed: true, winMethod: "tsumo", requiresDealer: true, yakuman: true, incompatible: ["suuankantsu", "riichi", "double-riichi", "ippatsu", "rinshan", "haitei"] },
+  { id: "chiihou", name: "Chiihou", detail: "Non-dealer wins on the first draw before any call", category: "yakuman", closedHan: 13, requiresClosed: true, winMethod: "tsumo", requiresDealer: false, yakuman: true, incompatible: ["suuankantsu", "rinshan", "haitei"] },
   { id: "kokushi", name: "Kokushi musou", detail: "Thirteen orphans; thirteen-sided wait is double", category: "yakuman", closedHan: 13, requiresClosed: true, yakuman: true, incompatible: ["suuankou", "daisangen", "shousangen", "daisuushi", "shousuushi", "suuankantsu", "sankantsu", "toitoi", "sanankou", "chiitoitsu"] },
   { id: "chuuren", name: "Chuuren poutou", detail: "Nine gates; pure nine-sided wait is double", category: "yakuman", closedHan: 13, requiresClosed: true, yakuman: true },
   { id: "ryuuiisou", name: "Ryuuiisou", detail: "All green tiles", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true },
   { id: "suuankou", name: "Suuankou", detail: "Four concealed triplets; tanki wait is double", category: "yakuman", closedHan: 13, requiresClosed: true, yakuman: true, incompatible: ["pinfu", "sanankou", "chiitoitsu", "kokushi"] },
-  { id: "suuankantsu", name: "Suukantsu", detail: "Four kans", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true, incompatible: ["kokushi"] },
+  { id: "suuankantsu", name: "Suukantsu", detail: "Four kans", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true, incompatible: ["kokushi", "tenhou", "chiihou"] },
   { id: "chinroutou", name: "Chinroutou", detail: "All terminals", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true },
   { id: "tsuuiisou", name: "Tsuuiisou", detail: "All honours", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true },
   { id: "daisangen", name: "Daisangen", detail: "A set of all three dragons", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true, incompatible: ["kokushi", "shousangen"] },
@@ -103,12 +103,18 @@ for (const [id, conflicts] of Object.entries(additionalYakuConflicts)) {
   }
 }
 
-type YakuAvailabilityInput = Pick<ManualScoreInput, "selectedYaku" | "isClosed" | "isDealer" | "winType">;
+type YakuAvailabilityInput = Pick<ManualScoreInput, "selectedYaku" | "isClosed" | "isDealer" | "winType" | "handShape">;
 
 /** Keep picker guidance and scorer validation on the same yaku rules. */
 export function manualYakuUnavailableReason(id: string, input: YakuAvailabilityInput): string | null {
   const option = selectedOption(id);
   if (!option) return "Remove this unrecognised yaku.";
+  if (input.handShape === "kokushi" && !["kokushi", "riichi", "double-riichi", "ippatsu", "tenhou", "chiihou", "chankan", "haitei", "houtei"].includes(id)) {
+    return "Kokushi can only combine with Riichi, compatible situational yaku, or a compatible first-draw yakuman.";
+  }
+  if (input.handShape === "chiitoitsu" && ["pinfu", "iipeiko", "ryanpeiko", "toitoi", "sanankou", "suuankou"].includes(id)) {
+    return "This hand is set as Seven Pairs.";
+  }
   if (option.requiresClosed && !input.isClosed) return `${option.name} requires a closed hand.`;
   if (option.winMethod && option.winMethod !== input.winType) {
     return `${option.name} requires ${option.winMethod === "tsumo" ? "tsumo (self-draw)" : "ron (a discard)"}.`;
@@ -226,7 +232,7 @@ export function calculateManualHanFuScore(input: ManualHanFuInput): ManualScoreR
 }
 
 function tripletFu(group: ManualGroup): number {
-  const terminal = group.tileKind === "terminal-honor";
+  const terminal = group.tileKind !== "simple";
   if (group.type === "kan") {
     if (group.concealed) return terminal ? 32 : 16;
     return terminal ? 16 : 8;
@@ -238,7 +244,8 @@ function tripletFu(group: ManualGroup): number {
 }
 
 function groupName(group: ManualGroup): string {
-  return `${group.type === "kan" ? "Kan" : "Triplet"}, ${group.concealed ? "concealed" : "called"}, ${group.tileKind === "simple" ? "simple" : "terminal or honour"}`;
+  const tileKind = group.tileKind === "simple" ? "simple" : group.tileKind === "terminal" ? "terminal" : "honour";
+  return `${group.type === "kan" ? "Kan" : "Triplet"}, ${group.concealed ? "concealed" : "called"}, ${tileKind}`;
 }
 
 function selectedOption(id: string): ManualYakuOption | undefined {
@@ -319,6 +326,37 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
       issues.push("Tanyao cannot use an edge wait because it needs a 1 or 9. Choose another wait or deselect Tanyao.");
     }
   }
+  const suitedPattern = selected.has("chanta") || selected.has("junchan");
+  if (suitedPattern) {
+    const allowedPair = selected.has("junchan") ? input.pairChoice === "terminal-number" : ["terminal-number", "non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice ?? "");
+    if (input.pairChoice && !allowedPair) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} needs a terminal or honour pair. Choose a valid pair or deselect the yaku.`);
+    const invalidGroup = input.groups.some((group) => selected.has("junchan") ? group.tileKind !== "terminal" : group.tileKind === "simple");
+    if (invalidGroup) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} cannot include ${selected.has("junchan") ? "honour or simple" : "simple"} triplets and kans.`);
+  }
+  if (selected.has("honroutou")) {
+    if (input.pairChoice && !["terminal-number", "non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice)) issues.push("Honroutou needs a terminal or honour pair.");
+    if (input.groups.some((group) => group.tileKind === "simple")) issues.push("Honroutou cannot include simple triplets or kans.");
+  }
+  if (selected.has("chinroutou")) {
+    if (input.pairChoice && input.pairChoice !== "terminal-number") issues.push("Chinroutou needs a terminal-number pair.");
+    if (input.groups.some((group) => group.tileKind !== "terminal")) issues.push("Chinroutou cannot include simple tiles or honours in its triplets and kans.");
+  }
+  if (selected.has("tsuuiisou")) {
+    if (input.pairChoice && !["non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice)) issues.push("Tsuuiisou needs an honour pair.");
+    if (input.groups.some((group) => group.tileKind !== "honor")) issues.push("Tsuuiisou cannot include suited tiles in its triplets and kans.");
+  }
+  if (selected.has("ittsu") && input.groups.filter((group) => group.type === "triplet" || group.type === "kan").length > 1) {
+    issues.push("Ittsuu needs three runs in one suit, so it can include at most one triplet or kan.");
+  }
+  if (selected.has("sanshoku-doujun") && input.groups.length > 1) {
+    issues.push("Sanshoku doujun needs the same run in all three suits, so it can include at most one triplet or kan.");
+  }
+  if (selected.has("iipeiko") && input.groups.length > 2) {
+    issues.push("Iipeikou needs two identical runs, so it can include at most two triplets or kans.");
+  }
+  if (selected.has("ryanpeiko") && input.groups.length) {
+    issues.push("Ryanpeikou needs four runs. Remove the entered triplets or kans.");
+  }
   if (input.pairChoice === "double-wind" && input.seatWind !== input.roundWind) {
     issues.push("A double-wind pair must match both your seat wind and the round wind.");
   }
@@ -350,7 +388,7 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     const assignedYakuhai = input.groups.map((group) => group.yakuId).filter((id): id is string => Boolean(id));
     if (new Set(assignedYakuhai).size !== assignedYakuhai.length) issues.push("Assign each dragon or wind yaku to a different group.");
     for (const group of input.groups) {
-      if (group.yakuId && (!requiredYakuhai.has(group.yakuId) || group.tileKind !== "terminal-honor")) {
+      if (group.yakuId && (!requiredYakuhai.has(group.yakuId) || group.tileKind !== "honor")) {
         issues.push("Match the selected dragon or wind yaku to its honour triplet or kan, or mark this as another set.");
         break;
       }

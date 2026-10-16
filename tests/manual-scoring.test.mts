@@ -72,6 +72,60 @@ test('simplified questions still reject contradictory explicit details', () => {
   assert.equal(fourKansWithTriplet.points, 0)
 })
 
+test('explicit tile and group details must fit selected yaku patterns', () => {
+  const triplet = (id: number, tileKind: 'simple' | 'terminal' | 'honor' = 'simple') => ({
+    id, type: 'triplet' as const, tileKind, concealed: true, completedByRon: false,
+  })
+  const pairAndWait = { pairChoice: 'simple', pairFu: 0, pairIsValue: false, waitType: 'ryanmen' as const }
+
+  const impossibleIttsuu = calculateManualScore(hand({
+    selectedYaku: ['ittsu'], ...pairAndWait, groups: [triplet(1), triplet(2)],
+  }))
+  assert.ok(impossibleIttsuu.issues.some(issue => /Ittsuu needs three runs/.test(issue)))
+
+  const impossibleHonours = calculateManualScore(hand({
+    selectedYaku: ['tsuuiisou'], pairChoice: 'dragon', groups: [triplet(1)],
+  }))
+  assert.ok(impossibleHonours.issues.some(issue => /Tsuuiisou cannot include suited tiles/.test(issue)))
+
+  const impossibleHonroutou = calculateManualScore(hand({
+    selectedYaku: ['honroutou'], pairChoice: 'terminal-number', pairFu: 0, pairIsValue: false,
+    waitType: 'ryanmen', groups: [triplet(1)],
+  }))
+  assert.ok(impossibleHonroutou.issues.some(issue => /Honroutou cannot include simple/.test(issue)))
+
+  const impossibleJunchan = calculateManualScore(hand({
+    selectedYaku: ['junchan'], pairChoice: 'dragon', pairFu: 2, pairIsValue: true,
+    waitType: 'ryanmen',
+  }))
+  assert.ok(impossibleJunchan.issues.some(issue => /Junchan needs a terminal or honour pair/.test(issue)))
+
+  const impossibleIipeiko = calculateManualScore(hand({
+    selectedYaku: ['iipeiko'], ...pairAndWait, groups: [triplet(1), triplet(2), triplet(3)],
+  }))
+  assert.ok(impossibleIipeiko.issues.some(issue => /Iipeikou needs two identical runs/.test(issue)))
+})
+
+test('first-draw yakuman cannot stack with four kans, while Kokushi supports compatible selections', () => {
+  const firstDrawFourKans = calculateManualScore(hand({
+    selectedYaku: ['tenhou', 'suuankantsu'], isDealer: true, winType: 'tsumo',
+  }))
+  assert.ok(firstDrawFourKans.issues.some(issue => /cannot be scored alongside Suukantsu/.test(issue)))
+  assert.equal(firstDrawFourKans.points, 0)
+
+  const tenhouRiichi = calculateManualScore(hand({
+    selectedYaku: ['tenhou', 'riichi'], isDealer: true, winType: 'tsumo',
+  }))
+  assert.ok(tenhouRiichi.issues.some(issue => /Tenhou cannot be scored alongside Riichi/.test(issue)))
+
+  const kokushiChiihou = calculateManualScore(hand({
+    selectedYaku: ['kokushi', 'chiihou', 'double-riichi', 'ippatsu'], handShape: 'kokushi', winType: 'tsumo',
+  }))
+  assert.deepEqual(kokushiChiihou.issues, [])
+  assert.equal(kokushiChiihou.yakumanUnits, 2)
+  assert.equal(kokushiChiihou.points, 64000)
+})
+
 test('automatic Menzen Tsumo counts as a yaku and dealer payments include honba', () => {
   const result = calculateManualScore(hand({
     winType: 'tsumo', isDealer: true, seatWind: 'east',
