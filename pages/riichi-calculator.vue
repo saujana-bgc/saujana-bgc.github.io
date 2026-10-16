@@ -20,7 +20,7 @@
             <strong>{{ formatPoints(result.pao ? paoTsumoTotal : result.points) }}</strong>
           </div>
           <div v-if="!resultReady" class="result-empty">
-            <p>{{ hasInteracted && entryMode === 'hanfu' && directEntryIssue ? 'Review the highlighted hand value.' : hasInteracted ? nextStepLabel : (entryMode === 'yaku' ? 'Choose how you want to enter the hand.' : 'Enter han and fu to see the payment.') }}</p>
+            <p>{{ hasInteracted && entryMode === 'hanfu' && directEntryIssue ? 'Review the highlighted hand value.' : hasInteracted ? nextStepLabel : (entryMode === 'yaku' ? 'Select your yaku below to see the payment.' : 'Enter han and fu to see the payment.') }}</p>
             <button v-if="hasInteracted && entryMode === 'hanfu' && directEntryIssue" type="button" class="next-step-button" @click="jumpToNextIssue">Review hand value</button>
             <button v-else-if="hasInteracted && entryMode === 'yaku' && canJumpToNextIssue" type="button" class="next-step-button" @click="jumpToNextIssue">Go to next step</button>
           </div>
@@ -144,8 +144,8 @@
             <div class="bonus-copy"><label id="honba-count-label" for="honba-count">Honba · repeat counter</label><span>+300 on ron; +100 from each payer on tsumo</span></div>
             <div class="stepper" role="group" aria-label="Honba">
               <button type="button" aria-label="Remove one honba" :disabled="form.honba <= 0" @click="form.honba = Math.max(0, form.honba - 1)">−</button>
-              <input id="honba-count" v-model.number="form.honba" type="number" inputmode="numeric" min="0" step="1" @change="form.honba = integerAtLeastZero(form.honba)" />
-              <button type="button" aria-label="Add one honba" @click="form.honba += 1">+</button>
+              <input id="honba-count" v-model.number="form.honba" type="number" inputmode="numeric" min="0" max="99" step="1" @change="form.honba = Math.min(99, integerAtLeastZero(form.honba))" />
+              <button type="button" aria-label="Add one honba" :disabled="form.honba >= 99" @click="form.honba = Math.min(99, form.honba + 1)">+</button>
             </div>
             <ul v-if="shouldShowProblems && fieldIssues.table.length" class="field-problems"><li v-for="issue in fieldIssues.table" :key="issue">{{ issue }}</li></ul>
           </div>
@@ -176,7 +176,7 @@
             <button v-if="form.winType !== 'tsumo'" type="button" class="choice-button" @click="selectTsumoFromSearch">Set win to Tsumo</button>
           </div>
           <div v-if="selectedYakuOptions.length" class="selected-yaku" aria-label="Selected yaku">
-            <span>Selected</span>
+            <span>Selected{{ selectedYakuHanTotal ? ` · ${selectedYakuHanTotal} han` : '' }}</span>
             <button v-for="yaku in selectedYakuOptions" :key="yaku.id" type="button" class="selected-yaku-chip" :class="{ 'chip-conflict': unavailableReasons[yaku.id] }" :aria-label="`Remove ${yaku.name}${unavailableReasons[yaku.id] ? `: ${unavailableReasons[yaku.id]}` : ''}`" @click="toggleYaku(yaku.id)"><span v-if="unavailableReasons[yaku.id]" aria-hidden="true">!</span>{{ yaku.name }} <b aria-hidden="true">×</b></button>
           </div>
           <div v-if="needsYakuWindConfirmation && needsWindsConfirmation" class="wind-prompt">
@@ -242,7 +242,7 @@
 
           <div v-if="hasSpecialWait" ref="specialWaitSection" class="variant-panel" tabindex="-1">
             <h3>Special waits</h3>
-            <p class="field-hint">These waits double the matching yakuman on the cheat sheet.</p>
+            <p class="field-hint">These waits double the matching yakuman under the double-yakuman rule.</p>
             <label v-if="form.selectedYaku.includes('kokushi')" class="checkbox-row">
               <input v-model="form.doubleYakumanWaits.kokushi" type="checkbox" @change="form.waitType = form.doubleYakumanWaits.kokushi ? 'kokushi-thirteen' : null" />
               <span>Kokushi: thirteen-sided wait <strong>(double yakuman)</strong></span>
@@ -785,6 +785,9 @@ const resultAnnouncement = computed(() => {
   return `${summary} · ${formatPoints(headlinePoints.value ?? 0)}`
 })
 
+const selectedYakuHanTotal = computed(() => result.value.isYakuman
+  ? null
+  : result.value.yaku.reduce((sum, yaku) => sum + yaku.han, 0))
 const fuLines = computed(() => {
   const breakdown = result.value.fuBreakdown
   if (!breakdown) return []
