@@ -89,7 +89,7 @@
             </div>
             <div v-if="!form.isClosed && !form.groups.some(group => !group.concealed) && selectedYakuOptions.some(yaku => yaku.requiresClosed)" class="closed-hand-correction">
               <p class="field-hint">If this was your only call and you have no open runs, mark the hand closed to score this yaku.</p>
-              <button ref="closedHandCorrection" type="button" class="choice-button" @click="form.isClosed = true">Mark hand closed</button>
+              <button id="closed-hand-correction" ref="closedHandCorrection" type="button" class="choice-button" @click="form.isClosed = true">Mark hand closed</button>
             </div>
             <details class="hand-help"><summary>What makes a hand open?</summary><p>Chi, pon or an open kan makes the hand open. A concealed kan stays closed. Closed tsumo adds Menzen tsumo automatically; open tsumo needs another yaku.</p></details>
           </template>
@@ -513,7 +513,7 @@ const yakuhaiChoices = computed(() => {
 const hasSpecialWait = computed(() => selectedYakuman.value.some(id => ['kokushi', 'suuankou', 'chuuren'].includes(id)))
 const filteredYaku = computed(() => {
   const search = yakuSearch.value.trim().toLowerCase()
-  return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yaku.detail} ${(yakuSearchAliases[yaku.id] ?? []).join(' ')}`.toLowerCase().includes(search))
+  return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yakuDisplayName(yaku)} ${yaku.detail} ${(yakuSearchAliases[yaku.id] ?? []).join(' ')}`.toLowerCase().includes(search))
 })
 const yakuByCategory = computed(() => Object.fromEntries(categories.map(category => [category.id, filteredYaku.value.filter(yaku => yaku.category === category.id)])) )
 const visibleCategories = computed(() => categories.filter(category => yakuByCategory.value[category.id]?.length))
@@ -787,6 +787,7 @@ function groupName(group) {
 }
 
 function groupYakuOptions(group) {
+  if (group.tileKind !== 'terminal-honor' && !group.yakuId) return []
   const assignedElsewhere = new Set(form.groups.filter(other => other.id !== group.id).map(other => other.yakuId).filter(Boolean))
   const options = yakuhaiChoices.value.filter(option => !assignedElsewhere.has(option.id) || option.id === group.yakuId)
   if (group.yakuId && !options.some(option => option.id === group.yakuId)) {
@@ -804,6 +805,18 @@ function groupFu(group) {
 }
 
 function groupTileExamples(group) {
+  if (group.tileKind === 'terminal-honor' && group.yakuId) {
+    const yakuhaiTiles = {
+      'yakuhai-haku': 'Haku',
+      'yakuhai-hatsu': 'Hatsu',
+      'yakuhai-chun': 'Chun',
+      'yakuhai-seat': windTileNames[form.seatWind],
+      'yakuhai-round': windTileNames[form.roundWind],
+      'yakuhai-double-wind': windTileNames[form.seatWind],
+    }
+    const tile = yakuhaiTiles[group.yakuId]
+    if (tile) return Array.from({ length: group.type === 'kan' ? 4 : 3 }, () => tile)
+  }
   return groupOptions.find(option => option.type === group.type && option.tileKind === group.tileKind && option.concealed === group.concealed)?.tileExamples ?? []
 }
 
