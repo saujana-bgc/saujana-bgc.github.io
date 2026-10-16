@@ -295,7 +295,7 @@
               </div>
               <button v-for="option in groupOptionsForPicker" :key="option.id" type="button" @click="addGroup(option)"><strong>{{ option.label }}</strong><span class="group-tile-samples" aria-hidden="true"><template v-for="(tile, index) in option.tileExamples" :key="`${tile}-${index}`"><span v-if="isConcealedKanOptionBack(option, index)" class="tile-back"></span><img v-else :src="`/tiles/${tile}.svg`" alt="" /></template></span><span>{{ option.detail }}</span><b>+{{ option.fu }} fu</b></button>
             </div>
-            <label v-if="needsFuQuestions && form.groups.length < 4 && (!form.selectedYaku.includes('shousangen') || form.groups.length >= 2)" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
+            <label v-if="needsGroupCompletenessConfirmation && form.groups.length < 4 && (!form.selectedYaku.includes('shousangen') || form.groups.length >= 2)" class="checkbox-row no-sets-confirm"><input v-model="form.groupsConfirmed" type="checkbox" /><span>{{ form.groups.length ? 'I have entered all triplets and kans in my hand' : 'My hand has no triplets or kans (only runs)' }}</span></label>
             <p v-if="form.groups.length === 4" class="field-hint">That’s all four groups. Runs don’t need to be entered.</p>
             <ul v-if="shouldShowProblems && fieldIssues.groups.length" class="field-problems"><li v-for="issue in fieldIssues.groups" :key="issue">{{ issue }}</li></ul>
           </div>
@@ -571,6 +571,7 @@ function makeScoreInput() {
     pairIsValue: pairOption ? pairOption.fu > 0 : null,
     waitType: form.waitType,
     groups: form.groups,
+    groupsConfirmed: form.groupsConfirmed,
     bonusHan: form.bonusHan,
     doubleYakumanWaits: form.doubleYakumanWaits,
     honba: integerAtLeastZero(form.honba),
@@ -586,11 +587,16 @@ const resultReady = computed(() => entryMode.value === 'yaku'
   ? result.value.issues.length === 0 && result.value.han > 0 && !needsSetConfirmation.value && !needsWindsConfirmation.value
   : result.value.issues.length === 0 && result.value.han > 0)
 const shouldShowProblems = computed(() => entryMode.value === 'yaku' && hasInteracted.value && result.value.issues.some(issue => !/^Choose your pair|^Choose the wait|^Select at least one yaku/.test(issue)))
-const needsSetConfirmation = computed(() => entryMode.value === 'yaku' && needsFuQuestions.value && form.groups.length < 4 && !form.groupsConfirmed)
+const needsPatternCompletenessConfirmation = computed(() => form.handShape === 'standard'
+  && ['chanta', 'honitsu'].some(id => form.selectedYaku.includes(id))
+  && !(['non-value-wind', 'dragon', 'seat-wind', 'round-wind', 'double-wind'].includes(form.pairChoice) || form.pairChoice?.startsWith('dragon-'))
+  && !form.groups.some(group => group.tileKind === 'honor'))
+const needsGroupCompletenessConfirmation = computed(() => needsFuQuestions.value || needsPatternCompletenessConfirmation.value)
+const needsSetConfirmation = computed(() => entryMode.value === 'yaku' && needsGroupCompletenessConfirmation.value && form.groups.length < 4 && !form.groupsConfirmed)
 const needsFuQuestions = computed(() => !result.value.isYakuman && result.value.han > 0 && result.value.han < 5 && form.handShape === 'standard' && !isPinfu.value)
-const showPairQuestion = computed(() => (needsFuQuestions.value && !(form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple')) || fieldIssues.value.pair.some(issue => !issue.startsWith('Choose your pair')))
+const showPairQuestion = computed(() => (needsFuQuestions.value && !(form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple')) || form.selectedYaku.some(id => ['shousangen', 'chanta', 'honitsu'].includes(id)) || fieldIssues.value.pair.some(issue => !issue.startsWith('Choose your pair')))
 const showWaitQuestion = computed(() => needsFuQuestions.value || fieldIssues.value.wait.some(issue => !issue.startsWith('Choose the wait')))
-const showGroupBuilder = computed(() => needsFuQuestions.value || form.groups.length > 0 || fieldIssues.value.groups.length > 0)
+const showGroupBuilder = computed(() => needsFuQuestions.value || needsPatternCompletenessConfirmation.value || form.groups.length > 0 || fieldIssues.value.groups.length > 0)
 const showFuSection = computed(() => showPairQuestion.value || showWaitQuestion.value || showGroupBuilder.value)
 const needsYakuWindConfirmation = computed(() => form.selectedYaku.some(id => ['yakuhai-seat', 'yakuhai-round'].includes(id)))
 const needsPairWindConfirmation = computed(() => needsFuQuestions.value && !form.selectedYaku.includes('tanyao') && ['seat-wind', 'round-wind', 'double-wind'].includes(form.pairChoice))
@@ -609,6 +615,9 @@ const fieldIssues = computed(() => {
     else if (/^Suuankou on ron|^Suuankou needs a pair wait|^Double (Suuankou|Kokushi|Nine Gates)/.test(issue)) fields.special.push(issue)
     else if (/^Honroutou needs four terminal or honour triplets or kans/.test(issue)) fields.groups.push(issue)
     else if (/^Junchan needs at least one run/.test(issue)) fields.groups.push(issue)
+    else if (/^Honitsu needs at least one honour|^Chanta needs an honour pair or group/.test(issue)) { fields.groups.push(issue); fields.pair.push(issue) }
+    else if (/^(?:Nine Gates|Chinitsu) cannot include honours/.test(issue)) { fields.pair.push(issue); fields.groups.push(issue) }
+    else if (/^The pair and a dragon or wind set/.test(issue)) { fields.pair.push(issue); fields.groups.push(issue) }
     else if (/^Choose the winning wait to check whether Chankan/.test(issue)) fields.wait.push(issue)
     else if (/^This Chankan wait already holds a copy/.test(issue)) fields.wait.push(issue)
     else if (/^Choose your pair/.test(issue) && needsWindsConfirmation.value) continue
