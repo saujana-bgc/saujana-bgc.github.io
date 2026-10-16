@@ -79,7 +79,7 @@
             <span class="step-number">{{ entryMode === 'hanfu' ? 2 : 1 }}</span>
             <div>
               <h2 id="win-heading">How did you win?</h2>
-              <p>Choose the win and dealer status.</p>
+              <p>Choose Ron or Tsumo and your dealer status.</p>
             </div>
           </div>
 
@@ -94,7 +94,6 @@
             <button type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="setDealer(true)">Yes</button>
             <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="setDealer(false)">No</button>
           </div>
-          <p class="field-hint">Set the actual winds when fu or wind yaku needs them.</p>
           <template v-if="entryMode === 'yaku'">
             <span class="field-label">Your hand</span>
             <div class="choice-row" role="group" aria-label="Open or closed hand">
@@ -183,7 +182,7 @@
           <p v-if="selectedYakuman.length" class="automatic-note">Yakuman sets the hand’s payment; bonus han do not add to it. Compatible yakuman can stack.</p>
           <div v-if="form.selectedYaku.some(id => ['daisangen', 'daisuushi'].includes(id))" class="pao-control">
             <label class="checkbox-row"><input v-model="form.paoApplies" type="checkbox" /><span>Pao applies to this yakuman under the league rules</span></label>
-            <p class="field-hint">Use pao when you fed the final dragon or wind set that completed the yakuman.</p>
+            <p class="field-hint">Pao applies when another player supplied the final dragon or wind set that completed your yakuman.</p>
             <template v-if="form.paoApplies && form.winType === 'ron'">
               <span class="field-label">Did the responsible player also discard the winning tile?</span>
               <div class="choice-row" role="group" aria-label="Was the pao-responsible player the discarder?">
@@ -290,7 +289,7 @@
             <span class="step-number">{{ selectedYakuman.length ? 3 : 4 }}</span>
             <div>
               <h2 id="fu-heading">{{ needsFuQuestions ? 'Count your fu' : 'Check hand details' }}</h2>
-              <p>{{ needsFuQuestions ? (form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple' ? 'Tanyao has a number-tile pair worth 0 fu. Choose the wait and add any triplets or kans.' : 'Choose the pair and wait. Add triplets and kans; skip runs.') : 'Fu entry is not needed. You can correct previously entered details here.' }}</p>
+              <p>{{ needsFuQuestions ? (form.selectedYaku.includes('tanyao') && form.pairChoice === 'simple' ? 'Tanyao has a number-tile pair worth 0 fu. Choose the wait and add any triplets or kans.' : 'Choose the pair and wait. Add triplets and kans; skip runs.') : needsPatternCompletenessConfirmation ? 'Enter the required pair and groups for this yaku. Fu does not change this payment.' : 'Fu does not change this payment. Check any details needed for your selected yaku.' }}</p>
             </div>
           </div>
 
@@ -435,16 +434,16 @@ const waits = [
 const groupOptions = [
   { id: 'triplet-called-simple', type: 'triplet', tileKind: 'simple', concealed: false, label: 'Called triplet · simple', detail: '2–8 tile · 2 fu', tileExamples: ['Man5', 'Man5', 'Man5'], fu: 2 },
   { id: 'triplet-called-terminal', type: 'triplet', tileKind: 'terminal', concealed: false, label: 'Called triplet · terminal', detail: '1 or 9 · 4 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 4 },
-  { id: 'triplet-called-honor', type: 'triplet', tileKind: 'honor', concealed: false, label: 'Called triplet · honour', detail: 'Wind or dragon · 4 fu', tileExamples: ['Haku', 'Haku', 'Haku'], fu: 4 },
+  { id: 'triplet-called-honor', type: 'triplet', tileKind: 'honor', concealed: false, label: 'Called triplet · honour', detail: 'Wind or dragon · 4 fu', tileExamples: ['Chun', 'Chun', 'Chun'], fu: 4 },
   { id: 'triplet-concealed-simple', type: 'triplet', tileKind: 'simple', concealed: true, label: 'Concealed triplet · simple', detail: '2–8 tile · 4 fu', tileExamples: ['Man5', 'Man5', 'Man5'], fu: 4 },
   { id: 'triplet-concealed-terminal', type: 'triplet', tileKind: 'terminal', concealed: true, label: 'Concealed triplet · terminal', detail: '1 or 9 · 8 fu', tileExamples: ['Man1', 'Man1', 'Man1'], fu: 8 },
-  { id: 'triplet-concealed-honor', type: 'triplet', tileKind: 'honor', concealed: true, label: 'Concealed triplet · honour', detail: 'Wind or dragon · 8 fu', tileExamples: ['Haku', 'Haku', 'Haku'], fu: 8 },
+  { id: 'triplet-concealed-honor', type: 'triplet', tileKind: 'honor', concealed: true, label: 'Concealed triplet · honour', detail: 'Wind or dragon · 8 fu', tileExamples: ['Chun', 'Chun', 'Chun'], fu: 8 },
   { id: 'kan-called-simple', type: 'kan', tileKind: 'simple', concealed: false, label: 'Called kan · simple', detail: '2–8 tile · 8 fu', tileExamples: ['Man5', 'Man5', 'Man5', 'Man5'], fu: 8 },
   { id: 'kan-called-terminal', type: 'kan', tileKind: 'terminal', concealed: false, label: 'Called kan · terminal', detail: '1 or 9 · 16 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 16 },
-  { id: 'kan-called-honor', type: 'kan', tileKind: 'honor', concealed: false, label: 'Called kan · honour', detail: 'Wind or dragon · 16 fu', tileExamples: ['Haku', 'Haku', 'Haku', 'Haku'], fu: 16 },
+  { id: 'kan-called-honor', type: 'kan', tileKind: 'honor', concealed: false, label: 'Called kan · honour', detail: 'Wind or dragon · 16 fu', tileExamples: ['Chun', 'Chun', 'Chun', 'Chun'], fu: 16 },
   { id: 'kan-concealed-simple', type: 'kan', tileKind: 'simple', concealed: true, label: 'Concealed kan · simple', detail: '2–8 tile · 16 fu', tileExamples: ['Man5', 'Man5', 'Man5', 'Man5'], fu: 16 },
   { id: 'kan-concealed-terminal', type: 'kan', tileKind: 'terminal', concealed: true, label: 'Concealed kan · terminal', detail: '1 or 9 · 32 fu', tileExamples: ['Man1', 'Man1', 'Man1', 'Man1'], fu: 32 },
-  { id: 'kan-concealed-honor', type: 'kan', tileKind: 'honor', concealed: true, label: 'Concealed kan · honour', detail: 'Wind or dragon · 32 fu', tileExamples: ['Haku', 'Haku', 'Haku', 'Haku'], fu: 32 },
+  { id: 'kan-concealed-honor', type: 'kan', tileKind: 'honor', concealed: true, label: 'Concealed kan · honour', detail: 'Wind or dragon · 32 fu', tileExamples: ['Chun', 'Chun', 'Chun', 'Chun'], fu: 32 },
 ]
 const groupTypes = [
   { id: 'triplet', label: 'Triplet' },
@@ -480,6 +479,7 @@ const initialState = () => ({
 
 const form = reactive(initialState())
 const entryMode = ref('yaku')
+const SESSION_STORAGE_KEY = 'saujana-riichi-calculator-session-v1'
 const undoSnapshot = ref(null)
 const standardHandDraft = ref(null)
 const yakuSearch = ref('')
@@ -507,6 +507,32 @@ let nextIssueHighlightTimer
 
 watch(form, () => { undoSnapshot.value = null }, { deep: true, flush: 'sync' })
 watch(entryMode, () => { undoSnapshot.value = null }, { flush: 'sync' })
+
+function restoreSessionState() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY) ?? 'null')
+    if (saved?.version !== 1 || !saved.form || !Array.isArray(saved.form.selectedYaku) || !Array.isArray(saved.form.groups)) return
+    const defaults = initialState()
+    Object.assign(form, defaults, saved.form)
+    form.bonusHan = { ...defaults.bonusHan, ...(saved.form.bonusHan ?? {}) }
+    form.doubleYakumanWaits = { ...defaults.doubleYakumanWaits, ...(saved.form.doubleYakumanWaits ?? {}) }
+    if (saved.entryMode === 'yaku' || saved.entryMode === 'hanfu') entryMode.value = saved.entryMode
+    hasInteracted.value = Boolean(saved.hasInteracted)
+  } catch {
+    try { sessionStorage.removeItem(SESSION_STORAGE_KEY) } catch { /* Storage may be unavailable. */ }
+  }
+}
+
+function persistSessionState() {
+  try {
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+      version: 1,
+      form: toRaw(form),
+      entryMode: entryMode.value,
+      hasInteracted: hasInteracted.value,
+    }))
+  } catch { /* Storage may be unavailable or full; the calculator still works for this visit. */ }
+}
 
 const directFuOptions = computed(() => {
   const han = integerAtLeastZero(form.directHan)
@@ -686,7 +712,7 @@ const fieldIssues = computed(() => {
     else if (/^This Chankan wait already holds a copy/.test(issue)) fields.wait.push(issue)
     else if (/^Choose your pair/.test(issue) && needsWindsConfirmation.value) continue
     else if (/no runs, so it cannot use a run wait|^Choose the wait|^Pinfu needs a two-sided wait|^Tanyao cannot use an edge wait/.test(issue)) fields.wait.push(issue)
-    else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a specific dragon pair|^(?:Junchan|Chanta|Honroutou|Chinroutou|Tsuuiisou) needs/.test(issue)) fields.pair.push(issue)
+    else if (/^Choose your pair|^Tanyao needs a number-tile pair|^Pinfu needs a non-value pair|^A double-wind pair|^A double-wind pair is|^Shousangen needs a specific dragon pair|^Big Three Dragons needs a pair|^Big Four Winds needs a pair|^Little Four Winds needs a specific wind pair|^All Green cannot include a terminal pair|^All Green only allows a Green dragon pair|^(?:Junchan|Chanta|Honroutou|Chinroutou|Tsuuiisou) needs/.test(issue)) fields.pair.push(issue)
     else if (/group|\btriplet\b|\bkan\b|requires a kan|winning-triplet|yakuhai|Tanyao cannot include terminal or honour triplets and kans/i.test(issue)) fields.groups.push(issue)
     else fields.yaku.push(issue)
   }
@@ -1063,8 +1089,10 @@ watch(() => [form.winType, form.waitType], () => {
 }, { flush: 'sync' })
 
 watch(() => [form.winType, form.isClosed], () => { hasInteracted.value = true }, { flush: 'sync' })
+watch([form, entryMode, hasInteracted], persistSessionState, { deep: true, flush: 'post' })
 
 onMounted(() => {
+  restoreSessionState()
   window.visualViewport?.addEventListener('resize', updateKeyboardState)
   window.addEventListener('resize', updateKeyboardState)
 })
@@ -1294,6 +1322,7 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .payment-list p strong { font-size: 1rem; }
   .result-tsumo .payment-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; }
   .result-tsumo .payment-list h3 { display: none; }
+  .result-tsumo .pao-payment h3 { display: flex; grid-column: 1 / -1; }
   .result-tsumo .payment-list p { display: grid; justify-items: center; gap: 1px; padding: 2px 0; border: 0; font-size: .68rem; text-align: center; }
   .result-tsumo .payment-list p strong { font-size: 1rem; }
   .result-tsumo .payment-list p:only-of-type { grid-column: 1 / -1; }
@@ -1317,6 +1346,11 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .direct-field .stepper { justify-content: space-between; width: 100%; }
   .direct-field .stepper input { flex: 1; }
   .no-sets-confirm { min-height: 48px; align-items: center; }
+  .win-section .section-heading { margin-bottom: 9px; }
+  .win-section > .choice-row { margin-block: 6px; }
+  .win-section .hand-mode-row { margin-top: 9px; padding-top: 8px; }
+  .win-section .table-settings { margin-top: 9px; padding-top: 5px; }
+  .win-section .hand-help summary { min-height: 32px; }
   .yaku-grid { grid-template-columns: minmax(0, 1fr); }
   .yaku-copy strong { font-size: .94rem; }
   .yaku-copy small { font-size: .875rem; }

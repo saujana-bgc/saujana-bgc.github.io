@@ -62,7 +62,7 @@ const navigation = [
 const { lastUpdated } = useVersion()
 const route = useRoute()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
-const isRiichiCalculatorRoute = computed(() => route.path === '/riichi-calculator')
+const isRiichiCalculatorRoute = computed(() => route.path.replace(/\/+$/, '') === '/riichi-calculator')
 const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
 const showVisitorCounter = ref(false)
