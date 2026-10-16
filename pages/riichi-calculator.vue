@@ -540,7 +540,7 @@ const filteredYaku = computed(() => {
   const search = yakuSearch.value.trim().toLowerCase()
   return MANUAL_YAKU.filter(yaku => !search || `${yaku.name} ${yakuDisplayName(yaku)} ${yaku.detail} ${(yakuSearchAliases[yaku.id] ?? []).join(' ')}`.toLowerCase().includes(search))
 })
-const showTsumoSearchHelp = computed(() => /tsumo|self.?draw|menzen/i.test(yakuSearch.trim()) && automaticYaku.value.length === 0)
+const showTsumoSearchHelp = computed(() => /tsumo|self.?draw|menzen/i.test(yakuSearch.value.trim()) && automaticYaku.value.length === 0)
 const yakuByCategory = computed(() => Object.fromEntries(categories.map(category => [category.id, filteredYaku.value.filter(yaku => yaku.category === category.id)])) )
 const visibleCategories = computed(() => categories.filter(category => yakuByCategory.value[category.id]?.length))
 const automaticYaku = computed(() => isClosed.value && form.winType === 'tsumo' && !selectedYakuman.value.length
@@ -758,7 +758,7 @@ function yakuUnavailableReason(id) {
   if (!option) return null
   if (id === 'chiitoitsu' && form.handShape === 'kokushi') return 'Choose a standard hand before selecting Seven Pairs.'
   if (id === 'kokushi' && form.handShape === 'chiitoitsu') return 'Choose a standard hand before selecting Kokushi.'
-  return manualYakuUnavailableReason(id, { selectedYaku: form.selectedYaku, isClosed: isClosed.value, isDealer: isDealer.value, winType: form.winType, handShape: form.handShape })
+  return manualYakuUnavailableReason(id, { selectedYaku: form.selectedYaku, isClosed: isClosed.value, isDealer: isDealer.value, winType: form.winType, playerCount: form.playerCount, handShape: form.handShape })
 }
 
 function toggleYaku(id) {

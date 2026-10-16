@@ -65,7 +65,7 @@ export const MANUAL_YAKU: ManualYakuOption[] = [
   { id: "chinitsu", name: "Chinitsu", detail: "One suit, no honours", category: "suits", closedHan: 6, openHan: 5, incompatible: ["honitsu"] },
 
   { id: "tenhou", name: "Tenhou", detail: "Dealer wins on the opening draw", category: "yakuman", closedHan: 13, requiresClosed: true, winMethod: "tsumo", requiresDealer: true, yakuman: true, incompatible: ["suuankantsu", "riichi", "double-riichi", "ippatsu", "rinshan", "haitei"] },
-  { id: "chiihou", name: "Chiihou", detail: "Non-dealer wins on the first draw before any call", category: "yakuman", closedHan: 13, requiresClosed: true, winMethod: "tsumo", requiresDealer: false, yakuman: true, incompatible: ["suuankantsu", "rinshan", "haitei"] },
+  { id: "chiihou", name: "Chiihou", detail: "Non-dealer wins on the first draw before any call", category: "yakuman", closedHan: 13, requiresClosed: true, winMethod: "tsumo", requiresDealer: false, yakuman: true, incompatible: ["suuankantsu", "riichi", "double-riichi", "ippatsu", "rinshan", "haitei"] },
   { id: "kokushi", name: "Kokushi musou", detail: "Thirteen orphans; thirteen-sided wait is double", category: "yakuman", closedHan: 13, requiresClosed: true, yakuman: true, incompatible: ["suuankou", "daisangen", "shousangen", "daisuushi", "shousuushi", "suuankantsu", "sankantsu", "toitoi", "sanankou", "chiitoitsu"] },
   { id: "chuuren", name: "Chuuren poutou", detail: "Nine gates; pure nine-sided wait is double", category: "yakuman", closedHan: 13, requiresClosed: true, yakuman: true },
   { id: "ryuuiisou", name: "Ryuuiisou", detail: "All green tiles", category: "yakuman", closedHan: 13, openHan: 13, yakuman: true },
@@ -103,7 +103,7 @@ for (const [id, conflicts] of Object.entries(additionalYakuConflicts)) {
   }
 }
 
-type YakuAvailabilityInput = Pick<ManualScoreInput, "selectedYaku" | "isClosed" | "isDealer" | "winType" | "handShape">;
+type YakuAvailabilityInput = Pick<ManualScoreInput, "selectedYaku" | "isClosed" | "isDealer" | "winType" | "playerCount" | "handShape">;
 
 /** Keep picker guidance and scorer validation on the same yaku rules. */
 export function manualYakuUnavailableReason(id: string, input: YakuAvailabilityInput): string | null {
@@ -114,6 +114,9 @@ export function manualYakuUnavailableReason(id: string, input: YakuAvailabilityI
   }
   if (input.handShape === "chiitoitsu" && ["pinfu", "iipeiko", "ryanpeiko", "toitoi", "sanankou", "suuankou"].includes(id)) {
     return "This hand is set as Seven Pairs.";
+  }
+  if (input.playerCount === 3 && id === "sanshoku-doujun") {
+    return "Sanshoku doujun needs runs in all three suits, but three-player mahjong removes 2–8 man.";
   }
   if (option.requiresClosed && !input.isClosed) return `${option.name} requires a closed hand.`;
   if (option.winMethod && option.winMethod !== input.winType) {
@@ -294,7 +297,12 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (selected.has("ippatsu") && !selected.has("riichi") && !selected.has("double-riichi")) issues.push("Ippatsu requires riichi or double riichi.");
   if (selected.has("ippatsu") && (!input.isClosed || input.groups.some((group) => !group.concealed))) issues.push("Ippatsu requires a closed hand with no calls.");
   if (selected.has("double-riichi") && !input.isClosed) issues.push("Double riichi requires a closed hand.");
-  if ((selected.has("tenhou") || selected.has("chiihou")) && input.groups.length) issues.push("A first-draw yakuman cannot include a call or kan. Remove the entered groups.");
+  if ((selected.has("tenhou") || selected.has("chiihou")) && input.groups.some((group) => !group.concealed || group.type === "kan")) issues.push("A first-draw yakuman cannot include a call or kan. Remove the called groups and kans.");
+  if (selected.has("rinshan") && input.handShape !== "standard") issues.push("Rinshan requires a standard hand; Seven Pairs and Thirteen Orphans cannot contain a kan.");
+  if ((selected.has("kokushi") || selected.has("chiitoitsu") || selected.has("chuuren")) && input.groups.some((group) => group.type === "kan")) {
+    issues.push("This hand shape cannot contain a kan. Remove the kan or change the selected hand shape or yaku.");
+  }
+  if (selected.has("chuuren") && selected.has("rinshan")) issues.push("Nine Gates cannot include a kan or a Rinshan win.");
   if (needsGroupFu && selected.has("rinshan") && input.groups.every((group) => group.type !== "kan")) issues.push("Rinshan requires a kan in the winning hand.");
   if (selected.has("renhou") && input.winType !== "ron") issues.push("Renhou requires a ron win before your first draw.");
 
@@ -332,6 +340,7 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     if (input.pairChoice && !allowedPair) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} needs a terminal or honour pair. Choose a valid pair or deselect the yaku.`);
     const invalidGroup = input.groups.some((group) => selected.has("junchan") ? group.tileKind !== "terminal" : group.tileKind === "simple");
     if (invalidGroup) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} cannot include ${selected.has("junchan") ? "honour or simple" : "simple"} triplets and kans.`);
+    if (input.groups.length === 4) issues.push(`${selected.has("junchan") ? "Junchan" : "Chanta"} needs at least one run. Four entered triplets or kans leave no run.`);
   }
   if (selected.has("honroutou")) {
     if (input.pairChoice && !["terminal-number", "non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice)) issues.push("Honroutou needs a terminal or honour pair.");
@@ -344,6 +353,10 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (selected.has("tsuuiisou")) {
     if (input.pairChoice && !["non-value-wind", "dragon", "seat-wind", "round-wind", "double-wind"].includes(input.pairChoice)) issues.push("Tsuuiisou needs an honour pair.");
     if (input.groups.some((group) => group.tileKind !== "honor")) issues.push("Tsuuiisou cannot include suited tiles in its triplets and kans.");
+  }
+  const noRunPattern = ["toitoi", "honroutou", "chinroutou", "tsuuiisou"].some((id) => selected.has(id)) || isSevenPairs;
+  if (noRunPattern && input.waitType !== null && ["ryanmen", "penchan", "kanchan"].includes(input.waitType)) {
+    issues.push("This hand pattern has no runs, so it cannot use a run wait. Choose a pair or triplet wait.");
   }
   if (selected.has("ittsu") && input.groups.filter((group) => group.type === "triplet" || group.type === "kan").length > 1) {
     issues.push("Ittsuu needs three runs in one suit, so it can include at most one triplet or kan.");

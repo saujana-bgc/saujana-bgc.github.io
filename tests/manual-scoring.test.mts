@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { calculateManualHanFuScore, calculateManualScore, type ManualScoreInput } from '../utils/scoring/manual.ts'
+import { calculateManualHanFuScore, calculateManualScore, manualYakuUnavailableReason, type ManualScoreInput } from '../utils/scoring/manual.ts'
 
 function hand(overrides: Partial<ManualScoreInput> = {}): ManualScoreInput {
   return {
@@ -104,6 +104,17 @@ test('explicit tile and group details must fit selected yaku patterns', () => {
     selectedYaku: ['iipeiko'], ...pairAndWait, groups: [triplet(1), triplet(2), triplet(3)],
   }))
   assert.ok(impossibleIipeiko.issues.some(issue => /Iipeikou needs two identical runs/.test(issue)))
+
+  const impossibleFourTripletJunchan = calculateManualScore(hand({
+    selectedYaku: ['junchan'], pairChoice: 'terminal-number', pairFu: 0, pairIsValue: false,
+    groups: [triplet(1, 'terminal'), triplet(2, 'terminal'), triplet(3, 'terminal'), triplet(4, 'terminal')],
+  }))
+  assert.ok(impossibleFourTripletJunchan.issues.some(issue => /Junchan needs at least one run/.test(issue)))
+
+  const impossibleHonroutouWait = calculateManualScore(hand({
+    selectedYaku: ['honroutou'], pairChoice: 'terminal-number', waitType: 'ryanmen',
+  }))
+  assert.ok(impossibleHonroutouWait.issues.some(issue => /cannot use a run wait/.test(issue)))
 })
 
 test('first-draw yakuman cannot stack with four kans, while Kokushi supports compatible selections', () => {
@@ -118,12 +129,48 @@ test('first-draw yakuman cannot stack with four kans, while Kokushi supports com
   }))
   assert.ok(tenhouRiichi.issues.some(issue => /Tenhou cannot be scored alongside Riichi/.test(issue)))
 
+  const chiihouRiichi = calculateManualScore(hand({
+    selectedYaku: ['chiihou', 'double-riichi', 'ippatsu'], isDealer: false, winType: 'tsumo',
+  }))
+  assert.ok(chiihouRiichi.issues.some(issue => /Chiihou cannot be scored alongside Double riichi/.test(issue)))
+
   const kokushiChiihou = calculateManualScore(hand({
-    selectedYaku: ['kokushi', 'chiihou', 'double-riichi', 'ippatsu'], handShape: 'kokushi', winType: 'tsumo',
+    selectedYaku: ['kokushi', 'chiihou'], handShape: 'kokushi', isDealer: false, winType: 'tsumo',
   }))
   assert.deepEqual(kokushiChiihou.issues, [])
   assert.equal(kokushiChiihou.yakumanUnits, 2)
   assert.equal(kokushiChiihou.points, 64000)
+})
+
+test('special hands reject incompatible kans and Rinshan while first-draw hands allow concealed triplets', () => {
+  const kan = { id: 1, type: 'kan' as const, tileKind: 'simple' as const, concealed: true, completedByRon: false }
+  const triplet = { ...kan, type: 'triplet' as const }
+
+  for (const selectedYaku of [['chiitoitsu', 'rinshan'], ['kokushi', 'rinshan'], ['chuuren', 'rinshan']]) {
+    const handShape = selectedYaku.includes('chiitoitsu') ? 'chiitoitsu' as const : selectedYaku.includes('kokushi') ? 'kokushi' as const : 'standard' as const
+    const result = calculateManualScore(hand({ selectedYaku, handShape, winType: 'tsumo', groups: [kan], bonusHan: { dora: 4, nuki: 0 } }))
+    assert.ok(result.issues.length > 0, selectedYaku.join(', '))
+    assert.equal(result.points, 0, selectedYaku.join(', '))
+  }
+
+  const nineGatesWithKan = calculateManualScore(hand({
+    selectedYaku: ['chuuren'], groups: [kan], bonusHan: { dora: 4, nuki: 0 },
+  }))
+  assert.ok(nineGatesWithKan.issues.some(issue => /cannot contain a kan/.test(issue)))
+
+  const tenhouConcealedTriplet = calculateManualScore(hand({
+    selectedYaku: ['tenhou'], isDealer: true, winType: 'tsumo', groups: [triplet],
+  }))
+  assert.deepEqual(tenhouConcealedTriplet.issues, [])
+  assert.equal(tenhouConcealedTriplet.points, 48000)
+})
+
+test('Sanshoku doujun is unavailable in three-player mode in the picker and scorer', () => {
+  const input = hand({ selectedYaku: ['sanshoku-doujun'], playerCount: 3 })
+  assert.match(manualYakuUnavailableReason('sanshoku-doujun', input) ?? '', /three-player mahjong/)
+  const result = calculateManualScore(input)
+  assert.ok(result.issues.some(issue => /three-player mahjong/.test(issue)))
+  assert.equal(result.points, 0)
 })
 
 test('automatic Menzen Tsumo counts as a yaku and dealer payments include honba', () => {
