@@ -15,8 +15,9 @@
             <strong>{{ formatPoints(result.points) }}</strong>
           </div>
           <div v-if="!resultReady" class="result-empty">
-            <p>{{ hasInteracted && entryMode === 'hanfu' && directEntryIssue ? 'Check the hand value below.' : hasInteracted ? nextStepLabel : (entryMode === 'yaku' ? 'Choose how you want to enter the hand.' : 'Enter han and fu to see the payment.') }}</p>
-            <button v-if="hasInteracted && entryMode === 'yaku'" type="button" class="next-step-button" @click="jumpToNextIssue">Go to next step</button>
+            <p>{{ hasInteracted && entryMode === 'hanfu' && directEntryIssue ? 'Review the highlighted hand value.' : hasInteracted ? nextStepLabel : (entryMode === 'yaku' ? 'Choose how you want to enter the hand.' : 'Enter han and fu to see the payment.') }}</p>
+            <button v-if="hasInteracted && entryMode === 'hanfu' && directEntryIssue" type="button" class="next-step-button" @click="jumpToNextIssue">Review hand value</button>
+            <button v-else-if="hasInteracted && entryMode === 'yaku'" type="button" class="next-step-button" @click="jumpToNextIssue">Go to next step</button>
           </div>
 
           <template v-if="resultReady">
@@ -47,7 +48,7 @@
           <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect 5 han and above.</p></div></div>
           <div class="direct-fields">
             <div class="direct-field"><label for="direct-han">Total han</label><p class="field-hint">{{ form.directHan ? 'Include yaku and bonus han' : 'Tap + or enter the total han' }}</p><div class="stepper" role="group" aria-label="Total han"><button type="button" aria-label="Remove one han" :disabled="form.directHan <= 0" @click="adjustDirect('directHan', -1)">−</button><input id="direct-han" ref="directHanInput" v-model.number="form.directHan" type="number" inputmode="numeric" min="0" max="99" @change="sanitizeDirect('directHan', 99)" /><button type="button" aria-label="Add one han" @click="adjustDirect('directHan', 1, 99)">+</button></div></div>
-            <div v-if="form.directHan > 0 && form.directHan < 5" class="direct-field"><label for="direct-fu">Fu</label><p class="field-hint">Choose the rounded fu total</p><select id="direct-fu" v-model.number="form.directFu"><option v-if="!directFuOptions.includes(form.directFu)" :value="form.directFu">{{ form.directFu }} fu · check selection</option><option v-for="fu in directFuOptions" :key="fu" :value="fu">{{ fu }} fu</option></select></div>
+            <div v-if="form.directHan > 0 && form.directHan < 5" class="direct-field"><label for="direct-fu">Fu</label><p class="field-hint">Choose the rounded fu total</p><select id="direct-fu" ref="directFuInput" v-model.number="form.directFu"><option v-if="!directFuOptions.includes(form.directFu)" :value="form.directFu">{{ form.directFu }} fu · check selection</option><option v-for="fu in directFuOptions" :key="fu" :value="fu">{{ fu }} fu</option></select></div>
           </div>
           <div v-if="form.directHan > 0 && form.directHan < 5 && [20, 25].includes(form.directFu)" class="direct-closed-control">
             <span class="field-label">Is the hand closed?</span>
@@ -88,7 +89,7 @@
             </div>
             <div v-if="!form.isClosed && !form.groups.some(group => !group.concealed) && selectedYakuOptions.some(yaku => yaku.requiresClosed)" class="closed-hand-correction">
               <p class="field-hint">If this was your only call and you have no open runs, mark the hand closed to score this yaku.</p>
-              <button type="button" class="choice-button" @click="form.isClosed = true">Mark hand closed</button>
+              <button ref="closedHandCorrection" type="button" class="choice-button" @click="form.isClosed = true">Mark hand closed</button>
             </div>
             <details class="hand-help"><summary>What makes a hand open?</summary><p>Chi, pon or an open kan makes the hand open. A concealed kan stays closed. Closed tsumo adds Menzen tsumo automatically; open tsumo needs another yaku.</p></details>
           </template>
@@ -427,6 +428,8 @@ const specialWaitSection = ref(null)
 const bonusSection = ref(null)
 const honbaSection = ref(null)
 const directHanInput = ref(null)
+const directFuInput = ref(null)
+const closedHandCorrection = ref(null)
 const keyboardOpen = ref(false)
 let groupId = 0
 let nextIssueHighlightTimer
@@ -578,7 +581,8 @@ const fieldIssues = computed(() => {
   return fields
 })
 const nextIssueTarget = computed(() => {
-  if (entryMode.value === 'hanfu') return { label: directEntryIssue.value || 'Enter han and fu', target: null }
+  if (entryMode.value === 'hanfu') return { label: directEntryIssue.value || 'Enter han and fu', target: directFuInput.value ?? directHanInput.value }
+  if (fieldIssues.value.yaku.some(issue => /requires a closed hand/i.test(issue)) && closedHandCorrection.value) return { label: 'Mark the hand closed', target: closedHandCorrection.value }
   if (fieldIssues.value.yaku.length || (form.selectedYaku.length === 0 && automaticYaku.value.length === 0)) return { label: 'Choose or fix a yaku', target: yakuSection.value }
   if (needsWindsConfirmation.value) return { label: 'Confirm the seat and round winds', target: needsYakuWindConfirmation.value ? yakuSection.value : pairSection.value }
   if (fieldIssues.value.special.length) return { label: 'Check the special wait', target: specialWaitSection.value }
@@ -1158,6 +1162,8 @@ watch(() => yakuSearch.value.trim(), (search, previousSearch) => {
   .direct-field .stepper input { flex: 1; }
   .no-sets-confirm { min-height: 48px; align-items: center; }
   .yaku-grid { grid-template-columns: minmax(0, 1fr); }
+  .yaku-copy strong { font-size: .94rem; }
+  .yaku-copy small { font-size: .875rem; }
   .fu-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .win-section, .fu-field, .variant-panel, .section-heading[tabindex], .calc-section[tabindex], .honba-control { scroll-margin-top: 92px; }
   .bonus-grid { grid-template-columns: minmax(0, 1fr); }
