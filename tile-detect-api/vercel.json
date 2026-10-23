@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "functions": {
+    "api/detect.js": {
+      "memory": 1024,
+      "maxDuration": 60,
+      "includeFiles": "tile-model.onnx"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/detect",
+      "destination": "/api/detect.js"
+    }
+  ]
+}

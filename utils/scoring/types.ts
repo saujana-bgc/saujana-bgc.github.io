@@ -1,0 +1,239 @@
+// ─── Tiles ────────────────────────────────────────────────────────────────────
+
+export type Suit = "man" | "pin" | "sou";
+export type SuitedValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export type WindValue = "east" | "south" | "west" | "north";
+export type DragonValue = "haku" | "hatsu" | "chun";
+export type HonorValue = WindValue | DragonValue;
+
+export interface SuitedTile {
+  suit: Suit;
+  value: SuitedValue;
+  isAka?: boolean; // aka dora (red 5)
+}
+
+export interface HonorTile {
+  suit: "honor";
+  value: HonorValue;
+}
+
+export type Tile = SuitedTile | HonorTile;
+
+// Dora indicator → dora resolution order (single source of truth)
+// Wind: east→south→west→north→east (wraps)
+export const WIND_DORA_ORDER: WindValue[] = ["east", "south", "west", "north"];
+// Dragon: haku→hatsu→chun→haku (wraps)
+export const DRAGON_DORA_ORDER: DragonValue[] = ["haku", "hatsu", "chun"];
+
+// ─── Melds ────────────────────────────────────────────────────────────────────
+
+export type MeldType =
+  | "chi"         // open sequence (left player only)
+  | "pon"         // open triplet
+  | "kan-open"    // open quad (called from discard)
+  | "kan-closed"  // closed quad (self-drawn, hand stays concealed)
+  | "kan-added";  // extended pon → quad
+
+export interface Meld {
+  type: MeldType;
+  tiles: [Tile, Tile, Tile] | [Tile, Tile, Tile, Tile];
+  /** Position of the discard within an open meld; absent for a concealed kan.
+   *  tiles[calledTileIndex] is the tile claimed from another player, the rest
+   *  were taken from the winner's hand (a concealed kan is all held tiles). */
+  calledTileIndex?: number;
+  /** Direction the claim came from; display metadata only, never used by scoring. */
+  calledFrom?: "left" | "opposite" | "right";
+}
+
+// ─── Hand input ───────────────────────────────────────────────────────────────
+
+export interface Hand {
+  closedTiles: Tile[];       // tiles in hand (not including winningTile for ron)
+  melds: Meld[];
+  winningTile: Tile;
+  winType: "tsumo" | "ron";
+
+  // Dealer derived solely from seatWind === 'east'; no separate dealer field
+  seatWind: WindValue;
+  roundWind: WindValue;
+
+  doraIndicators: Tile[];
+  uraDoraIndicators?: Tile[]; // only revealed with riichi
+  /** North tiles declared as nuki dora in sanma (0-4). Ignored in yonma. */
+  nukiDoraCount?: number;
+  /** Kans declared by opponents before the win (for first-draw yaku validation). */
+  opponentKanCount?: number;
+  /** Optional total bonus han, used when the player enters the total directly. */
+  bonusHanOverride?: number;
+  /**
+   * Seat of the player responsible for the winner's Daisangen/Daisuushii
+   * (pao). Present only when the winner claims pao; the engine still applies
+   * it only when one of those yakuman actually scores.
+   */
+  paoResponsibleSeat?: WindValue;
+  /**
+   * Seat of the player who discarded the winning tile (ron). Required for a
+   * pao ron so the payment can be split when the discarder is not the
+   * responsible player.
+   */
+  ronDiscarderSeat?: WindValue;
+
+  // Situational flags
+  riichi: boolean;
+  doubleRiichi: boolean;
+  ippatsu: boolean;
+  haitei: boolean;   // tsumo on the last draw
+  houtei: boolean;   // ron on the last discard
+  rinshan: boolean;  // win after kan supplemental draw
+  chankan: boolean;  // win by stealing a pon→kan extension
+  renho?: boolean;   // non-dealer wins on first round of discards (Hand of Man)
+  openingWin?: "tenhou" | "chiihou"; // first-draw self-draw before any call or kan
+
+  /** Honba sticks in play: ron +300/honba, tsumo +100 per paying player */
+  honba?: number;
+}
+
+// ─── Score result ─────────────────────────────────────────────────────────────
+
+export interface Yaku {
+  name: string;      // English identifier, e.g. "riichi"
+  nameJa: string;    // Japanese name, e.g. "立直"
+  detail?: string;   // specific value/role, e.g. "East (round wind)"
+  han: number;       // closed han value; 0 for dora (counted separately)
+  isYakuman: boolean;
+}
+
+export interface FuBreakdown {
+  base: number;     // 30 normal, 25 chiitoitsu (chiitoitsu: all others are 0), 20 pinfu tsumo
+  pairFu: number;   // 0, 2, 4, 8 depending on pair tile and rules
+  meldFu: number;   // sum of all meld fu
+  waitFu: number;   // 0 or 2 (kanchan/penchan/tanki = 2, ryanmen/shanpon = 0)
+  tsumoFu: number;  // 2 for tsumo (0 for pinfu tsumo, 0 for ron)
+  total: number;    // rounded up to nearest 10
+}
+
+export interface TsumoPayment {
+  dealerPays: number;    // what the dealer pays (non-dealer tsumo)
+  nonDealerPays: number; // what each non-dealer pays
+}
+
+export interface PointsBreakdown {
+  total: number;
+  /** Per-seat tsumo amounts; with pao, these are the remaining opponents' amounts after liability is redirected. */
+  tsumo?: TsumoPayment;
+  ron?: number;         // present when winType === 'ron'
+  /**
+   * Amount the pao-responsible player pays. For a pao tsumo — or a pao ron
+   * where the responsible player is also the discarder — this is the full
+   * winning amount; for a split pao ron it is the responsible player's half.
+   */
+  responsiblePays?: number;
+  /** Amount the discarder pays when a pao ron splits the payment between the responsible player and the discarder. */
+  discarderPays?: number;
+  /** Aggregate tsumo amount paid by opponents other than the pao-responsible player. */
+  otherPlayersPay?: number;
+}
+
+// Named hand thresholds
+export type HandName =
+  | "mangan"       // 5 han (or 4h30f / 3h60f with kiriage), 8000 basic
+  | "haneman"      // 6–7 han, 12000 basic
+  | "baiman"       // 8–10 han, 16000 basic
+  | "sanbaiman"    // 11–12 han, 24000 basic
+  | "yakuman"      // 13+ han or yakuman, 32000 basic
+  | "kazoe-yakuman"; // 13+ counted han (not yakuman by name)
+
+export interface ScoreResult {
+  valid: boolean;
+  error?: string;
+
+  yaku: Yaku[];
+  totalHan: number;  // yaku han only (excludes dora)
+  fu: number;        // rounded fu
+  fuBreakdown: FuBreakdown;
+
+  doraCount: number;     // dora from visible indicators
+  akaDoraCount: number;  // red-five dora
+  uraDoraCount: number;
+  nukiDoraCount: number;
+
+  points: PointsBreakdown;
+  handName?: HandName;
+}
+
+// ─── Local yaku config ────────────────────────────────────────────────────────
+
+export interface LocalYakuConfig {
+  /** 人和 - Non-dealer wins on first round of discards before their draw (5 han) */
+  renho: boolean;
+  /** 一筒摸月 - Win by tsumo on 1-pin (1 han) */
+  iipinmoyue: boolean;
+  /** 九筒撈魚 - Win by ron on 9-pin (1 han) */
+  chuupinraoyui: boolean;
+  /** 大車輪 - 22334455667788 all circles (yakuman, chiitoitsu form) */
+  daisharin: boolean;
+  /** 大七星 - Seven pairs of all different honor tiles (yakuman) */
+  daishichi: boolean;
+  /** 三連刻 - Three triplets of consecutive values in same suit (2 han) */
+  sanrenkou: boolean;
+  /** 四連刻 - Four triplets of consecutive values in same suit (yakuman) */
+  suurenkou: boolean;
+  /** 五門斉 - All five categories present: man, pin, sou, wind, dragon (2 han) */
+  uumensai: boolean;
+  /** 一色三順 - Same three-tile sequence three times in one suit (1 han open, 2 han closed) */
+  iisousanjun: boolean;
+}
+
+export const DEFAULT_LOCAL_YAKU: LocalYakuConfig = {
+  renho: false,
+  iipinmoyue: false,
+  chuupinraoyui: false,
+  daisharin: false,
+  daishichi: false,
+  sanrenkou: false,
+  suurenkou: false,
+  uumensai: false,
+  iisousanjun: false,
+};
+
+// ─── Rules config ─────────────────────────────────────────────────────────────
+
+export interface RulesConfig {
+  /** Open tanyao (default: true - WRC/Mahjong Soul) */
+  kuitan: boolean;
+
+  /** 4h30f or 3h60f rounds up to mangan (default: false - WRC/Mahjong Soul; on for Tenhou / many club tables) */
+  kiriagemangan: boolean;
+
+  /** Double yakuman for certain yakuman hands (default: false - treat as single) */
+  doubleYakuman: boolean;
+
+  /**
+   * Fu value for a pair of double-wind tiles (seat === round wind).
+   * WRC: 2 (each pair = 2 fu, no stacking). Mahjong Soul: 4.
+   * Default: 4 (Mahjong Soul default).
+   */
+  doubleWindPairFu: 2 | 4;
+
+  /**
+   * Number of aka dora (red 5s) in the game set.
+   * 0 = no aka dora, 2 = sanma (two red fives), 3 = one per suit (standard), 4 = extra man aka.
+   * Default: 3 (2 for three-player games).
+   */
+  akaDoraCount: 0 | 2 | 3 | 4;
+
+  /** Number of players at the table - affects tsumo payment structure (default: 4) */
+  playerCount?: 3 | 4;
+
+  /** Optional local/house yaku - all disabled by default */
+  localYaku?: LocalYakuConfig;
+}
+
+export const DEFAULT_RULES: RulesConfig = {
+  kuitan: true,
+  kiriagemangan: false,
+  doubleYakuman: false,
+  doubleWindPairFu: 4,
+  akaDoraCount: 3,
+  localYaku: DEFAULT_LOCAL_YAKU,
+};

@@ -1,0 +1,22 @@
+{
+  "name": "tile-detect-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "onnxruntime-node": "^1.29.0",
+    "sharp": "^0.34.0"
+  },
+  "scripts": {
+    "test": "tsx test-onnx.mts",
+    "test:unit": "tsx --test test-onnx.mts",
+    "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File ./deploy.ps1"
+  },
+  "devDependencies": {
+    "@vercel/node": "^5.0.0",
+    "tsx": "^4.0.0"
+  }
+}

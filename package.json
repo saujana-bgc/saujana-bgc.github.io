@@ -1,0 +1,22 @@
+{
+  "name": "saujana-bgc-nuxt",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "node -e \"require('fs').writeFileSync('public/version.json', JSON.stringify({v: Date.now()}))\" && nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test": "tsx --test tests/*.test.mts"
+  },
+  "dependencies": {
+    "dompurify": "3.4.17",
+    "marked": "18.1.1",
+    "nuxt": "^4.6.2"
+  },
+  "devDependencies": {
+    "supabase": "^2.119.0",
+    "tsx": "^4.0.0"
+  }
+}
