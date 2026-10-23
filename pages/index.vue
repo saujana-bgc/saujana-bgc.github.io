@@ -129,7 +129,7 @@
 import { instagramData } from '~/assets/data/instagram_data.js'
 
 useHead({
-  title: 'Saujana Board Game Community | Pull up a chair',
+  title: 'Saujana Board Game Community',
   meta: [{ name: 'description', content: 'Come on your own or bring a friend. Find a Saujana board game gathering, explore the collection, and learn a new game with good company.' }],
 })
 
