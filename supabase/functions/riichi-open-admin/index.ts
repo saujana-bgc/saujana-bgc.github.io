@@ -151,13 +151,17 @@ Deno.serve(async (request) => {
     }
 
     if(body.action==='export'){
-      const [registrations,participants,results]=await Promise.all([
-        client.from('riichi_open_registrations').select('display_name,status,submitted_at,verified_at').eq('event_id',event.id),
-        client.from('riichi_open_participants').select('display_name,checked_in,active,is_substitute,eligible_for_final').eq('event_id',event.id),
+      const [registrations,participants,rounds,tables,seats,results,penalties]=await Promise.all([
+        client.from('riichi_open_registrations').select('id,display_name,status,submitted_at,verified_at').eq('event_id',event.id),
+        client.from('riichi_open_participants').select('id,registration_id,display_name,checked_in,active,is_substitute,eligible_for_final,qualification_seed,source').eq('event_id',event.id),
+        client.from('riichi_open_rounds').select('id,round_key,status,draft_revision,expected_tables,started_at,certified_at,certified_by').eq('event_id',event.id).order('round_key'),
+        client.from('riichi_open_tables').select('id,round_id,table_number,unclaimed_sticks,published').eq('event_id',event.id).order('table_number'),
+        client.from('riichi_open_seats').select('round_id,table_id,participant_id,seat_wind').eq('event_id',event.id),
         client.from('riichi_open_results').select('round_id,table_id,participant_id,raw_points,placement,uma,score').eq('event_id',event.id),
+        client.from('riichi_open_penalties').select('round_id,participant_id,points,reason,recorded_by,created_at').eq('event_id',event.id),
       ])
-      if(registrations.error||participants.error||results.error) throw registrations.error||participants.error||results.error
-      return reply(request,200,{registrations:registrations.data,participants:participants.data,results:results.data})
+      for(const result of [registrations,participants,rounds,tables,seats,results,penalties]) if(result.error) throw result.error
+      return reply(request,200,{event:{id:event.id,slug:event.slug,name:event.name,event_date:event.event_date,timezone:event.timezone,venue:event.venue,capacity:event.capacity,stage:event.stage},registrations:registrations.data,participants:participants.data,rounds:rounds.data,tables:tables.data,seats:seats.data,results:results.data,penalties:penalties.data})
     }
 
     return reply(request,400,{error:'Unknown organiser action.'})

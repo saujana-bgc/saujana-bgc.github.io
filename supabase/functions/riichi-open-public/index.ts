@@ -29,7 +29,11 @@ Deno.serve(async (request) => {
       const token = String(body.token ?? '')
       const idem = String(body.idempotency_key ?? '')
       if (token.length < 40 || token.length > 120 || idem.length < 20 || idem.length > 100) return reply(request,400,{error:'Refresh the page and try again.'})
-      const { data, error } = await client.rpc('reserve_riichi_open_place',{p_token_hash:await hashText(token),p_idempotency_key:idem})
+      const forwarded = request.headers.get('cf-connecting-ip') ?? request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim() ?? ''
+      if (!forwarded || forwarded.length > 64 || !/^[0-9a-f:.]+$/i.test(forwarded)) return reply(request,400,{error:'Your network address could not be checked. Please try again.'})
+      const clientFingerprint = await hashText(forwarded.toLowerCase())
+      const { data, error } = await client.rpc('reserve_riichi_open_place',{p_token_hash:await hashText(token),p_idempotency_key:idem,p_client_fingerprint:clientFingerprint})
+      if (error?.message.toLowerCase().includes('reservation rate limit')) return reply(request,429,{error:'Too many places have been reserved from this network. Please wait 30 minutes before trying again.'})
       if (error) throw new Error(error.message.includes('All places') ? 'All 16 places are currently reserved.' : error.message)
       const hold = data as {id:string;expires_at:string}
       const { data: completed } = await client.from('riichi_open_registrations').select('id,status').eq('hold_id',hold.id).maybeSingle()
