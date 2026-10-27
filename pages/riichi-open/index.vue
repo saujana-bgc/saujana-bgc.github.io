@@ -60,16 +60,25 @@
 
     <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The four highest eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><button ref="guideTrigger" type="button" class="guide-trigger" @click="openGuide">Read the tournament guide <span aria-hidden="true">↗</span></button></section>
 
-    <dialog ref="guideDialog" class="guide-dialog" aria-labelledby="guide-title" aria-describedby="guide-description" @click="closeGuideFromBackdrop" @close="restoreGuideFocus">
+    <dialog ref="guideDialog" class="guide-dialog" aria-label="Riichi Open I tournament rules" @click="closeGuideFromBackdrop" @close="restoreGuideFocus">
       <div class="guide-shell">
-        <div class="guide-topbar"><span><i aria-hidden="true"></i> SAUJANA · RIICHI OPEN I</span><button type="button" class="guide-close" aria-label="Close tournament guide" @click="closeGuide">×</button></div>
-        <header class="guide-header"><p class="eyebrow">Tournament guide</p><h2 id="guide-title">Know the rules.<br><em>Enjoy the game.</em></h2><p id="guide-description">The complete event guide, with Riichi Open arrangements and WRC 2025 gameplay rules.</p><div class="guide-chips"><span>2 qualifying hanchans</span><span>Top 4 final</span><span>30,000 starting points</span></div></header>
-        <div class="guide-reader" aria-live="polite">
-          <p v-if="guideLoading" class="guide-state">Opening the guide…</p>
-          <div v-else-if="guideError" class="guide-state guide-error"><p>{{ guideError }}</p><button type="button" class="guide-retry" @click="loadGuide">Try again</button></div>
-          <article v-else class="guide-content" v-html="guideHtml"></article>
+        <div class="guide-topbar"><span><i aria-hidden="true"></i> RIICHI OPEN I · TOURNAMENT RULES</span><button type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</button></div>
+        <div class="guide-body">
+          <aside class="guide-toc" aria-label="Rules sections">
+            <details>
+              <summary>Jump to section</summary>
+              <nav aria-label="Jump to a rules section">
+                <button v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</button>
+              </nav>
+            </details>
+          </aside>
+          <div ref="guideReader" class="guide-reader" tabindex="-1" aria-live="polite">
+            <p v-if="guideLoading" class="guide-state">Opening the guide…</p>
+            <div v-else-if="guideError" class="guide-state guide-error"><p>{{ guideError }}</p><button type="button" class="guide-retry" @click="loadGuide">Try again</button></div>
+            <article v-else class="guide-content" v-html="guideHtml"></article>
+            <footer v-if="!guideLoading && !guideError && guideMarkdown" class="guide-footer"><span>Gameplay follows WRC Rules 2025 and its official clarification.</span><button type="button" @click="closeGuide">Back to event</button></footer>
+          </div>
         </div>
-        <footer class="guide-footer"><span>Gameplay follows WRC Rules 2025 and its official clarification.</span><button type="button" @click="closeGuide">Back to event</button></footer>
       </div>
     </dialog>
     </section>
@@ -103,6 +112,8 @@ watch(activeTab, tab => {
 const { callPublic } = useRiichiOpen()
 const guideDialog = ref(null)
 const guideTrigger = ref(null)
+const guideReader = ref(null)
+const guideScrollTop = ref(0)
 const posterDialog = ref(null)
 const guideMarkdown = ref('')
 const guideLoading = ref(false)
@@ -111,11 +122,22 @@ const guideHtml = computed(() => {
   if (!guideMarkdown.value) return ''
   const parsed = DOMPurify.sanitize(marked.parse(guideMarkdown.value, { async: false, gfm: true }))
   const document = new DOMParser().parseFromString(parsed, 'text/html')
+  for (const heading of document.body.querySelectorAll('h2')) {
+    heading.id = `guide-${heading.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
+  }
   for (const link of document.body.querySelectorAll('a')) {
     link.target = '_blank'
     link.rel = 'noopener noreferrer'
   }
   return DOMPurify.sanitize(document.body.innerHTML)
+})
+const guideSections = computed(() => {
+  if (!guideMarkdown.value) return []
+  return [...guideMarkdown.value.matchAll(/^##\s+(.+)$/gm)].map((match) => {
+    const title = match[1].replace(/\s+#+\s*$/, '').replace(/\*\*/g, '').trim()
+    const id = `guide-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
+    return { id, title }
+  })
 })
 const event = ref(null)
 const registrations = ref([])
@@ -174,6 +196,7 @@ async function goToRegistration() { activeTab.value = 'registration'; await next
 function openGuide(event) {
   guideReturnFocus = event?.currentTarget ?? guideTrigger.value
   if (!guideDialog.value?.open) guideDialog.value?.showModal()
+  nextTick(() => { if (guideReader.value) guideReader.value.scrollTop = guideScrollTop.value })
   if (!guideMarkdown.value) loadGuide()
 }
 
@@ -193,7 +216,16 @@ async function loadGuide() {
 
 function closeGuide() { guideDialog.value?.close() }
 function closeGuideFromBackdrop(event) { if (event.target === guideDialog.value) closeGuide() }
-function restoreGuideFocus() { guideReturnFocus?.focus() }
+function restoreGuideFocus() { guideScrollTop.value = guideReader.value?.scrollTop ?? guideScrollTop.value; guideReturnFocus?.focus() }
+function jumpToGuideSection(id) {
+  const heading = guideReader.value?.querySelector(`#${CSS.escape(id)}`)
+  if (!heading || !guideReader.value) return
+  const reader = guideReader.value
+  const top = reader.scrollTop + heading.getBoundingClientRect().top - reader.getBoundingClientRect().top - 12
+  reader.scrollTo({ top, behavior: 'smooth' })
+  guideScrollTop.value = top
+  if (window.matchMedia('(max-width: 760px)').matches) guideReader.value.closest('.guide-body')?.querySelector('.guide-toc details')?.removeAttribute('open')
+}
 function openPoster(event) { posterReturnFocus=event.currentTarget;posterDialog.value?.showModal() }
 function closePoster() { posterDialog.value?.close() }
 function closePosterFromBackdrop(event) { if (event.target === posterDialog.value) closePoster() }
@@ -428,35 +460,38 @@ async function cancelHold() {
 .format-strip .guide-trigger{grid-column:2;justify-self:start;border:0;padding:0;background:none;color:var(--matcha-leaf);font:650 .95rem 'Segoe UI',sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 .guide-trigger span{display:inline-block;margin-left:5px;color:var(--gold-leaf);transition:transform .18s ease}
 .guide-trigger:hover span{transform:translate(3px,-2px)}
-.guide-trigger:focus-visible,.guide-close:focus-visible,.guide-footer button:focus-visible,.guide-retry:focus-visible{outline:3px solid #bc9d60;outline-offset:3px}
-.guide-dialog{width:min(920px,calc(100% - 24px));max-width:920px;height:min(88dvh,940px);max-height:calc(100dvh - 24px);padding:0;border:1px solid #d8d5c8;border-radius:18px;background:transparent;color:var(--clay-text);box-shadow:0 28px 100px #111a1280;overflow:hidden}
+.guide-trigger:focus-visible,.guide-close:focus-visible,.guide-footer button:focus-visible,.guide-retry:focus-visible,.guide-toc button:focus-visible,.guide-toc summary:focus-visible{outline:3px solid #bc9d60;outline-offset:3px}
+.guide-dialog{width:min(1200px,calc(100% - 32px));max-width:1200px;height:min(94dvh,1040px);max-height:calc(100dvh - 32px);padding:0;border:1px solid #d8d5c8;border-radius:14px;background:transparent;color:var(--clay-text);box-shadow:0 28px 100px #111a1280;overflow:hidden}
 .guide-dialog::backdrop{background:#18241bcc;backdrop-filter:blur(5px)}
 .guide-shell{height:100%;display:flex;flex-direction:column;background:#fbfaf6}
-.guide-topbar{display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;padding:13px 21px;background:#354c3e;color:#f8f6ed;font-size:.67rem;letter-spacing:.13em}
+.guide-topbar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;padding:8px 20px;background:#354c3e;color:#f8f6ed;font-size:.67rem;letter-spacing:.1em}
 .guide-topbar>span{display:flex;align-items:center;gap:10px}.guide-topbar i{width:8px;height:8px;border-radius:50%;background:#d6be7e;box-shadow:0 0 0 4px #ffffff18}
-.guide-close{width:34px;height:34px;border:1px solid #ffffff50;border-radius:50%;background:#ffffff12;color:white;font:1.5rem/1 'Segoe UI',sans-serif;cursor:pointer}
-.guide-header{flex:0 0 auto;padding:clamp(24px,5vw,44px) clamp(22px,6vw,60px) 24px;background:radial-gradient(ellipse at 90% 0,#ece8d8 0,transparent 48%);border-bottom:1px solid #e5e1d5}
-.guide-header .eyebrow{margin:0 0 10px}.guide-header h2{margin:0;color:var(--matcha-leaf);font:400 clamp(2rem,5vw,3.35rem)/1.08 var(--font-display);letter-spacing:-.025em}.guide-header h2 em{color:var(--gold-leaf);font-weight:400}
-.guide-header>p:last-of-type{max-width:610px;margin:12px 0 0;color:#6c7066;font-size:.9rem;line-height:1.65}
-.guide-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.guide-chips span{padding:7px 10px;border:1px solid #dbd6c6;border-radius:99px;background:#ffffffbd;color:#475447;font-size:.68rem;font-weight:650}
-.guide-reader{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;padding:clamp(22px,5vw,50px) clamp(22px,6vw,60px);scrollbar-color:#c9c2ae transparent;scrollbar-width:thin}
+.guide-close{display:grid;place-items:center;width:38px;height:38px;border:1px solid #ffffff50;border-radius:50%;background:#ffffff12;color:white;font:1.5rem/1 'Segoe UI',sans-serif;cursor:pointer}
+.guide-body{display:flex;flex:1 1 auto;min-height:0}
+.guide-toc{flex:0 0 225px;overflow:auto;border-right:1px solid #e5e1d5;background:#f5f3ec;padding:22px 12px;scrollbar-color:#c9c2ae transparent;scrollbar-width:thin}
+.guide-toc details:not([open]) nav{display:block}
+.guide-toc summary{display:none}
+.guide-toc nav{display:grid;gap:3px}
+.guide-toc nav button{border:0;border-radius:5px;background:transparent;color:#4d594c;padding:9px 10px;text-align:left;font:400 .82rem/1.4 'Segoe UI',sans-serif;cursor:pointer}
+.guide-toc nav button:hover{background:#e9e7dc;color:#354c3e}
+.guide-reader{flex:1 1 auto;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;padding:clamp(24px,4vw,48px) clamp(24px,5vw,64px);scrollbar-color:#c9c2ae transparent;scrollbar-width:thin;scroll-behavior:smooth}
 .guide-state{min-height:120px;display:grid;place-content:center;text-align:center;color:#73776f;line-height:1.65}.guide-error{color:#913f45}.guide-error p{margin:0}.guide-retry{justify-self:center;margin-top:10px;border:1px solid #a9884d;border-radius:5px;background:#fff;color:#5a644e;padding:8px 13px;cursor:pointer}
-.guide-content{max-width:760px;margin:0 auto;color:#454a43;font-size:.91rem;line-height:1.78;overflow-wrap:anywhere}
-.guide-content :deep(h1){margin:0 0 18px;color:#344d3c;font:400 clamp(1.8rem,4vw,2.5rem)/1.15 var(--font-display);letter-spacing:-.02em}
-.guide-content :deep(h2){margin:34px 0 14px;padding:12px 15px;border-left:3px solid #a8894f;border-radius:0 7px 7px 0;background:#f0eee5;color:#354c3e;font:400 1.35rem/1.3 var(--font-display)}
-.guide-content :deep(h3){margin:23px 0 8px;color:#4e644f;font:600 1rem/1.4 'Segoe UI',sans-serif}
+.guide-content{max-width:76ch;margin:0 auto;color:#3f453e;font-size:1rem;line-height:1.8;overflow-wrap:anywhere}
+.guide-content :deep(h1){margin:0 0 24px;color:#344d3c;font:400 clamp(1.9rem,3vw,2.55rem)/1.15 var(--font-display);letter-spacing:-.02em}
+.guide-content :deep(h2){scroll-margin-top:14px;margin:36px 0 15px;padding:12px 15px;border-left:3px solid #a8894f;border-radius:0 7px 7px 0;background:#f0eee5;color:#354c3e;font:400 1.4rem/1.35 var(--font-display)}
+.guide-content :deep(h3){scroll-margin-top:14px;margin:25px 0 9px;color:#435b45;font:650 1.05rem/1.45 'Segoe UI',sans-serif}
 .guide-content :deep(p){margin:10px 0 15px}.guide-content :deep(strong){color:#344d3c;font-weight:700}.guide-content :deep(em){color:#696b5d}
 .guide-content :deep(ul),.guide-content :deep(ol){padding-left:1.35rem;margin:9px 0 18px}.guide-content :deep(li){padding-left:3px;margin:5px 0}.guide-content :deep(li::marker){color:#a8894f;font-weight:700}
 .guide-content :deep(a){color:#46694c;text-decoration-thickness:1px;text-underline-offset:3px}.guide-content :deep(a:hover){color:#846633}
 .guide-content :deep(blockquote){margin:18px 0;padding:12px 17px;border-left:3px solid #bca36d;background:#f4f1e7;color:#65695f}
 .guide-content :deep(code){padding:2px 5px;border-radius:4px;background:#efede5;color:#344d3c;font: .86em ui-monospace,Consolas,monospace}
 .guide-content :deep(hr){height:1px;margin:25px 0;border:0;background:#dedbce}
-.guide-content :deep(table){width:100%;margin:14px 0 20px;border-collapse:collapse;font-size:.84rem}
-.guide-content :deep(th){background:#354c3e;color:white;font-weight:650}.guide-content :deep(th),.guide-content :deep(td){padding:10px 12px;border:1px solid #dedbce;text-align:left}
+.guide-content :deep(table){display:block;max-width:100%;overflow-x:auto;margin:14px 0 20px;border-collapse:collapse;font-size:.9rem;white-space:normal}
+.guide-content :deep(th){background:#354c3e;color:white;font-weight:650}.guide-content :deep(th),.guide-content :deep(td){min-width:5ch;padding:10px 12px;border:1px solid #dedbce;text-align:left;overflow-wrap:anywhere}
 .guide-content :deep(tr:nth-child(even) td){background:#f3f1e9}
-.guide-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:0 0 auto;padding:14px clamp(18px,4vw,36px);border-top:1px solid #e5e1d5;background:#fbfaf6;color:#77796f;font-size:.7rem;line-height:1.5}
-.guide-footer button{flex:0 0 auto;border:0;border-radius:5px;background:#354c3e;color:white;padding:10px 14px;font:600 .77rem 'Segoe UI',sans-serif;cursor:pointer}
-@media(max-width:760px){.format-strip .guide-trigger{grid-column:auto}.guide-dialog{height:calc(100dvh - 18px);max-height:calc(100dvh - 18px);width:calc(100% - 18px);border-radius:13px}.guide-topbar{padding:11px 15px;font-size:.58rem}.guide-reader{padding:22px 20px}.guide-content{font-size:.85rem;line-height:1.72}.guide-content :deep(table){display:block;overflow-x:auto;white-space:nowrap}.guide-footer{align-items:flex-start;font-size:.65rem}.guide-footer button{padding:9px 11px}}
+.guide-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:40px;padding:16px 0 4px;border-top:1px solid #e5e1d5;color:#686e65;font-size:.78rem;line-height:1.6}
+.guide-footer button{flex:0 0 auto;border:0;border-radius:5px;background:#354c3e;color:white;padding:11px 15px;font:600 .82rem 'Segoe UI',sans-serif;cursor:pointer}
+@media(max-width:760px){.format-strip .guide-trigger{grid-column:auto}.guide-dialog{width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0}.guide-topbar{padding:calc(8px + env(safe-area-inset-top)) 16px 8px;font-size:.61rem}.guide-body{flex-direction:column}.guide-toc{flex:0 0 auto;overflow:visible;border-right:0;border-bottom:1px solid #e5e1d5;padding:8px 16px;background:#f5f3ec}.guide-toc summary{display:list-item;width:max-content;max-width:100%;padding:7px 0;color:#354c3e;font-size:.86rem;font-weight:650;cursor:pointer}.guide-toc details:not([open]) nav{display:none}.guide-toc details[open] nav{max-height:34dvh;overflow:auto;padding:5px 0 4px}.guide-toc nav button{padding:8px 9px;font-size:.84rem}.guide-reader{padding:24px 20px calc(24px + env(safe-area-inset-bottom))}.guide-content{font-size:1rem;line-height:1.78}.guide-content :deep(h1){font-size:2rem}.guide-content :deep(h2){font-size:1.3rem}.guide-content :deep(table){font-size:.88rem}.guide-footer{align-items:flex-start;font-size:.72rem}.guide-footer button{padding:10px 12px}}
 @media(prefers-reduced-motion:reduce){.guide-trigger span{transition:none}}
 .event-status-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 2px 18px;color:var(--matcha-leaf);font-size:.78rem}.event-status-bar>span{display:flex;align-items:center;gap:8px;font-weight:650}.event-status-bar i{width:7px;height:7px;background:#6c8260;border-radius:50%}.event-status-bar small{font-size:.73rem;color:var(--muted)}.event-hero{min-height:510px;border-radius:16px}.mika-frame{height:455px}.hero-actions{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:25px}.hero-actions .event-button{display:flex;align-items:center;gap:24px;min-height:48px}.hero-guide{padding:10px 0;min-height:44px;border:0;border-bottom:1px solid #bdb9a8;background:none;font:600 .83rem var(--font-body);color:var(--matcha-leaf);cursor:pointer}.hero-reassurance{font-size:.72rem;line-height:1.6;color:var(--muted);max-width:420px;margin:14px 0 0}.registration-panel{scroll-margin-top:24px;border-radius:14px;outline-offset:5px}.register-heading .eyebrow{color:#e2c995}.signup-progress{display:grid;grid-template-columns:repeat(3,1fr);list-style:none;grid-column:1/-1;gap:16px;margin:0;padding:0 0 4px}.signup-progress li{display:flex;gap:9px;align-items:center;color:#cad0c7;font-size:.8rem;border-bottom:1px solid #ffffff30;padding-bottom:15px}.signup-progress li>span{display:grid;place-items:center;flex-shrink:0;width:25px;height:25px;border-radius:50%;border:1px solid #ffffff50;font-size:.7rem}.signup-progress .current{color:white;font-weight:650;border-color:#e2c995}.signup-progress .current>span{background:#e2c995;color:var(--matcha-leaf);border-color:#e2c995}.signup-progress .done>span{color:#e2c995;border-color:#e2c995}.signup-step,.payment-step,.confirmation{border-radius:10px;padding:clamp(18px,3vw,28px)}.signup-step input{min-height:48px}.event-button:disabled{cursor:not-allowed}.registration-closed h3{font:1.5rem var(--font-display);margin:0;color:var(--matcha-leaf)}.registration-closed p{color:var(--muted);font-size:.88rem;line-height:1.6}.hold-note{padding-bottom:16px;border-bottom:1px solid var(--line);align-items:flex-start}.hold-note strong{font-variant-numeric:tabular-nums}.hold-note .inline-button{flex-shrink:0;font-size:.74rem;min-height:42px}.payment-instructions{border:1px solid var(--line);border-radius:10px}.payment-instructions p{font-size:.88rem;line-height:1.65}.copy-button{min-height:44px}.payment-step label span{display:block;font-weight:400;margin-top:4px}.payment-step input[type=file]{max-width:100%;min-width:0;width:100%;font-size:.8rem;background:var(--bg-silk)}.payment-step input[type=file]::file-selector-button{border:0;background:var(--matcha-leaf);color:white;padding:9px 12px;border-radius:6px;cursor:pointer;margin-right:10px}.receipt-selection{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:10px;min-width:0}.receipt-selection>img{width:54px;height:64px;object-fit:cover;border-radius:5px;flex-shrink:0}.receipt-selection>div{flex:1;min-width:0}.receipt-selection strong{display:block;font-size:.8rem;overflow-wrap:anywhere}.receipt-selection small{display:block;font-size:.68rem;color:var(--muted);margin-top:4px}.receipt-selection .inline-button{font-size:.7rem;padding:7px;min-height:40px}.registrant-list li{background:var(--white-pure);min-height:58px}.registrant-list .pending-badge,.registrant-list .verified-badge{flex-shrink:0;font-size:.66rem}.confirmation .reference strong{display:block;margin-top:7px;font:1.6rem var(--font-display);letter-spacing:.1em;color:var(--matcha-leaf)}
 @media(max-width:760px){.event-hero{display:block;min-height:0;padding:26px 22px}.hero-copy{padding-bottom:0}.event-hero h1{width:58%;min-height:185px;display:flex;flex-direction:column;justify-content:center;font-size:clamp(2.7rem,7vw,4.3rem)}.mika-frame{position:absolute;top:6px;right:10px;height:220px;width:38%;pointer-events:none}.hero-intro{font-size:1rem;margin-top:20px}.event-facts{font-size:.85rem;gap:8px;margin:20px 0}.event-offer{margin:16px 0}.hero-actions{margin-top:20px;gap:18px}.hero-reassurance{font-size:.69rem}.signup-progress{gap:8px}.signup-progress li{font-size:.69rem;gap:6px}.signup-progress li>span{width:22px;height:22px}.hold-note{flex-wrap:wrap}.event-status-bar small{font-size:.65rem}.registration-panel{gap:20px;padding:22px}.availability{grid-template-columns:auto 1fr;align-items:center;gap:1px 14px;padding:14px}.availability>strong{grid-row:span 2;font-size:2rem}.availability .capacity-track{grid-column:1/-1;width:100%;margin:8px 0 3px}.availability small{grid-column:1/-1}.payment-step .event-button{width:100%;justify-content:center}.registrant-list li{gap:8px;padding:12px;font-size:.83rem}}
