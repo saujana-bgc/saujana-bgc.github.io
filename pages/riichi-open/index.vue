@@ -23,14 +23,16 @@
 
     <section v-if="complete" ref="confirmationPanel" class="confirmation" tabindex="-1" aria-live="polite"><span class="confirm-mark">{{ registrationStatus === 'verified' ? '✓' : '·' }}</span><h3>{{ confirmationTitle }}</h3><p>{{ confirmationMessage }}</p><p class="reference">Keep your registration reference <strong>{{ registrationRef }}</strong></p><span v-if="registrationStatus === 'pending' || !registrationStatus" class="pending-badge">Awaiting payment verification</span><span v-else-if="registrationStatus === 'verified'" class="verified-badge">Payment verified</span><a v-else-if="registrationStatus === 'needs_clarification' || registrationStatus === 'rejected'" class="confirmation-contact" href="tel:+60162459482">Contact the organiser · +60 16-245 9482</a></section>
       <div v-else-if="restorePending || restoreFailed" class="signup-step restore-state" role="status">
-        <h3>{{ restorePending ? 'Restoring your saved place…' : 'Your saved place needs reconnecting' }}</h3>
-        <p>{{ restorePending ? 'Checking the reservation saved in this browser.' : 'Your saved reservation is still here. Restore or release it before starting another registration.' }}</p>
+        <h3>{{ restorePending ? 'Restoring your saved place…' : savedHoldCanDiscard ? 'Your saved details could not be recovered' : 'Your saved place needs reconnecting' }}</h3>
+        <p>{{ restorePending ? 'Checking the reservation saved in this browser.' : savedHoldCanDiscard ? 'Clear the incomplete saved details to start again. Any previous unpaid reservation will expire automatically.' : 'Your saved reservation is still here. Restore or release it before starting another registration.' }}</p>
+        <p v-if="restoreFailed && savedHoldCanDiscard">Already paid? <a href="tel:+60162459482">Contact the organiser with your receipt</a>.</p>
         <p v-if="restoreFailed && error" class="form-error" role="alert">{{ error }}</p>
-        <div class="restore-actions"><button type="button" class="event-button" :disabled="busy || restorePending" @click="restoreSavedHold">{{ restorePending ? 'Restoring…' : 'Try restoring place' }}</button><button v-if="restoreFailed && savedHoldCanRelease" type="button" class="inline-button" :disabled="busy" @click="releaseSavedHold">Release saved place</button></div>
+        <div class="restore-actions"><button v-if="!savedHoldCanDiscard" type="button" class="event-button" :disabled="busy || restorePending" @click="restoreSavedHold">{{ restorePending ? 'Restoring…' : 'Try restoring place' }}</button><button v-if="restoreFailed && savedHoldCanRelease" type="button" class="inline-button" :disabled="busy" @click="releaseSavedHold">Release saved place</button><button v-if="restoreFailed && savedHoldCanDiscard" type="button" class="inline-button" :disabled="busy" @click="clearSavedHoldDetails">Clear saved details</button></div>
       </div>
       <div v-else-if="!hold" class="signup-step">
         <p v-if="!publicLoaded" role="status">{{ refreshing ? 'Checking available places…' : 'Availability could not be loaded.' }} <button v-if="!refreshing" class="inline-button" @click="loadPublic">Try again</button></p>
         <div v-else-if="!canRegister" class="registration-closed"><h3>{{ event?.stage !== 'registration' ? 'Registration has ended.' : availablePlaces === 0 ? 'All places are currently reserved.' : 'Registration is closed.' }}</h3><p>{{ event?.stage !== 'registration' ? 'The playing roster is set. Follow table assignments and certified scores in Standings.' : 'Please check back for availability before sending a payment.' }}</p><button class="inline-button" @click="activeTab = 'standings'">View standings →</button></div>
+        <p v-else-if="registrationStorageUnavailable" class="form-error" role="alert">This browser can’t access your saved registration details. Enable site storage or use another browser before reserving a place.</p>
         <form v-else @submit.prevent="reservePlace">
           <label for="display-name">Name for the public participant list</label>
           <input id="display-name" v-model="name" maxlength="80" autocomplete="name" required placeholder="Your name">
@@ -172,6 +174,8 @@ const registrationStatus = ref('')
 const restorePending = ref(false)
 const restoreFailed = ref(false)
 const savedHoldCanRelease = ref(false)
+const savedHoldCanDiscard = ref(false)
+const registrationStorageUnavailable = ref(false)
 const HOLD_KEY = 'riichi-open-i-registration-hold'
 const DRAFT_KEY = 'riichi-open-i-registration-draft'
 const CONFIRMATION_KEY = 'riichi-open-i-registration-confirmation'
@@ -191,6 +195,7 @@ const confirmationTitle = computed(() => ({pending:'You’re on the list.',verif
 const confirmationMessage = computed(() => ({pending:'Your receipt has been submitted. Your name will show as verified once the organiser checks your payment.',verified:'Your payment has been checked and your place is confirmed. See you at the table.',needs_clarification:'Please contact the organiser to clarify your payment before the event.',rejected:'Please contact the organiser if you think this decision was made by mistake.',cancelled:'This registration no longer holds a place in the event.',payment_exception:'The reservation expired before submission. The organiser will review the receipt; your place is not yet confirmed.'}[registrationStatus.value] ?? 'Your receipt has been submitted. The organiser will review your registration.'))
 let refreshTimer, clockTimer, guideReturnFocus
 let posterReturnFocus
+let disposed = false
 
 watch(receipt, file => {
   if (receiptPreviewUrl.value) URL.revokeObjectURL(receiptPreviewUrl.value)
@@ -246,24 +251,37 @@ function closePosterFromBackdrop(event) { if (event.target === posterDialog.valu
 function restorePosterFocus() { posterReturnFocus?.focus() }
 
 onMounted(async () => {
-  clockTimer = window.setInterval(() => { now.value = Date.now() }, 1000)
+  clockTimer = window.setInterval(() => { if (document.visibilityState !== 'hidden') now.value = Date.now() }, 1000)
   try {
-    const confirmation = JSON.parse(sessionStorage.getItem(CONFIRMATION_KEY) ?? 'null')
-    if (confirmation?.reference) {
-      registrationRef.value = confirmation.reference
-      registrationStatus.value = confirmation.status ?? (confirmation.paymentException ? 'payment_exception' : 'pending')
-      complete.value = true
-    }
-  } catch { sessionStorage.removeItem(CONFIRMATION_KEY) }
-  if (sessionStorage.getItem(HOLD_KEY) || sessionStorage.getItem(DRAFT_KEY)) await restoreSavedHold()
+    try {
+      const confirmation = JSON.parse(sessionStorage.getItem(CONFIRMATION_KEY) ?? 'null')
+      if (confirmation?.reference) {
+        registrationRef.value = confirmation.reference
+        registrationStatus.value = confirmation.status ?? (confirmation.paymentException ? 'payment_exception' : 'pending')
+        complete.value = true
+      }
+    } catch { sessionStorage.removeItem(CONFIRMATION_KEY) }
+    if (sessionStorage.getItem(HOLD_KEY) || sessionStorage.getItem(DRAFT_KEY)) await restoreSavedHold()
+  } catch {
+    registrationStorageUnavailable.value = true
+  }
+  if (disposed) return
   await loadPublic()
-  refreshTimer=window.setInterval(loadPublic,30000)
-  window.addEventListener('focus',loadPublic)
+  if (disposed) return
+  refreshTimer=window.setInterval(refreshWhenVisible,30000)
+  window.addEventListener('focus',refreshWhenVisible)
+  document.addEventListener('visibilitychange',refreshWhenVisible)
 })
-onBeforeUnmount(()=>{if(refreshTimer)window.clearInterval(refreshTimer);if(clockTimer)window.clearInterval(clockTimer);if(receiptPreviewUrl.value)URL.revokeObjectURL(receiptPreviewUrl.value);window.removeEventListener('focus',loadPublic)})
+onBeforeUnmount(()=>{disposed=true;if(refreshTimer)window.clearInterval(refreshTimer);if(clockTimer)window.clearInterval(clockTimer);if(receiptPreviewUrl.value)URL.revokeObjectURL(receiptPreviewUrl.value);window.removeEventListener('focus',refreshWhenVisible);document.removeEventListener('visibilitychange',refreshWhenVisible)})
+
+function refreshWhenVisible() {
+  if (disposed || document.visibilityState === 'hidden') return
+  now.value = Date.now()
+  return loadPublic()
+}
 
 async function loadPublic() {
-  if (refreshing.value) return
+  if (disposed || refreshing.value) return
   refreshing.value = true
   try {
     const data = await callPublic('summary')
@@ -300,16 +318,22 @@ async function refreshOwnRegistration() {
 }
 
 async function restoreSavedHold() {
+  if (busy.value || restorePending.value) return
   const saved=sessionStorage.getItem(HOLD_KEY)??sessionStorage.getItem(DRAFT_KEY)
-  if (!saved) { restoreFailed.value=false;return }
+  if (!saved) { restoreFailed.value=false;savedHoldCanRelease.value=false;savedHoldCanDiscard.value=false;return }
   restorePending.value=true
   restoreFailed.value=false
   savedHoldCanRelease.value=false
+  savedHoldCanDiscard.value=true
   error.value=''
   try {
-    const stored=JSON.parse(saved)
-    if (!stored?.token || !stored?.idempotency_key) throw new Error('The saved reservation details are incomplete. Release this saved place to continue.')
-    savedHoldCanRelease.value=Boolean(stored.id && stored.token)
+    let stored
+    try { stored=JSON.parse(saved) } catch { throw new Error('The saved reservation details could not be read. Clear them to start again.') }
+    const hasToken=typeof stored?.token==='string' && stored.token.length>=40 && stored.token.length<=120
+    const canRestore=hasToken && typeof stored?.idempotency_key==='string' && stored.idempotency_key.length>=20 && stored.idempotency_key.length<=100
+    savedHoldCanRelease.value=Boolean(hasToken && typeof stored?.id==='string' && stored.id)
+    savedHoldCanDiscard.value=!canRestore && !savedHoldCanRelease.value
+    if (!canRestore) throw new Error(savedHoldCanRelease.value ? 'The saved reservation details are incomplete. Release this saved place to continue.' : 'The saved reservation details are incomplete. Clear them to start again.')
     name.value=stored.name??''
     const grant=await callPublic('reserve',{token:stored.token,idempotency_key:stored.idempotency_key})
     if (grant.completed) {
@@ -317,22 +341,25 @@ async function restoreSavedHold() {
       sessionStorage.removeItem(HOLD_KEY)
       sessionStorage.removeItem(DRAFT_KEY)
       savedHoldCanRelease.value=false
+      savedHoldCanDiscard.value=false
     } else {
       hold.value={...stored,...grant,token:stored.token,idempotency_key:stored.idempotency_key,name:stored.name??''}
       savedHoldCanRelease.value=false
       sessionStorage.setItem(HOLD_KEY,JSON.stringify({id:hold.value.id,expires_at:hold.value.expires_at,path:hold.value.path,token:hold.value.token,idempotency_key:hold.value.idempotency_key,name:hold.value.name}))
+      sessionStorage.removeItem(DRAFT_KEY)
     }
   } catch (cause) {
     restoreFailed.value=true
-    notice.value='Your saved reservation is still in this browser. Restore or release it before starting another registration.'
+    notice.value=savedHoldCanDiscard.value ? '' : 'Your saved reservation is still in this browser. Restore or release it before starting another registration.'
     error.value=cause.message || 'Could not restore the saved reservation. Check your connection and try again.'
   } finally { restorePending.value=false }
 }
 
 async function releaseSavedHold() {
+  if (busy.value || restorePending.value) return
   if (!window.confirm('Release the reservation saved in this browser? This will free the place and let you start a new registration.')) return
   let stored
-  try { stored=JSON.parse(sessionStorage.getItem(HOLD_KEY)??'null') } catch {}
+  try { stored=JSON.parse(sessionStorage.getItem(HOLD_KEY)??sessionStorage.getItem(DRAFT_KEY)??'null') } catch {}
   if (!stored?.id || !stored?.token) { error.value='The saved reservation details are incomplete. Try restoring it first.';return }
   busy.value=true
   error.value=''
@@ -340,16 +367,34 @@ async function releaseSavedHold() {
     await callPublic('cancel',{hold_id:stored.id,token:stored.token})
     sessionStorage.removeItem(HOLD_KEY)
     sessionStorage.removeItem(DRAFT_KEY)
+    hold.value=null
+    receipt.value=null
     restoreFailed.value=false
     savedHoldCanRelease.value=false
+    savedHoldCanDiscard.value=false
     notice.value='Saved place released. You can start a new registration.'
     await loadPublic()
   } catch (cause) { error.value=cause.message || 'The saved place could not be released.' }
   finally { busy.value=false }
 }
 
+async function clearSavedHoldDetails() {
+  if (busy.value || restorePending.value || !savedHoldCanDiscard.value) return
+  if (!window.confirm('Clear the incomplete reservation details saved in this browser? Any existing reservation will expire automatically. If you have already paid, contact the organiser with your receipt.')) return
+  sessionStorage.removeItem(HOLD_KEY)
+  sessionStorage.removeItem(DRAFT_KEY)
+  restoreFailed.value=false
+  savedHoldCanDiscard.value=false
+  savedHoldCanRelease.value=false
+  error.value=''
+  notice.value='Saved details cleared. You can start a new registration.'
+  await loadPublic()
+}
+
 
 async function reservePlace() {
+  if (busy.value) return
+  if (registrationStorageUnavailable.value) { error.value='Enable site storage or use another browser before reserving a place.';return }
   error.value = ''
   if (restorePending.value || restoreFailed.value || sessionStorage.getItem(HOLD_KEY)) { error.value='Restore or release your saved reservation before starting another registration.';return }
   if (!name.value.trim()) { error.value = 'Enter the name you’d like shown on the list.'; return }
@@ -389,7 +434,7 @@ function chooseReceipt(event) {
   receipt.value = event.target.files?.[0] ?? null
   error.value = ''
   if (!receipt.value) return
-  if (!['image/jpeg','image/png','application/pdf'].includes(receipt.value.type) || receipt.value.size > 5*1024*1024) {
+  if (!['image/jpeg','image/png','application/pdf'].includes(receipt.value.type) || receipt.value.size < 1 || receipt.value.size > 5*1024*1024) {
     error.value = 'Choose a JPG, PNG or PDF file no larger than 5 MB.'
     receipt.value = null
     event.target.value = ''

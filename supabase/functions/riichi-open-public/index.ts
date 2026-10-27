@@ -13,11 +13,11 @@ Deno.serve(async (request) => {
     if (eventError || !event) throw new Error('Event details are temporarily unavailable.')
 
     if (body.action === 'summary') {
-      const [{ data: registrations, error }, { count: holds }] = await Promise.all([
+      const [{ data: registrations, error }, { count: holds, error: holdError }] = await Promise.all([
         client.from('riichi_open_registrations').select('id,event_id,display_name,status,submitted_at').eq('event_id', event.id).in('status',['pending','verified','needs_clarification']).order('submitted_at'),
         client.from('riichi_open_registration_holds').select('id',{count:'exact',head:true}).eq('event_id',event.id).eq('status','active').gt('expires_at',new Date().toISOString()),
       ])
-      if (error) throw error
+      if (error || holdError) throw error ?? holdError
       const publication = event.current_publication_id
         ? await client.from('riichi_open_publications').select('id,version,snapshot,created_at').eq('id',event.current_publication_id).maybeSingle()
         : { data: null, error: null }
