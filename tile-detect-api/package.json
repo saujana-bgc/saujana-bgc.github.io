@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "onnxruntime-node": "^1.29.0",
-    "sharp": "^0.34.0"
+    "sharp": "^0.35.5"
   },
   "scripts": {
     "test": "tsx test-onnx.mts",
@@ -17,6 +17,6 @@
   },
   "devDependencies": {
     "@vercel/node": "^5.0.0",
-    "tsx": "^4.0.0"
+    "tsx": "^4.23.15"
   }
 }
