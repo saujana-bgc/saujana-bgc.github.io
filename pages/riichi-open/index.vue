@@ -12,7 +12,7 @@
         <div class="hero-actions"><button class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></button><button class="hero-guide" @click="openGuide">Tournament guide</button></div>
         <p class="hero-reassurance">16 places · No account needed · Receipt verified by the organiser</p>
       </div>
-      <div class="mika-frame"><img src="/images/riichi-open/mika-one-man.png" alt="Mika holding a one-man mahjong tile and inviting you to join the tournament" width="640" height="800"></div>
+      <figure class="poster-card"><button type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster.png" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="1122" height="1402"></button><figcaption>Tap or click to view the full poster</figcaption></figure>
     </section>
 
     <section id="registration" ref="registrationPanel" class="registration-panel" aria-labelledby="register-heading" tabindex="-1">
@@ -74,6 +74,11 @@
     </dialog>
     </section>
 
+    <dialog ref="posterDialog" class="poster-dialog" aria-label="Riichi Open I event poster" @click="closePosterFromBackdrop" @close="restorePosterFocus">
+      <button type="button" class="poster-close" aria-label="Close event poster" @click="closePoster">×</button>
+      <img src="/images/riichi-open/riichi-open-i-poster.png" alt="Full Riichi Open I tournament poster">
+    </dialog>
+
     <section v-show="activeTab === 'standings'" id="riichi-standings-panel" role="tabpanel" aria-labelledby="riichi-standings-tab">
       <RiichiOpenStandings :event="event" :snapshot="snapshot" :updated-at="updatedAt" :loading="!publicLoaded && !standingsError" :refreshing="refreshing" :error="standingsError" @refresh="loadPublic" @register="goToRegistration" />
     </section>
@@ -98,6 +103,7 @@ watch(activeTab, tab => {
 const { callPublic } = useRiichiOpen()
 const guideDialog = ref(null)
 const guideTrigger = ref(null)
+const posterDialog = ref(null)
 const guideMarkdown = ref('')
 const guideLoading = ref(false)
 const guideError = ref('')
@@ -156,6 +162,7 @@ const holdExpired = computed(() => Boolean(hold.value) && holdSeconds.value === 
 const confirmationTitle = computed(() => ({pending:'You’re on the list.',verified:'Your place is confirmed.',needs_clarification:'The organiser needs a clearer receipt.',rejected:'This registration was not accepted.',cancelled:'This registration was cancelled.',payment_exception:'Receipt sent for review'}[registrationStatus.value] ?? 'Receipt submitted'))
 const confirmationMessage = computed(() => ({pending:'Your receipt has been submitted. Your name will show as verified once the organiser checks your payment.',verified:'Your payment has been checked and your place is confirmed. See you at the table.',needs_clarification:'Please contact the organiser to clarify your payment before the event.',rejected:'Please contact the organiser if you think this decision was made by mistake.',cancelled:'This registration no longer holds a place in the event.',payment_exception:'The reservation expired before submission. The organiser will review the receipt; your place is not yet confirmed.'}[registrationStatus.value] ?? 'Your receipt has been submitted. The organiser will review your registration.'))
 let refreshTimer, clockTimer, guideReturnFocus
+let posterReturnFocus
 
 watch(receipt, file => {
   if (receiptPreviewUrl.value) URL.revokeObjectURL(receiptPreviewUrl.value)
@@ -187,6 +194,10 @@ async function loadGuide() {
 function closeGuide() { guideDialog.value?.close() }
 function closeGuideFromBackdrop(event) { if (event.target === guideDialog.value) closeGuide() }
 function restoreGuideFocus() { guideReturnFocus?.focus() }
+function openPoster(event) { posterReturnFocus=event.currentTarget;posterDialog.value?.showModal() }
+function closePoster() { posterDialog.value?.close() }
+function closePosterFromBackdrop(event) { if (event.target === posterDialog.value) closePoster() }
+function restorePosterFocus() { posterReturnFocus?.focus() }
 
 onMounted(async () => {
   clockTimer = window.setInterval(() => { now.value = Date.now() }, 1000)
@@ -399,6 +410,21 @@ async function cancelHold() {
 </style>
 
 <style scoped>
+.poster-card{align-self:center;justify-self:center;width:min(100%,380px);margin:0;text-align:center}
+.poster-preview{display:block;width:100%;aspect-ratio:1122/1402;padding:0;border:1px solid #d9c994;border-radius:12px;background:#fbfaf6;overflow:hidden;box-shadow:0 16px 36px #26392b24;cursor:zoom-in;transition:transform .18s ease,box-shadow .18s ease}
+.poster-preview:hover{transform:translateY(-3px);box-shadow:0 20px 42px #26392b30}
+.poster-preview:focus-visible,.poster-close:focus-visible{outline:3px solid #bc9d60;outline-offset:4px}
+.poster-preview img{display:block;width:100%;height:100%;object-fit:contain}
+.poster-dialog{position:fixed;width:min(94vw,900px);height:min(94dvh,1125px);max-width:none;max-height:none;padding:46px 14px 14px;border:1px solid #d9c994;border-radius:14px;background:#fbfaf6;box-shadow:0 28px 100px #111a1280;overflow:hidden;box-sizing:border-box}
+.poster-dialog::backdrop{background:#18241bd9;backdrop-filter:blur(4px)}
+.poster-dialog>img{display:block;width:100%;height:100%;object-fit:contain}
+.poster-close{position:absolute;top:9px;right:10px;z-index:1;width:34px;height:34px;border:1px solid #d8d5c8;border-radius:50%;background:#fbfaf6;color:#354c3e;font:1.4rem/1 'Segoe UI',sans-serif;cursor:pointer}
+.poster-card figcaption{margin-top:9px;color:var(--muted);font-size:.7rem}
+@media(max-width:760px){.poster-card{width:min(46vw,190px);margin:14px auto 18px}}
+@media(prefers-reduced-motion:reduce){.poster-preview{transition:none}}
+</style>
+
+<style scoped>
 .format-strip .guide-trigger{grid-column:2;justify-self:start;border:0;padding:0;background:none;color:var(--matcha-leaf);font:650 .95rem 'Segoe UI',sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 .guide-trigger span{display:inline-block;margin-left:5px;color:var(--gold-leaf);transition:transform .18s ease}
 .guide-trigger:hover span{transform:translate(3px,-2px)}
@@ -437,4 +463,9 @@ async function cancelHold() {
 @media(max-width:440px){.event-hero h1{font-size:2.7rem;min-height:175px;width:57%}.mika-frame{width:44%;height:210px;right:2px}.hero-actions{gap:12px}.hero-actions .event-button{width:100%;justify-content:space-between}.hero-guide{font-size:.8rem}.event-offer{gap:8px}.event-offer>span{font-size:.74rem}.event-offer i{margin:0 3px}.event-status-bar small{display:none}.registration-panel{padding:18px}.signup-progress li{font-size:.61rem;gap:5px}.signup-progress li>span{width:20px;height:20px}.registrant-list li{align-items:flex-start}.registrant-list .pending-badge{white-space:normal;text-align:center;max-width:110px}}
 @media(prefers-reduced-motion:reduce){.event-page *{scroll-behavior:auto!important}}
 .restore-state h3{margin:0 0 8px;color:var(--matcha-leaf);font:1.4rem var(--font-display)}.restore-state>p{line-height:1.6;color:var(--muted)}.restore-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.confirmation-contact{display:inline-block;margin-top:12px;color:var(--matcha-leaf);font-size:.85rem;font-weight:650;text-underline-offset:3px}
+</style>
+
+<style scoped>
+@media(max-width:760px){.event-hero h1{width:auto;min-height:0;display:block}}
+@media(max-width:440px){.event-hero h1{width:auto;min-height:0}}
 </style>

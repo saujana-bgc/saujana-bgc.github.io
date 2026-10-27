@@ -46,13 +46,15 @@ Deno.serve(async (request) => {
 
     if(body.action==='registration_status'){
       if(event.stage!=='registration') return reply(request,409,{error:'Payment status is locked after the playing roster starts.'})
-      const id=String(body.registration_id??''),status=String(body.status??''),note=String(body.private_note??'').slice(0,2000)
+      const id=String(body.registration_id??''),status=String(body.status??''),note=String(body.private_note??'').slice(0,2000),expectedNote=String(body.expected_private_note??'').slice(0,2000)
+      if(typeof body.expected_private_note!=='string') return reply(request,400,{error:'Reload this registration before changing its payment status.'})
       if(!['verified','needs_clarification','rejected','cancelled'].includes(status)) return reply(request,400,{error:'Choose a valid payment status.'})
       if(status==='verified'&&body.manual_verification===true&&note.trim().length<4) return reply(request,400,{error:'Add a short reason for manual payment verification.'})
       const {data:before,error:findError}=await client.from('riichi_open_registrations').select('id,display_name,status,receipt_path').eq('id',id).eq('event_id',event.id).single()
       if(findError||!before) return reply(request,404,{error:'Registration not found.'})
       if(status==='verified'&&!before.receipt_path&&body.manual_verification!==true) return reply(request,400,{error:'A private reason is required to verify payment without a receipt.'})
-      const {error}=await client.rpc('admin_set_riichi_open_registration_status',{p_registration_id:id,p_status:status,p_note:note,p_actor:user.id})
+      const {error}=await client.rpc('admin_set_riichi_open_registration_status',{p_registration_id:id,p_status:status,p_note:note,p_expected_note:expectedNote,p_actor:user.id})
+      if(error?.message?.includes('Private note changed')) return reply(request,409,{error:error.message})
       if(error) throw error
       return reply(request,200,{ok:true})
     }
@@ -60,10 +62,15 @@ Deno.serve(async (request) => {
     if(body.action==='registration_note'){
       if(event.stage!=='registration') return reply(request,409,{error:'Private notes are locked after the playing roster starts.'})
       const id=String(body.registration_id??''),note=String(body.private_note??'').trim().slice(0,2000)
+      if(typeof body.expected_private_note!=='string') return reply(request,400,{error:'Reload this registration before saving its note.'})
+      const expectedNote=String(body.expected_private_note).trim().slice(0,2000)
       const {data:registration,error:findError}=await client.from('riichi_open_registrations').select('id').eq('id',id).eq('event_id',event.id).maybeSingle()
       if(findError||!registration) return reply(request,404,{error:'Registration not found.'})
-      const {error}=await client.from('riichi_open_registrations').update({private_note:note||null,updated_at:new Date().toISOString()}).eq('id',id).eq('event_id',event.id)
+      let update=client.from('riichi_open_registrations').update({private_note:note||null,updated_at:new Date().toISOString()}).eq('id',id).eq('event_id',event.id)
+      update=expectedNote?update.eq('private_note',expectedNote):update.is('private_note',null)
+      const {data:updated,error}=await update.select('id').maybeSingle()
       if(error) throw error
+      if(!updated) return reply(request,409,{error:'Private note changed in another session; choose which version to keep.'})
       await client.from('riichi_open_audit_log').insert({event_id:event.id,actor_id:user.id,action:'update_registration_note',entity_type:'registration',entity_id:id,details:{note_updated:true}})
       return reply(request,200,{ok:true})
     }
@@ -167,6 +174,7 @@ Deno.serve(async (request) => {
     return reply(request,400,{error:'Unknown organiser action.'})
   } catch(error){
     const message=safeMessage(error)
-    return reply(request,message.includes('access')||message.includes('Sign in')?401:400,{error:message})
+    const status=message.includes('Private note changed')?409:message.includes('access')||message.includes('Sign in')?401:400
+    return reply(request,status,{error:message})
   }
 })

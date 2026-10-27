@@ -45,7 +45,7 @@ definePageMeta({layout:'admin'})
 useHead({title:'Riichi Open admin | Saujana BGC',meta:[{name:'robots',content:'noindex, nofollow, noarchive'}]})
 const {callAdmin,callPublic}=useRiichiOpen(),route=useRoute()
 const data=ref(null),loading=ref(true),busy=ref(false),error=ref(''),message=ref(''),preview=ref(null)
-const registrationNotes=reactive({}),savedRegistrationNotes=reactive({}),registrationNoteConflicts=reactive({}),participantEdits=reactive({}),savedParticipantEdits=reactive({}),participantConflicts=reactive({}),participantSaveStates=reactive({}),scores=reactive({}),sticks=reactive({}),tableSaveStates=reactive({})
+const registrationNotes=reactive({}),savedRegistrationNotes=reactive({}),registrationNoteConflicts=reactive({}),registrationNoteSavePending=reactive({}),participantEdits=reactive({}),savedParticipantEdits=reactive({}),participantConflicts=reactive({}),participantSaveStates=reactive({}),scores=reactive({}),sticks=reactive({}),tableSaveStates=reactive({})
 const newParticipant=reactive({name:'',verified:false,reason:''}),penalty=reactive({round_id:'',participant_id:'',points:0,reason:''})
 const tieDrawInProgress=ref(false)
 const receiptDialog = ref(null)
@@ -55,6 +55,7 @@ const revisionConflict = ref(false)
 const savedScores = reactive({})
 const savedSticks = reactive({})
 const participantSaveTasks = new Map()
+const participantMutationVersions = new Map()
 const tableSaveTimers = new Map()
 const roundSaveQueues = new Map()
 const backgroundSaveCount = computed(() => Object.values(participantSaveStates).filter(state => state === 'saving').length + Object.values(tableSaveStates).filter(state => state === 'saving').length)
@@ -79,6 +80,7 @@ onBeforeRouteLeave(()=>!hasUnsavedChanges()||window.confirm('Some edits have not
 watch(()=>route.hash,async()=>{await nextTick();scrollToHash()})
 watch(() => penalty.round_id, () => { penalty.participant_id = '' })
 async function load(options = {}) {
+  const participantVersionsAtStart=new Map(participantMutationVersions)
   loading.value = !data.value
   error.value = ''
   try {
@@ -97,6 +99,13 @@ async function load(options = {}) {
     latest.tie_draws=tieDraws
     for (const row of latest.registrations) {
       const latestNote=String(row.private_note??''),currentNote=String(registrationNotes[row.id]??''),savedNote=savedRegistrationNotes[row.id]
+      const pendingNote=registrationNoteSavePending[row.id]
+      if(pendingNote){
+        savedRegistrationNotes[row.id]=latestNote
+        if(latestNote.trim()!==pendingNote.expectedNote.trim()&&latestNote.trim()!==pendingNote.note.trim())registrationNoteConflicts[row.id]=true
+        else if(currentNote.trim()===latestNote.trim()||latestNote.trim()===pendingNote.note.trim())delete registrationNoteConflicts[row.id]
+        continue
+      }
       if(savedNote===undefined||currentNote.trim()===String(savedNote).trim()){
         registrationNotes[row.id]=latestNote
         savedRegistrationNotes[row.id]=latestNote
@@ -109,6 +118,10 @@ async function load(options = {}) {
     }
     const participantFields=['display_name','checked_in','is_substitute','eligible_for_final']
     for (const row of latest.participants) {
+      if((participantMutationVersions.get(row.id)??0)!==(participantVersionsAtStart.get(row.id)??0)){
+        const currentRow=data.value?.participants.find(person=>person.id===row.id)
+        if(currentRow)Object.assign(row,currentRow)
+      }
       const latestEdits=Object.fromEntries(participantFields.map(field=>[field,row[field]]))
       if(options.resetParticipantEdits||!savedParticipantEdits[row.id]) {
         participantEdits[row.id]={...latestEdits}
@@ -146,16 +159,16 @@ async function load(options = {}) {
   } catch (cause) { error.value = cause.message }
   finally { loading.value = false }
 }
-async function act(action,payload={}){if(busy.value)return null;busy.value=true;error.value='';message.value='';try{if(action==='penalty'){await flushRoundSaves(payload.round_id);if(revisionConflict.value)return null;const round=data.value?.rounds.find(item=>item.id===payload.round_id);payload={...payload,revision:round?.draft_revision??payload.revision}}const result=await callAdmin(action,payload);await load();return result}catch(cause){error.value=cause.message;if(/round changed|reload before editing/i.test(cause.message)){revisionConflict.value=true;await load();error.value='Another organiser changed this round. Your entries are preserved; review the latest saved scores before continuing.'}return null}finally{busy.value=false}}
+async function act(action,payload={}){if(busy.value)return null;busy.value=true;error.value='';message.value='';try{if(action==='penalty'){await flushRoundSaves(payload.round_id);if(revisionConflict.value)return null;const round=data.value?.rounds.find(item=>item.id===payload.round_id);payload={...payload,revision:round?.draft_revision??payload.revision}}const result=await callAdmin(action,payload);await load();return result}catch(cause){error.value=cause.message;if(/round changed|reload before editing/i.test(cause.message)){revisionConflict.value=true;await load();error.value='Another organiser changed this round. Your entries are preserved; review the latest saved scores before continuing.'}else if(/private note changed/i.test(cause.message))await load();return null}finally{busy.value=false}}
 async function toggleRegistration(){const result=await act('registration_open',{open:!data.value.event.registration_open});if(result)message.value=`Registration ${data.value.event.registration_open?'opened':'closed'}.`}
 async function previewReceipt(registration){try{const result=await callAdmin('receipt_url',{path:registration.receipt_path});preview.value={url:result.url,mime:registration.receipt_mime,name:registration.display_name};await nextTick();receiptDialog.value?.showModal()}catch(cause){error.value=cause.message}}
 function closeReceiptBackdrop(event){if(event.target===receiptDialog.value)receiptDialog.value.close()}
 function jumpTo(id){if(id)document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
-async function setRegistration(registration,status){if(registrationNoteConflicts[registration.id])return;const sourceNote=String(registrationNotes[registration.id]??''),note=sourceNote.trim().slice(0,2000);if(status==='verified'&&!registration.receipt_path&&note.trim().length<4){error.value='Add a private reason before verifying a registration without a receipt.';return}const result=await act('registration_status',{registration_id:registration.id,status,private_note:note,manual_verification:status==='verified'&&!registration.receipt_path});if(result){commitRegistrationNote(registration,note,sourceNote);message.value=`${registration.display_name}: ${humanize(status)}.`}}
+async function setRegistration(registration,status){if(registrationNoteConflicts[registration.id])return;const sourceNote=String(registrationNotes[registration.id]??''),note=sourceNote.trim().slice(0,2000),expectedNote=String(savedRegistrationNotes[registration.id]??'');if(status==='verified'&&!registration.receipt_path&&note.trim().length<4){error.value='Add a private reason before verifying a registration without a receipt.';return}registrationNoteSavePending[registration.id]={note,expectedNote};try{const result=await act('registration_status',{registration_id:registration.id,status,private_note:note,expected_private_note:expectedNote,manual_verification:status==='verified'&&!registration.receipt_path});if(result){commitRegistrationNote(registration,note,sourceNote);message.value=`${registration.display_name}: ${humanize(status)}.`}}finally{delete registrationNoteSavePending[registration.id]}}
 function registrationNoteIsDirty(registration){return String(registrationNotes[registration.id]??'').trim()!==String(savedRegistrationNotes[registration.id]??'').trim()}
 function commitRegistrationNote(registration,note,sourceNote=note){savedRegistrationNotes[registration.id]=note;if(String(registrationNotes[registration.id]??'')===sourceNote)registrationNotes[registration.id]=note;delete registrationNoteConflicts[registration.id]}
 function resolveRegistrationNoteConflict(registration,choice){if(choice==='latest')registrationNotes[registration.id]=String(savedRegistrationNotes[registration.id]??'');delete registrationNoteConflicts[registration.id]}
-async function saveRegistrationNote(registration){if(registrationNoteConflicts[registration.id])return;const sourceNote=String(registrationNotes[registration.id]??''),note=sourceNote.trim().slice(0,2000);const result=await act('registration_note',{registration_id:registration.id,private_note:note});if(result){commitRegistrationNote(registration,note,sourceNote);message.value=`Private note saved for ${registration.display_name}.`}}
+async function saveRegistrationNote(registration){if(registrationNoteConflicts[registration.id])return;const sourceNote=String(registrationNotes[registration.id]??''),note=sourceNote.trim().slice(0,2000),expectedNote=String(savedRegistrationNotes[registration.id]??'');registrationNoteSavePending[registration.id]={note,expectedNote};try{const result=await act('registration_note',{registration_id:registration.id,private_note:note,expected_private_note:expectedNote});if(result){commitRegistrationNote(registration,note,sourceNote);message.value=`Private note saved for ${registration.display_name}.`}}finally{delete registrationNoteSavePending[registration.id]}}
 async function addParticipant(){const result=await act('add_participant',{name:newParticipant.name,payment_verified:newParticipant.verified,reason:newParticipant.reason});if(result){message.value='Participant added.';newParticipant.name='';newParticipant.reason='';newParticipant.verified=false}}
 function participantSaveLabel(id){const state=participantSaveStates[id];if(state==='saving')return'Saving…';if(state==='error')return'Could not save';if(participantConflicts[id]?.length)return'Reload needed';const current=participantEdits[id],saved=savedParticipantEdits[id];return current&&saved&&Object.keys(saved).some(field=>!Object.is(current[field],saved[field]))?'Unsaved':'Saved'}
 async function saveParticipant(person){
@@ -175,6 +188,7 @@ async function saveParticipant(person){
         const original={...patch},sent={...patch}
         if(typeof sent.display_name==='string')sent.display_name=sent.display_name.trim()
         await callAdmin('participant_update',{participant_id:person.id,...sent,reason:'Roster update'})
+        participantMutationVersions.set(person.id,(participantMutationVersions.get(person.id)??0)+1)
         const latest={...saved,...sent}
         savedParticipantEdits[person.id]=latest
         const row=data.value.participants.find(item=>item.id===person.id)
