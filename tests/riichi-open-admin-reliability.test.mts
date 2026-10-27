@@ -175,3 +175,14 @@ test('the admin endpoint returns a conflict for a stale participant version', as
   assert.equal(response.status, 409)
   assert.match((await response.json()).error, /Participant changed in another session/)
 })
+
+test('marking an already-ineligible participant as a substitute preserves the expected field set', async () => {
+  const calls: { name: string; args: any }[] = []
+  const request = adminHandler(async (name, args) => { calls.push({ name, args }); return { data: null, error: null } })
+  const response = await request({ is_substitute: true, expected: { is_substitute: false } })
+
+  assert.equal(response.status, 200)
+  assert.equal(calls[0].args.p_patch.is_substitute, true)
+  assert.deepEqual(calls[0].args.p_expected, { is_substitute: false })
+  assert.equal('eligible_for_final' in calls[0].args.p_patch, false)
+})

@@ -92,7 +92,6 @@ Deno.serve(async (request) => {
       }
       for(const key of ['checked_in','active','is_substitute','eligible_for_final']) if(typeof body[key]==='boolean') patch[key]=body[key]
       if(!Object.keys(patch).length) return reply(request,400,{error:'Choose at least one participant detail to update.'})
-      if(patch.is_substitute===true) patch.eligible_for_final=false
       const {error}=await client.rpc('admin_update_riichi_open_participant',{p_event_id:event.id,p_participant_id:id,p_patch:patch,p_expected:object(body.expected),p_actor:user.id,p_reason:String(body.reason??'').slice(0,500)||null})
       if(error) throw error
       return reply(request,200,{ok:true})
