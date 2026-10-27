@@ -8,6 +8,7 @@ const { descriptor } = parse(readFileSync(new URL('../pages/riichi-open/index.vu
 const script = compileScript(descriptor, { id: 'riichi-open-recovery' })
 const HOLD = 'riichi-open-i-registration-hold'
 const DRAFT = 'riichi-open-i-registration-draft'
+const CONFIRMATION = 'riichi-open-i-registration-confirmation'
 const token = 'a'.repeat(72)
 const reservation = { id: 'hold-1', token, idempotency_key: 'key-'.repeat(9), name: 'Player' }
 const summary = { event: { stage: 'registration', capacity: 16, registration_open: true }, registrations: [], active_holds: 0 }
@@ -62,6 +63,82 @@ test('release uses the same saved draft fallback as restoration', async () => {
   await app.state.releaseSavedHold()
   assert.equal(app.calls.filter(call => call.action === 'cancel').length, 1)
   assert.equal(app.saved.has(DRAFT), false)
+})
+
+test('a cancelled registration starts a linked fresh reservation and keeps retries idempotent', async () => {
+  const calls: { action: string; payload: any }[] = []
+  const app = page(async (action, payload) => {
+    calls.push({ action, payload })
+    if (action === 'restart') return { id: 'new-hold', path: 'receipt-path', expires_at: '2026-11-14T06:30:00Z', restarted_from_registration_id: 'registration-1' }
+    return summary
+  })
+  app.saved.set(CONFIRMATION, JSON.stringify({ reference: 'OLDREF01', status: 'cancelled', registration_id: 'registration-1', display_name: 'Player', hold_id: 'old-hold', token }))
+  app.state.complete.value = true
+  app.state.registrationStatus.value = 'cancelled'
+  app.state.name.value = 'Player'
+  app.state.event.value = { stage: 'registration', registration_open: true, capacity: 16 }
+
+  await app.state.restartCancelledRegistration()
+
+  const restart = calls.find(call => call.action === 'restart')!
+  assert.equal(restart.payload.registration_id, 'registration-1')
+  assert.equal(restart.payload.previous_token, token)
+  assert.equal(restart.payload.token.length, 72)
+  assert.equal(restart.payload.idempotency_key.length, 36)
+  assert.equal(app.state.complete.value, false)
+  assert.equal(app.state.hold.value.id, 'new-hold')
+  assert.equal(app.state.hold.value.restart_registration_id, 'registration-1')
+  assert.equal(app.saved.has(CONFIRMATION), false)
+  assert.equal(JSON.parse(app.saved.get(HOLD)!).restart_previous_token, token)
+})
+
+test('a rejected registration cannot restart itself and retains its reference', async () => {
+  const app = page(() => { throw new Error('Restart must not be requested') })
+  app.saved.set(CONFIRMATION, JSON.stringify({ reference: 'OLDREF01', status: 'rejected', registration_id: 'registration-1', hold_id: 'old-hold', token }))
+  app.state.complete.value = true
+  app.state.registrationStatus.value = 'rejected'
+  app.state.registrationRef.value = 'OLDREF01'
+
+  await app.state.restartCancelledRegistration()
+
+  assert.equal(app.state.complete.value, true)
+  assert.equal(app.state.registrationRef.value, 'OLDREF01')
+  assert.equal(app.calls.some(call => call.action === 'restart'), false)
+})
+
+test('restoring an interrupted restart retries the same linked request', async () => {
+  const calls: { action: string; payload: any }[] = []
+  const app = page(async (action, payload) => {
+    calls.push({ action, payload })
+    if (action === 'restart') return { id: 'new-hold', path: 'receipt-path', expires_at: '2026-11-14T06:30:00Z', restarted_from_registration_id: 'registration-1' }
+    return summary
+  })
+  app.saved.set(DRAFT, JSON.stringify({ mode: 'restart', registration_id: 'registration-1', previous_token: token, token: 'b'.repeat(72), idempotency_key: 'key-'.repeat(9), name: 'Player' }))
+
+  await app.state.restoreSavedHold()
+
+  assert.equal(calls[0].action, 'restart')
+  assert.equal(calls[0].payload.registration_id, 'registration-1')
+  assert.equal(calls[0].payload.idempotency_key, 'key-'.repeat(9))
+  assert.equal(app.state.hold.value.id, 'new-hold')
+  assert.equal(JSON.parse(app.saved.get(HOLD)!).restart_registration_id, 'registration-1')
+  assert.equal(app.saved.has(DRAFT), false)
+})
+
+test('a failed restart keeps the old cancellation and idempotency draft available', async () => {
+  const app = page(action => action === 'restart' ? Promise.reject(new Error('All places are currently reserved')) : summary)
+  app.saved.set(CONFIRMATION, JSON.stringify({ reference: 'OLDREF01', status: 'cancelled', registration_id: 'registration-1', display_name: 'Player', hold_id: 'old-hold', token }))
+  app.state.complete.value = true
+  app.state.registrationStatus.value = 'cancelled'
+  app.state.registrationRef.value = 'OLDREF01'
+  app.state.event.value = { stage: 'registration', registration_open: true, capacity: 16 }
+
+  await app.state.restartCancelledRegistration()
+
+  assert.equal(app.state.complete.value, true)
+  assert.equal(JSON.parse(app.saved.get(CONFIRMATION)!).reference, 'OLDREF01')
+  assert.equal(JSON.parse(app.saved.get(DRAFT)!).registration_id, 'registration-1')
+  assert.match(app.state.error.value, /All places/)
 })
 
 test('unreadable saved details have an explicit local reset without issuing a server cancellation', async () => {

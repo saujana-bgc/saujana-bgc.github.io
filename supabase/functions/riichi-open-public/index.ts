@@ -42,6 +42,30 @@ Deno.serve(async (request) => {
       return reply(request,200,{id:hold.id,expires_at:hold.expires_at,path,completed:false})
     }
 
+    if (body.action === 'restart') {
+      const registrationId = String(body.registration_id ?? '')
+      const previousToken = String(body.previous_token ?? '')
+      const token = String(body.token ?? '')
+      const idem = String(body.idempotency_key ?? '')
+      if (!/^[0-9a-f-]{36}$/i.test(registrationId) || token.length < 40 || token.length > 120 ||
+          previousToken.length < 40 || previousToken.length > 120 || idem.length < 20 || idem.length > 100) {
+        return reply(request,400,{error:'Refresh this page and try again.'})
+      }
+      const forwarded = request.headers.get('cf-connecting-ip') ?? request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim() ?? ''
+      if (!forwarded || forwarded.length > 64 || !/^[0-9a-f:.]+$/i.test(forwarded)) return reply(request,400,{error:'Your network address could not be checked. Please try again.'})
+      const clientFingerprint = await hashText(forwarded.toLowerCase())
+      const {data,error}=await client.rpc('restart_cancelled_riichi_open_registration',{
+        p_registration_id:registrationId,
+        p_previous_token_hash:await hashText(previousToken),
+        p_new_token_hash:await hashText(token),
+        p_idempotency_key:idem,
+        p_client_fingerprint:clientFingerprint,
+      })
+      if(error?.message.toLowerCase().includes('reservation rate limit')) return reply(request,429,{error:'Too many places have been reserved from this network. Please wait 30 minutes before trying again.'})
+      if(error) throw new Error(error.message)
+      return reply(request,200,data)
+    }
+
     if (body.action === 'receipt_upload_url') {
       const holdId = String(body.hold_id ?? '')
       const token = String(body.token ?? '')
@@ -113,7 +137,7 @@ Deno.serve(async (request) => {
       if(holdError) throw holdError
       if(!ownedHold||ownedHold.token_hash!==await hashText(token)) return reply(request,400,{error:'This registration session could not be confirmed.'})
       const {data:registration,error:registrationError}=await client.from('riichi_open_registrations')
-        .select('id,status,submitted_at').eq('hold_id',holdId).maybeSingle()
+        .select('id,display_name,status,submitted_at').eq('hold_id',holdId).maybeSingle()
       if(registrationError) throw registrationError
       if(!registration) return reply(request,404,{error:'No submitted registration was found for this reservation.'})
       return reply(request,200,{...registration,reference:registration.id.slice(0,8).toUpperCase()})

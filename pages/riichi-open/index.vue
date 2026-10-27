@@ -21,7 +21,7 @@
       <ol class="signup-progress" aria-label="Registration progress"><li :class="{ current: !hold && !complete, done: hold || complete }" :aria-current="!hold && !complete ? 'step' : undefined"><span>{{ hold || complete ? '✓' : '1' }}</span>Your name</li><li :class="{ current: hold && !complete, done: complete }" :aria-current="hold && !complete ? 'step' : undefined"><span>{{ complete ? '✓' : '2' }}</span>Pay & upload</li><li :class="{ current: complete }" :aria-current="complete ? 'step' : undefined"><span>3</span>Organiser review</li></ol>
       <p v-if="notice" class="notice" role="status">{{ notice }}</p>
 
-    <section v-if="complete" ref="confirmationPanel" class="confirmation" tabindex="-1" aria-live="polite"><span class="confirm-mark">{{ registrationStatus === 'verified' ? '✓' : '·' }}</span><h3>{{ confirmationTitle }}</h3><p>{{ confirmationMessage }}</p><p class="reference">Keep your registration reference <strong>{{ registrationRef }}</strong></p><span v-if="registrationStatus === 'pending' || !registrationStatus" class="pending-badge">Awaiting payment verification</span><span v-else-if="registrationStatus === 'verified'" class="verified-badge">Payment verified</span><a v-else-if="registrationStatus === 'needs_clarification' || registrationStatus === 'rejected'" class="confirmation-contact" href="tel:+60162459482">Contact the organiser · +60 16-245 9482</a></section>
+    <section v-if="complete" ref="confirmationPanel" class="confirmation" tabindex="-1" aria-live="polite"><span class="confirm-mark">{{ registrationStatus === 'verified' ? '✓' : '·' }}</span><h3>{{ confirmationTitle }}</h3><p>{{ confirmationMessage }}</p><p class="reference">Keep your registration reference <strong>{{ registrationRef }}</strong></p><span v-if="registrationStatus === 'pending' || !registrationStatus" class="pending-badge">Awaiting payment verification</span><span v-else-if="registrationStatus === 'verified'" class="verified-badge">Payment verified</span><button v-if="registrationStatus === 'cancelled'" type="button" class="event-button" :disabled="busy || !canRegister" @click="restartCancelledRegistration">{{ busy ? 'Reserving…' : canRegister ? 'Register again' : 'Registration is unavailable' }}</button><p v-if="registrationStatus === 'cancelled'" class="small-print">If you already paid and were not refunded, upload your original receipt. Contact the organiser before paying again.</p><p v-if="error" class="form-error" role="alert">{{ error }}</p><a v-else-if="registrationStatus === 'needs_clarification' || registrationStatus === 'rejected' || registrationStatus === 'cancelled'" class="confirmation-contact" href="tel:+60162459482">Contact the organiser · +60 16-245 9482</a></section>
       <div v-else-if="restorePending || restoreFailed" class="signup-step restore-state" role="status">
         <h3>{{ restorePending ? 'Restoring your saved place…' : savedHoldCanDiscard ? 'Your saved details could not be recovered' : 'Your saved place needs reconnecting' }}</h3>
         <p>{{ restorePending ? 'Checking the reservation saved in this browser.' : savedHoldCanDiscard ? 'Clear the incomplete saved details to start again. Any previous unpaid reservation will expire automatically.' : 'Your saved reservation is still here. Restore or release it before starting another registration.' }}</p>
@@ -43,7 +43,7 @@
       </div>
       <div v-else ref="paymentPanel" class="payment-step" tabindex="-1">
         <div class="hold-note"><div><strong>{{ holdExpired ? 'Your place reservation has expired.' : `${holdCountdown} left to complete registration` }}</strong><small>{{ holdExpired ? 'Already paid? Submit your receipt for organiser review. Your place will need to be checked.' : `Held for ${hold.name} until ${holdExpiry}. Already paid? Upload your receipt before leaving.` }}</small></div><button type="button" class="inline-button" :disabled="busy" @click="cancelHold">Release place</button></div>
-        <div class="payment-instructions"><h3>Pay RM10</h3><p>Send your entry fee by Touch ’n Go or DuitNow to:</p><a href="tel:+60162459482">+60 16-245 9482</a><p>Recipient name: <strong>NICHOLAS</strong></p><button type="button" class="copy-button" @click="copyNumber">{{ copied ? 'Number copied' : 'Copy number' }}</button></div>
+        <div class="payment-instructions"><h3>{{ hold.restarted_from_registration_id ? 'Submit your receipt' : 'Pay RM10' }}</h3><p v-if="hold.restarted_from_registration_id">If your entry fee was refunded, contact the organiser before paying again. Otherwise, upload your original receipt so the organiser can review the payment.</p><template v-else><p>Send your entry fee by Touch ’n Go or DuitNow to:</p><a href="tel:+60162459482">+60 16-245 9482</a><p>Recipient name: <strong>NICHOLAS</strong></p><button type="button" class="copy-button" @click="copyNumber">{{ copied ? 'Number copied' : 'Copy number' }}</button></template></div>
         <form @submit.prevent="submitReceipt">
           <label for="receipt">Upload your payment receipt <span>(JPG, PNG or PDF · up to 5 MB)</span></label>
           <input id="receipt" ref="receiptInput" type="file" accept="image/jpeg,image/png,application/pdf" required :disabled="busy" @change="chooseReceipt">
@@ -192,7 +192,7 @@ const holdSeconds = computed(() => Math.max(0, Math.ceil((new Date(hold.value?.e
 const holdCountdown = computed(() => `${Math.floor(holdSeconds.value / 60)}:${String(holdSeconds.value % 60).padStart(2,'0')}`)
 const holdExpired = computed(() => Boolean(hold.value) && holdSeconds.value === 0)
 const confirmationTitle = computed(() => ({pending:'You’re on the list.',verified:'Your place is confirmed.',needs_clarification:'The organiser needs a clearer receipt.',rejected:'This registration was not accepted.',cancelled:'This registration was cancelled.',payment_exception:'Receipt sent for review'}[registrationStatus.value] ?? 'Receipt submitted'))
-const confirmationMessage = computed(() => ({pending:'Your receipt has been submitted. Your name will show as verified once the organiser checks your payment.',verified:'Your payment has been checked and your place is confirmed. See you at the table.',needs_clarification:'Please contact the organiser to clarify your payment before the event.',rejected:'Please contact the organiser if you think this decision was made by mistake.',cancelled:'This registration no longer holds a place in the event.',payment_exception:'The reservation expired before submission. The organiser will review the receipt; your place is not yet confirmed.'}[registrationStatus.value] ?? 'Your receipt has been submitted. The organiser will review your registration.'))
+const confirmationMessage = computed(() => ({pending:'Your receipt has been submitted. Your name will show as verified once the organiser checks your payment.',verified:'Your payment has been checked and your place is confirmed. See you at the table.',needs_clarification:'Please contact the organiser to clarify your payment before the event.',rejected:'Please contact the organiser if you think this decision was made by mistake.',cancelled:'This registration no longer holds a place. You can start a new registration while places remain.',payment_exception:'The reservation expired before submission. The organiser will review the receipt; your place is not yet confirmed.'}[registrationStatus.value] ?? 'Your receipt has been submitted. The organiser will review your registration.'))
 let refreshTimer, clockTimer, guideReturnFocus
 let posterReturnFocus
 let disposed = false
@@ -258,6 +258,7 @@ onMounted(async () => {
       if (confirmation?.reference) {
         registrationRef.value = confirmation.reference
         registrationStatus.value = confirmation.status ?? (confirmation.paymentException ? 'payment_exception' : 'pending')
+        name.value = confirmation.display_name ?? ''
         complete.value = true
       }
     } catch { sessionStorage.removeItem(CONFIRMATION_KEY) }
@@ -304,7 +305,8 @@ function storeConfirmation(data, holdId, token) {
   registrationRef.value = data.reference ?? String(data.id).slice(0,8).toUpperCase()
   registrationStatus.value = data.status ?? 'pending'
   complete.value = true
-  sessionStorage.setItem(CONFIRMATION_KEY,JSON.stringify({reference:registrationRef.value,status:registrationStatus.value,hold_id:holdId,token}))
+  const registrationId=data.registration_id??data.id
+  sessionStorage.setItem(CONFIRMATION_KEY,JSON.stringify({reference:registrationRef.value,status:registrationStatus.value,registration_id:registrationId,display_name:data.display_name??name.value,hold_id:holdId,token}))
 }
 
 async function refreshOwnRegistration() {
@@ -335,7 +337,11 @@ async function restoreSavedHold() {
     savedHoldCanDiscard.value=!canRestore && !savedHoldCanRelease.value
     if (!canRestore) throw new Error(savedHoldCanRelease.value ? 'The saved reservation details are incomplete. Release this saved place to continue.' : 'The saved reservation details are incomplete. Clear them to start again.')
     name.value=stored.name??''
-    const grant=await callPublic('reserve',{token:stored.token,idempotency_key:stored.idempotency_key})
+    const restartRegistrationId=stored.restart_registration_id??(stored.mode==='restart'?stored.registration_id:null)
+    const restartPreviousToken=stored.restart_previous_token??(stored.mode==='restart'?stored.previous_token:null)
+    const grant=restartRegistrationId && restartPreviousToken
+      ? await callPublic('restart',{registration_id:restartRegistrationId,previous_token:restartPreviousToken,token:stored.token,idempotency_key:stored.idempotency_key})
+      : await callPublic('reserve',{token:stored.token,idempotency_key:stored.idempotency_key})
     if (grant.completed) {
       storeConfirmation(grant,grant.id,stored.token)
       sessionStorage.removeItem(HOLD_KEY)
@@ -343,9 +349,16 @@ async function restoreSavedHold() {
       savedHoldCanRelease.value=false
       savedHoldCanDiscard.value=false
     } else {
-      hold.value={...stored,...grant,token:stored.token,idempotency_key:stored.idempotency_key,name:stored.name??''}
+      hold.value={...stored,...grant,token:stored.token,idempotency_key:stored.idempotency_key,name:stored.name??'',restart_registration_id:restartRegistrationId,restart_previous_token:restartPreviousToken}
       savedHoldCanRelease.value=false
-      sessionStorage.setItem(HOLD_KEY,JSON.stringify({id:hold.value.id,expires_at:hold.value.expires_at,path:hold.value.path,token:hold.value.token,idempotency_key:hold.value.idempotency_key,name:hold.value.name}))
+      if(restartRegistrationId){
+        complete.value=false
+        registrationRef.value=''
+        registrationStatus.value=''
+        sessionStorage.removeItem(CONFIRMATION_KEY)
+        notice.value='Your new place is held. Upload your receipt to send this registration for review.'
+      }
+      sessionStorage.setItem(HOLD_KEY,JSON.stringify({id:hold.value.id,expires_at:hold.value.expires_at,path:hold.value.path,token:hold.value.token,idempotency_key:hold.value.idempotency_key,name:hold.value.name,restart_registration_id:hold.value.restart_registration_id,restart_previous_token:hold.value.restart_previous_token}))
       sessionStorage.removeItem(DRAFT_KEY)
     }
   } catch (cause) {
@@ -353,6 +366,53 @@ async function restoreSavedHold() {
     notice.value=savedHoldCanDiscard.value ? '' : 'Your saved reservation is still in this browser. Restore or release it before starting another registration.'
     error.value=cause.message || 'Could not restore the saved reservation. Check your connection and try again.'
   } finally { restorePending.value=false }
+}
+
+async function restartCancelledRegistration() {
+  if (busy.value || !canRegister.value || registrationStatus.value!=='cancelled') return
+  let confirmation
+  try { confirmation=JSON.parse(sessionStorage.getItem(CONFIRMATION_KEY)??'null') } catch {}
+  if (!confirmation?.registration_id || !confirmation?.hold_id || !confirmation?.token) {
+    error.value='Refresh your registration details before trying again.'
+    return
+  }
+  let draft
+  try { draft=JSON.parse(sessionStorage.getItem(DRAFT_KEY)??'null') } catch {}
+  if (draft?.mode!=='restart' || draft.registration_id!==confirmation.registration_id) {
+    draft={mode:'restart',registration_id:confirmation.registration_id,previous_token:confirmation.token,
+      token:crypto.randomUUID()+crypto.randomUUID(),idempotency_key:crypto.randomUUID(),name:confirmation.display_name??name.value}
+  }
+  sessionStorage.setItem(DRAFT_KEY,JSON.stringify(draft))
+  busy.value=true
+  error.value=''
+  try {
+    const grant=await callPublic('restart',{registration_id:draft.registration_id,previous_token:draft.previous_token,token:draft.token,idempotency_key:draft.idempotency_key})
+    if (grant.completed) {
+      sessionStorage.removeItem(DRAFT_KEY)
+      storeConfirmation(grant,grant.id,draft.token)
+      await loadPublic()
+      return
+    }
+    hold.value={...grant,token:draft.token,idempotency_key:draft.idempotency_key,name:draft.name,
+      restart_registration_id:draft.registration_id,restart_previous_token:draft.previous_token}
+    name.value=draft.name
+    receipt.value=null
+    complete.value=false
+    registrationRef.value=''
+    registrationStatus.value=''
+    sessionStorage.removeItem(CONFIRMATION_KEY)
+    sessionStorage.removeItem(DRAFT_KEY)
+    sessionStorage.setItem(HOLD_KEY,JSON.stringify({id:hold.value.id,expires_at:hold.value.expires_at,path:hold.value.path,
+      token:hold.value.token,idempotency_key:hold.value.idempotency_key,name:hold.value.name,
+      restart_registration_id:hold.value.restart_registration_id,restart_previous_token:hold.value.restart_previous_token}))
+    notice.value='Your new place is held. Upload your receipt to send this registration for review.'
+    now.value=Date.now()
+    await loadPublic()
+    await nextTick()
+    paymentPanel.value?.scrollIntoView({behavior:'smooth',block:'start'})
+    paymentPanel.value?.focus({preventScroll:true})
+  } catch (cause) { error.value=cause.message || 'A new reservation could not be started. Try again.' }
+  finally { busy.value=false }
 }
 
 async function releaseSavedHold() {
