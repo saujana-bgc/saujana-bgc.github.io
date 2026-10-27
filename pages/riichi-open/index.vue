@@ -100,9 +100,6 @@
 </template>
 
 <script setup>
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
-
 useHead({ title: 'Riichi Open I | Saujana BGC', meta: [{ name: 'description', content: 'Register for Riichi Open I and follow certified standings for the 14 November 2026 event at Boardroom Bandit, Ara Damansara.' }] })
 const route = useRoute()
 const router = useRouter()
@@ -122,10 +119,12 @@ const guideMobileToc = ref(null)
 const guideScrollTop = ref(0)
 const posterDialog = ref(null)
 const guideMarkdown = ref('')
+const guideLibraries = shallowRef(null)
 const guideLoading = ref(false)
 const guideError = ref('')
 const guideHtml = computed(() => {
-  if (!guideMarkdown.value) return ''
+  if (!guideMarkdown.value || !guideLibraries.value) return ''
+  const { marked, DOMPurify } = guideLibraries.value
   const parsed = DOMPurify.sanitize(marked.parse(guideMarkdown.value, { async: false, gfm: true }))
   const document = new DOMParser().parseFromString(parsed, 'text/html')
   for (const heading of document.body.querySelectorAll('h2')) {
@@ -208,11 +207,17 @@ function openGuide(event) {
 }
 
 async function loadGuide() {
+  if (guideLoading.value) return
   guideLoading.value = true
   guideError.value = ''
   try {
-    const response = await fetch('/riichi-open/rules.md')
+    const [response, markdown, sanitizer] = await Promise.all([
+      fetch('/riichi-open/rules.md'),
+      import('marked'),
+      import('dompurify'),
+    ])
     if (!response.ok) throw new Error('The tournament guide could not be loaded. Please try again.')
+    guideLibraries.value = { marked: markdown.marked, DOMPurify: sanitizer.default }
     guideMarkdown.value = await response.text()
   } catch (cause) {
     guideError.value = cause.message || 'The tournament guide could not be loaded. Please try again.'

@@ -1,7 +1,8 @@
 const TTL = 24 * 60 * 60 * 1000
 const CACHE_KEY = 'saujana-playlog-cache-v2'
 
-const data = ref([])
+// Rows are replaced as a snapshot, never edited in place by consumers.
+const data = shallowRef([])
 const isPending = ref(true)
 const isError = ref(false)
 let loadPromise = null

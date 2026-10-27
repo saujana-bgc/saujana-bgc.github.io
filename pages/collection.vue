@@ -201,16 +201,6 @@ const getStats = (gameName) => {
     return playStats.value[key] ?? { date: null, count: 0 }
 }
 
-const gamesWithStats = computed(() => {
-    if (!collectionDataSimple) return []
-    return collectionDataSimple.games.map(game => ({
-        ...game,
-        stats: getStats(game.name)
-    }))
-})
-
-const normalizedSearch = computed(() => search.value.trim().toLowerCase())
-
 function gameSearchText(game) {
     return [
         game.name,
@@ -221,28 +211,26 @@ function gameSearchText(game) {
     ].filter(Boolean).join(' ').toLowerCase()
 }
 
+// Catalogue fields are immutable; build searchable text once per page visit.
+const indexedGames = collectionDataSimple.games.map(game => ({ ...game, searchText: gameSearchText(game) }))
+const gamesWithStats = computed(() => indexedGames.map(game => ({ ...game, stats: getStats(game.name) })))
+const gamesByName = computed(() => [...gamesWithStats.value].sort((a, b) => a.name.localeCompare(b.name)))
+const gamesByPlayed = computed(() => [...gamesWithStats.value].sort((a, b) => {
+    if (a.stats.date !== b.stats.date) return (b.stats.date ?? '') > (a.stats.date ?? '') ? 1 : -1
+    return a.name.localeCompare(b.name)
+}))
+const normalizedSearch = computed(() => search.value.trim().toLowerCase())
+
 const displayedGames = computed(() => {
-    let list = currentSort.value === 'surprise'
-        ? gamesWithStats.value.filter(game => game.stats.count === 0)
-        : [...gamesWithStats.value]
-
+    const unplayedOnly = currentSort.value === 'surprise'
+    const list = unplayedOnly ? gamesWithStats.value
+        : currentSort.value === 'played' ? gamesByPlayed.value : gamesByName.value
     const query = normalizedSearch.value
-    if (query) list = list.filter(game => gameSearchText(game).includes(query))
-
     const cats = selectedCategories.value
-    if (cats.length) list = list.filter(game => cats.some(c => game.categories?.includes(c)))
-
-    if (currentSort.value === 'surprise') return list
-
-    if (currentSort.value === 'name' || currentSort.value === null) {
-        list.sort((a, b) => a.name.localeCompare(b.name))
-    } else if (currentSort.value === 'played') {
-        list.sort((a, b) => {
-            if (a.stats.date !== b.stats.date) return (b.stats.date ?? '') > (a.stats.date ?? '') ? 1 : -1
-            return a.name.localeCompare(b.name)
-        })
-    }
-    return list
+    if (!unplayedOnly && !query && !cats.length) return list
+    return list.filter(game => (!unplayedOnly || game.stats.count === 0)
+        && (!query || game.searchText.includes(query))
+        && (!cats.length || cats.some(category => game.categories?.includes(category))))
 })
 
 const gridGap = computed(() => viewportWidth.value >= 768 ? 30 : 16)
@@ -254,7 +242,7 @@ const virtualColumns = computed(() => {
     return Math.max(1, Math.floor((containerWidth + gridGap.value) / (200 + gridGap.value)))
 })
 
-const virtualState = computed(() => {
+const virtualState = computed((previous) => {
     const totalRows = Math.ceil(displayedGames.value.length / virtualColumns.value)
     const offsetY = Math.max(0, scrollY.value - gridTop.value)
     const overscan = 3
@@ -265,12 +253,17 @@ const virtualState = computed(() => {
     const start = firstRow * virtualColumns.value
     const end = Math.min(displayedGames.value.length, lastRow * virtualColumns.value)
 
+    const renderedRows = Math.max(0, lastRow - firstRow)
+    // Pixel scrolling within the same rows must not invalidate the card list.
+    if (previous && previous.firstRow === firstRow && previous.totalRows === totalRows
+        && previous.start === start && previous.end === end && previous.renderedRows === renderedRows) return previous
+
     return {
         firstRow,
         totalRows,
         start,
         end,
-        renderedRows: Math.max(0, lastRow - firstRow),
+        renderedRows,
     }
 })
 
