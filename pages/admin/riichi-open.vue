@@ -24,7 +24,9 @@
 
       <section id="participants" class="admin-section"><div class="section-title"><div><p class="eyebrow">Roster</p><h2>Participants and check-in</h2></div></div><p v-if="rosterLocked" class="locked-note">The playing roster is locked because the tournament has started.</p><p v-if="participantConflictIds.length" class="admin-error" role="alert">Some roster details changed in another session. Your edits are preserved. Reload the roster before saving those rows.</p><button v-if="participantConflictIds.length" class="admin-action secondary" @click="load({ resetParticipantEdits:true })">Reload roster and discard local roster edits</button><p v-if="!rosterLocked" class="save-hint">Check-in and eligibility save as soon as you change them. Names save when you leave the field.</p><form v-if="!rosterLocked" class="admin-card admin-form-row add-player" @submit.prevent="addParticipant"><label>Name<input v-model="newParticipant.name" maxlength="80" required></label><label class="inline-check"><input v-model="newParticipant.verified" type="checkbox"> Payment checked</label><label v-if="newParticipant.verified">Verification reason<input v-model="newParticipant.reason" required placeholder="e.g. cash checked in person"></label><button class="admin-action">Add participant</button></form><div class="admin-table-wrap admin-card"><table class="admin-table roster-table"><thead><tr><th>Participant</th><th>Payment</th><th>Checked in</th><th>Substitute</th><th>Final eligible</th><th>Save status</th></tr></thead><tbody><tr v-for="person in data.participants" :key="person.id"><td data-label="Participant"><input :disabled="rosterLocked" v-model="participantEdits[person.id].display_name" maxlength="80" aria-label="Participant name" @blur="saveParticipant(person)"></td><td data-label="Payment">{{ paymentStatus(person) }}</td><td data-label="Checked in"><input :disabled="rosterLocked" v-model="participantEdits[person.id].checked_in" type="checkbox" aria-label="Checked in" @change="saveParticipant(person)"></td><td data-label="Substitute"><input :disabled="rosterLocked" v-model="participantEdits[person.id].is_substitute" type="checkbox" aria-label="Substitute" @change="saveParticipant(person)"></td><td data-label="Final eligible"><input v-model="participantEdits[person.id].eligible_for_final" type="checkbox" :disabled="rosterLocked || participantEdits[person.id].is_substitute" aria-label="Eligible for final" @change="saveParticipant(person)"></td><td data-label="Save status"><span v-if="rosterLocked" class="locked-note">Locked</span><button v-else-if="participantSaveStates[person.id] === 'error'" type="button" class="inline-save-state save-error retry-save" @click="saveParticipant(person)">Could not save · retry</button><span v-else class="inline-save-state" :class="`save-${participantSaveStates[person.id] || 'saved'}`" role="status">{{ participantSaveLabel(person.id) }}</span></td></tr></tbody></table></div><div v-if="!rosterLocked" class="draw-readiness"><p><strong>{{ checkedInCount }}</strong> verified players checked in · {{ canDrawFirstRound ? 'Ready for tables of four' : 'Check in 4, 8, 12 or 16 players to draw' }}</p><button class="admin-action" :disabled="!canDrawFirstRound || backgroundSaveCount > 0" @click="drawFirstRound">Draw Qualifier 1 tables and seats</button></div></section>
 
-      <section id="tables" class="admin-section"><p class="eyebrow">Assignments</p><h2>Tables and seating</h2><p class="admin-lede">Published assignments appear on public standings. Complete, balanced tables save automatically as private drafts. Scores appear publicly only after you certify the round.</p><div v-if="revisionConflict" class="admin-error" role="alert"><p>Another organiser changed this round. Your score entries are preserved. Choose how to continue before saving again.</p><div class="action-row"><button class="admin-action secondary" @click="resolveRoundConflict(false)">Use the latest saved scores</button><button class="admin-action" @click="resolveRoundConflict(true)">Keep my entries and continue</button></div></div><div v-if="!data.rounds.length" class="admin-card">Draw the first round after the verified roster is checked in.</div><article v-for="round in data.rounds" :key="round.id" class="round-card admin-card"><div class="section-title"><h3>{{ humanize(round.round_key) }}</h3><span class="admin-badge">{{ humanize(round.status) }} · revision {{ round.draft_revision }}</span></div><div class="round-tables"><section v-for="table in tablesFor(round)" :key="table.id" class="table-editor"><h4>Table {{ table.table_number }} <small :class="{ 'draft-dirty': tableStatus(table).dirty }">{{ round.status === 'certified' ? 'Certified · locked' : tableSaveStates[table.id] === 'saving' ? 'Saving…' : tableSaveStates[table.id] === 'error' ? 'Save failed' : tableStatus(table).dirty ? 'Unsaved changes' : tableStatus(table).saved ? 'Draft saved' : 'No results yet' }}</small></h4><div v-for="seat in seatsFor(table)" :key="seat.participant_id" class="seat-row"><span>{{ seat.seat_wind }}</span><strong>{{ participantName(seat.participant_id) }}</strong><input v-if="round.status!=='certified'" v-model.number="scores[table.id][seat.participant_id]" type="number" step="100" inputmode="numeric" placeholder="Raw points" :aria-label="`${participantName(seat.participant_id)} raw points`" @input="scheduleTableSave(round,table)"><span v-else>{{ pointsFor(table,seat.participant_id) }}</span></div><label v-if="round.status!=='certified'" class="sticks-label">Unclaimed sticks <input v-model.number="sticks[table.id]" type="number" min="0" max="100" step="1" @input="scheduleTableSave(round,table)"></label><div v-if="round.status !== 'certified'" class="table-balance" :class="{ balanced: tableStatus(table).valid }"><span>Points + sticks</span><strong>{{ tableStatus(table).total.toLocaleString('en-MY') }} / 120,000</strong><small>{{ !tableStatus(table).complete ? 'Enter all four scores in multiples of 100.' : tableStatus(table).valid ? 'Balanced · saving automatically' : 'Check points and unclaimed sticks before saving.' }}</small></div><p v-if="round.status !== 'certified' && tableStatus(table).valid" class="preview-line">Score preview · {{ tablePreview(table) }}</p><button v-if="round.status!=='certified' && tableSaveStates[table.id] === 'error'" class="admin-action secondary" :disabled="revisionConflict" @click="saveTable(round,table)">Retry table save</button></section></div></article></section>
+      <section id="tables" class="admin-section"><p class="eyebrow">Assignments</p><h2>Tables and seating</h2><p class="admin-lede">Published assignments appear on public standings. Complete, balanced tables save automatically as private drafts. Scores appear publicly only after you certify the round.</p><div v-if="revisionConflict" class="admin-error" role="alert"><p>Another organiser changed this round. Your score entries are preserved. Choose how to continue before saving again.</p><div class="action-row"><button class="admin-action secondary" @click="resolveRoundConflict(false)">Use the latest saved scores</button><button class="admin-action" @click="resolveRoundConflict(true)">Keep my entries and continue</button></div></div><div v-if="!data.rounds.length" class="admin-card">Draw the first round after the verified roster is checked in.</div><article v-for="round in data.rounds" :key="round.id" class="round-card admin-card"><div class="section-title"><h3>{{ humanize(round.round_key) }}</h3><span class="admin-badge">{{ humanize(round.status) }} · revision {{ round.draft_revision }}</span></div><div class="round-tables"><section v-for="table in tablesFor(round)" :key="table.id" class="table-editor"><h4>Table {{ table.table_number }} <small :class="{ 'draft-dirty': tableStatus(table).dirty }">{{ round.status === 'certified' ? 'Certified · locked' : tableSaveStates[table.id] === 'saving' ? 'Saving…' : tableSaveStates[table.id] === 'error' ? 'Save failed' : tableStatus(table).dirty ? 'Unsaved changes' : tableStatus(table).saved ? 'Draft saved' : 'No results yet' }}</small></h4><div v-for="seat in seatsFor(table)" :key="seat.participant_id" class="seat-row"><span>{{ seat.seat_wind }}</span><strong>{{ participantName(seat.participant_id) }}</strong><input v-if="round.status!=='certified'" v-model.number="scores[table.id][seat.participant_id]" :disabled="roundMutationLocks.includes(round.id)" type="number" step="100" inputmode="numeric" placeholder="Raw points" :aria-label="`${participantName(seat.participant_id)} raw points`" @input="scheduleTableSave(round,table)"><span v-else>{{ pointsFor(table,seat.participant_id) }}</span></div><label v-if="round.status!=='certified'" class="sticks-label">Unclaimed sticks <input v-model.number="sticks[table.id]" :disabled="roundMutationLocks.includes(round.id)" type="number" min="0" max="100" step="1" @input="scheduleTableSave(round,table)"></label><div v-if="round.status !== 'certified'" class="table-balance" :class="{ balanced: tableStatus(table).valid }"><span>Points + sticks</span><strong>{{ tableStatus(table).total.toLocaleString('en-MY') }} / 120,000</strong><small>{{ !tableStatus(table).complete ? 'Enter all four scores in multiples of 100.' : tableStatus(table).valid ? 'Balanced · saving automatically' : 'Check points and unclaimed sticks before saving.' }}</small></div><p v-if="round.status !== 'certified' && tableStatus(table).valid" class="preview-line">Score preview · {{ tablePreview(table) }}</p><button v-if="round.status!=='certified' && tableSaveStates[table.id] === 'error'" class="admin-action secondary" :disabled="revisionConflict" @click="saveTable(round,table)">Retry table save</button></section></div></article></section>
+
+      <section v-if="unpublishedRounds.length" class="admin-card publication-recovery" aria-live="polite"><div><strong>Seating is prepared but not public yet.</strong><span>Retry publication to show the assignments on the public standings page.</span></div><button v-for="round in unpublishedRounds" :key="round.id" type="button" class="admin-action secondary" :disabled="busy" @click="republishRound(round)">Retry {{ humanize(round.round_key) }} publication</button></section>
 
       <section id="results" class="admin-section"><p class="eyebrow">Scoring record</p><h2>Penalties</h2><p class="admin-lede">Enter raw scores in the table editors above. Use this section only for a tournament-point penalty, with a reason for the audit trail.</p><p v-if="!activeRounds.length" class="locked-note">Penalties can be entered while a round is active.</p><form v-else class="admin-card admin-form-row" @submit.prevent="recordPenalty"><label>Round<select v-model="penalty.round_id"><option v-for="round in activeRounds" :key="round.id" :value="round.id">{{ humanize(round.round_key) }}</option></select></label><label>Participant<select v-model="penalty.participant_id" required><option value="">Choose a seated player</option><option v-for="person in penaltyParticipants" :key="person.id" :value="person.id">{{ person.display_name }}</option></select></label><label>Penalty points<input v-model.number="penalty.points" type="number" min="0" step="0.1" required></label><label>Reason<input v-model="penalty.reason" required maxlength="500"></label><button class="admin-action">Record penalty</button></form><p class="admin-lede">Chombo is entered as 30.0 tournament points. Penalties stay separate from mahjong points.</p></section>
 
@@ -52,6 +54,9 @@ const receiptDialog = ref(null)
 const certificationDialog = ref(null)
 const certificationRound = ref(null)
 const revisionConflict = ref(false)
+const roundMutationLocks = ref([])
+const publishedRoundKey = ref('')
+const publicationStatusKnown = ref(false)
 const savedScores = reactive({})
 const savedSticks = reactive({})
 const participantSaveTasks = new Map()
@@ -61,6 +66,7 @@ const roundSaveQueues = new Map()
 const backgroundSaveCount = computed(() => Object.values(participantSaveStates).filter(state => state === 'saving').length + Object.values(tableSaveStates).filter(state => state === 'saving').length)
 const rosterLocked = computed(() => data.value?.event.stage !== 'registration')
 const activeRounds = computed(() => data.value?.rounds.filter(round => round.status !== 'certified') ?? [])
+const unpublishedRounds = computed(() => publicationStatusKnown.value ? activeRounds.value.filter(round => round.round_key === data.value?.event.stage && publishedRoundKey.value !== round.round_key) : [])
 const penaltyParticipants = computed(() => { const ids = new Set(data.value?.seats.filter(seat => seat.round_id === penalty.round_id).map(seat => seat.participant_id)); return data.value?.participants.filter(person => ids.has(person.id)) ?? [] })
 const checkedInCount = computed(() => data.value?.participants.filter(person => person.active && person.checked_in && paymentStatus(person) === 'verified').length ?? 0)
 const canDrawFirstRound = computed(() => !rosterLocked.value && checkedInCount.value >= 4 && checkedInCount.value % 4 === 0)
@@ -88,6 +94,8 @@ async function load(options = {}) {
       callAdmin('overview'),
       callPublic('summary').catch(() => null),
     ])
+    publicationStatusKnown.value = Boolean(publicSummary)
+    publishedRoundKey.value = publicSummary?.publication?.snapshot?.assignment_round ?? ''
     const tieDraws=latest.tie_draws??[]
     for(const draw of publicSummary?.publication?.snapshot?.tie_draws??[]){
       const roundId=latest.rounds.find(round=>round.round_key===draw.round)?.id
@@ -159,7 +167,44 @@ async function load(options = {}) {
   } catch (cause) { error.value = cause.message }
   finally { loading.value = false }
 }
-async function act(action,payload={}){if(busy.value)return null;busy.value=true;error.value='';message.value='';try{if(action==='penalty'){await flushRoundSaves(payload.round_id);if(revisionConflict.value)return null;const round=data.value?.rounds.find(item=>item.id===payload.round_id);payload={...payload,revision:round?.draft_revision??payload.revision}}const result=await callAdmin(action,payload);await load();return result}catch(cause){error.value=cause.message;if(/round changed|reload before editing/i.test(cause.message)){revisionConflict.value=true;await load();error.value='Another organiser changed this round. Your entries are preserved; review the latest saved scores before continuing.'}else if(/private note changed/i.test(cause.message))await load();return null}finally{busy.value=false}}
+async function act(action,payload={}){
+  if(busy.value)return null
+  busy.value=true;error.value='';message.value=''
+  let lockedRoundId=''
+  try{
+    if(action==='penalty'){
+      lockedRoundId=payload.round_id
+      roundMutationLocks.value=[...roundMutationLocks.value,lockedRoundId]
+      await flushRoundSaves(lockedRoundId)
+      if(revisionConflict.value)return null
+      const round=data.value?.rounds.find(item=>item.id===lockedRoundId)
+      if(!round)throw new Error('The active round could not be reloaded. Refresh the page before recording the penalty.')
+      payload={...payload,revision:round.draft_revision}
+    }
+    try { const result=await callAdmin(action,payload);await load();return result }
+    catch(cause){
+      if(['generate_q1','prepare_round'].includes(action)){
+        await load()
+        if(unpublishedRounds.value.length)error.value=`${cause.message} Seating was prepared, but publication failed. Use the retry control above the penalties section.`
+        else error.value=cause.message
+        return null
+      }
+      throw cause
+    }
+  }catch(cause){
+    error.value=cause.message
+    if(/round changed|reload before editing/i.test(cause.message)){revisionConflict.value=true;await load();error.value='Another organiser changed this round. Your entries are preserved; review the latest saved scores before continuing.'}
+    else if(/private note changed/i.test(cause.message))await load()
+    return null
+  }finally{
+    if(lockedRoundId)roundMutationLocks.value=roundMutationLocks.value.filter(id=>id!==lockedRoundId)
+    busy.value=false
+  }
+}
+async function republishRound(round){
+  const result=await act('publish_round',{round_id:round.id})
+  if(result)message.value=`${humanize(round.round_key)} seating is now public.`
+}
 async function toggleRegistration(){const result=await act('registration_open',{open:!data.value.event.registration_open});if(result)message.value=`Registration ${data.value.event.registration_open?'opened':'closed'}.`}
 async function previewReceipt(registration){try{const result=await callAdmin('receipt_url',{path:registration.receipt_path});preview.value={url:result.url,mime:registration.receipt_mime,name:registration.display_name};await nextTick();receiptDialog.value?.showModal()}catch(cause){error.value=cause.message}}
 function closeReceiptBackdrop(event){if(event.target===receiptDialog.value)receiptDialog.value.close()}
@@ -233,6 +278,7 @@ function tableStatus(table) {
 function canCertify(round){return round.status!=='certified'&&resultCount(round)===round.expected_tables*4&&tablesFor(round).every(table=>tableStatus(table).saved&&!tableStatus(table).dirty)}
 function tablePreview(table){return scoreFourPlayerTable(seatsFor(table).map(seat=>({id:seat.participant_id,rawPoints:Number(scores[table.id][seat.participant_id])})),Number(sticks[table.id]??0)).map(row=>`${participantName(row.id)} ${row.score>=0?'+':''}${row.score.toFixed(1)}`).join(' · ')}
 function scheduleTableSave(round,table){
+  if(roundMutationLocks.value.includes(round.id))return
   const existing=tableSaveTimers.get(table.id)
   if(existing)clearTimeout(existing)
   if(revisionConflict.value){tableSaveTimers.delete(table.id);tableSaveStates[table.id]='';return}
@@ -245,14 +291,17 @@ async function saveTable(round,table){
   if(!tableStatus(table).valid||revisionConflict.value)return
   const previous=roundSaveQueues.get(round.id)??Promise.resolve()
   const task=previous.catch(()=>{}).then(async()=>{
-    if(!tableStatus(table).valid||revisionConflict.value)return
+    const currentRound=data.value?.rounds.find(item=>item.id===round.id)
+    if(!currentRound||currentRound.status==='certified'||!tableStatus(table).valid||revisionConflict.value)return
     const rawResults=seatsFor(table).map(seat=>({participant_id:seat.participant_id,raw_points:Number(scores[table.id]?.[seat.participant_id])}))
     const savedStickValue=Number(sticks[table.id]??0)
-    const revision=Number(round.draft_revision)
+    const revision=Number(currentRound.draft_revision)
     tableSaveStates[table.id]='saving'
     try{
       const response=await callAdmin('save_table',{round_id:round.id,table_id:table.id,revision,unclaimed_sticks:savedStickValue,results:rawResults})
-      round.draft_revision=response.draft_revision
+      currentRound.draft_revision=response.draft_revision
+      const capturedRound=data.value?.rounds.find(item=>item.id===round.id)
+      if(capturedRound)capturedRound.draft_revision=response.draft_revision
       const computed=scoreFourPlayerTable(rawResults.map(result=>({id:result.participant_id,rawPoints:result.raw_points})),savedStickValue)
       data.value.results=data.value.results.filter(result=>result.table_id!==table.id).concat(computed.map(result=>({round_id:round.id,table_id:table.id,participant_id:result.id,raw_points:result.rawPoints,placement:result.placement,uma:result.uma,score:result.score,first_place:result.firstPlace,fourth_place:result.fourthPlace})))
       for(const result of rawResults)savedScores[table.id][result.participant_id]=result.raw_points
@@ -272,13 +321,16 @@ async function saveTable(round,table){
 async function flushRoundSaves(roundId){
   const round=data.value?.rounds.find(item=>item.id===roundId)
   if(!round)return
-  for(const table of tablesFor(round)){
-    const timer=tableSaveTimers.get(table.id)
-    if(timer){clearTimeout(timer);tableSaveTimers.delete(table.id)}
-    if(tableStatus(table).valid&&tableStatus(table).dirty)await saveTable(round,table)
-    if(revisionConflict.value)return
+  while(true){
+    for(const table of tablesFor(round)){
+      const timer=tableSaveTimers.get(table.id)
+      if(timer){clearTimeout(timer);tableSaveTimers.delete(table.id)}
+      if(tableStatus(table).valid&&tableStatus(table).dirty)await saveTable(round,table)
+      if(revisionConflict.value)return
+    }
+    await roundSaveQueues.get(roundId)
+    if(![...tableSaveTimers.keys()].some(id=>tablesFor(round).some(table=>table.id===id))&&!tablesFor(round).some(table=>tableStatus(table).valid&&tableStatus(table).dirty))break
   }
-  await roundSaveQueues.get(roundId)
 }
 function resolveRoundConflict(keepLocal){
   for(const [tableId,timer] of tableSaveTimers){clearTimeout(timer);tableSaveTimers.delete(tableId);if(tableSaveStates[tableId]==='pending')tableSaveStates[tableId]=''}
@@ -399,6 +451,10 @@ function scrollToHash(){const id=route.hash.slice(1);if(id)document.getElementBy
 @media(max-width:800px){.overview-grid{grid-template-columns:repeat(2,1fr)}.event-workflow{align-items:stretch;flex-direction:column;gap:20px}.event-workflow label{max-width:360px}.registration-admin-list,.round-tables{grid-template-columns:1fr}.event-admin-heading{align-items:flex-start}.public-event-link{font-size:.72rem;padding-top:12px}.round-card{padding:18px}.certify-row{align-items:flex-start;flex-direction:column}.certify-row .admin-action{width:100%}.section-title{align-items:flex-start}.section-title>.admin-action{font-size:.72rem}.audit-list li{grid-template-columns:1fr}.audit-list small{grid-column:auto}}
 @media(max-width:440px){.event-admin-heading{flex-direction:column;gap:0}.public-event-link{padding:0 0 12px}.overview-grid .admin-card{padding:15px}.overview-grid strong{font-size:1.4rem}.overview-grid span{font-size:.68rem}.event-workflow{padding:21px}.registration-top{flex-wrap:wrap}.seat-row{grid-template-columns:34px minmax(0,1fr) 90px;gap:7px}.table-editor{padding:13px}.round-card{padding:14px}.round-card .section-title{flex-wrap:wrap;gap:8px}.action-row .admin-action{flex:1;min-width:110px}.table-balance{grid-template-columns:1fr}.admin-section{margin-top:26px}}
 
+</style>
+
+<style scoped>
+.publication-recovery{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:18px 0;padding:18px 20px;border-color:#dccbac;background:#fbf6e9}.publication-recovery>div{display:grid;gap:5px}.publication-recovery strong{color:var(--matcha-leaf)}.publication-recovery span{font-size:.8rem;color:var(--muted)}
 </style>
 
 <style scoped>

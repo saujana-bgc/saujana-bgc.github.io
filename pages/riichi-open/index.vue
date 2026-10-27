@@ -64,14 +64,19 @@
       <div class="guide-shell">
         <div class="guide-topbar"><span><i aria-hidden="true"></i> RIICHI OPEN I · TOURNAMENT RULES</span><button type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</button></div>
         <div class="guide-body">
-          <aside class="guide-toc" aria-label="Rules sections">
-            <details>
+          <aside class="guide-toc-desktop" aria-label="Rules sections">
+            <nav aria-label="Jump to a rules section">
+              <button v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</button>
+            </nav>
+          </aside>
+          <div class="guide-toc-mobile">
+            <details ref="guideMobileToc">
               <summary>Jump to section</summary>
               <nav aria-label="Jump to a rules section">
                 <button v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</button>
               </nav>
             </details>
-          </aside>
+          </div>
           <div ref="guideReader" class="guide-reader" tabindex="-1" aria-live="polite">
             <p v-if="guideLoading" class="guide-state">Opening the guide…</p>
             <div v-else-if="guideError" class="guide-state guide-error"><p>{{ guideError }}</p><button type="button" class="guide-retry" @click="loadGuide">Try again</button></div>
@@ -113,6 +118,7 @@ const { callPublic } = useRiichiOpen()
 const guideDialog = ref(null)
 const guideTrigger = ref(null)
 const guideReader = ref(null)
+const guideMobileToc = ref(null)
 const guideScrollTop = ref(0)
 const posterDialog = ref(null)
 const guideMarkdown = ref('')
@@ -124,6 +130,7 @@ const guideHtml = computed(() => {
   const document = new DOMParser().parseFromString(parsed, 'text/html')
   for (const heading of document.body.querySelectorAll('h2')) {
     heading.id = `guide-${heading.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
+    heading.tabIndex = -1
   }
   for (const link of document.body.querySelectorAll('a')) {
     link.target = '_blank'
@@ -217,14 +224,16 @@ async function loadGuide() {
 function closeGuide() { guideDialog.value?.close() }
 function closeGuideFromBackdrop(event) { if (event.target === guideDialog.value) closeGuide() }
 function restoreGuideFocus() { guideScrollTop.value = guideReader.value?.scrollTop ?? guideScrollTop.value; guideReturnFocus?.focus() }
-function jumpToGuideSection(id) {
+async function jumpToGuideSection(id) {
+  if (guideMobileToc.value) guideMobileToc.value.open = false
+  await nextTick()
   const heading = guideReader.value?.querySelector(`#${CSS.escape(id)}`)
   if (!heading || !guideReader.value) return
   const reader = guideReader.value
   const top = reader.scrollTop + heading.getBoundingClientRect().top - reader.getBoundingClientRect().top - 12
-  reader.scrollTo({ top, behavior: 'smooth' })
+  reader.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
   guideScrollTop.value = top
-  if (window.matchMedia('(max-width: 760px)').matches) guideReader.value.closest('.guide-body')?.querySelector('.guide-toc details')?.removeAttribute('open')
+  heading.focus({ preventScroll: true })
 }
 function openPoster(event) { posterReturnFocus=event.currentTarget;posterDialog.value?.showModal() }
 function closePoster() { posterDialog.value?.close() }
@@ -241,8 +250,7 @@ onMounted(async () => {
       complete.value = true
     }
   } catch { sessionStorage.removeItem(CONFIRMATION_KEY) }
-  if (sessionStorage.getItem(HOLD_KEY)) await restoreSavedHold()
-  else { try { const draft=JSON.parse(sessionStorage.getItem(DRAFT_KEY)??'null');if(draft)name.value=draft.name??'' } catch { sessionStorage.removeItem(DRAFT_KEY) } }
+  if (sessionStorage.getItem(HOLD_KEY) || sessionStorage.getItem(DRAFT_KEY)) await restoreSavedHold()
   await loadPublic()
   refreshTimer=window.setInterval(loadPublic,30000)
   window.addEventListener('focus',loadPublic)
@@ -287,7 +295,7 @@ async function refreshOwnRegistration() {
 }
 
 async function restoreSavedHold() {
-  const saved=sessionStorage.getItem(HOLD_KEY)
+  const saved=sessionStorage.getItem(HOLD_KEY)??sessionStorage.getItem(DRAFT_KEY)
   if (!saved) { restoreFailed.value=false;return }
   restorePending.value=true
   restoreFailed.value=false
@@ -302,6 +310,7 @@ async function restoreSavedHold() {
     if (grant.completed) {
       storeConfirmation(grant,grant.id,stored.token)
       sessionStorage.removeItem(HOLD_KEY)
+      sessionStorage.removeItem(DRAFT_KEY)
       savedHoldCanRelease.value=false
     } else {
       hold.value={...stored,...grant,token:stored.token,idempotency_key:stored.idempotency_key,name:stored.name??''}
@@ -361,7 +370,13 @@ async function reservePlace() {
     await nextTick()
     paymentPanel.value?.scrollIntoView({behavior:'smooth',block:'start'})
     paymentPanel.value?.focus({preventScroll:true})
-  } catch (cause) { error.value = cause.message }
+  } catch (cause) {
+    error.value = cause.message
+    if (sessionStorage.getItem(DRAFT_KEY)) {
+      restoreFailed.value = true
+      notice.value = 'Your reservation may have been created. Reconnect to check its status before starting another registration.'
+    }
+  }
   finally { busy.value = false }
 }
 
@@ -460,7 +475,7 @@ async function cancelHold() {
 .format-strip .guide-trigger{grid-column:2;justify-self:start;border:0;padding:0;background:none;color:var(--matcha-leaf);font:650 .95rem 'Segoe UI',sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 .guide-trigger span{display:inline-block;margin-left:5px;color:var(--gold-leaf);transition:transform .18s ease}
 .guide-trigger:hover span{transform:translate(3px,-2px)}
-.guide-trigger:focus-visible,.guide-close:focus-visible,.guide-footer button:focus-visible,.guide-retry:focus-visible,.guide-toc button:focus-visible,.guide-toc summary:focus-visible{outline:3px solid #bc9d60;outline-offset:3px}
+.guide-trigger:focus-visible,.guide-close:focus-visible,.guide-footer button:focus-visible,.guide-retry:focus-visible,.guide-toc-desktop button:focus-visible,.guide-toc-mobile button:focus-visible,.guide-toc-mobile summary:focus-visible{outline:3px solid #bc9d60;outline-offset:3px}
 .guide-dialog{width:min(1200px,calc(100% - 32px));max-width:1200px;height:min(94dvh,1040px);max-height:calc(100dvh - 32px);padding:0;border:1px solid #d8d5c8;border-radius:14px;background:transparent;color:var(--clay-text);box-shadow:0 28px 100px #111a1280;overflow:hidden}
 .guide-dialog::backdrop{background:#18241bcc;backdrop-filter:blur(5px)}
 .guide-shell{height:100%;display:flex;flex-direction:column;background:#fbfaf6}
@@ -468,12 +483,11 @@ async function cancelHold() {
 .guide-topbar>span{display:flex;align-items:center;gap:10px}.guide-topbar i{width:8px;height:8px;border-radius:50%;background:#d6be7e;box-shadow:0 0 0 4px #ffffff18}
 .guide-close{display:grid;place-items:center;width:38px;height:38px;border:1px solid #ffffff50;border-radius:50%;background:#ffffff12;color:white;font:1.5rem/1 'Segoe UI',sans-serif;cursor:pointer}
 .guide-body{display:flex;flex:1 1 auto;min-height:0}
-.guide-toc{flex:0 0 225px;overflow:auto;border-right:1px solid #e5e1d5;background:#f5f3ec;padding:22px 12px;scrollbar-color:#c9c2ae transparent;scrollbar-width:thin}
-.guide-toc details:not([open]) nav{display:block}
-.guide-toc summary{display:none}
-.guide-toc nav{display:grid;gap:3px}
-.guide-toc nav button{border:0;border-radius:5px;background:transparent;color:#4d594c;padding:9px 10px;text-align:left;font:400 .82rem/1.4 'Segoe UI',sans-serif;cursor:pointer}
-.guide-toc nav button:hover{background:#e9e7dc;color:#354c3e}
+.guide-toc-desktop{flex:0 0 225px;overflow:auto;border-right:1px solid #e5e1d5;background:#f5f3ec;padding:22px 12px;scrollbar-color:#c9c2ae transparent;scrollbar-width:thin}
+.guide-toc-mobile{display:none}
+.guide-toc-desktop nav,.guide-toc-mobile nav{display:grid;gap:3px}
+.guide-toc-desktop nav button,.guide-toc-mobile nav button{border:0;border-radius:5px;background:transparent;color:#4d594c;padding:9px 10px;text-align:left;font:400 .82rem/1.4 'Segoe UI',sans-serif;cursor:pointer}
+.guide-toc-desktop nav button:hover,.guide-toc-mobile nav button:hover{background:#e9e7dc;color:#354c3e}
 .guide-reader{flex:1 1 auto;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;padding:clamp(24px,4vw,48px) clamp(24px,5vw,64px);scrollbar-color:#c9c2ae transparent;scrollbar-width:thin;scroll-behavior:smooth}
 .guide-state{min-height:120px;display:grid;place-content:center;text-align:center;color:#73776f;line-height:1.65}.guide-error{color:#913f45}.guide-error p{margin:0}.guide-retry{justify-self:center;margin-top:10px;border:1px solid #a9884d;border-radius:5px;background:#fff;color:#5a644e;padding:8px 13px;cursor:pointer}
 .guide-content{max-width:76ch;margin:0 auto;color:#3f453e;font-size:1rem;line-height:1.8;overflow-wrap:anywhere}
@@ -491,7 +505,7 @@ async function cancelHold() {
 .guide-content :deep(tr:nth-child(even) td){background:#f3f1e9}
 .guide-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:40px;padding:16px 0 4px;border-top:1px solid #e5e1d5;color:#686e65;font-size:.78rem;line-height:1.6}
 .guide-footer button{flex:0 0 auto;border:0;border-radius:5px;background:#354c3e;color:white;padding:11px 15px;font:600 .82rem 'Segoe UI',sans-serif;cursor:pointer}
-@media(max-width:760px){.format-strip .guide-trigger{grid-column:auto}.guide-dialog{width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0}.guide-topbar{padding:calc(8px + env(safe-area-inset-top)) 16px 8px;font-size:.61rem}.guide-body{flex-direction:column}.guide-toc{flex:0 0 auto;overflow:visible;border-right:0;border-bottom:1px solid #e5e1d5;padding:8px 16px;background:#f5f3ec}.guide-toc summary{display:list-item;width:max-content;max-width:100%;padding:7px 0;color:#354c3e;font-size:.86rem;font-weight:650;cursor:pointer}.guide-toc details:not([open]) nav{display:none}.guide-toc details[open] nav{max-height:34dvh;overflow:auto;padding:5px 0 4px}.guide-toc nav button{padding:8px 9px;font-size:.84rem}.guide-reader{padding:24px 20px calc(24px + env(safe-area-inset-bottom))}.guide-content{font-size:1rem;line-height:1.78}.guide-content :deep(h1){font-size:2rem}.guide-content :deep(h2){font-size:1.3rem}.guide-content :deep(table){font-size:.88rem}.guide-footer{align-items:flex-start;font-size:.72rem}.guide-footer button{padding:10px 12px}}
+@media(max-width:760px){.format-strip .guide-trigger{grid-column:auto}.guide-dialog{width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0}.guide-topbar{padding:calc(8px + env(safe-area-inset-top)) 16px 8px;font-size:.61rem}.guide-body{flex-direction:column}.guide-toc-desktop{display:none}.guide-toc-mobile{display:block;flex:0 0 auto;overflow:visible;border-bottom:1px solid #e5e1d5;padding:8px 16px;background:#f5f3ec}.guide-toc-mobile summary{display:list-item;width:max-content;max-width:100%;padding:7px 0;color:#354c3e;font-size:.86rem;font-weight:650;cursor:pointer}.guide-toc-mobile details[open] nav{max-height:34dvh;overflow:auto;padding:5px 0 4px}.guide-toc-mobile nav button{padding:8px 9px;font-size:.84rem}.guide-reader{padding:24px 20px calc(24px + env(safe-area-inset-bottom))}.guide-content{font-size:1rem;line-height:1.78}.guide-content :deep(h1){font-size:2rem}.guide-content :deep(h2){font-size:1.3rem}.guide-content :deep(table){font-size:.88rem}.guide-footer{align-items:flex-start;font-size:.72rem}.guide-footer button{padding:10px 12px}}
 @media(prefers-reduced-motion:reduce){.guide-trigger span{transition:none}}
 .event-status-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 2px 18px;color:var(--matcha-leaf);font-size:.78rem}.event-status-bar>span{display:flex;align-items:center;gap:8px;font-weight:650}.event-status-bar i{width:7px;height:7px;background:#6c8260;border-radius:50%}.event-status-bar small{font-size:.73rem;color:var(--muted)}.event-hero{min-height:510px;border-radius:16px}.mika-frame{height:455px}.hero-actions{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:25px}.hero-actions .event-button{display:flex;align-items:center;gap:24px;min-height:48px}.hero-guide{padding:10px 0;min-height:44px;border:0;border-bottom:1px solid #bdb9a8;background:none;font:600 .83rem var(--font-body);color:var(--matcha-leaf);cursor:pointer}.hero-reassurance{font-size:.72rem;line-height:1.6;color:var(--muted);max-width:420px;margin:14px 0 0}.registration-panel{scroll-margin-top:24px;border-radius:14px;outline-offset:5px}.register-heading .eyebrow{color:#e2c995}.signup-progress{display:grid;grid-template-columns:repeat(3,1fr);list-style:none;grid-column:1/-1;gap:16px;margin:0;padding:0 0 4px}.signup-progress li{display:flex;gap:9px;align-items:center;color:#cad0c7;font-size:.8rem;border-bottom:1px solid #ffffff30;padding-bottom:15px}.signup-progress li>span{display:grid;place-items:center;flex-shrink:0;width:25px;height:25px;border-radius:50%;border:1px solid #ffffff50;font-size:.7rem}.signup-progress .current{color:white;font-weight:650;border-color:#e2c995}.signup-progress .current>span{background:#e2c995;color:var(--matcha-leaf);border-color:#e2c995}.signup-progress .done>span{color:#e2c995;border-color:#e2c995}.signup-step,.payment-step,.confirmation{border-radius:10px;padding:clamp(18px,3vw,28px)}.signup-step input{min-height:48px}.event-button:disabled{cursor:not-allowed}.registration-closed h3{font:1.5rem var(--font-display);margin:0;color:var(--matcha-leaf)}.registration-closed p{color:var(--muted);font-size:.88rem;line-height:1.6}.hold-note{padding-bottom:16px;border-bottom:1px solid var(--line);align-items:flex-start}.hold-note strong{font-variant-numeric:tabular-nums}.hold-note .inline-button{flex-shrink:0;font-size:.74rem;min-height:42px}.payment-instructions{border:1px solid var(--line);border-radius:10px}.payment-instructions p{font-size:.88rem;line-height:1.65}.copy-button{min-height:44px}.payment-step label span{display:block;font-weight:400;margin-top:4px}.payment-step input[type=file]{max-width:100%;min-width:0;width:100%;font-size:.8rem;background:var(--bg-silk)}.payment-step input[type=file]::file-selector-button{border:0;background:var(--matcha-leaf);color:white;padding:9px 12px;border-radius:6px;cursor:pointer;margin-right:10px}.receipt-selection{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:10px;min-width:0}.receipt-selection>img{width:54px;height:64px;object-fit:cover;border-radius:5px;flex-shrink:0}.receipt-selection>div{flex:1;min-width:0}.receipt-selection strong{display:block;font-size:.8rem;overflow-wrap:anywhere}.receipt-selection small{display:block;font-size:.68rem;color:var(--muted);margin-top:4px}.receipt-selection .inline-button{font-size:.7rem;padding:7px;min-height:40px}.registrant-list li{background:var(--white-pure);min-height:58px}.registrant-list .pending-badge,.registrant-list .verified-badge{flex-shrink:0;font-size:.66rem}.confirmation .reference strong{display:block;margin-top:7px;font:1.6rem var(--font-display);letter-spacing:.1em;color:var(--matcha-leaf)}
 @media(max-width:760px){.event-hero{display:block;min-height:0;padding:26px 22px}.hero-copy{padding-bottom:0}.event-hero h1{width:58%;min-height:185px;display:flex;flex-direction:column;justify-content:center;font-size:clamp(2.7rem,7vw,4.3rem)}.mika-frame{position:absolute;top:6px;right:10px;height:220px;width:38%;pointer-events:none}.hero-intro{font-size:1rem;margin-top:20px}.event-facts{font-size:.85rem;gap:8px;margin:20px 0}.event-offer{margin:16px 0}.hero-actions{margin-top:20px;gap:18px}.hero-reassurance{font-size:.69rem}.signup-progress{gap:8px}.signup-progress li{font-size:.69rem;gap:6px}.signup-progress li>span{width:22px;height:22px}.hold-note{flex-wrap:wrap}.event-status-bar small{font-size:.65rem}.registration-panel{gap:20px;padding:22px}.availability{grid-template-columns:auto 1fr;align-items:center;gap:1px 14px;padding:14px}.availability>strong{grid-row:span 2;font-size:2rem}.availability .capacity-track{grid-column:1/-1;width:100%;margin:8px 0 3px}.availability small{grid-column:1/-1}.payment-step .event-button{width:100%;justify-content:center}.registrant-list li{gap:8px;padding:12px;font-size:.83rem}}

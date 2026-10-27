@@ -126,6 +126,16 @@ Deno.serve(async (request) => {
       return reply(request,200,data)
     }
 
+    if(body.action==='publish_round'){
+      const roundId=String(body.round_id??'')
+      const {data:round,error:roundError}=await client.from('riichi_open_rounds').select('id,round_key,status').eq('id',roundId).eq('event_id',event.id).single()
+      if(roundError||!round) return reply(request,404,{error:'Prepared round not found.'})
+      if(round.status==='certified'||round.round_key!==event.stage) return reply(request,409,{error:'Only the active round can have its seating published.'})
+      const {data,error}=await client.rpc('publish_riichi_open_assignments',{p_round_id:roundId,p_actor:user.id})
+      if(error) throw error
+      return reply(request,200,data)
+    }
+
     if(body.action==='record_tie_draw'){
       const roundId=String(body.round_id??''),participantIds=Array.isArray(body.participant_ids)?body.participant_ids.map(String):[],orderIds=Array.isArray(body.order_ids)?body.order_ids.map(String):[],note=String(body.public_note??'').slice(0,500)
       const {error}=await client.rpc('admin_record_riichi_open_tie_draw',{p_round_id:roundId,p_participant_ids:participantIds,p_order_ids:orderIds,p_note:note,p_actor:user.id})
