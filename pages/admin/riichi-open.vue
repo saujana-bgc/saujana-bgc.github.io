@@ -20,7 +20,7 @@
 
       <section id="overview" class="admin-section"><div class="section-title"><div><p class="eyebrow">Overview</p><h2>Event controls</h2></div><button v-if="!rosterLocked" class="admin-action" @click="toggleRegistration">{{ data.event.registration_open?'Close registration':'Open registration' }}</button></div><p class="admin-lede">Saturday, 14 November 2026 · 2:30 pm · Boardroom Bandit, Ara Damansara · RM10 · Winner’s prize</p></section>
 
-      <section id="registrations" class="admin-section"><p class="eyebrow">Payment checks</p><h2>Registrations</h2><div v-if="!data.registrations.length" class="admin-card">No registrations yet.</div><div v-else class="registration-admin-list"><article v-for="registration in data.registrations" :key="registration.id" class="admin-card registration-card"><div class="registration-top"><div><h3>{{ registration.display_name }}</h3><span :class="['admin-badge',`status-${registration.status}`]">{{ humanize(registration.status) }}</span><small>Submitted {{ formatDate(registration.submitted_at) }} · Ref {{ registration.id.slice(0,8).toUpperCase() }}</small></div><button v-if="registration.receipt_path" class="admin-action secondary" @click="previewReceipt(registration)">View receipt</button><span v-else class="missing-receipt">No receipt</span></div><textarea v-model="registrationNotes[registration.id]" rows="2" placeholder="Private organiser note" :aria-label="`Private note for ${registration.display_name}`" :disabled="rosterLocked"></textarea><button v-if="!rosterLocked" class="admin-action secondary" :disabled="busy || !registrationNoteIsDirty(registration)" @click="saveRegistrationNote(registration)">Save private note</button><div v-if="!rosterLocked" class="action-row"><button class="admin-action" :disabled="registration.status === 'verified'" @click="setRegistration(registration,'verified')">Verify payment</button><button class="admin-action secondary" @click="setRegistration(registration,'needs_clarification')">Ask for clarification</button><button class="admin-action danger" @click="setRegistration(registration,'rejected')">Reject</button><button class="admin-action secondary" @click="setRegistration(registration,'cancelled')">Cancel</button></div></article></div></section>
+      <section id="registrations" class="admin-section"><p class="eyebrow">Payment checks</p><h2>Registrations</h2><div v-if="!data.registrations.length" class="admin-card">No registrations yet.</div><div v-else class="registration-admin-list"><article v-for="registration in data.registrations" :key="registration.id" class="admin-card registration-card"><div class="registration-top"><div><h3>{{ registration.display_name }}</h3><span :class="['admin-badge',`status-${registration.status}`]">{{ humanize(registration.status) }}</span><small>Submitted {{ formatDate(registration.submitted_at) }} · Ref {{ registration.id.slice(0,8).toUpperCase() }}</small></div><button v-if="registration.receipt_path" class="admin-action secondary" @click="previewReceipt(registration)">View receipt</button><span v-else class="missing-receipt">No receipt</span></div><textarea v-model="registrationNotes[registration.id]" rows="2" maxlength="2000" placeholder="Private organiser note" :aria-label="`Private note for ${registration.display_name}`" :disabled="rosterLocked"></textarea><p v-if="registrationNoteConflicts[registration.id]" class="admin-error" role="alert">Another organiser changed this note. Choose which version to keep before changing payment status or saving.</p><div v-if="registrationNoteConflicts[registration.id]" class="action-row"><button class="admin-action secondary" @click="resolveRegistrationNoteConflict(registration,'latest')">Use latest note</button><button class="admin-action" @click="resolveRegistrationNoteConflict(registration,'local')">Keep my note</button></div><button v-if="!rosterLocked" class="admin-action secondary" :disabled="busy || registrationNoteConflicts[registration.id] || !registrationNoteIsDirty(registration)" @click="saveRegistrationNote(registration)">Save private note</button><div v-if="!rosterLocked" class="action-row"><button class="admin-action" :disabled="busy || registrationNoteConflicts[registration.id] || registration.status === 'verified'" @click="setRegistration(registration,'verified')">Verify payment</button><button class="admin-action secondary" :disabled="busy || registrationNoteConflicts[registration.id]" @click="setRegistration(registration,'needs_clarification')">Ask for clarification</button><button class="admin-action danger" :disabled="busy || registrationNoteConflicts[registration.id]" @click="setRegistration(registration,'rejected')">Reject</button><button class="admin-action secondary" :disabled="busy || registrationNoteConflicts[registration.id]" @click="setRegistration(registration,'cancelled')">Cancel</button></div></article></div></section>
 
       <section id="participants" class="admin-section"><div class="section-title"><div><p class="eyebrow">Roster</p><h2>Participants and check-in</h2></div></div><p v-if="rosterLocked" class="locked-note">The playing roster is locked because the tournament has started.</p><p v-if="participantConflictIds.length" class="admin-error" role="alert">Some roster details changed in another session. Your edits are preserved. Reload the roster before saving those rows.</p><button v-if="participantConflictIds.length" class="admin-action secondary" @click="load({ resetParticipantEdits:true })">Reload roster and discard local roster edits</button><p v-if="!rosterLocked" class="save-hint">Check-in and eligibility save as soon as you change them. Names save when you leave the field.</p><form v-if="!rosterLocked" class="admin-card admin-form-row add-player" @submit.prevent="addParticipant"><label>Name<input v-model="newParticipant.name" maxlength="80" required></label><label class="inline-check"><input v-model="newParticipant.verified" type="checkbox"> Payment checked</label><label v-if="newParticipant.verified">Verification reason<input v-model="newParticipant.reason" required placeholder="e.g. cash checked in person"></label><button class="admin-action">Add participant</button></form><div class="admin-table-wrap admin-card"><table class="admin-table roster-table"><thead><tr><th>Participant</th><th>Payment</th><th>Checked in</th><th>Substitute</th><th>Final eligible</th><th>Save status</th></tr></thead><tbody><tr v-for="person in data.participants" :key="person.id"><td data-label="Participant"><input :disabled="rosterLocked" v-model="participantEdits[person.id].display_name" maxlength="80" aria-label="Participant name" @blur="saveParticipant(person)"></td><td data-label="Payment">{{ paymentStatus(person) }}</td><td data-label="Checked in"><input :disabled="rosterLocked" v-model="participantEdits[person.id].checked_in" type="checkbox" aria-label="Checked in" @change="saveParticipant(person)"></td><td data-label="Substitute"><input :disabled="rosterLocked" v-model="participantEdits[person.id].is_substitute" type="checkbox" aria-label="Substitute" @change="saveParticipant(person)"></td><td data-label="Final eligible"><input v-model="participantEdits[person.id].eligible_for_final" type="checkbox" :disabled="rosterLocked || participantEdits[person.id].is_substitute" aria-label="Eligible for final" @change="saveParticipant(person)"></td><td data-label="Save status"><span v-if="rosterLocked" class="locked-note">Locked</span><button v-else-if="participantSaveStates[person.id] === 'error'" type="button" class="inline-save-state save-error retry-save" @click="saveParticipant(person)">Could not save · retry</button><span v-else class="inline-save-state" :class="`save-${participantSaveStates[person.id] || 'saved'}`" role="status">{{ participantSaveLabel(person.id) }}</span></td></tr></tbody></table></div><div v-if="!rosterLocked" class="draw-readiness"><p><strong>{{ checkedInCount }}</strong> verified players checked in · {{ canDrawFirstRound ? 'Ready for tables of four' : 'Check in 4, 8, 12 or 16 players to draw' }}</p><button class="admin-action" :disabled="!canDrawFirstRound || backgroundSaveCount > 0" @click="drawFirstRound">Draw Qualifier 1 tables and seats</button></div></section>
 
@@ -45,7 +45,7 @@ definePageMeta({layout:'admin'})
 useHead({title:'Riichi Open admin | Saujana BGC',meta:[{name:'robots',content:'noindex, nofollow, noarchive'}]})
 const {callAdmin,callPublic}=useRiichiOpen(),route=useRoute()
 const data=ref(null),loading=ref(true),busy=ref(false),error=ref(''),message=ref(''),preview=ref(null)
-const registrationNotes=reactive({}),savedRegistrationNotes=reactive({}),participantEdits=reactive({}),savedParticipantEdits=reactive({}),participantConflicts=reactive({}),participantSaveStates=reactive({}),scores=reactive({}),sticks=reactive({}),tableSaveStates=reactive({})
+const registrationNotes=reactive({}),savedRegistrationNotes=reactive({}),registrationNoteConflicts=reactive({}),participantEdits=reactive({}),savedParticipantEdits=reactive({}),participantConflicts=reactive({}),participantSaveStates=reactive({}),scores=reactive({}),sticks=reactive({}),tableSaveStates=reactive({})
 const newParticipant=reactive({name:'',verified:false,reason:''}),penalty=reactive({round_id:'',participant_id:'',points:0,reason:''})
 const tieDrawInProgress=ref(false)
 const receiptDialog = ref(null)
@@ -96,8 +96,16 @@ async function load(options = {}) {
     }
     latest.tie_draws=tieDraws
     for (const row of latest.registrations) {
-      registrationNotes[row.id] ??= row.private_note ?? ''
-      savedRegistrationNotes[row.id] ??= row.private_note ?? ''
+      const latestNote=String(row.private_note??''),currentNote=String(registrationNotes[row.id]??''),savedNote=savedRegistrationNotes[row.id]
+      if(savedNote===undefined||currentNote.trim()===String(savedNote).trim()){
+        registrationNotes[row.id]=latestNote
+        savedRegistrationNotes[row.id]=latestNote
+        delete registrationNoteConflicts[row.id]
+      }else{
+        if(latestNote.trim()!==String(savedNote).trim()&&latestNote.trim()!==currentNote.trim())registrationNoteConflicts[row.id]=true
+        savedRegistrationNotes[row.id]=latestNote
+        if(currentNote.trim()===latestNote.trim())delete registrationNoteConflicts[row.id]
+      }
     }
     const participantFields=['display_name','checked_in','is_substitute','eligible_for_final']
     for (const row of latest.participants) {
@@ -143,9 +151,11 @@ async function toggleRegistration(){const result=await act('registration_open',{
 async function previewReceipt(registration){try{const result=await callAdmin('receipt_url',{path:registration.receipt_path});preview.value={url:result.url,mime:registration.receipt_mime,name:registration.display_name};await nextTick();receiptDialog.value?.showModal()}catch(cause){error.value=cause.message}}
 function closeReceiptBackdrop(event){if(event.target===receiptDialog.value)receiptDialog.value.close()}
 function jumpTo(id){if(id)document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
-async function setRegistration(registration,status){if(status==='verified'&&!registration.receipt_path&&registrationNotes[registration.id]?.trim().length<4){error.value='Add a private reason before verifying a registration without a receipt.';return}const result=await act('registration_status',{registration_id:registration.id,status,private_note:registrationNotes[registration.id],manual_verification:status==='verified'&&!registration.receipt_path});if(result){savedRegistrationNotes[registration.id]=registrationNotes[registration.id]??'';message.value=`${registration.display_name}: ${humanize(status)}.`}}
+async function setRegistration(registration,status){if(registrationNoteConflicts[registration.id])return;const sourceNote=String(registrationNotes[registration.id]??''),note=sourceNote.trim().slice(0,2000);if(status==='verified'&&!registration.receipt_path&&note.trim().length<4){error.value='Add a private reason before verifying a registration without a receipt.';return}const result=await act('registration_status',{registration_id:registration.id,status,private_note:note,manual_verification:status==='verified'&&!registration.receipt_path});if(result){commitRegistrationNote(registration,note,sourceNote);message.value=`${registration.display_name}: ${humanize(status)}.`}}
 function registrationNoteIsDirty(registration){return String(registrationNotes[registration.id]??'').trim()!==String(savedRegistrationNotes[registration.id]??'').trim()}
-async function saveRegistrationNote(registration){const note=String(registrationNotes[registration.id]??'').trim();const result=await act('registration_note',{registration_id:registration.id,private_note:note});if(result){registrationNotes[registration.id]=note;savedRegistrationNotes[registration.id]=note;message.value=`Private note saved for ${registration.display_name}.`}}
+function commitRegistrationNote(registration,note,sourceNote=note){savedRegistrationNotes[registration.id]=note;if(String(registrationNotes[registration.id]??'')===sourceNote)registrationNotes[registration.id]=note;delete registrationNoteConflicts[registration.id]}
+function resolveRegistrationNoteConflict(registration,choice){if(choice==='latest')registrationNotes[registration.id]=String(savedRegistrationNotes[registration.id]??'');delete registrationNoteConflicts[registration.id]}
+async function saveRegistrationNote(registration){if(registrationNoteConflicts[registration.id])return;const sourceNote=String(registrationNotes[registration.id]??''),note=sourceNote.trim().slice(0,2000);const result=await act('registration_note',{registration_id:registration.id,private_note:note});if(result){commitRegistrationNote(registration,note,sourceNote);message.value=`Private note saved for ${registration.display_name}.`}}
 async function addParticipant(){const result=await act('add_participant',{name:newParticipant.name,payment_verified:newParticipant.verified,reason:newParticipant.reason});if(result){message.value='Participant added.';newParticipant.name='';newParticipant.reason='';newParticipant.verified=false}}
 function participantSaveLabel(id){const state=participantSaveStates[id];if(state==='saving')return'Saving…';if(state==='error')return'Could not save';if(participantConflicts[id]?.length)return'Reload needed';const current=participantEdits[id],saved=savedParticipantEdits[id];return current&&saved&&Object.keys(saved).some(field=>!Object.is(current[field],saved[field]))?'Unsaved':'Saved'}
 async function saveParticipant(person){
@@ -211,6 +221,7 @@ function tablePreview(table){return scoreFourPlayerTable(seatsFor(table).map(sea
 function scheduleTableSave(round,table){
   const existing=tableSaveTimers.get(table.id)
   if(existing)clearTimeout(existing)
+  if(revisionConflict.value){tableSaveTimers.delete(table.id);tableSaveStates[table.id]='';return}
   if(!tableStatus(table).valid){tableSaveStates[table.id]='';tableSaveTimers.delete(table.id);return}
   tableSaveStates[table.id]='pending'
   const timer=setTimeout(()=>{tableSaveTimers.delete(table.id);saveTable(round,table)},650)
@@ -256,6 +267,7 @@ async function flushRoundSaves(roundId){
   await roundSaveQueues.get(roundId)
 }
 function resolveRoundConflict(keepLocal){
+  for(const [tableId,timer] of tableSaveTimers){clearTimeout(timer);tableSaveTimers.delete(tableId);if(tableSaveStates[tableId]==='pending')tableSaveStates[tableId]=''}
   if(!keepLocal){
     for(const table of data.value.tables){
       sticks[table.id]=table.unclaimed_sticks
@@ -268,10 +280,17 @@ function resolveRoundConflict(keepLocal){
         if(raw==null){delete scores[table.id][seat.participant_id];delete savedScores[table.id][seat.participant_id]}
         else {scores[table.id][seat.participant_id]=raw;savedScores[table.id][seat.participant_id]=raw}
       }
+      tableSaveStates[table.id]=tableStatus(table).saved?'saved':''
     }
   }
   revisionConflict.value=false
   error.value=''
+  if(keepLocal){
+    for(const round of activeRounds.value)for(const table of tablesFor(round)){
+      if(tableStatus(table).valid&&tableStatus(table).dirty)scheduleTableSave(round,table)
+      else if(tableSaveStates[table.id]==='pending')tableSaveStates[table.id]=''
+    }
+  }
 }
 async function recordPenalty(){const round=data.value.rounds.find(r=>r.id===penalty.round_id);const result=await act('penalty',{...penalty,revision:round?.draft_revision??0});if(result){message.value='Penalty recorded.';penalty.reason='';penalty.points=0}}
 async function certify(round){if(!canCertify(round))return;error.value='';certificationRound.value=round;await nextTick();certificationDialog.value?.showModal()}
