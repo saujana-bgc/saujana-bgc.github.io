@@ -175,8 +175,11 @@ async function act(action,payload={}){
     if(action==='penalty'){
       lockedRoundId=payload.round_id
       roundMutationLocks.value=[...roundMutationLocks.value,lockedRoundId]
-      await flushRoundSaves(lockedRoundId)
-      if(revisionConflict.value)return null
+      const scoresSaved=await flushRoundSaves(lockedRoundId)
+      if(!scoresSaved){
+        if(!revisionConflict.value)error.value=error.value||'Some table scores could not be saved. Retry the failed table save before recording this penalty.'
+        return null
+      }
       const round=data.value?.rounds.find(item=>item.id===lockedRoundId)
       if(!round)throw new Error('The active round could not be reloaded. Refresh the page before recording the penalty.')
       payload={...payload,revision:round.draft_revision}
@@ -231,8 +234,9 @@ async function saveParticipant(person){
         const patch=Object.fromEntries(['display_name','checked_in','is_substitute','eligible_for_final'].filter(field=>!Object.is(current[field],saved[field])).map(field=>[field,current[field]]))
         if(!Object.keys(patch).length)break
         const original={...patch},sent={...patch}
+        const expected=Object.fromEntries(Object.keys(patch).map(field=>[field,saved[field]]))
         if(typeof sent.display_name==='string')sent.display_name=sent.display_name.trim()
-        await callAdmin('participant_update',{participant_id:person.id,...sent,reason:'Roster update'})
+        await callAdmin('participant_update',{participant_id:person.id,...sent,expected,reason:'Roster update'})
         participantMutationVersions.set(person.id,(participantMutationVersions.get(person.id)??0)+1)
         const latest={...saved,...sent}
         savedParticipantEdits[person.id]=latest
@@ -246,7 +250,11 @@ async function saveParticipant(person){
     }catch(cause){
       participantSaveStates[person.id]='error'
       error.value=cause.message
-      if(/roster is locked/i.test(cause.message))await load()
+      if(/participant changed in another session/i.test(cause.message)){
+        await load()
+        if(participantConflicts[person.id]?.length){participantSaveStates[person.id]='';error.value='Another organiser changed this participant. Review the roster fields before saving again.'}
+        else{participantSaveStates[person.id]='saved';error.value=''}
+      }else if(/roster is locked/i.test(cause.message))await load()
     }finally{participantSaveTasks.delete(person.id)}
   })()
   participantSaveTasks.set(person.id,task)
@@ -288,11 +296,11 @@ function scheduleTableSave(round,table){
   tableSaveTimers.set(table.id,timer)
 }
 async function saveTable(round,table){
-  if(!tableStatus(table).valid||revisionConflict.value)return
+  if(!tableStatus(table).valid||revisionConflict.value)return false
   const previous=roundSaveQueues.get(round.id)??Promise.resolve()
   const task=previous.catch(()=>{}).then(async()=>{
     const currentRound=data.value?.rounds.find(item=>item.id===round.id)
-    if(!currentRound||currentRound.status==='certified'||!tableStatus(table).valid||revisionConflict.value)return
+    if(!currentRound||currentRound.status==='certified'||!tableStatus(table).valid||revisionConflict.value)return false
     const rawResults=seatsFor(table).map(seat=>({participant_id:seat.participant_id,raw_points:Number(scores[table.id]?.[seat.participant_id])}))
     const savedStickValue=Number(sticks[table.id]??0)
     const revision=Number(currentRound.draft_revision)
@@ -309,10 +317,12 @@ async function saveTable(round,table){
       tableSaveStates[table.id]='saved'
       error.value=''
       if(tableStatus(table).dirty)scheduleTableSave(round,table)
+      return true
     }catch(cause){
       tableSaveStates[table.id]='error'
       error.value=cause.message
       if(/round changed|reload before editing/i.test(cause.message)){revisionConflict.value=true;await load();error.value='Another organiser changed this round. Your entries are preserved; review the latest saved scores before continuing.'}
+      return false
     }
   })
   roundSaveQueues.set(round.id,task)
@@ -320,17 +330,24 @@ async function saveTable(round,table){
 }
 async function flushRoundSaves(roundId){
   const round=data.value?.rounds.find(item=>item.id===roundId)
-  if(!round)return
+  if(!round)return false
   while(true){
     for(const table of tablesFor(round)){
       const timer=tableSaveTimers.get(table.id)
       if(timer){clearTimeout(timer);tableSaveTimers.delete(table.id)}
-      if(tableStatus(table).valid&&tableStatus(table).dirty)await saveTable(round,table)
-      if(revisionConflict.value)return
+      if(tableStatus(table).valid&&tableStatus(table).dirty){
+        const saved=await saveTable(round,table)
+        if(!saved)return false
+      }
+      if(revisionConflict.value)return false
     }
     await roundSaveQueues.get(roundId)
-    if(![...tableSaveTimers.keys()].some(id=>tablesFor(round).some(table=>table.id===id))&&!tablesFor(round).some(table=>tableStatus(table).valid&&tableStatus(table).dirty))break
+    const pendingTimer=[...tableSaveTimers.keys()].some(id=>tablesFor(round).some(table=>table.id===id))
+    const dirtyTables=tablesFor(round).filter(table=>tableStatus(table).valid&&tableStatus(table).dirty)
+    if(!pendingTimer&&!dirtyTables.length)break
+    if(dirtyTables.some(table=>tableSaveStates[table.id]==='error'))return false
   }
+  return true
 }
 function resolveRoundConflict(keepLocal){
   for(const [tableId,timer] of tableSaveTimers){clearTimeout(timer);tableSaveTimers.delete(tableId);if(tableSaveStates[tableId]==='pending')tableSaveStates[tableId]=''}

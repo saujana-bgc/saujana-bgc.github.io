@@ -89,14 +89,12 @@ Deno.serve(async (request) => {
         const name=body.display_name.trim()
         if(!name||name.length>80) return reply(request,400,{error:'Enter a name of up to 80 characters.'})
         patch.display_name=name
-        const {data:participant}=await client.from('riichi_open_participants').select('registration_id').eq('id',id).eq('event_id',event.id).single()
-        if(participant?.registration_id) await client.from('riichi_open_registrations').update({display_name:name,updated_at:new Date().toISOString()}).eq('id',participant.registration_id)
       }
       for(const key of ['checked_in','active','is_substitute','eligible_for_final']) if(typeof body[key]==='boolean') patch[key]=body[key]
+      if(!Object.keys(patch).length) return reply(request,400,{error:'Choose at least one participant detail to update.'})
       if(patch.is_substitute===true) patch.eligible_for_final=false
-      const {error}=await client.from('riichi_open_participants').update(patch).eq('id',id).eq('event_id',event.id)
+      const {error}=await client.rpc('admin_update_riichi_open_participant',{p_event_id:event.id,p_participant_id:id,p_patch:patch,p_expected:object(body.expected),p_actor:user.id,p_reason:String(body.reason??'').slice(0,500)||null})
       if(error) throw error
-      await client.from('riichi_open_audit_log').insert({event_id:event.id,actor_id:user.id,action:'update_participant',entity_type:'participant',entity_id:id,reason:String(body.reason??'').slice(0,500)||null,details:patch})
       return reply(request,200,{ok:true})
     }
 
@@ -184,7 +182,7 @@ Deno.serve(async (request) => {
     return reply(request,400,{error:'Unknown organiser action.'})
   } catch(error){
     const message=safeMessage(error)
-    const status=message.includes('Private note changed')?409:message.includes('access')||message.includes('Sign in')?401:400
+    const status=message.includes('Private note changed')||message.includes('Participant changed in another session')?409:message.includes('access')||message.includes('Sign in')?401:400
     return reply(request,status,{error:message})
   }
 })
