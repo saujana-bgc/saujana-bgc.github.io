@@ -13,7 +13,7 @@
   "dependencies": {
     "dompurify": "3.4.17",
     "marked": "18.1.1",
-    "nuxt": "^4.6.2"
+    "nuxt": "^4.6.3"
   },
   "devDependencies": {
     "supabase": "^2.119.0",

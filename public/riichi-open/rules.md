@@ -116,9 +116,9 @@ Use the **same tie-breaker order** for equal tournament scores after the first q
 1. Most first-place finishes.
 2. Fewest fourth-place finishes.
 3. Highest single-hanchan score before tournament-point penalties.
-4. A random draw conducted by the organiser in view of the tied players if they remain tied.
+4. A secure random order for the complete group of players still tied, when needed to determine second-qualifier table assignments or the Top 4 qualification and seeds. The organiser's system generates and records this order automatically when the next round is prepared; no manual draw is needed.
 
-The first three priorities follow WRC Section 5's recommended tie-breakers. WRC recommends a coin toss as the last step; this event uses a public random draw so the same procedure works for two or more tied players. These choices are announced **event rules**, not mandatory WRC gameplay rules.
+The first three priorities follow WRC Section 5's recommended tie-breakers. WRC recommends a coin toss as the last step; this event uses an automatic secure random order for groups of two or more tied players. The order is retained for event administration and is not shown as a draw list on public standings. These choices are **event rules**, not mandatory WRC gameplay rules.
 
 For these event counts, a player with the highest final mahjong points at their table counts as a first-place finisher, including a tie for the highest points. A player with the lowest final mahjong points counts as a fourth-place finisher, including a tie for the lowest points. Count these finishes from table points before tournament-point penalties. These counts do not change shared uma or hanchan scores.
 
