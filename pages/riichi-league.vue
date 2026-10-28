@@ -8,7 +8,7 @@
 
       <div class="season-switcher">
         <label class="league-field-label" for="season-select">Season</label>
-        <select class="league-control" id="season-select" v-model="selectedSeasonId" :disabled="isSubmittingScore">
+        <select class="league-control" id="season-select" v-model="selectedSeasonId" :disabled="isLoadingLeague || !seasons.length || isSubmittingScore">
           <option v-for="item in seasons" :key="item.id" :value="item.id">
             Season {{ item.number }}
           </option>
@@ -22,7 +22,10 @@
     </header>
 
     <p v-if="leagueLoadError" class="league-load-error" role="alert">{{ leagueLoadError }} <button type="button" @click="loadLeagueFromSupabase">Try again</button></p>
+    <p v-if="isLoadingLeague && !selectedSeason" role="status">Loading the latest league results…</p>
+    <p v-else-if="!isLoadingLeague && !selectedSeason && !leagueLoadError" role="status">There are no league seasons to show yet.</p>
 
+    <template v-if="selectedSeason">
     <section class="season-card fade-up" aria-labelledby="season-heading">
       <div class="season-heading">
         <div>
@@ -282,6 +285,7 @@
         <p v-if="selectedWeek.notes" class="week-notes">{{ selectedWeek.notes }}</p>
       </article>
     </section>
+    </template>
 
     <section class="rules-card fade-up" aria-labelledby="scoring-heading">
       <div>
@@ -534,7 +538,6 @@
 </template>
 
 <script setup>
-import leagueData from '~/assets/data/riichi_league.json'
 import { onMounted } from 'vue'
 
 useHead({
@@ -544,14 +547,8 @@ useHead({
   ],
 })
 
-const normalizedSeasons = leagueData.seasons ?? [{
-  ...leagueData.season,
-  players: leagueData.players,
-  weeks: leagueData.weeks,
-}]
-
-const seasons = ref(normalizedSeasons)
-const selectedSeasonId = ref(seasons.value[0]?.id ?? '')
+const seasons = ref([])
+const selectedSeasonId = ref('')
 const selectedWeekId = ref('')
 const rulesDialog = ref(null)
 
@@ -575,6 +572,7 @@ const editingTableId = ref('')
 const editingTable = computed(() => selectedWeek.value?.tables.find(table => table.id === editingTableId.value) ?? null)
 const scoreEntryMessage = ref('')
 const leagueLoadError = ref('')
+const isLoadingLeague = ref(true)
 const formResetKey = ref(0)
 const scoreDrafts = new Map()
 const standingQuery = ref('')
@@ -723,6 +721,7 @@ onMounted(async () => {
 
 async function loadLeagueFromSupabase() {
   leagueLoadError.value = ''
+  isLoadingLeague.value = true
   try {
     const supabase = useSupabase()
     const [seasonResponse, playerResponse, weekResponse, matchResponse, resultResponse] = await Promise.all([
@@ -788,17 +787,18 @@ async function loadLeagueFromSupabase() {
       }
     })
 
-    if (!loadedSeasons.length) return true
     seasons.value = loadedSeasons
-    selectedWeekId.value = latestSessionForToday.value?.id ?? ''
     if (!loadedSeasons.some(season => season.id === selectedSeasonId.value)) {
-      selectedSeasonId.value = loadedSeasons[0].id
+      selectedSeasonId.value = loadedSeasons[0]?.id ?? ''
     }
+    selectedWeekId.value = latestSessionForToday.value?.id ?? ''
     return true
   } catch (error) {
     console.error('Could not load Riichi League data from Supabase:', error)
-    leagueLoadError.value = 'We couldn’t load the latest league results. The figures shown may be out of date. Refresh the page to try again.'
+    leagueLoadError.value = 'We couldn’t load the league results. Check your connection and try again.'
     return false
+  } finally {
+    isLoadingLeague.value = false
   }
 }
 
