@@ -88,8 +88,54 @@ test('a cancelled registration starts a linked fresh reservation and keeps retri
   assert.equal(app.state.complete.value, false)
   assert.equal(app.state.hold.value.id, 'new-hold')
   assert.equal(app.state.hold.value.restart_registration_id, 'registration-1')
-  assert.equal(app.saved.has(CONFIRMATION), false)
+  assert.equal(JSON.parse(app.saved.get(CONFIRMATION)!).reference, 'OLDREF01')
   assert.equal(JSON.parse(app.saved.get(HOLD)!).restart_previous_token, token)
+})
+
+test('releasing a restarted reservation restores its previous cancellation and allows a fresh retry', async () => {
+  const restartKeys: string[] = []
+  const app = page((action, payload) => {
+    if (action === 'restart') {
+      restartKeys.push(payload.idempotency_key)
+      return { id: 'new-hold', expires_at: '2026-11-14T06:30:00Z', restarted_from_registration_id: 'registration-1' }
+    }
+    if (action === 'registration_status') return { id: 'registration-1', status: 'cancelled', reference: 'OLDREF01', display_name: 'Player' }
+    return action === 'cancel' ? { ok: true } : summary
+  })
+  app.saved.set(CONFIRMATION, JSON.stringify({ reference: 'OLDREF01', status: 'cancelled', registration_id: 'registration-1', display_name: 'Player', hold_id: 'old-hold', token }))
+  app.state.complete.value = true
+  app.state.registrationStatus.value = 'cancelled'
+  app.state.event.value = summary.event
+
+  await app.state.restartCancelledRegistration()
+  await app.state.cancelHold()
+
+  assert.equal(app.state.complete.value, true)
+  assert.equal(app.state.registrationRef.value, 'OLDREF01')
+  assert.equal(app.state.registrationStatus.value, 'cancelled')
+  assert.equal(app.state.hold.value, null)
+  assert.equal(app.saved.has(HOLD), false)
+  assert.equal(app.saved.has(DRAFT), false)
+  await app.state.restartCancelledRegistration()
+  assert.equal(restartKeys.length, 2)
+  assert.notEqual(restartKeys[0], restartKeys[1])
+})
+
+test('reloading during a restart restores the replacement instead of showing the old cancellation', async () => {
+  const app = page(action => action === 'restart'
+    ? { id: 'new-hold', expires_at: '2026-11-14T06:30:00Z', restarted_from_registration_id: 'registration-1' }
+    : summary)
+  app.saved.set(CONFIRMATION, JSON.stringify({ reference: 'OLDREF01', status: 'cancelled', registration_id: 'registration-1', hold_id: 'old-hold', token }))
+  app.saved.set(HOLD, JSON.stringify({ ...reservation, id: 'new-hold', restart_registration_id: 'registration-1', restart_previous_token: 'b'.repeat(72) }))
+
+  await app.mount()
+
+  assert.equal(app.state.complete.value, false)
+  assert.equal(app.state.hold.value.id, 'new-hold')
+  assert.equal(app.state.hold.value.restarted_from_registration_id, 'registration-1')
+  assert.equal(JSON.parse(app.saved.get(CONFIRMATION)!).reference, 'OLDREF01')
+  assert.equal(app.calls.filter(call => call.action === 'restart').length, 1)
+  app.unmount()
 })
 
 test('a rejected registration cannot restart itself and retains its reference', async () => {

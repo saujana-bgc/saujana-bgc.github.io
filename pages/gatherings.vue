@@ -37,7 +37,7 @@
         :id="`gathering-${event.id}`"
         class="event-card fade-up"
         tabindex="-1"
-        :class="{ 'event-card-collapsed': activeTab === 'past' && !expandedEvents.has(event.id) }"
+        :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
         :style="{ transitionDelay: (index * 0.07) + 's' }"
       >
         <div v-if="getEventImage(event)" class="event-image-wrap">
@@ -86,7 +86,7 @@
           </div>
         </div>
 
-        <button v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" @click="toggleEvent(event.id)">
+        <button v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>Look back at this gathering</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
         </button>
@@ -267,7 +267,7 @@
 
           </div>
 
-          <button v-if="activeTab === 'past'" class="collapse-bar" @click="toggleEvent(event.id)">
+          <button v-if="activeTab === 'past'" class="collapse-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id, true)">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" clip-rule="evenodd"/></svg>
             <span>Hide details</span>
           </button>
@@ -515,9 +515,15 @@ function switchTab(tab) {
     resizeAllAreas()
 }
 
-function toggleEvent(eventId) {
+async function toggleEvent(eventId, restoreFocus = false) {
     if (expandedEvents.has(eventId)) {
         expandedEvents.delete(eventId)
+        if (restoreFocus) {
+            await nextTick()
+            const trigger = document.querySelector(`#gathering-${CSS.escape(eventId)} .expand-bar`)
+            trigger?.focus({ preventScroll: true })
+            trigger?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }
     } else {
         expandedEvents.add(eventId)
         resizeAllAreas()
@@ -1109,7 +1115,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 22px 55px rgba(160, 100, 110, 0.14);
 }
 
-.event-card-collapsed { padding-bottom: calc(var(--section-pad) * 0.75); }
+.event-card[data-collapsed="true"] { padding-bottom: calc(var(--section-pad) * 0.75); }
 
 .expand-bar, .collapse-bar {
     display: flex;
