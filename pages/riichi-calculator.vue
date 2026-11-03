@@ -2,8 +2,8 @@
   <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && (entryMode !== 'tiles' || tileStep === 1) }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
     <header class="calculator-heading">
       <p class="page-eyebrow">A quick table-side guide</p>
-      <h1 class="hero-title">Riichi Calculator</h1>
-      <p class="calculator-description">Check a hand or enter han and fu to see the payment.</p>
+      <h1 class="hero-title">Riichi mahjong calculator</h1>
+      <p class="calculator-description">Check a Japanese mahjong hand or enter han and fu to calculate ron and tsumo payments.</p>
       <button ref="tutorialTrigger" type="button" class="tutorial-trigger" aria-haspopup="dialog" @click="openTutorial">
         <span aria-hidden="true">▶</span> Watch guide · 90 sec
       </button>
@@ -238,9 +238,7 @@ import { validateTileSet } from '~/utils/scoring/tile-set'
 import { DEFAULT_LOCAL_YAKU } from '~/utils/scoring/types'
 
 useHead({
-  title: 'Riichi Calculator | Saujana BGC',
   bodyAttrs: { class: 'riichi-calculator-body' },
-  meta: [{ name: 'description', content: 'Quickly estimate riichi mahjong han, fu and payments for ron or tsumo.' }],
 })
 
 const tileArtworkPaths = [

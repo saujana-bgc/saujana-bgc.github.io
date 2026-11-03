@@ -2,7 +2,7 @@
   <main class="league-page">
     <header class="league-hero fade-up">
       <p class="page-eyebrow">One more hand?</p>
-      <h1 class="hero-title">Riichi League</h1>
+      <h1 class="hero-title">Riichi mahjong league</h1>
       <p class="league-intro">A friendly season of riichi mahjong, one gathering at a time. Follow the standings, look back at a table, or add the results of your latest game.</p>
       <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings" no-prefetch>Come to a gathering</NuxtLink> and ask the host how to get started.</p>
 
@@ -539,13 +539,6 @@
 
 <script setup>
 import { onMounted } from 'vue'
-
-useHead({
-  title: 'Riichi League | Saujana BGC',
-  meta: [
-    { name: 'description', content: 'Saujana Riichi League season standings, weekly schedules, and table results.' },
-  ],
-})
 
 const seasons = ref([])
 const selectedSeasonId = ref('')

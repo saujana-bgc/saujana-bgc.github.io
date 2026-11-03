@@ -5,7 +5,8 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "node -e \"require('fs').writeFileSync('public/version.json', JSON.stringify({v: Date.now()}))\" && nuxt generate",
+    "generate": "node -e \"require('fs').writeFileSync('public/version.json', JSON.stringify({v: Date.now()}))\" && nuxt generate && npm run verify:seo",
+    "verify:seo": "tsx scripts/verify-seo.mts",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test": "tsx --test tests/*.test.mts"

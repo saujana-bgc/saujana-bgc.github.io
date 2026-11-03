@@ -13,6 +13,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             if (!intersectionObserver) {
                 element.classList.add('in-view')
             } else if (!observed.has(element)) {
+                element.classList.add('fade-ready')
                 observed.add(element)
                 intersectionObserver.observe(element)
             }

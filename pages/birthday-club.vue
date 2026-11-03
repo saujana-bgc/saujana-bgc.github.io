@@ -103,11 +103,6 @@
 </template>
 
 <script setup>
-useHead({
-  title: 'Birthday Club | Saujana BGC',
-  meta: [{ name: 'description', content: 'Share your birthday with Saujana and choose whether you’d like a public greeting. Just your name, month, and day.' }],
-})
-
 const supabase = useSupabase()
 
 const months = [

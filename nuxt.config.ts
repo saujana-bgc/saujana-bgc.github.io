@@ -1,12 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { publicRoutes } from './utils/siteSeo'
+
 export default defineNuxtConfig({
-  ssr: false,
+  // Generate page content and metadata as HTML for GitHub Pages and crawlers.
+  ssr: true,
   nitro: {
     // Bundle Nuxt 4.6's renderer so its generated build artifacts resolve in Nitro.
     externals: { inline: ['nuxt/internal'] },
     prerender: {
       routes: [
-        '/riichi-open',
+        ...publicRoutes,
         '/admin',
         '/admin/birthday-club',
         '/admin/riichi-open',
@@ -43,7 +46,6 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'theme-color', content: '#354C3E' },
-        { name: 'description', content: 'Come on your own or bring a friend. Find a Saujana board game gathering, explore the collection, and learn a new game with good company.' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico', sizes: '16x16 32x32 48x48 64x64' },

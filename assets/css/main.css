@@ -79,9 +79,13 @@ html, body {
 }
 
 .fade-up {
+    transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+/* Prerendered content stays readable before JavaScript starts, or without it. */
+.fade-up.fade-ready {
     opacity: 0;
     transform: translateY(18px);
-    transition: opacity 0.65s ease, transform 0.65s ease;
 }
 
 .fade-up.in-view {

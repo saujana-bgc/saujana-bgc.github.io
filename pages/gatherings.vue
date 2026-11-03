@@ -2,8 +2,8 @@
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
       <p class="page-eyebrow">Something to look forward to</p>
-      <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Choose a date, follow the signup details, and make a little time for games and good company. Your first visit starts here.</div>
+      <h1 class="hero-title">Board game gatherings</h1>
+      <div class="stats-container">Join Saujana for board games and good company. Choose a date, check the venue, and follow the signup details. Your first visit starts here.</div>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -350,11 +350,6 @@
 </template>
 
 <script setup>
-useHead({
-    title: 'Gatherings | Saujana BGC',
-    meta: [{ name: 'description', content: 'Find your next Saujana board game gathering. Check the date and venue, add your name, and join us. First-time players are welcome.' }],
-})
-
 const supabase = useSupabase()
 
 const PAGE_SIZE = 10

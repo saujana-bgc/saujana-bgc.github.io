@@ -24,11 +24,6 @@ function writeCache(rows) {
 }
 
 async function loadPlaylog() {
-    if (!import.meta.client) {
-        isPending.value = false
-        return
-    }
-
     const cached = readCache()
     if (cached) {
         data.value = cached
@@ -55,6 +50,10 @@ async function loadPlaylog() {
 }
 
 export function usePlaylogData() {
-    if (!loadPromise) loadPromise = loadPlaylog()
+    // Keep the initial HTML and hydration state identical. Live history is
+    // shared between client pages and starts loading only after mounting.
+    onMounted(() => {
+        if (!loadPromise) loadPromise = loadPlaylog()
+    })
     return { data, isPending, isError }
 }

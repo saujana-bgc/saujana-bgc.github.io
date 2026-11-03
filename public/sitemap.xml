@@ -2,32 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://saujana-bgc.github.io/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://saujana-bgc.github.io/gatherings</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://saujana-bgc.github.io/gatherings/</loc>
   </url>
   <url>
-    <loc>https://saujana-bgc.github.io/collection</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://saujana-bgc.github.io/collection/</loc>
   </url>
   <url>
-    <loc>https://saujana-bgc.github.io/playlog</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://saujana-bgc.github.io/playlog/</loc>
   </url>
   <url>
-    <loc>https://saujana-bgc.github.io/birthday-club</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://saujana-bgc.github.io/birthday-club/</loc>
   </url>
   <url>
-    <loc>https://saujana-bgc.github.io/riichi-league</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://saujana-bgc.github.io/riichi-league/</loc>
+  </url>
+  <url>
+    <loc>https://saujana-bgc.github.io/riichi-calculator/</loc>
+  </url>
+  <url>
+    <loc>https://saujana-bgc.github.io/riichi-open/</loc>
   </url>
 </urlset>

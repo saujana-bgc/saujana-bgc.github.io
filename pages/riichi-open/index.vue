@@ -6,7 +6,7 @@
     <section class="event-hero">
       <div class="hero-copy">
         <h1>Riichi <em>Open I</em></h1>
-        <p class="hero-intro">Two East–South qualifiers. One table for the Top 4. A friendly day of serious mahjong.</p>
+        <p class="hero-intro">A Japanese riichi mahjong tournament with two East–South qualifiers and one final for the Top 4. A friendly day of serious mahjong.</p>
         <div class="event-facts"><span>Saturday, 14 November 2026</span><span>Starts at 2:30 pm</span><span>Boardroom Bandit, Ara Damansara</span></div>
         <div class="event-offer"><strong>RM10</strong><span>entry fee</span><i aria-hidden="true"></i><span>A prize for the winner</span></div>
         <div class="hero-actions"><button class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></button><button class="hero-guide" @click="openGuide">Tournament guide</button></div>
@@ -102,7 +102,6 @@
 </template>
 
 <script setup>
-useHead({ title: 'Riichi Open I | Saujana BGC', meta: [{ name: 'description', content: 'Register for Riichi Open I and follow certified standings for the 14 November 2026 event at Boardroom Bandit, Ara Damansara.' }] })
 const route = useRoute()
 const router = useRouter()
 const activeTab = ref(route.query.tab === 'standings' ? 'standings' : 'registration')

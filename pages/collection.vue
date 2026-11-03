@@ -2,10 +2,11 @@
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="collection-header fade-up">
       <p class="page-eyebrow">What shall we play next?</p>
-      <h1 class="hero-title">Collection</h1>
+      <h1 class="hero-title">Board game collection</h1>
       <div class="stats-container collection-summary">
         <span><strong>{{ totalGames }}</strong> games on the shelf</span>
-        <span><strong>{{ isError ? '—' : unplayedCount }}</strong> {{ isError ? 'play history unavailable' : 'with no plays logged' }}</span>
+        <span v-if="isPending">Loading play history…</span>
+        <span v-else><strong>{{ isError ? '—' : unplayedCount }}</strong> {{ isError ? 'play history unavailable' : 'with no plays logged' }}</span>
       </div>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>
     </header>
@@ -40,19 +41,7 @@
 
       <div v-if="isError" class="page-hint" role="status">The collection is here, but play history is unavailable. Refresh the page to try again.</div>
 
-      <div v-if="isPending" class="editorial-grid">
-        <div class="loading-copy">Loading the collection…</div>
-        <article class="editorial-card" v-for="n in 8" :key="'skel-'+n" style="pointer-events: none;">
-          <div class="skel" style="height: 50px; margin-bottom: 18px;"></div>
-          <div style="width: 100%; aspect-ratio: 1/1; margin: 18px 0; border-radius: 20px; overflow: hidden;">
-            <div class="skel" style="width: 100%; height: 100%; margin: 0; border-radius: 0;"></div>
-          </div>
-          <div class="skel" style="width: 70%; height: 12px; margin-bottom: 8px;"></div>
-          <div class="skel" style="width: 50%; height: 12px; margin-bottom: 0;"></div>
-        </article>
-      </div>
-
-      <div v-else ref="gridRef" class="editorial-grid">
+      <div ref="gridRef" class="editorial-grid">
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>
 
         <article v-for="game in virtualGames" :key="game.name" class="editorial-card">
@@ -80,12 +69,13 @@
 
           <div class="last-played">
             <div>
-              <span v-if="isError">Play history unavailable</span>
+              <span v-if="isPending">Loading play history…</span>
+              <span v-else-if="isError">Play history unavailable</span>
               <span v-else-if="game.stats.date">Last played {{ formatDate(game.stats.date) }}</span>
               <span v-else style="opacity: 0.65; font-style: italic;">No plays logged yet</span>
             </div>
             <div style="margin-top: 6px; opacity: 0.65;">
-              Plays logged: {{ isError ? '—' : game.stats.count }}
+              Plays logged: {{ isPending || isError ? '—' : game.stats.count }}
             </div>
           </div>
         </article>
@@ -136,11 +126,6 @@
 
 <script setup>
 import { collectionDataSimple } from '~/assets/data/game_data_simple.js'
-
-useHead({
-    title: 'Collection | Saujana BGC',
-    meta: [{ name: 'description', content: 'Browse the Saujana host’s board game collection. Find a familiar favourite or something new to try at your next gathering.' }],
-})
 
 const currentSort = ref('name')
 const search = ref('')

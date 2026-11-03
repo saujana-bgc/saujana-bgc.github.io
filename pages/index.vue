@@ -3,7 +3,7 @@
     <section class="hero-section fade-up">
       <div class="hero-copy">
         <h1>Pull up a chair.<br><em>Let’s play.</em></h1>
-        <p class="hero-description">We’re Saujana, a board game community where new faces become familiar ones. Come on your own or bring a friend. We’ll help you find a game, learn the rules, and settle in.</p>
+        <p class="hero-description">We’re Saujana Board Game Community. Join us for board games and riichi mahjong, whether you’re learning your first game or returning to a favourite. Come on your own or bring a friend.</p>
         <div class="hero-actions">
           <NuxtLink to="/gatherings" class="primary-link" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
           <NuxtLink to="/collection" class="text-link" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
@@ -43,6 +43,16 @@
         <h2>Make a little time for play</h2>
         <p>Choose a date that suits you, check the venue, and add your name. We’ll see you there.</p>
         <NuxtLink to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+      </div>
+
+      <div class="welcome-note">
+        <h2>Explore riichi mahjong</h2>
+        <p>Curious about Japanese mahjong? Ask the host about riichi at a gathering. You can also check a hand’s score, follow our league, or find out about Riichi Open I.</p>
+        <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
+          <NuxtLink to="/riichi-calculator" no-prefetch>Riichi mahjong calculator →</NuxtLink>
+          <NuxtLink to="/riichi-league" no-prefetch>League and standings →</NuxtLink>
+          <NuxtLink to="/riichi-open" no-prefetch>Riichi Open I tournament →</NuxtLink>
+        </nav>
       </div>
 
       <div class="expect-guide">
@@ -128,11 +138,6 @@
 <script setup>
 import { instagramData } from '~/assets/data/instagram_data.js'
 
-useHead({
-  title: 'Saujana Board Game Community',
-  meta: [{ name: 'description', content: 'Come on your own or bring a friend. Find a Saujana board game gathering, explore the collection, and learn a new game with good company.' }],
-})
-
 const heroImageSrcset = '/images/site/saujana_bgc_banner_640.avif?v=20260806-hero-v6 640w, /images/site/saujana_bgc_banner_800.avif?v=20260806-hero-v6 800w, /images/site/saujana_bgc_banner_900.avif?v=20260806-hero-v6 900w, /images/site/saujana_bgc_banner_1000.avif?v=20260806-hero-v6 1000w, /images/site/saujana_bgc_banner_1200.avif?v=20260806-hero-v6 1200w, /images/site/saujana_bgc_banner.avif?v=20260806-hero-v6 1920w'
 const heroImageSizes = '(min-width: 1200px) 580px, (min-width: 900px) 48vw, 92vw'
 
@@ -203,6 +208,7 @@ const expectations = [
 .welcome-note h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 0 0 10px; }
 .welcome-note p { font-size: .9rem; color: var(--muted); margin: 0; }
 .welcome-note a { display: inline-block; color: var(--matcha-leaf); font-size: .8rem; margin-top: 16px; }
+.riichi-discovery { display: flex; justify-content: center; flex-wrap: wrap; gap: 0 24px; }
 .expect-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin: 44px 0 32px; }
 .expect-card { padding: 12px 0; border-top: 1px solid var(--line); }
 .expect-card span { color: var(--gold-leaf); font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; }

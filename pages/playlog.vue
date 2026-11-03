@@ -143,11 +143,6 @@
 </template>
 
 <script setup>
-useHead({
-    title: 'Play History | Saujana BGC',
-    meta: [{ name: 'description', content: 'Look back at Saujana gatherings, the games we’ve played, and the favourites we keep coming back to.' }],
-})
-
 const PAGE_SIZE = 10
 const HOVER_CARD_HEIGHT = 245
 
