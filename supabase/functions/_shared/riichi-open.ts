@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient, type User } from 'npm:@supabase/supabase-js@2'
+import { createClient, type SupabaseClient, type User } from 'npm:@supabase/supabase-js@2.119.0'
 
 export const bucket = 'riichi-open-receipts'
 export const eventSlug = 'riichi-open-i'
