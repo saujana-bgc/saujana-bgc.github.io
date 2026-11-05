@@ -56,6 +56,6 @@ begin
   end if;
   return jsonb_build_object('id',v_registration.id,'status',v_registration.status,'submitted_at',v_registration.submitted_at);
 end $$;
-revoke all on function public.finalize_riichi_open_registration(uuid,text,text,text,text,integer,text,text) from public,anon,authenticated;
-grant execute on function public.finalize_riichi_open_registration(uuid,text,text,text,text,integer,text,text) to service_role;
+revoke all on function public.finalize_riichi_open_registration(uuid,text,text,text,text,text,integer,text) from public,anon,authenticated;
+grant execute on function public.finalize_riichi_open_registration(uuid,text,text,text,text,text,integer,text) to service_role;
 notify pgrst, 'reload schema';

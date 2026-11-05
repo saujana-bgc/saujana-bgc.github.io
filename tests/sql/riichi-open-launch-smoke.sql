@@ -50,10 +50,14 @@ begin
     end;
     update public.riichi_open_events set capacity=original_event.capacity where id=original_event.id;
     registration_a := public.finalize_riichi_open_registration(
-      (grant_a->>'id')::uuid,token_a,'Launch smoke fixture',grant_a->>'receipt_path','image/png',8,token_a);
+      (grant_a->>'id')::uuid,token_a,'Launch smoke fixture',grant_a->>'receipt_path',
+      (select event_id::text||'/'||(grant_a->>'id')||'/smoke-final-a' from public.riichi_open_registration_holds where id=(grant_a->>'id')::uuid),
+      'image/png',8,token_a);
     assert registration_a->>'status'='pending', 'Active reservation did not become pending';
     retry := public.finalize_riichi_open_registration(
-      (grant_a->>'id')::uuid,token_a,'Launch smoke fixture',grant_a->>'receipt_path','image/png',8,token_a);
+      (grant_a->>'id')::uuid,token_a,'Launch smoke fixture',grant_a->>'receipt_path',
+      (select event_id::text||'/'||(grant_a->>'id')||'/smoke-final-a' from public.riichi_open_registration_holds where id=(grant_a->>'id')::uuid),
+      'image/png',8,token_a);
     assert retry->>'id'=registration_a->>'id', 'Finalisation retry created a duplicate';
     perform public.admin_set_riichi_open_registration_status((registration_a->>'id')::uuid,'cancelled','Rollback-only smoke fixture',null::uuid);
     grant_b := public.restart_cancelled_riichi_open_registration((registration_a->>'id')::uuid,token_a,token_b,key_b,fingerprint);
@@ -69,7 +73,9 @@ begin
     grant_c := public.restart_cancelled_riichi_open_registration((registration_a->>'id')::uuid,token_a,token_c,key_c,fingerprint);
     assert grant_c->>'id'<>grant_b->>'id', 'Released replacement could not be retried';
     registration_c := public.finalize_riichi_open_registration(
-      (grant_c->>'id')::uuid,token_c,'Launch smoke fixture',grant_c->>'path','image/png',8,token_c);
+      (grant_c->>'id')::uuid,token_c,'Launch smoke fixture',grant_c->>'path',
+      (select event_id::text||'/'||(grant_c->>'id')||'/smoke-final-c' from public.riichi_open_registration_holds where id=(grant_c->>'id')::uuid),
+      'image/png',8,token_c);
     assert registration_c->>'status'='pending', 'Replacement did not become pending';
     assert (select restarted_from_registration_id=(registration_a->>'id')::uuid
       from public.riichi_open_registrations where id=(registration_c->>'id')::uuid), 'Replacement lost its cancellation link';
@@ -84,7 +90,9 @@ begin
     grant_d := public.reserve_riichi_open_place(token_d,gen_random_uuid()::text,fingerprint);
     update public.riichi_open_registration_holds set expires_at=now()-interval '1 second' where id=(grant_d->>'id')::uuid;
     retry := public.finalize_riichi_open_registration(
-      (grant_d->>'id')::uuid,token_d,'Launch smoke fixture',grant_d->>'receipt_path','image/png',8,token_d);
+      (grant_d->>'id')::uuid,token_d,'Launch smoke fixture',grant_d->>'receipt_path',
+      (select event_id::text||'/'||(grant_d->>'id')||'/smoke-final-d' from public.riichi_open_registration_holds where id=(grant_d->>'id')::uuid),
+      'image/png',8,token_d);
     assert retry->>'status'='payment_exception', 'Expired reservation incorrectly claimed a place';
     begin
       perform public.reserve_riichi_open_place(repeat(md5(gen_random_uuid()::text),2),gen_random_uuid()::text,fingerprint);

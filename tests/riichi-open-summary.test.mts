@@ -2,9 +2,10 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { transformSync } from 'esbuild'
+import { receiptRecoveryAction } from '../supabase/functions/riichi-open-public/receipt-recovery.ts'
 
 const source = readFileSync(new URL('../supabase/functions/riichi-open-public/index.ts', import.meta.url), 'utf8')
-const compiled = transformSync(source.replace(/^import .*\r?\n/, ''), { loader: 'ts', format: 'esm' }).code
+const compiled = transformSync(source.replace(/^import .*\r?\n/gm, ''), { loader: 'ts', format: 'esm' }).code
 
 function publicHandler(holdResult: object) {
   let handler!: (request: Request) => Promise<Response>
@@ -19,10 +20,10 @@ function publicHandler(holdResult: object) {
     for (const method of ['select', 'eq', 'in', 'order', 'gt', 'single']) query[method] = () => query
     return query
   } }
-  new Function('Deno', 'serviceClient', 'eventSlug', 'reply', 'safeMessage', compiled)(
+  new Function('Deno', 'serviceClient', 'eventSlug', 'reply', 'safeMessage', 'receiptRecoveryAction', compiled)(
     { serve(callback: typeof handler) { handler = callback } }, () => client, 'riichi-open-i',
     (_request: Request, status: number, body: unknown) => Response.json(body, { status }),
-    (error: Error) => error.message,
+    (error: Error) => error.message, receiptRecoveryAction,
   )
   return () => handler(new Request('https://example.test', { method: 'POST', body: JSON.stringify({ action: 'summary' }) }))
 }

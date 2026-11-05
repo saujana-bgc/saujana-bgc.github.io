@@ -1,4 +1,5 @@
 import { bucket, eventSlug, hashText, options, reply, safeMessage, serviceClient } from '../_shared/riichi-open.ts'
+import { receiptRecoveryAction } from './receipt-recovery.ts'
 
 const json = (value: unknown) => value && typeof value === 'object' ? value as Record<string, unknown> : {}
 const acceptedMimes = new Set(['image/jpeg','image/png','application/pdf'])
@@ -156,10 +157,13 @@ Deno.serve(async (request) => {
         if (committed && committed.receipt_path !== finalPath) await client.storage.from(bucket).remove([finalPath])
       }
       if (error) {
-        const { data: committed } = await client.from('riichi_open_registrations').select('id,status,submitted_at,receipt_path').eq('hold_id',holdId).maybeSingle()
-        if (committed?.receipt_path === finalPath) {
+        const { data: committed, error: lookupError } = await client.from('riichi_open_registrations')
+          .select('id,status,submitted_at,receipt_path').eq('hold_id',holdId).maybeSingle()
+        const recovery = receiptRecoveryAction(finalPath, committed?.receipt_path, Boolean(lookupError))
+        if (recovery === 'return-committed' && committed) {
           return reply(request,200,{id:committed.id,status:committed.status,submitted_at:committed.submitted_at,reference:committed.id.slice(0,8).toUpperCase()})
         }
+        if (recovery === 'preserve-uncertain') return reply(request,503,{error:'Your submission may have completed. Check its status before trying again.'})
         await client.storage.from(bucket).remove([finalPath])
         throw new Error(error.message)
       }
