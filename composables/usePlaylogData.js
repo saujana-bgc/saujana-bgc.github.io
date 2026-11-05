@@ -1,5 +1,5 @@
 const TTL = 24 * 60 * 60 * 1000
-const CACHE_KEY = 'saujana-playlog-cache-v2'
+const CACHE_KEY = 'saujana-playlog-cache-v3'
 
 // Rows are replaced as a snapshot, never edited in place by consumers.
 const data = shallowRef([])
@@ -33,13 +33,24 @@ async function loadPlaylog() {
 
     try {
         const supabase = useSupabase()
-        const { data: rows, error } = await supabase
-            .from('playlog')
-            .select('game, date, players')
-            .order('date', { ascending: false })
+        const pageSize = 500
+        const rows = []
+        let offset = 0
+        while (true) {
+            const { data: page, error, count } = await supabase
+                .from('playlog')
+                .select('game, date, players', { count: 'exact' })
+                .order('date', { ascending: false })
+                .order('id')
+                .range(offset, offset + pageSize - 1)
 
-        if (error) throw error
-        data.value = rows ?? []
+            if (error) throw error
+            const batch = page ?? []
+            rows.push(...batch)
+            offset += batch.length
+            if (!batch.length || (count !== null && count !== undefined && offset >= count) || batch.length < pageSize) break
+        }
+        data.value = rows
         writeCache(data.value)
         isError.value = false
     } catch {

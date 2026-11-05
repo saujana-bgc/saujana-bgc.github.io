@@ -75,7 +75,7 @@ Deno.serve(async (request) => {
         return reply(request,400,{error:'Choose a JPG, PNG or PDF receipt no larger than 5 MB.'})
       }
       const { data: ownedHold, error: holdError } = await client.from('riichi_open_registration_holds')
-        .select('token_hash,status').eq('id',holdId).eq('event_id',event.id).maybeSingle()
+        .select('token_hash,status,receipt_path').eq('id',holdId).eq('event_id',event.id).maybeSingle()
       if (holdError) throw holdError
       if (!ownedHold || ownedHold.token_hash !== await hashText(token)) {
         return reply(request,400,{error:'This registration session could not be confirmed.'})
@@ -88,11 +88,25 @@ Deno.serve(async (request) => {
         return reply(request,409,{error:'This reservation has already been submitted or released.'})
       }
 
-      const path = `${event.id}/${holdId}/${crypto.randomUUID()}`
-      const { error: pathError } = await client.from('riichi_open_registration_holds')
-        .update({receipt_path:path}).eq('id',holdId).in('status',['active','expired'])
-      if (pathError) throw pathError
-      const { data: grant, error: grantError } = await client.storage.from(bucket).createSignedUploadUrl(path,{upsert:false})
+      let path = ownedHold.receipt_path
+      if (!path) {
+        const candidate = `${event.id}/${holdId}/${crypto.randomUUID()}`
+        const { data: savedPath, error: pathError } = await client.from('riichi_open_registration_holds')
+          .update({receipt_path:candidate}).eq('id',holdId).eq('event_id',event.id).in('status',['active','expired'])
+          .is('receipt_path',null).select('receipt_path').maybeSingle()
+        if (pathError) throw pathError
+        path = savedPath?.receipt_path
+        if (!path) {
+          const { data: currentHold, error: currentHoldError } = await client.from('riichi_open_registration_holds')
+            .select('receipt_path,status').eq('id',holdId).eq('event_id',event.id).maybeSingle()
+          if (currentHoldError) throw currentHoldError
+          if (!currentHold || !['active','expired'].includes(currentHold.status) || !currentHold.receipt_path) {
+            return reply(request,409,{error:'This reservation could not be updated. Restore it and try again.'})
+          }
+          path = currentHold.receipt_path
+        }
+      }
+      const { data: grant, error: grantError } = await client.storage.from(bucket).createSignedUploadUrl(path,{upsert:true})
       if (grantError || !grant) throw grantError ?? new Error('Secure receipt upload is unavailable.')
       return reply(request,200,{path,signed_url:grant.signedUrl,upload_token:grant.token})
     }
@@ -104,10 +118,15 @@ Deno.serve(async (request) => {
       const mime = String(body.mime_type ?? '')
       const size = Number(body.size)
       if (!acceptedMimes.has(mime) || !Number.isInteger(size) || size<1 || size>5242880 || !path.startsWith(`${event.id}/${holdId}/`)) return reply(request,400,{error:'The receipt details are invalid. Please choose an accepted file.'})
-      const { data: ownedHold } = await client.from('riichi_open_registration_holds').select('token_hash').eq('id',holdId).eq('event_id',event.id).maybeSingle()
+      const { data: ownedHold, error: holdError } = await client.from('riichi_open_registration_holds')
+        .select('token_hash,receipt_path,status').eq('id',holdId).eq('event_id',event.id).maybeSingle()
+      if (holdError) throw holdError
       if (!ownedHold || ownedHold.token_hash !== await hashText(token)) return reply(request,400,{error:'This registration session could not be confirmed.'})
       const { data: existing } = await client.from('riichi_open_registrations').select('id,status,submitted_at').eq('hold_id',holdId).maybeSingle()
       if (existing) return reply(request,200,{...existing,reference:existing.id.slice(0,8).toUpperCase()})
+      if (!['active','expired'].includes(ownedHold.status) || ownedHold.receipt_path !== path) {
+        return reply(request,409,{error:'This receipt upload no longer matches the reservation.'})
+      }
       const folder = `${event.id}/${holdId}`
       const { data: files, error: listError } = await client.storage.from(bucket).list(folder,{search:path.split('/').pop(),limit:5})
       if (listError) throw new Error('The receipt could not be confirmed in storage.')
@@ -123,10 +142,27 @@ Deno.serve(async (request) => {
       if ((mime==='image/jpeg'&&!isJpeg)||(mime==='image/png'&&!isPng)||(mime==='application/pdf'&&!isPdf)) throw new Error('The file contents do not match the selected receipt type.')
       const digest=await crypto.subtle.digest('SHA-256',await receiptFile.arrayBuffer())
       const sha256=[...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('')
+      // Copy the verified bytes to a server-only object. Upload grants target
+      // the replaceable staging path and cannot mutate this final receipt.
+      const finalPath = `${event.id}/${holdId}/${crypto.randomUUID()}`
+      const { error: copyError } = await client.storage.from(bucket).upload(finalPath,receiptFile,{contentType:mime,upsert:false})
+      if (copyError) throw new Error('The verified receipt could not be saved securely.')
       const { data, error } = await client.rpc('finalize_riichi_open_registration',{
-        p_hold_id:holdId,p_token_hash:await hashText(token),p_display_name:String(body.display_name??''),p_receipt_path:path,p_receipt_mime:mime,p_receipt_size:size,p_receipt_sha256:sha256,
+        p_hold_id:holdId,p_token_hash:await hashText(token),p_display_name:String(body.display_name??''),
+        p_receipt_upload_path:path,p_receipt_path:finalPath,p_receipt_mime:mime,p_receipt_size:size,p_receipt_sha256:sha256,
       })
-      if (error) throw new Error(error.message)
+      if (!error) {
+        const { data: committed } = await client.from('riichi_open_registrations').select('receipt_path').eq('hold_id',holdId).maybeSingle()
+        if (committed && committed.receipt_path !== finalPath) await client.storage.from(bucket).remove([finalPath])
+      }
+      if (error) {
+        const { data: committed } = await client.from('riichi_open_registrations').select('id,status,submitted_at,receipt_path').eq('hold_id',holdId).maybeSingle()
+        if (committed?.receipt_path === finalPath) {
+          return reply(request,200,{id:committed.id,status:committed.status,submitted_at:committed.submitted_at,reference:committed.id.slice(0,8).toUpperCase()})
+        }
+        await client.storage.from(bucket).remove([finalPath])
+        throw new Error(error.message)
+      }
       return reply(request,200,{...data,reference:String((data as {id:string}).id).slice(0,8).toUpperCase()})
     }
 

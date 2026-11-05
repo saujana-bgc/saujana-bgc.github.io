@@ -56,7 +56,10 @@ class SupabaseRestQuery {
     }
 
     order(column, options = {}) {
-        this.params.push(['order', `${column}.${options.ascending === false ? 'desc' : 'asc'}`])
+        const ordering = `${column}.${options.ascending === false ? 'desc' : 'asc'}`
+        const existing = this.params.find(([key]) => key === 'order')
+        if (existing) existing[1] += `,${ordering}`
+        else this.params.push(['order', ordering])
         return this
     }
 

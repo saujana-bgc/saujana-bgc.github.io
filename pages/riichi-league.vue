@@ -718,11 +718,11 @@ async function loadLeagueFromSupabase() {
   try {
     const supabase = useSupabase()
     const [seasonResponse, playerResponse, weekResponse, matchResponse, resultResponse] = await Promise.all([
-      supabase.from('riichi_league_seasons').select('*').order('season_number').range(0, 9999),
-      supabase.from('riichi_league_players').select('*').order('display_name').range(0, 9999),
-      supabase.from('riichi_league_weeks').select('*').order('week_number').range(0, 9999),
-      supabase.from('riichi_league_matches').select('*').order('table_number').range(0, 9999),
-      supabase.from('riichi_league_results').select('*').range(0, 9999),
+      fetchAllRows(supabase.from('riichi_league_seasons').select('*', { count: 'exact' }).order('season_number').order('id')),
+      fetchAllRows(supabase.from('riichi_league_players').select('*', { count: 'exact' }).order('season_id').order('display_name').order('id')),
+      fetchAllRows(supabase.from('riichi_league_weeks').select('*', { count: 'exact' }).order('season_id').order('week_number').order('id')),
+      fetchAllRows(supabase.from('riichi_league_matches').select('*', { count: 'exact' }).order('week_id').order('table_number').order('id')),
+      fetchAllRows(supabase.from('riichi_league_results').select('*', { count: 'exact' }).order('match_id').order('player_id')),
     ])
     const responses = [seasonResponse, playerResponse, weekResponse, matchResponse, resultResponse]
     const failed = responses.find(response => response.error)
@@ -792,6 +792,22 @@ async function loadLeagueFromSupabase() {
     return false
   } finally {
     isLoadingLeague.value = false
+  }
+}
+
+async function fetchAllRows(query) {
+  const pageSize = 500
+  const rows = []
+  let offset = 0
+  while (true) {
+    const { data, error, count } = await query.range(offset, offset + pageSize - 1)
+    if (error) throw error
+    const page = data ?? []
+    rows.push(...page)
+    offset += page.length
+    if (!page.length || (count !== null && count !== undefined && offset >= count) || page.length < pageSize) {
+      return { data: rows, error: null }
+    }
   }
 }
 
