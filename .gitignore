@@ -57,15 +57,11 @@ supabase/functions/*
 !supabase/functions/_shared/
 supabase/functions/_shared/*
 !supabase/functions/_shared/*.ts
-!supabase/functions/attendance-update/
-!supabase/functions/attendance-update/*
-!supabase/functions/attendance-update/*.ts
-!supabase/functions/attendance-update/*.json
 !supabase/functions/public-gatherings/
 !supabase/functions/public-gatherings/*
 !supabase/functions/public-gatherings/*.ts
-!supabase/functions/attendance-webhook/
-!supabase/functions/attendance-webhook/*.ts
+!supabase/functions/attendance-notifications/
+!supabase/functions/attendance-notifications/*.ts
 !supabase/functions/riichi-open-public/
 supabase/functions/riichi-open-public/*
 !supabase/functions/riichi-open-public/index.ts
