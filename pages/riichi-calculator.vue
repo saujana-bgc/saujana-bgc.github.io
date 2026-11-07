@@ -74,6 +74,7 @@
             <button type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three player</button>
           </div>
         </div>
+        <label class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Optional · off for Riichi Open</small></label>
 
         <section v-if="entryMode === 'hanfu'" class="calc-section direct-entry" aria-labelledby="direct-heading">
           <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect 5 han and above.</p></div></div>
@@ -111,6 +112,7 @@
           :result-panel-visible="!keyboardOpen && tileStep === 1"
           :player-count="form.playerCount"
           :aka-dora-count="tileAkaDoraCount"
+          :red-fives="form.redFives"
           :riichi="form.tileSituation.riichi !== 'none'"
           :tile-situation="form.tileSituation"
           :undo-context="{ tilePaoApplies: form.tilePaoApplies, tilePaoResponsibleSeat: form.tilePaoResponsibleSeat, tileRonDiscarderSeat: form.tileRonDiscarderSeat, contextRevision: tileContextRevision }"
@@ -180,7 +182,7 @@
             </button>
           </div>
 
-          <details class="hand-help"><summary>Table scoring rules</summary><p>The Saujana table uses kiriage mangan off and 4 fu for a double-wind pair. Three-player tsumo includes payments from the two opponents still at the table. Riichi sticks are collected separately and are not included in this score.</p></details>
+          <details class="hand-help"><summary>Table scoring rules</summary><p>Riichi Open uses kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. Red fives and three-player scoring are optional variants. Riichi sticks are collected separately.</p></details>
           </details>
 
           <div ref="honbaSection" class="bonus-control honba-control" tabindex="-1" aria-labelledby="honba-count-label">
@@ -206,8 +208,8 @@
             <label class="checkbox-row"><input v-model="form.tileSituation.renhou" type="checkbox" :disabled="form.winType !== 'ron' || isDealer || form.tileSituation.riichi !== 'none' || tileHasOpenMeld || tileHasKan || form.tileEntry.otherKanCount > 0 || form.bonusHan.nuki > 0 || form.tileSituation.houtei || form.tileSituation.chankan" @change="markTileContextChanged" /><span>Renhou · non-dealer ron before your first draw</span></label>
             <label v-if="form.winType === 'tsumo'" class="checkbox-row"><input v-model="form.tileSituation.openingWin" type="checkbox" true-value="opening" false-value="" :disabled="form.tileSituation.riichi !== 'none' || tileHasOpenMeld || tileHasKan || form.tileEntry.otherKanCount > 0 || form.bonusHan.nuki > 0 || form.tileSituation.haitei || form.tileSituation.rinshan" @change="markTileContextChanged" /><span>{{ isDealer ? 'Tenhou · dealer’s first draw' : 'Chiihou · non-dealer’s first draw' }}</span></label>
             <p v-if="form.winType === 'tsumo'" class="field-hint">The first draw must be before any player calls or declares a kan.</p>
-          </div><label class="checkbox-row"><input v-model="form.tileSituation.doubleYakuman" type="checkbox" @change="markTileContextChanged" /><span>Apply double yakuman rules</span></label><p class="field-hint">Includes thirteen-sided Kokushi, Suuankou tanki, pure Chuuren and Daisuushi.</p></details>
-          <details v-if="hasTilePaoYaku" ref="paoDetails" class="tile-situation-details"><summary>Pao · liability</summary><label class="checkbox-row"><input v-model="form.tilePaoApplies" type="checkbox" @change="markTileContextChanged" /><span>Pao applies under the table rules</span></label><template v-if="form.tilePaoApplies"><p class="field-hint">Pao applies when another player supplied the final set that completed Daisangen or Daisuushi.</p><template v-if="!seatWindConfirmed"><p class="field-hint">Confirm your seat first so the responsible-player choices are correct.</p><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind for pao"><button v-for="wind in availableSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</button></div></template><template v-else><label class="field-label">Responsible player<select v-model="form.tilePaoResponsibleSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label><label v-if="form.winType === 'ron'" class="field-label">Who discarded the winning tile?<select v-model="form.tileRonDiscarderSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label></template></template></details>
+          </div><p class="field-hint">Special waits do not double yakuman. Distinct yakuman stack.</p></details>
+          <details v-if="hasTilePaoYaku" ref="paoDetails" class="tile-situation-details"><summary>Pao · liability</summary><label class="checkbox-row"><input v-model="form.tilePaoApplies" type="checkbox" @change="markTileContextChanged" /><span>Pao applies under the table rules</span></label><template v-if="form.tilePaoApplies"><p class="field-hint">Pao applies when another player supplied the final required set after the others were visible.</p><template v-if="!seatWindConfirmed"><p class="field-hint">Confirm your seat first so the responsible-player choices are correct.</p><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind for pao"><button v-for="wind in availableSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</button></div></template><template v-else><label class="field-label">Liable yakuman<select v-model="form.tilePaoYakuman" class="tile-select" @change="markTileContextChanged"><option v-for="yaku in tilePaoYakumanOptions" :key="yaku.id" :value="yaku.id">{{ yaku.label }}</option></select></label><label class="field-label">Responsible player<select v-model="form.tilePaoResponsibleSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label><label v-if="form.winType === 'ron'" class="field-label">Who discarded the winning tile?<select v-model="form.tileRonDiscarderSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label></template></template></details>
           <p v-if="tileScoreIssue" class="field-problems" role="status">{{ tileScoreIssue }}</p>
           <p class="field-hint">Payment updates as you complete these details.</p>
         </section>
@@ -271,12 +273,14 @@ const initialState = () => ({
   roundWind: 'east',
   roundWindConfirmed: false,
   playerCount: 4,
+  redFives: false,
   isDealer: false,
   isClosed: true,
   tileEntry: { tiles: [], melds: [], winningIndex: null, doraIndicators: [], uraIndicators: [], doraEntryMode: 'total', totalBonusHan: 0, otherKanCount: 0 },
   tileSituation: { riichi: 'none', ippatsu: false, haitei: false, houtei: false, rinshan: false, chankan: false, renhou: false, openingWin: false, doubleYakuman: false },
   tilePaoApplies: false,
   tilePaoResponsibleSeat: null,
+  tilePaoYakuman: 'daisangen',
   tileRonDiscarderSeat: null,
   bonusHan: { dora: 0, nuki: 0 },
   honba: 0,
@@ -426,7 +430,7 @@ const quickScore = computed(() => calculateManualHanFuScore({
   winType: form.winType,
   playerCount: form.playerCount,
   honba: integerAtLeastZero(form.honba),
-  kiriageMangan: false,
+  kiriageMangan: true,
 }))
 const tileRiichiOptions = [
   { id: 'none', label: 'No riichi' },
@@ -449,12 +453,23 @@ const tileHasKan = computed(() => tileKanCount.value > 0)
 const tileHasOpenMeld = computed(() => form.tileEntry.melds.some(meld => meld.type !== 'kan-closed'))
 const openDragonSetCount = computed(() => form.tileEntry.melds.filter(meld => ['pon', 'kan-open', 'kan-added'].includes(meld.type) && /^h[4-6]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length)
 const openWindSetCount = computed(() => form.tileEntry.melds.filter(meld => ['pon', 'kan-open', 'kan-added'].includes(meld.type) && /^h[0-3]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length)
+const tilePaoYakumanOptions = computed(() => {
+  const options = []
+  const concealedDragonKans = form.tileEntry.melds.filter(meld => meld.type === 'kan-closed' && /^h[4-6]$/.test(meld.tokens[0])).length
+  const concealedWindKans = form.tileEntry.melds.filter(meld => meld.type === 'kan-closed' && /^h[0-3]$/.test(meld.tokens[0])).length
+  if (openDragonSetCount.value + concealedDragonKans === 3) options.push({ id: 'daisangen', label: 'Daisangen' })
+  if (openWindSetCount.value + concealedWindKans === 4) options.push({ id: 'daisuushi', label: 'Daisuushi' })
+  if (tileKanCount.value === 4) options.push({ id: 'suukantsu', label: 'Suukantsu' })
+  return options
+})
 const hasTilePaoYaku = computed(() => {
   const counts = new Map()
   for (const token of form.tileEntry.tiles) counts.set(token, (counts.get(token) ?? 0) + 1)
   const dragonSets = ['h4', 'h5', 'h6'].filter(token => counts.get(token) >= 3).length
   const windSets = ['h0', 'h1', 'h2', 'h3'].filter(token => counts.get(token) >= 3).length
-  return dragonSets === 3 && openDragonSetCount.value > 0 || windSets === 4 && openWindSetCount.value > 0
+  const visibleKanDragons = form.tileEntry.melds.filter(meld => meld.type === 'kan-closed' && /^h[4-6]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length
+  const visibleKanWinds = form.tileEntry.melds.filter(meld => meld.type === 'kan-closed' && /^h[0-3]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length
+  return dragonSets === 3 && openDragonSetCount.value + visibleKanDragons === 3 || windSets === 4 && openWindSetCount.value + visibleKanWinds === 4 || tileKanCount.value === 4
 })
 watch([hasTilePaoYaku, () => form.tilePaoApplies, () => form.tilePaoResponsibleSeat, () => form.tileRonDiscarderSeat], ([qualifies]) => {
   if (!qualifies) {
@@ -543,12 +558,13 @@ const tileResult = computed(() => {
   }
   const rules = {
     playerCount: form.playerCount,
-    doubleYakuman: form.tileSituation.doubleYakuman,
-    doubleWindPairFu: 4,
-    kiriagemangan: false,
+    doubleYakuman: false,
+    doubleWindPairFu: 2,
+    kiriagemangan: true,
     localYaku: { ...DEFAULT_LOCAL_YAKU, renho: true },
   }
   const structural = scoreFullHand(hand, rules)
+  if (!form.redFives && [...form.tileEntry.tiles, ...form.tileEntry.melds.flatMap(meld => meld.tokens), ...(form.tileEntry.doraEntryMode === 'indicators' ? [...form.tileEntry.doraIndicators, ...form.tileEntry.uraIndicators] : [])].some(token => token.endsWith('r'))) issues.push('Red fives are turned off. Remove them or enable red fives in table settings.')
   const structuralYakuman = structural.valid && structural.yaku.some(yaku => yaku.isYakuman)
   const bonusExempt = structuralYakuman || structural.yaku.some(yaku => yaku.name === 'renho')
   if (!bonusExempt && tileWindsNeeded.value && needsWindsConfirmation.value) issues.push('Confirm the seat and round winds.')
@@ -568,7 +584,7 @@ const tileResult = computed(() => {
     ...(form.tileEntry.doraEntryMode === 'total' ? {
       bonusHanOverride: Math.min(99, integerAtLeastZero(form.tileEntry.totalBonusHan) + integerAtLeastZero(structural.akaDoraCount)),
     } : {}),
-    ...(hasTilePaoYaku.value && form.tilePaoApplies && form.tilePaoResponsibleSeat ? { paoResponsibleSeat: form.tilePaoResponsibleSeat } : {}),
+    ...(hasTilePaoYaku.value && form.tilePaoApplies && form.tilePaoResponsibleSeat ? { paoResponsibleSeat: form.tilePaoResponsibleSeat, paoYakuman: form.tilePaoYakuman } : {}),
     ...(hasTilePaoYaku.value && form.winType === 'ron' && form.tilePaoApplies && form.tileRonDiscarderSeat ? { ronDiscarderSeat: form.tileRonDiscarderSeat } : {}),
   }
   const paoChangesScore = hasTilePaoYaku.value && form.tilePaoApplies && Boolean(form.tilePaoResponsibleSeat)
@@ -914,14 +930,14 @@ function formatPoints(value) {
 function limitName(name) {
   return ({
     mangan: 'Mangan', haneman: 'Haneman', baiman: 'Baiman',
-    sanbaiman: 'Sanbaiman', yakuman: 'Yakuman', 'kazoe-yakuman': 'Counted yakuman',
+    sanbaiman: 'Sanbaiman', yakuman: 'Yakuman', yonbaiman: 'Yonbaiman', 'kazoe-yakuman': 'Yonbaiman',
   })[name] ?? name
 }
 
 async function resetCalculator() {
   const previousHand = JSON.parse(JSON.stringify({ form: toRaw(form), entryMode: entryMode.value, tileStep: tileStep.value }))
   undoSnapshot.value = null
-  const table = { playerCount: form.playerCount, seatWind: form.seatWind, seatWindConfirmed: form.seatWindConfirmed, roundWind: form.roundWind, roundWindConfirmed: form.roundWindConfirmed, isDealer: form.isDealer, honba: form.honba }
+  const table = { playerCount: form.playerCount, redFives: form.redFives, seatWind: form.seatWind, seatWindConfirmed: form.seatWindConfirmed, roundWind: form.roundWind, roundWindConfirmed: form.roundWindConfirmed, isDealer: form.isDealer, honba: form.honba }
   const currentEntryMode = entryMode.value
   Object.assign(form, initialState(), table)
   entryMode.value = currentEntryMode

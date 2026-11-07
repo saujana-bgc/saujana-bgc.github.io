@@ -30,6 +30,18 @@
     --line: #DEDCD2;
     --muted: #666C60;
     --surface-soft: #EFEEE7;
+    /* Reusable dark artwork tokens; adding these does not enable site dark mode. */
+    --saujana-dark-bg: #171D19;
+    --saujana-dark-surface: #232D26;
+    --saujana-dark-raised: #2E3A31;
+    --saujana-dark-text: #F7F5EF;
+    --saujana-dark-muted: #C2C9BE;
+    --saujana-dark-heading: #D0DDC7;
+    --saujana-dark-gold: #D1AF73;
+    --saujana-dark-border: #53634F;
+    --saujana-clocktower-accent: #743C46;
+    --saujana-dark-qr-paper: #FFFEFA;
+    --saujana-dark-qr-ink: #393D35;
     --shadow-card: 0 8px 30px rgba(44, 55, 40, .035);
     --space-1: 4px;
     --space-2: 8px;

@@ -185,6 +185,7 @@ const props = defineProps({
   resultPanelVisible: { type: Boolean, default: false },
   playerCount: { type: Number, default: 4 },
   akaDoraCount: { type: Number, default: 0 },
+  redFives: { type: Boolean, default: false },
   riichi: { type: Boolean, default: false },
   tileSituation: { type: Object, required: true },
   undoContext: { type: Object, default: () => ({}) },
@@ -257,7 +258,7 @@ const activeSuitLabel = computed(() => suits.find(suit => suit.id === activeSuit
 const pickerTiles = computed(() => activeSuit.value === 'honor'
   ? Array.from({ length: 7 }, (_, index) => 'h' + index)
   : Array.from({ length: 9 }, (_, index) => activeSuit.value[0] + (index + 1)))
-const pickerTokens = computed(() => pickerTiles.value.flatMap(token => activeSuit.value !== 'honor' && token.endsWith('5') ? [token, token + 'r'] : [token]))
+const pickerTokens = computed(() => pickerTiles.value.flatMap(token => props.redFives && activeSuit.value !== 'honor' && token.endsWith('5') ? [token, token + 'r'] : [token]))
 const countHint = computed(() => {
   const remaining = targetCount.value - entry.value.tiles.length
   if (addingKanReplacement.value) return 'Choose one extra tile for a kan. Mark the kan after you finish entering tiles.'

@@ -8,7 +8,7 @@ import { countDora, countAkaDora, tilesEqual } from "./tiles";
 import type { HandInterpretation } from "./hand-parser";
 import type { FuBreakdown } from "./types";
 
-const PAO_YAKU = new Set(["daisangen", "daisuushi"]);
+const PAO_YAKU = new Set(["daisangen", "daisuushi", "suukantsu"]);
 
 export function hasDeclaredKan(melds: Hand["melds"]): boolean {
   return melds.some((m) => m.type === "kan-open" || m.type === "kan-closed" || m.type === "kan-added");
@@ -37,7 +37,7 @@ function applyPao(
 ): ScoreResult["points"] {
   const responsibleSeat: WindValue | undefined = hand.paoResponsibleSeat;
   const liableUnits = Math.round(yaku
-    .filter((y) => PAO_YAKU.has(y.name))
+    .filter((y) => PAO_YAKU.has(y.name) && (!hand.paoYakuman || y.name === hand.paoYakuman))
     .reduce((sum, y) => sum + y.han, 0) / 13);
   if (!responsibleSeat || liableUnits === 0) return points;
 
@@ -72,8 +72,8 @@ function applyPao(
       : otherTsumo?.tsumo?.nonDealerPays ?? 0;
   const perOtherDealerPayment = isDealer || responsibleSeat === "east"
     ? 0
-    : (otherTsumo?.tsumo?.dealerPays ?? 0) + 100 * honba;
-  const perOtherNonDealerPayment = (otherTsumo?.tsumo?.nonDealerPays ?? 0) + 100 * honba;
+    : (otherTsumo?.tsumo?.dealerPays ?? 0) + (otherUnits > 0 ? 100 * honba : 0);
+  const perOtherNonDealerPayment = (otherTsumo?.tsumo?.nonDealerPays ?? 0) + (otherUnits > 0 ? 100 * honba : 0);
   const otherDealerCount = isDealer || responsibleSeat === "east" ? 0 : 1;
   const otherNonDealerCount = isDealer
     ? playerCount - 2
@@ -303,6 +303,12 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
       : { base: 30, pairFu: 0, meldFu: 0, waitFu: 0, tsumoFu: 0, total: 30 };
     const yaku: Yaku = { name: "renho", nameJa: "人和", han: 5, isYakuman: false };
     const points = calculatePoints(5, fu.total, isDealer, hand.winType, 0, rules.kiriagemangan, hand.honba ?? 0, playerCount);
+    const ordinary = score({
+      ...hand,
+      renho: false,
+      ...(hand.bonusHanOverride === undefined ? {} : { bonusHanOverride: hand.bonusHanOverride + akaDoraCount }),
+    }, rules);
+    if (ordinary.valid && ordinary.points.total > points.total) return ordinary;
     return {
       valid: true, yaku: [yaku], totalHan: 5, fu: fu.total, fuBreakdown: fu,
       doraCount: 0, akaDoraCount: 0, uraDoraCount: 0, nukiDoraCount: 0,

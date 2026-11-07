@@ -14,7 +14,7 @@ export function roundUp100(n: number): number {
 // how far past 13 han it counts, unlike real yakuman which multiply per unit.
 export function handName(han: number, fu: number, yakumanUnits: number, kiriagemangan: boolean): HandName | undefined {
   if (yakumanUnits > 0) return "yakuman";
-  if (han >= 13) return "kazoe-yakuman";
+  if (han >= 13) return "yonbaiman";
   if (han >= 11) return "sanbaiman";
   if (han >= 8) return "baiman";
   if (han >= 6) return "haneman";
@@ -36,7 +36,7 @@ const MANGAN_BASIC = 2000;
 
 function capBasic(han: number, fu: number, name: HandName | undefined, yakumanUnits: number): number {
   if (name === "yakuman") return MANGAN_BASIC * 4 * Math.max(1, yakumanUnits); // 8000 per unit
-  if (name === "kazoe-yakuman") return MANGAN_BASIC * 4;                       // 8000, flat
+  if (name === "yonbaiman" || name === "kazoe-yakuman") return MANGAN_BASIC * 4; // 8000, flat
   if (name === "sanbaiman") return MANGAN_BASIC * 3;                            // 6000
   if (name === "baiman") return MANGAN_BASIC * 2;                               // 4000
   if (name === "haneman") return Math.floor(MANGAN_BASIC * 1.5);               // 3000

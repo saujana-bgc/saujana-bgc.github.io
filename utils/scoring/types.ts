@@ -71,6 +71,8 @@ export interface Hand {
    * it only when one of those yakuman actually scores.
    */
   paoResponsibleSeat?: WindValue;
+  /** Yakuman covered by the selected pao player when multiple liability yaku apply. */
+  paoYakuman?: "daisangen" | "daisuushi" | "suukantsu";
   /**
    * Seat of the player who discarded the winning tile (ron). Required for a
    * pao ron so the payment can be split when the discarder is not the
@@ -141,6 +143,7 @@ export type HandName =
   | "baiman"       // 8–10 han, 16000 basic
   | "sanbaiman"    // 11–12 han, 24000 basic
   | "yakuman"      // 13+ han or yakuman, 32000 basic
+  | "yonbaiman"    // 13+ ordinary han; same points as a single yakuman
   | "kazoe-yakuman"; // 13+ counted han (not yakuman by name)
 
 export interface ScoreResult {
