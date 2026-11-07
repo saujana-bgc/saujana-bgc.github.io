@@ -37,7 +37,10 @@ function applyPao(
 ): ScoreResult["points"] {
   const responsibleSeat: WindValue | undefined = hand.paoResponsibleSeat;
   const liableUnits = Math.round(yaku
-    .filter((y) => PAO_YAKU.has(y.name) && (!hand.paoYakuman || y.name === hand.paoYakuman))
+    .filter((y) => PAO_YAKU.has(y.name)
+      && (!hand.paoYakuman || y.name === hand.paoYakuman)
+      // A concealed or added fourth kan is self-drawn, not fed by an opponent.
+      && (y.name !== "suukantsu" || hand.melds.some((meld) => meld.type === "kan-open")))
     .reduce((sum, y) => sum + y.han, 0) / 13);
   if (!responsibleSeat || liableUnits === 0) return points;
 
@@ -60,6 +63,15 @@ function applyPao(
   }
 
   if (hand.winType === "ron") return { ...points, responsiblePays: points.total };
+
+  if (otherUnits === 0) {
+    return {
+      ...points,
+      responsiblePays: points.total,
+      otherPlayersPay: 0,
+      tsumo: { dealerPays: 0, nonDealerPays: 0 },
+    };
+  }
 
   const liableTsumo = calculatePoints(0, 30, isDealer, "tsumo", liableUnits, false, 0, playerCount).total;
   const otherTsumo = otherUnits > 0

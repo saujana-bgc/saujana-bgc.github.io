@@ -131,15 +131,41 @@ test('stacked yakuman tsumo redirects only the liable yakuman', () => {
   assert.deepEqual(result.points.tsumo, { dealerPays: 16100, nonDealerPays: 8100 })
 })
 
-test('pao tsumo honba is paid per opponent instead of all by the liable player', () => {
+test('single-yakuman pao tsumo assigns all honba to the liable player', () => {
   const result = score(daisangenHand({ paoResponsibleSeat: 'west', honba: 1 }))
 
   assert.equal(result.valid, true)
   assert.equal(result.points.total, 32300)
-  assert.equal(result.points.responsiblePays, 32100, 'liable player pays the yakuman and their own honba share')
-  assert.equal(result.points.otherPlayersPay, 200, 'the other two opponents pay their honba shares')
+  assert.equal(result.points.responsiblePays, 32300, 'liable player pays the yakuman and all honba')
+  assert.equal(result.points.otherPlayersPay, 0, 'the other two opponents pay nothing')
   assert.equal(result.points.responsiblePays + (result.points.otherPlayersPay ?? 0), result.points.total)
-  assert.deepEqual(result.points.tsumo, { dealerPays: 100, nonDealerPays: 100 })
+  assert.deepEqual(result.points.tsumo, { dealerPays: 0, nonDealerPays: 0 })
+})
+
+test('single-yakuman pao payments balance for dealer and non-dealer in both table sizes', () => {
+  for (const playerCount of [3, 4] as const) {
+    for (const seatWind of ['east', 'south'] as const) {
+      const result = score(daisangenHand({ seatWind, paoResponsibleSeat: 'west', honba: 2 }), { playerCount })
+      assert.equal(result.valid, true)
+      assert.equal(result.points.responsiblePays, result.points.total)
+      assert.equal(result.points.otherPlayersPay, 0)
+    }
+  }
+})
+
+test('Suukantsu pao redirects only the selected yakuman when Daisangen stacks', () => {
+  const result = score(daisangenHand({
+    closedTiles: [suited('pin', 2)], winningTile: suited('pin', 2),
+    melds: ['haku', 'hatsu', 'chun', 'east'].map(value => ({
+      type: 'kan-open', tiles: [honor(value as HonorValue), honor(value as HonorValue), honor(value as HonorValue), honor(value as HonorValue)],
+    })),
+    winType: 'ron', paoResponsibleSeat: 'west', ronDiscarderSeat: 'east', paoYakuman: 'suukantsu', honba: 1,
+  }))
+  assert.equal(result.valid, true)
+  assert.deepEqual(result.yaku.map(yaku => yaku.name), ['daisangen', 'suukantsu'])
+  assert.equal(result.points.total, 64300)
+  assert.equal(result.points.responsiblePays, 16000)
+  assert.equal(result.points.discarderPays, 48300)
 })
 
 test('daisuushii pao settles the same way', () => {

@@ -42,6 +42,30 @@ function page(t: { after: (callback: () => void) => void }) {
   return { state, html }
 }
 
+test('Suukantsu pao requires a called kan and selects its available liability yaku', async t => {
+  const { state } = page(t)
+  const tokens = ['m1', 'm9', 'p1', 's1']
+  state.form.tileEntry = {
+    tiles: [...tokens.flatMap(token => Array(4).fill(token)), 'p2', 'p2'],
+    melds: tokens.map((token, index) => ({ type: 'kan-closed', tokens: Array(4).fill(token), tileIndices: [0, 1, 2, 3].map(offset => index * 4 + offset) })),
+    winningIndex: 17, doraIndicators: [], uraIndicators: [], doraEntryMode: 'total', totalBonusHan: 0, otherKanCount: 0,
+  }
+  assert.equal(state.hasTilePaoYaku, false, 'four concealed kans cannot have been fed')
+  assert.deepEqual(state.tilePaoYakumanOptions, [])
+
+  state.form.tileEntry.melds[3].type = 'kan-open'
+  assert.equal(state.hasTilePaoYaku, true)
+  assert.equal(state.form.tilePaoYakuman, 'suukantsu')
+  state.form.tilePaoApplies = true
+  state.form.tilePaoResponsibleSeat = 'west'
+  state.form.seatWindConfirmed = true
+  state.form.winType = 'tsumo'
+  state.form.honba = 1
+  assert.equal(state.resultReady, true)
+  assert.equal(state.result.pao.responsiblePays, 32300)
+  assert.equal(state.result.pao.otherTsumo, undefined)
+})
+
 test('tile fu disappears at 5 total han including dora and returns below the limit', async t => {
   const { state, html } = page(t)
   state.form.tileEntry = {

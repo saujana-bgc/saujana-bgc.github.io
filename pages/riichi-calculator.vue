@@ -459,9 +459,12 @@ const tilePaoYakumanOptions = computed(() => {
   const concealedWindKans = form.tileEntry.melds.filter(meld => meld.type === 'kan-closed' && /^h[0-3]$/.test(meld.tokens[0])).length
   if (openDragonSetCount.value + concealedDragonKans === 3) options.push({ id: 'daisangen', label: 'Daisangen' })
   if (openWindSetCount.value + concealedWindKans === 4) options.push({ id: 'daisuushi', label: 'Daisuushi' })
-  if (tileKanCount.value === 4) options.push({ id: 'suukantsu', label: 'Suukantsu' })
+  if (tileKanCount.value === 4 && form.tileEntry.melds.some(meld => meld.type === 'kan-open')) options.push({ id: 'suukantsu', label: 'Suukantsu' })
   return options
 })
+watch(tilePaoYakumanOptions, options => {
+  if (!options.some(option => option.id === form.tilePaoYakuman)) form.tilePaoYakuman = options[0]?.id ?? null
+}, { immediate: true, flush: 'sync' })
 const hasTilePaoYaku = computed(() => {
   const counts = new Map()
   for (const token of form.tileEntry.tiles) counts.set(token, (counts.get(token) ?? 0) + 1)
@@ -469,7 +472,7 @@ const hasTilePaoYaku = computed(() => {
   const windSets = ['h0', 'h1', 'h2', 'h3'].filter(token => counts.get(token) >= 3).length
   const visibleKanDragons = form.tileEntry.melds.filter(meld => meld.type === 'kan-closed' && /^h[4-6]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length
   const visibleKanWinds = form.tileEntry.melds.filter(meld => meld.type === 'kan-closed' && /^h[0-3]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length
-  return dragonSets === 3 && openDragonSetCount.value + visibleKanDragons === 3 || windSets === 4 && openWindSetCount.value + visibleKanWinds === 4 || tileKanCount.value === 4
+  return dragonSets === 3 && openDragonSetCount.value + visibleKanDragons === 3 || windSets === 4 && openWindSetCount.value + visibleKanWinds === 4 || tileKanCount.value === 4 && form.tileEntry.melds.some(meld => meld.type === 'kan-open')
 })
 watch([hasTilePaoYaku, () => form.tilePaoApplies, () => form.tilePaoResponsibleSeat, () => form.tileRonDiscarderSeat], ([qualifies]) => {
   if (!qualifies) {
