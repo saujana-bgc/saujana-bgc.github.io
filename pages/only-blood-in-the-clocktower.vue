@@ -6,13 +6,13 @@
         <h1>Only Blood <em>in the Clocktower</em></h1>
         <p class="intro">Good games, impossible choices and the moment the town finds out.</p>
         <div class="hero-links">
-          <a class="hero-primary" :href="nextCtaHref">
-            {{ nextGathering?.signup_url ? 'Save your place' : nextGathering ? 'See next gathering' : eventLoading ? 'Checking dates' : 'Browse gatherings' }}
+          <a class="hero-primary" :href="heroPrimaryHref">
+            {{ heroPrimaryLabel }}
             <span v-if="nextGathering" class="hero-date">· {{ nextDateStamp.day }} {{ nextDateStamp.month }}</span>
             <span aria-hidden="true">↗</span>
           </a>
-          <a class="hero-secondary" :href="pastSessions.length ? '#clocktower-archive' : '#what-to-expect'">
-            {{ pastSessions.length ? 'Browse the archive' : 'What to expect' }} <span aria-hidden="true">↘</span>
+          <a class="hero-secondary" :href="heroSecondaryHref">
+            {{ heroSecondaryLabel }} <span aria-hidden="true">↘</span>
           </a>
         </div>
       </div>
@@ -35,62 +35,23 @@
           <template v-if="nextGathering?.time && nextGathering?.venue"> · </template>
           <template v-if="nextGathering?.venue">{{ nextGathering.venue }}</template>
         </p>
-        <p>{{ nextGathering?.first_timer_note || (eventError ? 'We couldn’t load the schedule. Browse all gatherings for the latest dates.' : nextGathering ? 'New to Clocktower? Come along. We’ll walk you through your first game.' : eventLoading ? 'Upcoming dates will appear here.' : 'We haven’t announced another Clocktower session yet. Browse all gatherings for what’s coming up.') }}</p>
+        <p>{{ nextGathering?.first_timer_note || (eventError ? 'We couldn’t load the schedule just now.' : nextGathering ? 'New to Clocktower? Come along. We’ll walk you through your first game.' : eventLoading ? 'Upcoming dates will appear here.' : 'No Clocktower date announced yet.') }}</p>
       </div>
-      <a class="primary-link" :href="nextCtaHref">
-        {{ nextGathering?.signup_url ? 'Save your place ↗' : nextGathering ? nextGathering.href.startsWith('/gatherings/#') ? 'See gathering details ↗' : 'See community gatherings ↗' : 'Browse gatherings ↗' }}
-      </a>
     </section>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
-      <div>
+      <div class="welcome-body">
         <p class="eyebrow">Your first night?</p>
         <h2 id="welcome-title">You don’t need to know every secret.</h2>
         <p>Come solo or bring a friend. No experience is needed. The host can help you find a seat and explain your first game. Check the gathering details and add your name to the signup list. Still deciding? Mark yourself tentative when the list allows it.</p>
-      </div>
-      <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Read the official guide <span aria-hidden="true">↗</span></a>
-    </section>
-
-    <section v-if="featured" class="featured" aria-labelledby="featured-title">
-      <figure class="featured-plate">
-        <img v-if="featuredCover" :src="photoUrls[featuredCover]" alt="A moment from a Saujana Clocktower gathering" loading="lazy">
-        <svg v-else viewBox="0 0 180 180" aria-hidden="true" fill="none" stroke="currentColor">
-          <circle cx="90" cy="90" r="78" opacity=".35"/>
-          <circle cx="90" cy="90" r="67"/>
-          <circle cx="90" cy="90" r="55" opacity=".45"/>
-          <path d="M90 12v18m0 120v18M12 90h18m120 0h18M35 35l13 13m84 84 13 13M35 145l13-13m84-84 13-13" opacity=".7"/>
-          <path d="M90 45l-4 45 4 6 6-6 23-25" stroke-width="2"/>
-          <circle cx="90" cy="90" r="5" fill="currentColor"/>
-        </svg>
-        <figcaption aria-hidden="true"><span>✦</span> The latest gathering</figcaption>
-      </figure>
-      <div class="featured-copy">
-        <p class="eyebrow"><span aria-hidden="true">✦</span> From the storyteller’s desk</p>
-        <h2 id="featured-title">{{ featured.teaser || 'The latest night in Ravenswood Bluff' }}</h2>
-        <p class="metadata">
-          <time :datetime="featured.session_date">{{ formatDate(featured.session_date) }}</time>
-          <template v-if="featured.venue"> · {{ featured.venue }}</template>
-          <template v-if="featured.games?.length"> · {{ featured.games.length }} {{ featured.games.length === 1 ? 'game' : 'games' }}</template>
-        </p>
-        <ul v-if="featuredScripts.length" class="script-tags" aria-label="Scripts played">
-          <li v-for="script in featuredScripts" :key="script">{{ script }}</li>
-        </ul>
-        <details v-if="featured.recap" class="recap-reveal">
-          <summary>Reveal Mika’s retelling</summary>
-          <p>{{ featured.recap }}</p>
-        </details>
-        <div class="featured-actions">
-          <a class="text-link" :href="'#session-' + featured.id" @click="showFeaturedInArchive">Explore this gathering <span aria-hidden="true">↓</span></a>
-          <button class="share-button" type="button" @click="shareSession(featured)">{{ featured.recap ? 'Share recap' : 'Share gathering' }}</button>
-        </div>
-        <p v-if="shareNotices[featured.id]" role="status" class="share-feedback">{{ shareNotices[featured.id] }}</p>
+        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Read the official guide <span aria-hidden="true">↗</span></a>
       </div>
     </section>
 
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header class="archive-heading">
         <p class="eyebrow">Past gatherings</p>
-        <h2 id="archive-title">Every town has a story</h2>
+        <h2 id="archive-title">The story so far</h2>
         <p v-if="pastSessions.length" class="metadata">Game results and retellings stay tucked away until you reveal them.</p>
       </header>
       <div v-if="!loading && !error && pastSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter past gatherings">
@@ -102,32 +63,30 @@
       <p v-else-if="loading" class="archive-state" role="status">Opening the grimoire…</p>
       <div v-else-if="!pastSessions.length" class="archive-state empty-archive">
         <span class="empty-mark" aria-hidden="true">✧</span>
-        <h3>The first story is still to come.</h3>
-        <p>After a gathering, look here for Mika’s retelling, game results and photos from the table.</p>
+        <h3>No recaps yet</h3>
+        <p>Mika’s retellings, game results and approved photos will appear here after a gathering.</p>
       </div>
 
       <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state">No gatherings match these filters. <button class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button></p>
-      <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card">
+      <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id }">
+        <p v-if="session.id === featured?.id" class="eyebrow latest-label">Latest gathering</p>
         <div class="session-heading">
           <div>
             <p class="eyebrow"><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
             <h3>{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
-            <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</p>
+            <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
           <button class="share-button" type="button" @click="shareSession(session)">Share gathering</button>
         </div>
-        <p v-if="shareNotices[session.id]" role="status" class="share-feedback">{{ shareNotices[session.id] }}</p>
+        <div v-if="shareNotices[session.id]" class="share-feedback" role="status">
+          {{ shareNotices[session.id] }}
+          <button v-if="shareLinks[session.id]" class="share-copy-link" type="button" @click="copyShareLink(session.id)">Copy link</button>
+        </div>
 
         <details v-if="session.recap" class="recap-reveal">
           <summary>Reveal Mika’s retelling</summary>
           <p>{{ session.recap }}</p>
         </details>
-
-        <div v-if="archivePhotos(session).length" class="photo-gallery" :aria-label="'Photos from ' + formatDate(session.session_date)">
-          <a v-for="photo in archivePhotos(session)" :key="photo.path" class="photo-link" :href="photoUrls[photo.path]" target="_blank" rel="noopener noreferrer" :aria-label="'Open full-size photo from ' + formatDate(session.session_date) + ' in a new tab'">
-            <img :src="photoUrls[photo.path]" :alt="photo.alt || 'Photo from this Blood on the Clocktower gathering'" loading="lazy">
-          </a>
-        </div>
 
         <div v-if="session.games?.length" class="game-grid">
           <details v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number">
@@ -147,22 +106,33 @@
             </ol>
             <p v-if="game.notes" class="story-text">{{ game.notes }}</p>
             <button v-if="game.id" class="share-button" type="button" @click="shareGame(session, game)">Share game link</button>
-            <p v-if="shareNotices[game.id]" role="status" class="share-feedback">{{ shareNotices[game.id] }}</p>
+            <div v-if="shareNotices[game.id]" class="share-feedback" role="status">
+              {{ shareNotices[game.id] }}
+              <button v-if="shareLinks[game.id]" class="share-copy-link" type="button" @click="copyShareLink(game.id)">Copy link</button>
+            </div>
           </details>
         </div>
+
+        <details v-if="sessionPhotos(session).length" class="photo-reveal">
+          <summary>Table photos · {{ sessionPhotos(session).length }}</summary>
+          <div class="photo-gallery" :aria-label="'Photos from ' + formatDate(session.session_date)">
+            <a v-for="photo in sessionPhotos(session)" :key="photo.path" class="photo-link" :href="photoUrls[photo.path]" target="_blank" rel="noopener noreferrer" :aria-label="'Open full-size photo from ' + formatDate(session.session_date) + ' in a new tab'">
+              <img :src="photoUrls[photo.path]" :alt="photo.alt || 'Photo from this Blood on the Clocktower gathering'" loading="lazy">
+            </a>
+          </div>
+        </details>
       </article>
     </section>
 
     <section v-if="!loading && !error && pastSessions.length" class="stats" aria-labelledby="stats-title">
       <p class="eyebrow">The tally</p>
-      <h2 id="stats-title">Stories from the circle</h2>
+      <h2 id="stats-title">Clocktower in numbers</h2>
       <div class="stat-row">
         <div><strong>{{ statistics.sessions }}</strong><span>gatherings</span></div>
         <div><strong>{{ statistics.games }}</strong><span>games played</span></div>
         <div><strong>{{ statistics.scripts }}</strong><span>scripts explored</span></div>
       </div>
     </section>
-    <p class="script-note">Ready to join a game? <a href="/gatherings/">See Saujana’s upcoming gatherings ↗</a></p>
   </main>
 </template>
 
@@ -172,6 +142,7 @@ const route = useRoute()
 const sessions = ref([])
 const photoUrls = ref({})
 const shareNotices = ref({})
+const shareLinks = ref({})
 const selectedYear = ref('all')
 const selectedScript = ref('all')
 const loading = ref(true)
@@ -227,9 +198,11 @@ const nextGathering = computed(() => {
   return null
 })
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
+const heroPrimaryHref = computed(() => nextGathering.value ? nextCtaHref.value : pastSessions.value.length ? '#clocktower-archive' : '#what-to-expect')
+const heroPrimaryLabel = computed(() => nextGathering.value?.signup_url ? 'Save your place' : nextGathering.value ? 'See next gathering' : eventLoading.value ? 'Checking dates' : pastSessions.value.length ? 'Browse past gatherings' : 'What to expect')
+const heroSecondaryHref = computed(() => nextGathering.value ? pastSessions.value.length ? '#clocktower-archive' : '#what-to-expect' : '/gatherings/')
+const heroSecondaryLabel = computed(() => nextGathering.value ? pastSessions.value.length ? 'Browse the archive' : 'First time? What to expect' : 'All board game gatherings')
 const featured = computed(() => [...pastSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
-const featuredCover = computed(() => featured.value && cover(featured.value))
-const featuredScripts = computed(() => [...new Set((featured.value?.games || []).map(game => game.script).filter(Boolean))])
 const nextDateStamp = computed(() => {
   if (!nextGathering.value) return null
   const date = new Date(nextGathering.value.date + 'T12:00:00')
@@ -265,17 +238,6 @@ function sessionPhotos(session) {
     .filter(photo => photo.approved && photoUrls.value[photo.path])
 }
 
-function archivePhotos(session) {
-  const photos = sessionPhotos(session)
-  if (session.id !== featured.value?.id || !featuredCover.value) return photos
-  return photos.filter(photo => photo.path !== featuredCover.value)
-}
-
-function cover(session) {
-  const photos = sessionPhotos(session)
-  return (photos.find(photo => photo.cover) || photos[0])?.path
-}
-
 function visibleGames(session) {
   return (session.games || [])
     .map((game, index) => ({ game, number: index + 1 }))
@@ -285,16 +247,6 @@ function visibleGames(session) {
 function clearArchiveFilters() {
   selectedYear.value = 'all'
   selectedScript.value = 'all'
-}
-
-async function showFeaturedInArchive(event) {
-  const target = 'session-' + featured.value.id
-  if (document.getElementById(target) || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-  event.preventDefault()
-  clearArchiveFilters()
-  await nextTick()
-  window.location.hash = target
-  document.getElementById(target)?.scrollIntoView({ block: 'start' })
 }
 
 async function loadArchive() {
@@ -358,8 +310,9 @@ async function shareSession(session) {
     if (nativeShare) await navigator.share({ title: 'Only Blood in the Clocktower', url: link.toString() })
     else await navigator.clipboard.writeText(link.toString())
     shareNotices.value = { ...shareNotices.value, [session.id]: nativeShare ? 'Recap shared.' : 'Recap link copied.' }
-  } catch {
-    shareNotices.value = { ...shareNotices.value, [session.id]: link.toString() }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') return
+    showShareFallback(session.id, link)
   }
 }
 
@@ -372,8 +325,24 @@ async function shareGame(session, game) {
     if (nativeShare) await navigator.share({ title: 'Blood on the Clocktower · ' + game.script, url: link.toString() })
     else await navigator.clipboard.writeText(link.toString())
     shareNotices.value = { ...shareNotices.value, [game.id]: nativeShare ? 'Game link shared.' : 'Game link copied.' }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') return
+    showShareFallback(game.id, link)
+  }
+}
+
+function showShareFallback(id, link) {
+  shareLinks.value = { ...shareLinks.value, [id]: link.toString() }
+  shareNotices.value = { ...shareNotices.value, [id]: 'Sharing didn’t work. Copy the link instead.' }
+}
+
+async function copyShareLink(id) {
+  try {
+    await navigator.clipboard.writeText(shareLinks.value[id])
+    shareLinks.value = { ...shareLinks.value, [id]: '' }
+    shareNotices.value = { ...shareNotices.value, [id]: 'Link copied.' }
   } catch {
-    shareNotices.value = { ...shareNotices.value, [game.id]: link.toString() }
+    shareNotices.value = { ...shareNotices.value, [id]: 'Couldn’t copy the link. Check your browser’s clipboard permissions.' }
   }
 }
 
@@ -469,7 +438,7 @@ onMounted(() => {
 .page-header h1 em { display: block; color: #efd0a4; }
 .intro { max-width: 37ch; margin: 0; color: #e1d0c8; font-size: clamp(.97rem, 1.6vw, 1.1rem); }
 .hero-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 26px; }
-.hero-primary, .hero-secondary, .primary-link, .text-link {
+.hero-primary, .hero-secondary {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -480,16 +449,16 @@ onMounted(() => {
   font-weight: 700;
   text-decoration: none;
 }
-.hero-primary, .primary-link { padding: 10px 16px; border-radius: 6px; }
+.hero-primary { padding: 10px 16px; border-radius: 6px; }
 .hero-primary { background: var(--gold); color: var(--night); }
 .hero-primary:hover { background: #f0d1a4; }
 .hero-date { font-size: .78em; font-weight: 650; }
 .hero-secondary { color: #f2e3da; }
-.hero-secondary:hover, .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.hero-secondary:hover { text-decoration: underline; text-underline-offset: 4px; }
 .clocktower-page :is(a, button, summary, select):focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .page-header a:focus-visible { outline-color: var(--gold); }
 
-.next-night, .featured, .session-card, .archive-state {
+.next-night, .session-card, .archive-state {
   border: 1px solid var(--rule);
   border-radius: 12px;
   background: var(--paper);
@@ -526,7 +495,7 @@ onMounted(() => {
 }
 .calendar-mark strong { font: 400 1.9rem/1 var(--font-display); }
 .calendar-mark span { font-size: .66rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
-.next-night h2, .featured h2, .archive h2, .stats h2 {
+.next-night h2, .archive h2, .stats h2 {
   margin: 3px 0 7px;
   color: var(--ink);
   font: 400 clamp(1.55rem, 3.5vw, 2.5rem)/1.14 var(--font-display);
@@ -534,10 +503,6 @@ onMounted(() => {
 }
 .next-night h2 { font-size: clamp(1.35rem, 3vw, 1.95rem); }
 .next-copy p:not(.eyebrow) { margin: 3px 0 0; color: var(--soft-ink); font-size: .91rem; }
-.primary-link { background: var(--wine); color: #fff8ee; text-align: center; }
-.primary-link:hover { background: #5b3039; }
-.text-link { color: var(--wine); }
-
 .welcome-note {
   display: flex;
   align-items: center;
@@ -555,47 +520,8 @@ onMounted(() => {
 .welcome-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 0 0 auto; min-height: 44px; padding: 9px 13px; border: 1px solid #b99577; border-radius: 6px; color: var(--wine); font-size: .86rem; font-weight: 700; text-decoration: none; }
 .welcome-link:hover { background: #fffaf2; }
 
-.featured {
-  display: grid;
-  grid-template-columns: minmax(0, .73fr) minmax(0, 1.27fr);
-  overflow: hidden;
-  margin: 0 0 26px;
-  background: linear-gradient(115deg, #f8eee6, var(--paper) 76%);
-  box-shadow: 0 9px 26px #3421250c;
-}
-.featured-plate {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 230px;
-  margin: 0;
-  background: radial-gradient(ellipse, #643b3c, #2e1e27 80%);
-  color: var(--gold);
-}
-.featured-plate img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.featured-plate > svg { width: min(45%, 150px); margin-bottom: 22px; }
-.featured-plate figcaption {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  left: 12px;
-  padding: 8px;
-  border: 1px solid #e6be8555;
-  border-radius: 4px;
-  background: #21171df2;
-  color: #f1d8b6;
-  text-align: center;
-  font-size: .65rem;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
-.featured-plate figcaption span { margin-inline-end: 5px; }
-.featured-copy { position: relative; min-width: 0; padding: var(--panel-pad); }
-.featured-copy .eyebrow span { margin-right: 6px; }
 .metadata { margin: 4px 0 0; color: var(--soft-ink); font-size: .92rem; overflow-wrap: anywhere; }
-.featured h2, .session-card h3 { overflow-wrap: anywhere; }
-.featured-actions { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; margin-top: 12px; }
+.session-card h3 { overflow-wrap: anywhere; }
 .script-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
 .script-tags li { padding: 4px 9px; border: 1px solid var(--rule); border-radius: 5px; color: var(--wine); font-size: .75rem; overflow-wrap: anywhere; }
 .recap-reveal { margin-top: 14px; padding-inline: 12px; border: 1px solid var(--rule); border-radius: 7px; background: #f5ece5; }
@@ -632,6 +558,8 @@ onMounted(() => {
 .empty-archive h3, .session-card h3 { margin: 0; color: var(--ink); font: 400 clamp(1.25rem, 3vw, 1.75rem)/1.2 var(--font-display); }
 .empty-archive p { max-width: 42ch; margin: 8px auto 0; }
 .session-card { margin: 0 0 14px; border-inline-start: 3px solid #b28869; box-shadow: 0 6px 20px #35282b08; }
+.session-card.is-latest-session { border-inline-start-color: var(--wine); background: linear-gradient(110deg, #f8eee6, var(--paper) 70%); box-shadow: 0 9px 26px #34212512; }
+.latest-label { margin-bottom: 5px; }
 .session-card h3 { margin-top: 3px; }
 .session-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; }
 .session-heading > div { flex: 1 1 110px; min-width: 0; }
@@ -659,15 +587,18 @@ details[open] > summary .when-open { display: inline; }
 .death-mark { grid-column: 3; grid-row: 1 / 3; padding: 3px 6px; border: 1px solid #743c4640; border-radius: 4px; color: var(--wine); font-size: .68rem; font-weight: 750; text-transform: uppercase; }
 .grimoire-seat.is-dead { background: #f1e7e2; }
 .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; margin: 16px 0 0; }
+.photo-reveal { margin-top: 12px; padding: 2px 12px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
+.photo-reveal summary { position: relative; list-style: none; }
+.photo-reveal summary::after { content: ''; position: absolute; right: 3px; top: 50%; width: 8px; height: 8px; border: solid var(--wine); border-width: 0 1.5px 1.5px 0; transform: translateY(-70%) rotate(45deg); }
+.photo-reveal .photo-gallery { margin: 4px 0 12px; }
 .photo-link { display: block; overflow: hidden; border-radius: 7px; background: var(--parchment); }
 .photo-gallery img { display: block; width: 100%; max-height: 300px; object-fit: cover; background: var(--parchment); transition: transform .2s ease; }
 .photo-link:hover img { transform: scale(1.025); }
 .share-button { min-height: 44px; padding: 7px 11px; border: 1px solid #d3bdb1; border-radius: 6px; background: transparent; color: var(--wine); font: 700 .85rem var(--font-body); cursor: pointer; }
 .share-button:hover { background: #743c460a; border-color: var(--wine); }
 .game-grid .share-button { margin-top: 7px; }
-.share-feedback { margin: 8px 0 0; color: var(--soft-ink); overflow-wrap: anywhere; font-size: .85rem; }
-.script-note { margin: 25px 0 0; text-align: center; color: var(--soft-ink); font-size: .9rem; }
-.script-note a { color: var(--wine); text-underline-offset: 3px; }
+.share-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 8px 0 0; color: var(--soft-ink); overflow-wrap: anywhere; font-size: .85rem; }
+.share-copy-link { min-height: 36px; padding: 5px 9px; border: 1px solid #d3bdb1; border-radius: 5px; background: transparent; color: var(--wine); font: 700 .8rem var(--font-body); cursor: pointer; }
 .next-night, .archive, .session-card, .game-grid details { scroll-margin-top: 86px; }
 
 @media (max-width: 760px) {
@@ -689,13 +620,9 @@ details[open] > summary .when-open { display: inline; }
   .next-night { grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: start; }
   .calendar-mark { width: 50px; height: 58px; }
   .calendar-mark strong { font-size: 1.5rem; }
-  .next-night .primary-link { grid-column: 1 / -1; justify-self: start; }
-  .featured { grid-template-columns: minmax(0, 1fr); }
-  .featured-plate { min-height: 0; aspect-ratio: 2 / 1; }
-  .featured-plate > svg { width: 27%; }
   .archive-filters label { flex: 1 1 112px; min-width: 0; }
   .welcome-note { align-items: flex-start; flex-direction: column; gap: 13px; }
-  .photo-gallery { grid-template-columns: 1fr; }
-  .photo-gallery img { max-height: 340px; }
+  .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .photo-gallery img { max-height: 180px; }
 }
 </style>
