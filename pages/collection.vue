@@ -388,6 +388,7 @@ watch([search, currentSort, selectedCategories], () => {
 
 .collection-search-input {
     width: 100%;
+    min-width: 0;
 }
 
 .collection-search-input :deep(.collection-search-field) {
@@ -583,7 +584,7 @@ watch([search, currentSort, selectedCategories], () => {
 @media (min-width: 768px) {
     .editorial-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; }
     .modal { align-items: center; padding: 40px; }
-    .modal-container { width: 95%; max-width: 900px; border-radius: 50px; }
+    .modal-container { width: 100%; max-width: none; margin-inline: auto; border-radius: 50px; }
     .modal-content { grid-template-columns: 1fr 1.2fr; padding: 50px; gap: 50px; }
     .editorial-card { padding: 40px; border-radius: 40px; height: 520px; }
     .sort-btn { padding: 12px 28px; font-size: 0.72rem; }
@@ -612,5 +613,10 @@ watch([search, currentSort, selectedCategories], () => {
 .modal-container { border-radius: 16px 16px 0 0; }
 @media (min-width: 768px) { .sort-controls { grid-template-columns: repeat(4, 1fr); } .editorial-card { padding: 22px; border-radius: 10px; } .modal-container { border-radius: 16px; } }
 @media (max-width: 400px) { .editorial-card { padding: 12px; } .card-game-title { font-size: 1.05rem; } .sort-btn { font-size: .75rem; } }
+@media (max-width: 480px) {
+    .collection-search { flex-wrap: wrap; }
+    .collection-search-input { flex: 1 0 100%; }
+    .collection-result-count { flex: 1; }
+}
 
 </style>

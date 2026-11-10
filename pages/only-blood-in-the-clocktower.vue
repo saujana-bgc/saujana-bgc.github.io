@@ -6,8 +6,8 @@
         <h1>Only Blood <em>in the Clocktower</em></h1>
         <p class="intro">Blood on the Clocktower is a social game of hidden roles. Talk, share clues and vote to find the Demon. New players are welcome; we’ll explain as you play.</p>
         <div class="hero-links">
-          <a class="hero-primary" href="#next-gathering">
-            Find the next game
+          <a class="hero-primary" :href="nextCtaHref">
+            {{ nextGathering ? (nextGathering.signup_url ? 'Save your place' : 'See gathering details') : 'See all gatherings' }}
             <span aria-hidden="true">↗</span>
           </a>
           <a class="hero-secondary" :href="heroSecondaryHref">
@@ -200,8 +200,8 @@ const nextGathering = computed(() => {
   return null
 })
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
-const heroSecondaryHref = computed(() => nextGathering.value || pastSessions.value.length ? '#what-to-expect' : '/gatherings/')
-const heroSecondaryLabel = computed(() => nextGathering.value || pastSessions.value.length ? 'First time? Start here' : 'All board game gatherings')
+const heroSecondaryHref = '#what-to-expect'
+const heroSecondaryLabel = 'First time? Start here'
 const featured = computed(() => [...pastSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
 const nextDateStamp = computed(() => {
   if (!nextGathering.value) return null

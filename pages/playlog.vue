@@ -104,7 +104,7 @@
               :key="game.key"
               class="game-pill"
               type="button"
-              :aria-pressed="hoverImage.name === game.name && hoverImage.visible"
+              :aria-pressed="hoverImage.key === game.key && hoverImage.visible"
               :class="{ 'game-pill-match': matchingGames && game.name.toLocaleLowerCase().includes(matchingGames) }"
               @click="toggleGameImage($event, game)"
             >{{ game.name }}</UButton>
@@ -148,7 +148,7 @@ const HOVER_CARD_HEIGHT = 245
 
 const currentPage = ref(1)
 const search = ref('')
-const hoverImage = reactive({ visible: false, src: '', name: '', showPlayers: true, players: [], x: 0, y: 0, above: true })
+const hoverImage = reactive({ visible: false, src: '', name: '', key: '', showPlayers: true, players: [], x: 0, y: 0, above: true })
 const matchingGames = computed(() => search.value.trim().toLocaleLowerCase())
 const matchingGameCount = computed(() => matchingGames.value
     ? filteredSessions.value.reduce((total, session) => total + session.games.filter(game => game.name.toLocaleLowerCase().includes(matchingGames.value)).length, 0)
@@ -260,7 +260,7 @@ const goToPage = (p) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-function showGameImageAt(x, y, gameName, showPlayers = true) {
+function showGameImageAt(x, y, gameName, showPlayers = true, key = gameName) {
     const filename = gameName
         .replace(/:\s*/g, ' ')
         .replace(/[<>"/\\|?*]/g, '')
@@ -272,6 +272,7 @@ function showGameImageAt(x, y, gameName, showPlayers = true) {
     const above = anchorY > window.innerHeight / 2
     hoverImage.src = `/images/playlog/${filename}.avif`
     hoverImage.name = gameName
+    hoverImage.key = key
     hoverImage.showPlayers = showPlayers
     hoverImage.players = []
     hoverImage.x = Math.max(14 + cardWidth / 2, Math.min(anchorX, window.innerWidth - 14 - cardWidth / 2))
@@ -315,7 +316,7 @@ function formatDisplayDate(date) {
 
 function showGameImage(e, game) {
     const rect = e.target.getBoundingClientRect()
-    showGameImageAt(rect.left + rect.width / 2, rect.top, getGameName(game))
+    showGameImageAt(rect.left + rect.width / 2, rect.top, getGameName(game), true, game.key)
     setHoverPlayers(game)
 }
 
@@ -332,7 +333,7 @@ function hideGameImage() { hoverImage.visible = false }
 
 function toggleGameImage(e, game) {
     const gameName = getGameName(game)
-    if (hoverImage.visible && hoverImage.name === gameName) hideGameImage()
+    if (hoverImage.visible && hoverImage.key === game.key) hideGameImage()
     else showGameImage(e, game)
 }
 

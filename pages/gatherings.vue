@@ -378,7 +378,7 @@ const savingRows = reactive({})
 const signupErrors = reactive({})
 const signupSuccess = reactive({})
 const attendeeNameOptions = ref([])
-const nameAutocomplete = reactive({ visible: false, row: null, x: 0, y: 0, width: 240 })
+const nameAutocomplete = reactive({ visible: false, row: null, input: null, x: 0, y: 0, width: 240 })
 const activeNameOptionIndex = ref(-1)
 const pendingDelete = ref(null)
 const deleteDialog = ref(null)
@@ -433,14 +433,26 @@ const filteredNameOptions = computed(() => {
 
 function showNameAutocomplete(e, row) {
     if (e.target.readOnly) return
-    const rect = e.target.getBoundingClientRect()
-    const width = Math.min(Math.max(220, rect.width), window.innerWidth - 28)
     nameAutocomplete.row = row
+    nameAutocomplete.input = e.currentTarget
     activeNameOptionIndex.value = -1
-    nameAutocomplete.x = Math.max(14, Math.min(rect.left, window.innerWidth - width - 14))
-    nameAutocomplete.y = rect.bottom + 6
-    nameAutocomplete.width = width
     nameAutocomplete.visible = true
+    updateNameAutocompletePosition()
+}
+
+function updateNameAutocompletePosition() {
+    const input = nameAutocomplete.input
+    if (!nameAutocomplete.visible || !input?.isConnected) return
+
+    const rect = input.getBoundingClientRect()
+    const width = Math.min(Math.max(220, rect.width), window.innerWidth - 28)
+    const listHeight = document.getElementById('name-autocomplete-list')?.getBoundingClientRect().height || 280
+    const belowSpace = window.innerHeight - rect.bottom - 14
+    nameAutocomplete.x = Math.max(14, Math.min(rect.left, window.innerWidth - width - 14))
+    nameAutocomplete.y = belowSpace >= Math.min(listHeight, 280) + 6
+        ? rect.bottom + 6
+        : Math.max(14, rect.top - Math.min(listHeight, 280) - 6)
+    nameAutocomplete.width = width
 }
 
 function hideNameAutocompleteSoon() {
@@ -968,6 +980,8 @@ watch(pendingDelete, async (value) => {
 })
 
 onMounted(async () => {
+    window.addEventListener('scroll', updateNameAutocompletePosition, { passive: true })
+    window.addEventListener('resize', updateNameAutocompletePosition, { passive: true })
     document.addEventListener('keydown', onKeydown)
     try {
         await Promise.all([
@@ -983,7 +997,11 @@ onMounted(async () => {
     }
 })
 
-onUnmounted(() => document.removeEventListener('keydown', onKeydown))
+onUnmounted(() => {
+    document.removeEventListener('keydown', onKeydown)
+    window.removeEventListener('scroll', updateNameAutocompletePosition)
+    window.removeEventListener('resize', updateNameAutocompletePosition)
+})
 
 watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 </script>
