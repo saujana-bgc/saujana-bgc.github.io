@@ -60,7 +60,7 @@
                 <button type="button" @click="removeGame(index)">Remove game</button>
               </div>
             </div>
-            <div class="fields">
+            <div class="fields game-basics">
               <label>Script
                 <select :value="game.script" @change="applyScript(game, $event)">
                   <option value="Trouble Brewing">Trouble Brewing</option>
@@ -71,21 +71,17 @@
                 </select>
               </label>
               <label v-if="!scriptPresets[game.script]">Custom script name<input v-model="game.script" placeholder="Enter the script name"></label>
-              <label>Outcome<select v-model="game.outcome"><option value="">Choose result</option><option>Good wins</option><option>Evil wins</option><option>No result</option><option>Unknown</option></select></label>
             </div>
-            <details class="script-list">
-              <summary>Script characters <span>{{ characters(game).length }} available</span></summary>
-              <label>Character list, separated by commas<input v-model="game.script_characters" placeholder="Washerwoman, Librarian, Investigator…"></label>
-            </details>
+            <p class="script-hint">{{ scriptPresets[game.script] ? `${characters(game).length} character suggestions loaded for ${game.script}.` : 'Enter each character in the player rows below.' }}</p>
 
             <div class="section-heading">
-              <h4>Players and characters <small>{{ game.players.length }}</small></h4>
+              <h4>Players and characters <small>{{ game.players.length }} {{ game.players.length === 1 ? 'player' : 'players' }}</small></h4>
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <label>Player name<input v-model="player.name" list="clocktower-players" placeholder="Choose or enter a name"></label>
               <label>Character<input class="character-field" v-model="player.character" :list="'clocktower-characters-' + game.id" placeholder="Choose or enter a character" @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"></label>
-              <label class="check-label"><input v-model="player.died" type="checkbox"> Died</label>
-              <details class="player-more"><summary>More</summary><label>Final status<input v-model="player.final_status" placeholder="Optional"></label></details>
+              <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
+              <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
               <button type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</button>
             </div>
             <datalist :id="'clocktower-characters-' + game.id"><option v-for="character in characters(game)" :key="character" :value="character"></option></datalist>
@@ -101,8 +97,10 @@
               <div><button type="button" @click="toggleBulkRoster(game)">Cancel</button><button class="admin-primary" type="button" @click="addPastedPlayers(game)">Add names</button></div>
             </section>
 
+            <label class="outcome-field">Outcome<select v-model="game.outcome"><option value="">Choose result</option><option>Good wins</option><option>Evil wins</option><option>No result</option><option>Unknown</option></select></label>
+
             <details class="game-extras" :open="Boolean(game.notes || game.photos?.length)">
-              <summary>Game extras <span v-if="game.photos?.length">{{ game.photos.length }} photos</span></summary>
+              <summary>Notes and photos <span v-if="game.photos?.length">{{ game.photos.length }} photos</span></summary>
               <label>Game notes<textarea v-model="game.notes" rows="2"></textarea></label>
               <label>Photos<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple @change="uploadPhotos($event,game)"></label>
               <div v-if="game.photos?.length" class="photo-list">
@@ -456,7 +454,7 @@ async function save(published = baseline.value.published) {
           ? card?.querySelector('.roster-actions > button')
           : missingPlayerIndex >= 0
             ? card?.querySelectorAll('input[list="clocktower-players"]')[missingPlayerIndex]
-            : card?.querySelectorAll('.fields select')[1]
+            : card?.querySelector('.outcome-field select')
       field?.focus()
       field?.scrollIntoView({ block: 'center' })
     })
@@ -682,11 +680,11 @@ button:disabled { opacity: .65; cursor: wait; }
 .saved-picker { margin-top: 16px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--desk-paper); }
 .saved-picker > summary { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 9px 14px; cursor: pointer; color: var(--matcha-leaf); font-weight: 700; }
 .saved-count { display: grid; place-items: center; min-width: 26px; height: 26px; margin-inline-start: auto; padding: 0 6px; border-radius: 20px; background: var(--surface-soft); font-size: .8rem; }
-.clocktower-admin :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary) {
+.clocktower-admin :is(.game-summary, .saved-picker > summary, .game-extras > summary) {
   list-style: none;
 }
-.clocktower-admin :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary)::-webkit-details-marker { display: none; }
-.clocktower-admin :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary)::after {
+.clocktower-admin :is(.game-summary, .saved-picker > summary, .game-extras > summary)::-webkit-details-marker { display: none; }
+.clocktower-admin :is(.game-summary, .saved-picker > summary, .game-extras > summary)::after {
   width: 7px;
   height: 7px;
   margin: 0 3px 4px auto;
@@ -695,7 +693,7 @@ button:disabled { opacity: .65; cursor: wait; }
   content: '';
   transform: rotate(45deg);
 }
-.clocktower-admin details[open] > :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary)::after {
+.clocktower-admin details[open] > :is(.game-summary, .saved-picker > summary, .game-extras > summary)::after {
   margin-bottom: 0;
   transform: rotate(225deg);
 }
@@ -707,22 +705,23 @@ button:disabled { opacity: .65; cursor: wait; }
 .editor-heading-actions .start-game { border-color: var(--matcha-leaf); color: var(--matcha-leaf); font-weight: 700; }
 .section-heading h4 small { margin-left: 5px; color: var(--muted); font: .75rem var(--font-body); }
 .roster-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.script-list, .game-extras { padding: 0 12px; border: 1px solid var(--desk-rule); border-radius: 7px; background: #f9f3ec; }
-.script-list[open], .game-extras[open] { padding-bottom: 12px; }
-.script-list > summary, .game-extras > summary, .player-more > summary { display: flex; align-items: center; gap: 9px; min-height: 40px; cursor: pointer; font-size: .86rem; font-weight: 650; }
-.script-list > summary span, .game-extras > summary span { color: var(--muted); font-size: .78rem; font-weight: 400; }
-.script-list label, .game-extras > label { margin-top: 9px; }
+.game-extras { padding: 0 12px; border: 1px solid var(--desk-rule); border-radius: 7px; background: #f9f3ec; }
+.game-extras[open] { padding-bottom: 12px; }
+.game-extras > summary { display: flex; align-items: center; gap: 9px; min-height: 40px; cursor: pointer; font-size: .86rem; font-weight: 650; }
+.game-extras > summary span { color: var(--muted); font-size: .78rem; font-weight: 400; }
+.game-extras > label { margin-top: 9px; }
 .bulk-roster-panel { display: grid; gap: 9px; margin: 0 0 8px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
 .bulk-roster-panel > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .bulk-roster-panel .admin-primary { border: 0; }
 .bulk-roster-panel textarea { min-height: 96px; resize: vertical; }
-.player-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto auto; gap: 6px 10px; align-items: end; padding: 8px 10px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--surface-soft); }
+.player-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto; gap: 6px 10px; align-items: end; padding: 8px 10px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--surface-soft); }
 .player-card:focus-within { border-color: #b48977; }
 .player-card > label:not(.check-label) { font-size: .8rem; }
 .player-card .check-label { align-self: end; min-height: 44px; padding: 0 3px; font-size: .82rem; }
-.player-more summary { min-width: 55px; justify-content: center; font-size: .8rem; color: var(--matcha-leaf); }
-.player-more label { min-width: 155px; margin-top: 6px; }
-.player-more[open] { grid-column: 1 / -1; }
+.player-card .death-check { white-space: nowrap; }
+.legacy-status { grid-column: 1 / -1; }
+.script-hint { margin: -5px 0 0; color: var(--muted); font-size: .78rem; }
+.outcome-field { max-width: 320px; }
 .remove-player { min-height: 40px; padding: 7px 9px; font-size: .8rem; color: var(--matcha-leaf); }
 .keyboard-hint { margin: -3px 0 0; color: var(--muted); font-size: .76rem; }
 .keyboard-hint kbd { padding: 1px 4px; border: 1px solid var(--desk-rule); border-radius: 3px; background: var(--surface-soft); }
@@ -738,9 +737,9 @@ button:disabled { opacity: .65; cursor: wait; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
   .player-card { grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: center; }
   .player-card > label:not(.check-label) { grid-column: span 3; }
-  .player-card > :is(.check-label, .player-more, .remove-player) { grid-column: span 2; }
+  .player-card > .death-check { grid-column: span 4; }
+  .player-card > .remove-player { grid-column: span 2; }
   .player-card .check-label { min-height: 38px; }
-  .player-card > .player-more[open] { grid-column: 1 / -1; }
   .remove-player { justify-self: end; }
   .photo-row label { flex: 1 1 150px; }
   .save-row { position: sticky; bottom: max(8px, env(safe-area-inset-bottom)); width: 100%; }
