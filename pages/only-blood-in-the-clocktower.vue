@@ -3,7 +3,7 @@
     <header class="page-header">
       <img class="hero-art" src="/images/clocktower-night.svg" alt="" width="640" height="500" fetchpriority="high">
       <div class="hero-copy">
-        <p class="eyebrow hero-kicker">Saujana · Ravenswood Bluff</p>
+        <p class="eyebrow hero-kicker">Saujana Board Game Community</p>
         <h1>Only Blood <em>in the Clocktower</em></h1>
         <p class="intro">Good games, impossible choices and the moment the town finds out.</p>
         <div class="hero-links">
@@ -11,12 +11,17 @@
           <a class="hero-secondary" href="#clocktower-archive">Browse the archive <span aria-hidden="true">↘</span></a>
         </div>
       </div>
+      <span class="hero-caption" aria-hidden="true">Ravenswood Bluff <span>✦</span> After dark</span>
     </header>
 
     <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
-      <span class="calendar-mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="22" height="21" rx="2"/><path d="M5 13h22M11 4v6m10-6v6m-5 6v8m-4-4h8"/></svg>
-      </span>
+      <div class="calendar-mark" aria-hidden="true">
+        <template v-if="nextGathering">
+          <strong>{{ nextDateStamp.day }}</strong>
+          <span>{{ nextDateStamp.month }}</span>
+        </template>
+        <svg v-else viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="22" height="21" rx="2"/><path d="M5 13h22M11 4v6m10-6v6m-5 6v8m-4-4h8"/></svg>
+      </div>
       <div class="next-copy">
         <p class="eyebrow">The next gathering</p>
         <h2 id="next-night-title">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'The town will meet again' }}</h2>
@@ -32,23 +37,38 @@
       </a>
     </section>
 
-    <section v-if="featured" class="featured" :class="{ 'has-cover': cover(featured) }" aria-labelledby="featured-title">
-      <figure v-if="cover(featured)" class="featured-photo">
-        <img :src="photoUrls[cover(featured)]" alt="A moment from a Saujana Clocktower gathering" loading="lazy">
+    <section v-if="featured" class="featured" aria-labelledby="featured-title">
+      <figure class="featured-plate">
+        <img v-if="featuredCover" :src="photoUrls[featuredCover]" alt="A moment from a Saujana Clocktower gathering" loading="lazy">
+        <svg v-else viewBox="0 0 180 180" aria-hidden="true" fill="none" stroke="currentColor">
+          <circle cx="90" cy="90" r="78" opacity=".35"/>
+          <circle cx="90" cy="90" r="67"/>
+          <circle cx="90" cy="90" r="55" opacity=".45"/>
+          <path d="M90 12v18m0 120v18M12 90h18m120 0h18M35 35l13 13m84 84 13 13M35 145l13-13m84-84 13-13" opacity=".7"/>
+          <path d="M90 45l-4 45 4 6 6-6 23-25" stroke-width="2"/>
+          <circle cx="90" cy="90" r="5" fill="currentColor"/>
+        </svg>
+        <figcaption aria-hidden="true"><span>✦</span> The latest gathering</figcaption>
       </figure>
       <div class="featured-copy">
         <p class="eyebrow"><span aria-hidden="true">✦</span> From the storyteller’s desk</p>
         <h2 id="featured-title">{{ featured.teaser || 'The latest night in Ravenswood Bluff' }}</h2>
-        <p class="metadata">{{ formatDate(featured.session_date) }}<template v-if="featured.venue"> · {{ featured.venue }}</template></p>
+        <p class="metadata">
+          <time :datetime="featured.session_date">{{ formatDate(featured.session_date) }}</time>
+          <template v-if="featured.venue"> · {{ featured.venue }}</template>
+          <template v-if="featured.games?.length"> · {{ featured.games.length }} {{ featured.games.length === 1 ? 'game' : 'games' }}</template>
+        </p>
+        <ul v-if="featuredScripts.length" class="script-tags" aria-label="Scripts played">
+          <li v-for="script in featuredScripts" :key="script">{{ script }}</li>
+        </ul>
         <details v-if="featured.recap" class="recap-reveal">
           <summary>Reveal Mika’s retelling</summary>
           <p>{{ featured.recap }}</p>
         </details>
-        <div v-if="!featured.recap" class="featured-prompt">
-          <p>{{ featured.games?.length ? `${featured.games.length} game${featured.games.length === 1 ? '' : 's'} played` : 'A new story from the circle' }}<template v-if="featured.games?.length"> · {{ [...new Set(featured.games.map(game => game.script).filter(Boolean))].join(' · ') }}</template></p>
-          <a class="text-link" :href="'#session-' + featured.id">Explore this gathering <span aria-hidden="true">↓</span></a>
+        <div class="featured-actions">
+          <a class="text-link" :href="'#session-' + featured.id" @click="showFeaturedInArchive">Explore this gathering <span aria-hidden="true">↓</span></a>
+          <button class="share-button" type="button" @click="shareSession(featured)">{{ featured.recap ? 'Share recap' : 'Share gathering' }}</button>
         </div>
-        <button v-if="featured.recap" class="share-button" type="button" @click="shareSession(featured)">Share recap</button>
         <p v-if="shareNotices[featured.id]" role="status" class="share-feedback">{{ shareNotices[featured.id] }}</p>
       </div>
     </section>
@@ -72,7 +92,7 @@
       <div v-if="!loading && !error && pastSessions.length" class="archive-filters" aria-label="Filter past gatherings">
         <label>Year<select v-model="selectedYear"><option value="all">All years</option><option v-for="year in archiveYears" :key="year" :value="year">{{ year }}</option></select></label>
         <label>Script<select v-model="selectedScript"><option value="all">All scripts</option><option v-for="script in archiveScripts" :key="script" :value="script">{{ script }}</option></select></label>
-        <button v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="selectedYear = 'all'; selectedScript = 'all'">Clear filters</button>
+        <button v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button>
       </div>
       <p v-if="error" class="archive-state" role="alert">{{ error }} <button class="share-button" type="button" @click="loadArchive">Try again</button></p>
       <p v-else-if="loading" class="archive-state" role="status">Opening the grimoire…</p>
@@ -82,12 +102,13 @@
         <p>After a gathering, look here for Mika’s retelling, game results and photos from the table.</p>
       </div>
 
-      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state">No gatherings match these filters. <button class="share-button" type="button" @click="selectedYear = 'all'; selectedScript = 'all'">Clear filters</button></p>
+      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state">No gatherings match these filters. <button class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button></p>
       <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card">
         <div class="session-heading">
           <div>
-            <h3>{{ formatDate(session.session_date) }}</h3>
-            <p class="metadata">{{ session.venue || 'Saujana gathering' }} · {{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</p>
+            <p class="eyebrow"><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
+            <h3>{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
+            <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</p>
           </div>
           <button class="share-button" type="button" @click="shareSession(session)">Share gathering</button>
         </div>
@@ -105,15 +126,16 @@
         </div>
 
         <div v-if="session.games?.length" class="game-grid">
-          <details v-for="(game, index) in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || index">
+          <details v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number">
             <summary>
-              <span class="game-label">Game {{ index + 1 }}</span>
-              <span>{{ game.script || 'Custom script' }} · reveal spoilers</span>
+              <span class="game-label">Game {{ number }}</span>
+              <span class="game-script">{{ game.script || 'Custom script' }}</span>
+              <span class="game-reveal-label"><span class="when-closed">Reveal spoilers</span><span class="when-open">Hide spoilers</span></span>
             </summary>
             <p v-if="game.outcome" class="outcome">{{ game.outcome }}</p>
             <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
               <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
-                <span class="seat-number">{{ String(pIndex + 1).padStart(2, '0') }}</span>
+                <span class="seat-number" aria-hidden="true">{{ String(pIndex + 1).padStart(2, '0') }}</span>
                 <span class="seat-name">{{ player.public_name || player.name || 'Seat ' + (pIndex + 1) }}</span>
                 <span v-if="player.character" class="seat-character">{{ player.character }}</span>
                 <span v-if="player.died" class="death-mark">Died</span>
@@ -190,8 +212,17 @@ const nextGathering = computed(() => {
   }
   return null
 })
-const latestSession = computed(() => [...pastSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
-const featured = computed(() => latestSession.value)
+const featured = computed(() => [...pastSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
+const featuredCover = computed(() => featured.value && cover(featured.value))
+const featuredScripts = computed(() => [...new Set((featured.value?.games || []).map(game => game.script).filter(Boolean))])
+const nextDateStamp = computed(() => {
+  if (!nextGathering.value) return null
+  const date = new Date(nextGathering.value.date + 'T12:00:00')
+  return {
+    day: date.toLocaleDateString('en-MY', { day: 'numeric' }),
+    month: date.toLocaleDateString('en-MY', { month: 'short' }),
+  }
+})
 const archiveYears = computed(() => [...new Set(pastSessions.value.map(session => session.session_date?.slice(0, 4)).filter(Boolean))].sort((a, b) => b.localeCompare(a)))
 const archiveScripts = computed(() => [...new Set(pastSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean))].sort((a, b) => a.localeCompare(b)))
 const filteredSessions = computed(() => pastSessions.value.filter(session =>
@@ -225,9 +256,24 @@ function cover(session) {
 }
 
 function visibleGames(session) {
-  return selectedScript.value === 'all'
-    ? session.games || []
-    : (session.games || []).filter(game => game.script === selectedScript.value)
+  return (session.games || [])
+    .map((game, index) => ({ game, number: index + 1 }))
+    .filter(({ game }) => selectedScript.value === 'all' || game.script === selectedScript.value)
+}
+
+function clearArchiveFilters() {
+  selectedYear.value = 'all'
+  selectedScript.value = 'all'
+}
+
+async function showFeaturedInArchive(event) {
+  const target = 'session-' + featured.value.id
+  if (document.getElementById(target) || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  event.preventDefault()
+  clearArchiveFilters()
+  await nextTick()
+  window.location.hash = target
+  document.getElementById(target)?.scrollIntoView({ block: 'start' })
 }
 
 async function loadArchive() {
@@ -319,7 +365,7 @@ onMounted(() => {
 <style scoped>
 .clocktower-page {
   --ink: #35282b;
-  --night: #211a20;
+  --night: #21171d;
   --wine: var(--saujana-clocktower-accent);
   --paper: #fffcf6;
   --parchment: #f3ebdd;
@@ -338,11 +384,11 @@ onMounted(() => {
   display: grid;
   align-items: center;
   overflow: hidden;
-  min-height: 436px;
-  padding: clamp(32px, 4vw, 54px) clamp(28px, 6vw, 74px);
+  min-height: 460px;
+  padding: clamp(36px, 5vw, 66px) clamp(26px, 6vw, 76px);
   text-align: left;
   border-radius: 16px;
-  background: radial-gradient(ellipse at 78% 40%, #432c34, var(--night) 72%);
+  background: radial-gradient(ellipse at 77% 44%, #533132, var(--night) 74%);
   color: #fff5e6;
   box-shadow: 0 16px 36px #34212523;
 }
@@ -360,18 +406,31 @@ onMounted(() => {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(90deg, var(--night) 10%, #211a20f2 32%, #211a20ad 47%, transparent 69%);
+  background: linear-gradient(90deg, var(--night) 12%, #21171deb 31%, #21171d91 52%, transparent 73%);
 }
 .hero-art {
   position: absolute;
   z-index: -2;
   inset: auto 0 0 auto;
-  width: min(66%, 700px);
+  width: min(70%, 770px);
   height: 100%;
   object-fit: cover;
-  object-position: center 57%;
+  object-position: center 62%;
 }
 .hero-copy { max-width: 620px; }
+.hero-caption {
+  position: absolute;
+  right: 26px;
+  bottom: 20px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  background: #21171de0;
+  color: #f1d8b6;
+  font-size: .65rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.hero-caption span { margin-inline: 5px; color: var(--gold); }
 .eyebrow {
   margin: 0;
   color: var(--wine);
@@ -407,7 +466,7 @@ onMounted(() => {
 .hero-primary:hover { background: #f0d1a4; }
 .hero-secondary { color: #f2e3da; }
 .hero-secondary:hover, .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
-.clocktower-page :is(a, button, summary):focus-visible { outline: 2px solid var(--wine); outline-offset: 4px; }
+.clocktower-page :is(a, button, summary, select):focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .page-header a:focus-visible { outline-color: var(--gold); }
 
 .next-night, .featured, .session-card, .archive-state {
@@ -416,13 +475,16 @@ onMounted(() => {
   background: var(--paper);
 }
 .next-night {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px clamp(15px, 3vw, 25px);
-  margin: 20px 0 clamp(32px, 5vw, 58px);
-  padding: clamp(18px, 3vw, 27px) var(--panel-pad);
-  background: var(--parchment);
+  margin: -22px clamp(14px, 4.8vw, 54px) clamp(30px, 4.7vw, 54px);
+  padding: clamp(16px, 2.5vw, 24px) var(--panel-pad);
+  border-top: 2px solid #af8053;
+  background: linear-gradient(110deg, #f7eee0, var(--paper) 75%);
+  box-shadow: 0 8px 22px #34212512;
 }
 .calendar-mark, .empty-mark {
   display: grid;
@@ -434,6 +496,16 @@ onMounted(() => {
   color: var(--wine);
 }
 .calendar-mark svg { width: 25px; }
+.calendar-mark {
+  align-content: center;
+  gap: 3px;
+  width: 68px;
+  height: 72px;
+  border-radius: 8px;
+  background: var(--paper);
+}
+.calendar-mark strong { font: 400 1.9rem/1 var(--font-display); }
+.calendar-mark span { font-size: .66rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
 .next-night h2, .featured h2, .archive h2, .stats h2 {
   margin: 3px 0 7px;
   color: var(--ink);
@@ -447,33 +519,50 @@ onMounted(() => {
 .text-link { color: var(--wine); }
 
 .featured {
-  position: relative;
   display: grid;
+  grid-template-columns: minmax(0, .73fr) minmax(0, 1.27fr);
   overflow: hidden;
   margin: 0 0 26px;
-  background: #f5eae4;
+  background: linear-gradient(115deg, #f8eee6, var(--paper) 76%);
+  box-shadow: 0 9px 26px #3421250c;
 }
-.featured:not(.has-cover)::before {
-  content: '';
+.featured-plate {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 230px;
+  margin: 0;
+  background: radial-gradient(ellipse, #643b3c, #2e1e27 80%);
+  color: var(--gold);
+}
+.featured-plate img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.featured-plate > svg { width: min(45%, 150px); margin-bottom: 22px; }
+.featured-plate figcaption {
   position: absolute;
-  inset: -110px -36px auto auto;
-  width: 330px;
-  aspect-ratio: 1;
-  border: 1px solid #743c4624;
-  border-radius: 50%;
-  box-shadow: 0 0 0 10px #f5eae4, 0 0 0 11px #743c4621, 0 0 0 32px #f5eae4, 0 0 0 33px #743c4619;
-  pointer-events: none;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  padding: 8px;
+  border: 1px solid #e6be8555;
+  border-radius: 4px;
+  background: #21171df2;
+  color: #f1d8b6;
+  text-align: center;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 }
-.featured.has-cover { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
-.featured-photo { position: relative; min-height: 260px; margin: 0; background: var(--parchment); }
-.featured-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.featured-plate figcaption span { margin-inline-end: 5px; }
 .featured-copy { position: relative; min-width: 0; padding: var(--panel-pad); }
 .featured-copy .eyebrow span { margin-right: 6px; }
-.metadata { margin: 4px 0 0; color: var(--soft-ink); font-size: .92rem; }
-.featured-prompt { display: grid; gap: 5px; margin-top: 13px; }
-.featured-prompt p { margin: 0; color: var(--soft-ink); }
-.recap-reveal { margin-top: 14px; }
-.recap-reveal summary { color: var(--wine); }
+.metadata { margin: 4px 0 0; color: var(--soft-ink); font-size: .92rem; overflow-wrap: anywhere; }
+.featured h2, .session-card h3 { overflow-wrap: anywhere; }
+.featured-actions { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; margin-top: 12px; }
+.script-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.script-tags li { padding: 4px 9px; border: 1px solid var(--rule); border-radius: 5px; color: var(--wine); font-size: .75rem; overflow-wrap: anywhere; }
+.recap-reveal { margin-top: 14px; padding-inline: 12px; border: 1px solid var(--rule); border-radius: 7px; background: #f5ece5; }
+.recap-reveal summary { color: var(--wine); font-size: .9rem; }
 .recap-reveal p, .story-text { max-width: 68ch; white-space: pre-wrap; overflow-wrap: anywhere; }
 .recap-reveal p { margin: 6px 0 12px; }
 
@@ -484,14 +573,16 @@ onMounted(() => {
   gap: 0 16px;
   margin: 0 0 clamp(32px, 5vw, 62px);
   padding: 18px var(--panel-pad);
-  border-block: 1px solid var(--rule);
+  border: 1px solid #e6be8538;
+  border-radius: 10px;
+  background: #33232b;
 }
-.stats .eyebrow { grid-column: 1; align-self: end; }
-.stats h2 { grid-column: 1; align-self: start; font-size: clamp(1.4rem, 3vw, 1.9rem); }
+.stats .eyebrow { grid-column: 1; align-self: end; color: var(--gold); }
+.stats h2 { grid-column: 1; align-self: start; color: #fff5e6; font-size: clamp(1.4rem, 3vw, 1.9rem); }
 .stat-row { grid-column: 2; grid-row: 1 / 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); text-align: center; }
-.stat-row div { display: grid; gap: 4px; padding: 4px 6px; border-left: 1px solid var(--rule); }
-.stat-row strong { color: var(--wine); font: 400 clamp(1.65rem, 4vw, 2.55rem)/1 var(--font-display); }
-.stat-row span { color: var(--soft-ink); font-size: .81rem; line-height: 1.3; }
+.stat-row div { display: grid; gap: 4px; padding: 4px 6px; border-left: 1px solid #e6be8540; }
+.stat-row strong { color: #f2d6ad; font: 400 clamp(1.65rem, 4vw, 2.55rem)/1 var(--font-display); }
+.stat-row span { color: #e5d4c6; font-size: .81rem; line-height: 1.3; }
 
 .clocktower-page .archive-heading { margin-bottom: 18px; padding: 0; text-align: left; }
 .archive-state, .session-card { padding: var(--panel-pad); }
@@ -503,26 +594,31 @@ onMounted(() => {
 .empty-mark { margin: 0 auto 12px; font-size: 1.7rem; }
 .empty-archive h3, .session-card h3 { margin: 0; color: var(--ink); font: 400 clamp(1.25rem, 3vw, 1.75rem)/1.2 var(--font-display); }
 .empty-archive p { max-width: 42ch; margin: 8px auto 0; }
-.session-card { margin: 0 0 14px; box-shadow: 0 6px 20px #35282b08; }
+.session-card { margin: 0 0 14px; border-inline-start: 3px solid #b28869; box-shadow: 0 6px 20px #35282b08; }
+.session-card h3 { margin-top: 3px; }
 .session-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; }
+.session-heading > div { flex: 1 1 110px; min-width: 0; }
 .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; margin-top: 14px; align-items: start; }
-.game-grid details { min-width: 0; padding: 4px 14px 10px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
-.game-grid details[open] { border-color: #cdb3a4; }
+.game-grid details { min-width: 0; padding: 2px 14px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
+.game-grid details[open] { padding-bottom: 10px; border-color: #cdb3a4; }
 .clocktower-page summary { min-height: 44px; padding: 9px 25px 7px 0; cursor: pointer; font-weight: 700; overflow-wrap: anywhere; }
-.game-grid summary { display: grid; gap: 2px; }
+.game-grid summary { display: grid; gap: 2px; padding-block: 11px; }
 .game-grid summary, .recap-reveal summary { position: relative; list-style: none; }
 .clocktower-page summary::-webkit-details-marker { display: none; }
 .game-grid summary::after, .recap-reveal summary::after { content: ''; position: absolute; right: 3px; top: 50%; width: 8px; height: 8px; border: solid var(--wine); border-width: 0 1.5px 1.5px 0; transform: translateY(-70%) rotate(45deg); }
-.recap-reveal summary { display: inline-flex; align-items: center; }
+.recap-reveal summary { display: flex; align-items: center; }
 .clocktower-page details[open] > summary::after { transform: translateY(-25%) rotate(225deg); }
 .game-label { color: var(--wine); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
+.game-script { font: 400 1.12rem/1.3 var(--font-display); }
+.game-reveal-label { color: var(--soft-ink); font-size: .73rem; font-weight: 600; }
+.when-open, details[open] > summary .when-closed { display: none; }
+details[open] > summary .when-open { display: inline; }
 .outcome { display: inline-block; margin: 7px 0 0; padding: 4px 9px; border-radius: 5px; background: #eee0d5; color: #63323d; font-weight: 700; }
-.roster { margin: 10px 0; padding-left: 20px; font-size: .9rem; overflow-wrap: anywhere; }
 .grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 7px; margin: 12px 0; padding: 0; list-style: none; }
 .grimoire-seat { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 3px 8px; align-items: center; min-height: 56px; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 7px; background: var(--paper); }
 .seat-number { grid-row: span 2; display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--wine); font-size: .66rem; font-weight: 750; }
 .seat-name { min-width: 0; overflow-wrap: anywhere; font-weight: 700; }
-.seat-character { grid-column: 2; color: var(--soft-ink); font-size: .8rem; }
+.seat-character { grid-column: 2; color: var(--soft-ink); font-size: .8rem; overflow-wrap: anywhere; }
 .death-mark { grid-column: 3; grid-row: 1 / 3; padding: 3px 6px; border: 1px solid #743c4640; border-radius: 4px; color: var(--wine); font-size: .68rem; font-weight: 750; text-transform: uppercase; }
 .grimoire-seat.is-dead { background: #f1e7e2; }
 .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; margin: 16px 0 0; }
@@ -538,9 +634,11 @@ onMounted(() => {
 .next-night, .archive, .session-card, .game-grid details { scroll-margin-top: 86px; }
 
 @media (max-width: 760px) {
-  .clocktower-page > .page-header { min-height: 0; padding: 25px 20px 142px; }
-  .page-header::after { background: linear-gradient(180deg, var(--night) 20%, #211a20f5 43%, #211a2085 72%, transparent 90%); }
-  .hero-art { width: min(82%, 400px); height: 168px; max-height: none; object-fit: contain; object-position: right bottom; }
+  .clocktower-page > .page-header { min-height: 0; padding: 28px 22px 142px; }
+  .page-header::after { background: linear-gradient(180deg, var(--night) 19%, #21171df2 41%, #21171d58 72%, transparent 93%); }
+  .hero-art { width: min(94%, 480px); height: 225px; max-height: none; object-fit: cover; object-position: right center; }
+  .hero-caption { display: none; }
+  .next-night { margin: 12px 0 30px; }
   .page-header h1 { font-size: clamp(2.2rem, 8.9vw, 4rem); }
   .hero-links { margin-top: 18px; gap: 6px 10px; }
   .hero-primary, .hero-secondary { font-size: .8rem; }
@@ -550,12 +648,15 @@ onMounted(() => {
   .stat-row div:first-child { border: 0; }
 }
 @media (max-width: 560px) {
-  .clocktower-page > .page-header { padding-bottom: 130px; }
-  .next-night { grid-template-columns: minmax(0, 1fr); }
-  .calendar-mark { display: none; }
-  .next-night .primary-link { justify-self: start; }
-  .featured.has-cover { grid-template-columns: minmax(0, 1fr); }
-  .featured-photo { min-height: 0; aspect-ratio: 16 / 10; }
+  .clocktower-page > .page-header { padding-bottom: 134px; }
+  .next-night { grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: start; }
+  .calendar-mark { width: 50px; height: 58px; }
+  .calendar-mark strong { font-size: 1.5rem; }
+  .next-night .primary-link { grid-column: 1 / -1; justify-self: start; }
+  .featured { grid-template-columns: minmax(0, 1fr); }
+  .featured-plate { min-height: 0; aspect-ratio: 2 / 1; }
+  .featured-plate > svg { width: 27%; }
+  .archive-filters label { flex: 1 1 112px; min-width: 0; }
   .photo-gallery { grid-template-columns: 1fr; }
   .photo-gallery img { max-height: 340px; }
 }

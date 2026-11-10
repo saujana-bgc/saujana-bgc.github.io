@@ -8,10 +8,10 @@
     <p v-if="error" class="message error" role="alert">{{ error }}</p>
 
     <details v-if="saved.length" class="saved-picker">
-      <summary>Open a saved gathering <span>{{ saved.length }}</span></summary>
+      <summary><span>Open a saved gathering</span><span class="saved-count">{{ saved.length }}</span></summary>
       <div class="saved-list">
         <article v-for="session in saved" :key="session.id" class="admin-card saved">
-          <div><strong>{{ session.session_date }} · {{ session.venue || 'Saujana' }}</strong><span>{{ session.published ? 'Published' : 'Draft' }}</span></div>
+          <div><strong>{{ session.session_date }} · {{ session.venue || 'Saujana' }}</strong><span class="status-badge" :class="{ 'is-published': session.published }">{{ session.published ? 'Published' : 'Draft' }}</span></div>
           <button type="button" :disabled="busy" @click="edit(session)">Edit</button>
         </article>
       </div>
@@ -20,8 +20,12 @@
     <form ref="editorForm" class="editor admin-card" @submit.prevent>
       <div class="editor-heading">
         <div>
+          <p class="eyebrow">Gathering editor</p>
           <h2>{{ draft.id ? 'Edit gathering' : 'Log a gathering' }}</h2>
-          <p v-if="isDirty" class="dirty-note">Unsaved changes</p>
+          <div class="editor-status">
+            <span class="status-badge" :class="{ 'is-published': baseline.published }">{{ baseline.published ? 'Published' : 'Draft' }}</span>
+            <span v-if="isDirty" class="dirty-note">Unsaved changes</span>
+          </div>
         </div>
         <div class="editor-heading-actions">
           <button v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</button>
@@ -30,20 +34,27 @@
       </div>
 
       <fieldset class="editor-fields" :disabled="busy">
-        <div class="fields">
-          <label>Date<input v-model="draft.session_date" type="date" required></label>
-          <label>Time<input v-model="draft.session_time" type="time"></label>
-          <label>Venue<input v-model="draft.venue" maxlength="160"></label>
-          <label>Signup link<input v-model="draft.signup_url" type="url" placeholder="https://…"></label>
-        </div>
-        <label>First timer note<textarea v-model="draft.first_timer_note" rows="2" placeholder="What should a first timer know?"></textarea></label>
+        <section class="gathering-details">
+          <h3>Gathering details</h3>
+          <div class="fields">
+            <label>Date<input v-model="draft.session_date" type="date" required></label>
+            <label>Time<input v-model="draft.session_time" type="time"></label>
+            <label>Venue<input v-model="draft.venue" maxlength="160"></label>
+            <label>Signup link<input v-model="draft.signup_url" type="url" placeholder="https://…"></label>
+          </div>
+          <label>First timer note<textarea v-model="draft.first_timer_note" rows="2" placeholder="What should a first timer know?"></textarea></label>
+        </section>
         <datalist id="clocktower-players"><option v-for="player in players" :key="player.id" :value="player.private_name"></option></datalist>
 
         <details v-for="(game,index) in draft.games" :key="game.id" ref="gameCards" class="game admin-card" open>
-          <summary class="game-summary"><span>Game {{ index + 1 }}<small>{{ game.script || 'Choose a script' }}</small></span></summary>
+          <summary class="game-summary">
+            <span class="game-number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
+            <span class="game-summary-copy"><small>Game {{ index + 1 }}</small><strong>{{ game.script || 'Choose a script' }}</strong></span>
+            <span class="game-count">{{ game.players.length }} {{ game.players.length === 1 ? 'player' : 'players' }}</span>
+          </summary>
           <div class="game-content">
             <div class="game-heading">
-              <h3>Game {{ index + 1 }}</h3>
+              <h3>Game settings</h3>
               <div class="game-actions">
                 <button v-if="index > 0" type="button" @click="copyRoster(index)">Copy previous roster</button>
                 <button type="button" @click="removeGame(index)">Remove game</button>
@@ -552,24 +563,110 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.clocktower-admin { --matcha-leaf: var(--saujana-clocktower-accent); --surface-soft: #f6efe7; max-width: 1000px; }
+.clocktower-admin {
+  --matcha-leaf: var(--saujana-clocktower-accent);
+  --surface-soft: #f6efe7;
+  --desk-paper: #fffcf7;
+  --desk-rule: #e3d6c6;
+  --desk-ink: #382932;
+  --desk-pad: clamp(14px, 2.6vw, 24px);
+  max-width: 1000px;
+}
 .admin-masthead {
+  position: relative;
   overflow: hidden;
   padding: clamp(23px, 4.5vw, 43px);
   border-radius: 12px;
-  background: linear-gradient(90deg, #211a20 32%, #211a20d9 64%, #211a2080),
-    url('/images/clocktower-night.svg') right 34% / auto 250% no-repeat #38262e;
+  background: linear-gradient(90deg, #21171d 22%, #21171ddd 58%, #21171d65),
+    url('/images/clocktower-night.svg') right 51% / auto 290% no-repeat #38262e;
+  box-shadow: 0 7px 22px #36252c22;
   color: #fff5e6;
 }
+.admin-masthead::after {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid #e6be8550;
+  border-radius: 7px;
+  content: '';
+  pointer-events: none;
+}
 .admin-masthead .eyebrow { margin: 0; color: #e6be85; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.admin-masthead h1 { margin: 6px 0 8px; font: 400 clamp(1.85rem, 5vw, 3.25rem)/1.12 var(--font-display); text-wrap: balance; }
+.admin-masthead h1 { margin: 6px 0 8px; color: #fff5e6; font: 400 clamp(1.85rem, 5vw, 3.25rem)/1.12 var(--font-display); text-wrap: balance; }
 .admin-masthead p:last-child { margin: 0; color: #e1d0c8; }
-.editor{display:grid;gap:18px;margin-top:24px}.editor-heading,.game-heading,.saved,.save-row,.section-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}.editor-heading h2{margin:0;font:1.55rem var(--font-display);color:var(--matcha-leaf)}.dirty-note{margin:4px 0 0;color:#855e22;font-size:.82rem}
-.editor-fields{display:grid;gap:18px;min-width:0;margin:0;padding:0;border:0}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}.editor label{display:grid;gap:6px;font-size:.86rem}.editor input:not([type=checkbox]),.editor select,.editor textarea{width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid var(--line);border-radius:6px;font:inherit}.editor textarea{min-height:auto}.editor input:focus-visible,.editor select:focus-visible,.editor textarea:focus-visible{outline:2px solid var(--gold-leaf);outline-offset:1px}
-.game{padding:0;overflow:hidden}.game-summary{display:flex;align-items:center;min-height:62px;padding:15px 20px;color:var(--matcha-leaf);font-weight:700}.game-summary span{display:grid;gap:3px}.game-summary small{font-size:.78rem;color:var(--muted);font-weight:400}.game-content{display:grid;gap:14px;padding:0 20px 20px}.game-heading h3,.story h3{margin:0;color:var(--matcha-leaf)}.game-actions{display:flex;flex-wrap:wrap;gap:8px}.section-heading h4{margin:0}.player-card{display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(160px,1fr) auto minmax(130px,1fr) auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}.player-card .check-label{padding:10px 0}.check-label{display:flex!important;align-items:center;gap:8px}.check-label input{width:18px;height:18px;accent-color:var(--matcha-leaf)}
-.photo-list{display:grid;gap:9px}.photo-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:8px}.photo-row img,.photo-placeholder{width:76px;height:60px;object-fit:cover;border-radius:5px}.photo-placeholder{display:grid;place-items:center;padding:4px;background:var(--surface-soft);color:var(--muted);font-size:.7rem;text-align:center}.story{display:grid;gap:14px}.add-game{justify-self:start}.save-row{justify-content:flex-start;flex-wrap:wrap}.save-row .message{margin:0}.admin-primary{background:var(--matcha-leaf);color:#fff;border-color:var(--matcha-leaf);padding:12px 18px;font-weight:700}.admin-primary:disabled,button:disabled{opacity:.65;cursor:wait}.saved{margin:10px 0}.saved span{display:block;color:var(--muted)}.message{padding:12px;background:var(--surface-soft)}.message.error{color:#913f45;background:#fbf0ef}.empty-note{color:var(--muted);font-size:.88rem}
-button{min-height:42px;padding:8px 12px;border:1px solid var(--line);background:var(--white-pure);border-radius:6px;cursor:pointer;font:inherit}.saved-section h2{font:1.55rem var(--font-display);color:var(--matcha-leaf)}
-.visitor-preview { background: #fffcf6; border-color: #e3d6c6; }
+.editor { display: grid; gap: 18px; margin-top: 16px; padding: var(--desk-pad); border-color: var(--desk-rule); background: #faf5ed; }
+.editor-heading, .game-heading, .saved, .save-row, .section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.editor-heading { padding: 2px 0 14px; border-bottom: 1px solid var(--desk-rule); }
+.editor-heading .eyebrow { margin: 0 0 3px; color: var(--matcha-leaf); font-weight: 750; letter-spacing: .12em; }
+.editor-heading h2 { margin: 0; font: 400 clamp(1.55rem, 3vw, 2rem)/1.15 var(--font-display); color: var(--desk-ink); }
+.editor-status { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 8px; }
+.status-badge { display: inline-block; width: fit-content; padding: 3px 8px; border: 1px solid #dec8a9; border-radius: 20px; background: #f6ebda; color: #705122; font-size: .7rem; font-weight: 700; }
+.status-badge.is-published { border-color: #c3d4bf; background: #e8f0e4; color: #38543d; }
+.dirty-note { color: #79551e; font-size: .82rem; }
+.editor-fields { display: grid; gap: 16px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.gathering-details, .story {
+  display: grid;
+  gap: 13px;
+  padding: var(--desk-pad);
+  border: 1px solid var(--desk-rule);
+  border-radius: 10px;
+  background: var(--desk-paper);
+}
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr)); gap: 12px; }
+.editor label { display: grid; gap: 6px; min-width: 0; color: var(--desk-ink); font-size: .86rem; font-weight: 600; }
+.editor :is(input:not([type=checkbox]), select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 10px;
+  border: 1px solid #daccbd;
+  border-radius: 6px;
+  background: #fffdfa;
+  color: var(--desk-ink);
+  font: inherit;
+  font-weight: 400;
+}
+.editor textarea { min-height: auto; resize: vertical; }
+.clocktower-admin :is(input, select, textarea, button, summary):focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
+.game { padding: 0; overflow: hidden; border-color: var(--desk-rule); border-radius: 10px; background: var(--desk-paper); }
+.game-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px var(--desk-pad);
+  background: #f3e7e2;
+  color: var(--desk-ink);
+  cursor: pointer;
+}
+.game-summary:focus-visible { outline-offset: -3px; }
+.game-summary-copy { display: grid; gap: 2px; }
+.game-summary small, .game-count { font-size: .75rem; color: #65514c; }
+.game-summary strong { font: 400 clamp(1rem, 2.1vw, 1.35rem)/1.15 var(--font-display); overflow-wrap: anywhere; }
+.game-number { display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid #cfb3a0; border-radius: 50%; background: var(--desk-paper); color: var(--matcha-leaf); font: 400 1rem/1 var(--font-display); }
+.game-content { display: grid; gap: 12px; padding: 14px var(--desk-pad) var(--desk-pad); border-top: 1px solid var(--desk-rule); }
+.gathering-details h3, .story h3, .game-heading h3 { margin: 0; color: var(--desk-ink); font: 400 1.23rem/1.2 var(--font-display); }
+.game-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.section-heading h4 { margin: 5px 0 0; color: var(--desk-ink); font-size: .94rem; }
+.check-label { display: flex !important; align-items: center; gap: 7px; }
+.check-label input { flex: 0 0 auto; width: 18px; height: 18px; accent-color: var(--matcha-leaf); }
+.photo-list { display: grid; gap: 9px; }
+.photo-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px; border: 1px solid var(--desk-rule); border-radius: 8px; }
+.photo-row img, .photo-placeholder { width: 76px; height: 60px; object-fit: cover; border-radius: 5px; }
+.photo-placeholder { display: grid; place-items: center; padding: 4px; background: var(--surface-soft); color: var(--muted); font-size: .7rem; text-align: center; }
+.message { padding: 12px; border-radius: 6px; background: var(--surface-soft); }
+.message.error { color: #913f45; background: #fbf0ef; }
+.empty-note { margin: 0; color: var(--muted); font-size: .88rem; }
+button { min-height: 42px; padding: 8px 12px; border: 1px solid #daccbd; border-radius: 6px; background: var(--desk-paper); color: var(--desk-ink); cursor: pointer; font: inherit; font-size: .86rem; }
+button:enabled:hover { border-color: var(--matcha-leaf); background: #f6ebe5; }
+button:disabled { opacity: .65; cursor: wait; }
+.admin-primary { border-color: var(--matcha-leaf); background: var(--matcha-leaf); color: #fff; padding-inline: 15px; font-weight: 700; }
+.admin-primary:enabled:hover { background: #5b3039; }
+.visitor-preview { padding: var(--desk-pad); background: var(--desk-paper); border-color: var(--desk-rule); }
 .visitor-preview summary, .preview-reveal summary { cursor: pointer; font-weight: 700; color: var(--matcha-leaf); }
 .preview-note { margin: 9px 0 13px; color: var(--muted); font-size: .86rem; }
 .preview-session { overflow: hidden; padding: 0 16px 14px; border: 1px solid #e3d6c6; border-radius: 9px; background: #fffcf6; overflow-wrap: anywhere; }
@@ -582,18 +679,36 @@ button{min-height:42px;padding:8px 12px;border:1px solid var(--line);background:
 .preview-reveal p { white-space: pre-wrap; }
 .preview-photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 8px; }
 .preview-photos img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; }
-@media(max-width:900px){.player-card{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}.player-card .check-label{align-self:center}.remove-player{justify-self:start}}
-@media(max-width:720px){.clocktower-admin .admin-card{padding:16px}.player-card{grid-template-columns:minmax(0,1fr)}.player-card .check-label{padding:2px 0}.game-heading,.saved,.editor-heading,.section-heading{align-items:flex-start;flex-wrap:wrap}.game-content{padding:0 14px 16px}.game-actions{width:100%}.game-actions button{flex:1}.photo-row{align-items:flex-start}.photo-row label{flex:1 1 150px}.editor-heading>button{width:100%}}
-.saved-picker { margin-top: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
-.saved-picker > summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 9px 14px; cursor: pointer; color: var(--matcha-leaf); font-weight: 700; }
-.saved-picker > summary span { display: grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px; border-radius: 20px; background: var(--surface-soft); font-size: .8rem; }
+.saved-picker { margin-top: 16px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--desk-paper); }
+.saved-picker > summary { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 9px 14px; cursor: pointer; color: var(--matcha-leaf); font-weight: 700; }
+.saved-count { display: grid; place-items: center; min-width: 26px; height: 26px; margin-inline-start: auto; padding: 0 6px; border-radius: 20px; background: var(--surface-soft); font-size: .8rem; }
+.clocktower-admin :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary) {
+  list-style: none;
+}
+.clocktower-admin :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary)::-webkit-details-marker { display: none; }
+.clocktower-admin :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary)::after {
+  width: 7px;
+  height: 7px;
+  margin: 0 3px 4px auto;
+  border: solid var(--matcha-leaf);
+  border-width: 0 1.5px 1.5px 0;
+  content: '';
+  transform: rotate(45deg);
+}
+.clocktower-admin details[open] > :is(.game-summary, .saved-picker > summary, .script-list > summary, .game-extras > summary)::after {
+  margin-bottom: 0;
+  transform: rotate(225deg);
+}
+.clocktower-admin .saved-picker > summary::after { margin-inline-start: 0; }
 .saved-list { display: grid; gap: 8px; padding: 0 10px 10px; }
-.saved-list .saved { margin: 0; padding: 12px; }
+.saved-list .saved { margin: 0; padding: 12px; border-color: var(--desk-rule); box-shadow: none; }
+.saved strong { display: block; margin-bottom: 3px; overflow-wrap: anywhere; }
 .editor-heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .editor-heading-actions .start-game { border-color: var(--matcha-leaf); color: var(--matcha-leaf); font-weight: 700; }
 .section-heading h4 small { margin-left: 5px; color: var(--muted); font: .75rem var(--font-body); }
-.roster-actions { display: flex; align-items: center; gap: 8px; }
-.script-list, .game-extras { padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--white-pure); }
+.roster-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.script-list, .game-extras { padding: 0 12px; border: 1px solid var(--desk-rule); border-radius: 7px; background: #f9f3ec; }
+.script-list[open], .game-extras[open] { padding-bottom: 12px; }
 .script-list > summary, .game-extras > summary, .player-more > summary { display: flex; align-items: center; gap: 9px; min-height: 40px; cursor: pointer; font-size: .86rem; font-weight: 650; }
 .script-list > summary span, .game-extras > summary span { color: var(--muted); font-size: .78rem; font-weight: 400; }
 .script-list label, .game-extras > label { margin-top: 9px; }
@@ -601,34 +716,38 @@ button{min-height:42px;padding:8px 12px;border:1px solid var(--line);background:
 .bulk-roster-panel > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .bulk-roster-panel .admin-primary { border: 0; }
 .bulk-roster-panel textarea { min-height: 96px; resize: vertical; }
-.player-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto auto; gap: 8px 10px; align-items: center; padding: 8px 10px; }
+.player-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto auto; gap: 6px 10px; align-items: end; padding: 8px 10px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--surface-soft); }
+.player-card:focus-within { border-color: #b48977; }
 .player-card > label:not(.check-label) { font-size: .8rem; }
 .player-card .check-label { align-self: end; min-height: 44px; padding: 0 3px; font-size: .82rem; }
-.player-more summary { min-width: 68px; justify-content: center; font-size: .8rem; }
+.player-more summary { min-width: 55px; justify-content: center; font-size: .8rem; color: var(--matcha-leaf); }
 .player-more label { min-width: 155px; margin-top: 6px; }
 .player-more[open] { grid-column: 1 / -1; }
-.remove-player { min-height: 40px; padding: 7px 9px; font-size: .8rem; }
+.remove-player { min-height: 40px; padding: 7px 9px; font-size: .8rem; color: var(--matcha-leaf); }
+.keyboard-hint { margin: -3px 0 0; color: var(--muted); font-size: .76rem; }
+.keyboard-hint kbd { padding: 1px 4px; border: 1px solid var(--desk-rule); border-radius: 3px; background: var(--surface-soft); }
 .add-game-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .add-game-actions button { border-color: var(--matcha-leaf); color: var(--matcha-leaf); font-weight: 650; }
 .add-player-next { justify-self: start; border-style: dashed; color: var(--matcha-leaf); }
-.save-row { position: sticky; bottom: 8px; z-index: 3; width: fit-content; max-width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fffcf6ee; box-shadow: 0 4px 18px #211a201c; backdrop-filter: blur(10px); }
+.save-row { position: sticky; bottom: 8px; z-index: 3; justify-content: flex-start; flex-wrap: wrap; gap: 7px; width: fit-content; max-width: 100%; padding: 7px; border: 1px solid #d8bfab; border-radius: 10px; background: #fffcf6f5; box-shadow: 0 4px 18px #211a2026; backdrop-filter: blur(10px); }
+.save-row .message { margin: 0; }
 .save-row .admin-primary { min-height: 46px; }
 .save-row .publish-button { min-height: 46px; border-color: var(--gold-leaf); color: #704b19; font-weight: 700; }
 @media(max-width:720px) {
+  .game-heading, .editor-heading { align-items: flex-start; flex-wrap: wrap; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
-  .section-heading { align-items: center; }
-  .roster-actions { flex-wrap: wrap; }
-  .player-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+  .player-card { grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: center; }
+  .player-card > label:not(.check-label) { grid-column: span 3; }
+  .player-card > :is(.check-label, .player-more, .remove-player) { grid-column: span 2; }
   .player-card .check-label { min-height: 38px; }
-  .player-more { grid-column: 1 / 3; }
+  .player-card > .player-more[open] { grid-column: 1 / -1; }
   .remove-player { justify-self: end; }
+  .photo-row label { flex: 1 1 150px; }
   .save-row { position: sticky; bottom: max(8px, env(safe-area-inset-bottom)); width: 100%; }
-  .save-row .admin-primary { flex: 0 0 auto; }
 }
 @media(max-width:420px) {
-  .player-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px; }
-  .player-card .check-label { align-self: center; }
-  .player-more { grid-column: 1; }
-  .remove-player { grid-column: 2; grid-row: 3; }
+  .game-summary { gap: 6px; }
+  .game-number { width: 29px; height: 29px; }
+  .game-count { font-size: .69rem; }
 }
 </style>
