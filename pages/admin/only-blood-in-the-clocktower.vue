@@ -1,8 +1,10 @@
 <template>
   <main class="clocktower-admin">
-    <p class="eyebrow">Community sessions</p>
-    <h1>Only Blood in the Clocktower</h1>
-    <p>Log games, share the best moment and keep the next gathering easy to find.</p>
+    <header class="admin-masthead">
+      <p class="eyebrow">The storyteller’s desk</p>
+      <h1>Only Blood in the Clocktower</h1>
+      <p>Log games, write the recap and prepare the next gathering.</p>
+    </header>
     <p v-if="error" class="message error" role="alert">{{ error }}</p>
 
     <form class="editor admin-card" @submit.prevent="save">
@@ -82,6 +84,37 @@
           <label>Mika’s retelling<textarea v-model="draft.recap" rows="4" maxlength="3000" placeholder="What did the town believe? What changed? What did everyone talk about?"></textarea></label>
           <label class="check-label"><input v-model="draft.published" type="checkbox"> Publish this gathering</label>
         </section>
+
+        <details class="visitor-preview admin-card">
+          <summary>Preview as visitors will see it</summary>
+          <p class="preview-note">Private preview. Players appear by seat unless they have a public name.</p>
+          <article class="preview-session">
+            <header class="preview-masthead">
+              <p class="eyebrow">From the storyteller’s desk</p>
+              <h3>{{ draft.teaser || 'A night in Ravenswood Bluff' }}</h3>
+              <p>{{ draft.session_date }}<template v-if="draft.session_time"> · {{ draft.session_time }}</template><template v-if="draft.venue"> · {{ draft.venue }}</template></p>
+            </header>
+            <p v-if="draft.first_timer_note">{{ draft.first_timer_note }}</p>
+            <details v-if="draft.recap" class="preview-reveal">
+              <summary>Reveal Mika’s retelling</summary>
+              <p>{{ draft.recap }}</p>
+            </details>
+            <template v-for="game in draft.games" :key="game.id">
+              <h4>{{ game.script || 'Custom script' }}</h4>
+              <p v-if="game.players.length">In the circle · {{ game.players.map((player, index) => player.public_name.trim() || `Seat ${index + 1}`).join(', ') }}</p>
+              <details class="preview-reveal">
+                <summary>Reveal the result</summary>
+                <p v-if="game.outcome">{{ game.outcome }}</p>
+                <ul><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Seat ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · died</template></li></ul>
+                <p v-if="game.notes">{{ game.notes }}</p>
+              </details>
+              <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
+                <img v-for="photo in game.photos.filter(photo => photo.approved && photoSource(photo))" :key="photo.path" :src="photoSource(photo)" alt="Approved gathering photo">
+              </div>
+            </template>
+            <p v-if="!draft.games.length && !draft.recap" class="empty-note">Add a game or write a retelling to preview the session story.</p>
+          </article>
+        </details>
       </fieldset>
 
       <div class="save-row">
@@ -127,6 +160,54 @@ const scriptPresets = {
 const busy = computed(() => saving.value || uploading.value)
 const isDirty = computed(() => JSON.stringify(cleanSession(draft.value)) !== JSON.stringify(baseline.value))
 onBeforeRouteLeave(() => !busy.value && confirmDiscard())
+
+let draftSaveTimer
+let restoringDraft = false
+function draftStorageKey() {
+  const userId = auth.session.value?.user?.id
+  return userId ? `saujana-botc-draft-${userId}` : null
+}
+
+function persistDraftLocally() {
+  if (restoringDraft || typeof window === 'undefined') return
+  clearTimeout(draftSaveTimer)
+  draftSaveTimer = setTimeout(() => {
+    const key = draftStorageKey()
+    if (!key) return
+    try {
+      if (!isDirty.value) window.localStorage.removeItem(key)
+      else window.localStorage.setItem(key, JSON.stringify({ draft: cleanSession(draft.value), baseline: cleanSession(baseline.value) }))
+    } catch {
+      // Keep editing available when local storage is blocked or full.
+    }
+  }, 250)
+}
+
+watch([draft, baseline], persistDraftLocally, { deep: true })
+
+function restoreDraftLocally() {
+  const key = draftStorageKey()
+  if (!key) return
+  try {
+    const stored = window.localStorage.getItem(key)
+    if (!stored) return
+    const recovered = JSON.parse(stored)
+    if (!recovered?.draft || typeof recovered.draft !== 'object' || !recovered?.baseline || typeof recovered.baseline !== 'object') return
+    const restoredDraft = cleanSession(recovered.draft)
+    const restoredBaseline = cleanSession(recovered.baseline)
+    if (JSON.stringify(restoredDraft) === JSON.stringify(restoredBaseline)) {
+      window.localStorage.removeItem(key)
+      return
+    }
+    restoringDraft = true
+    draft.value = restoredDraft
+    baseline.value = restoredBaseline
+    restoringDraft = false
+    notice.value = 'Recovered your unsaved draft from this device.'
+  } catch {
+    // Ignore unreadable local drafts and leave the server copy untouched.
+  }
+}
 
 function emptySession() {
   return {
@@ -179,7 +260,13 @@ function applyScript(game) {
     game.script_characters = ''
     return
   }
-  if (scriptPresets[game.script]) game.script_characters = scriptPresets[game.script]
+  if (scriptPresets[game.script]) {
+    game.script_characters = scriptPresets[game.script]
+    const availableCharacters = new Set(characters(game))
+    for (const player of game.players) {
+      if (player.character && !availableCharacters.has(player.character)) player.character = ''
+    }
+  }
 }
 
 function photoSource(photo) {
@@ -251,10 +338,10 @@ async function save() {
   error.value = ''
   notice.value = ''
   if (draft.value.published && draft.value.games.some(game =>
-    !game.script.trim() || !game.players.some(player => player.name.trim()) || !game.outcome,
+    !game.script.trim() || !game.players.length || game.players.some(player => !player.name.trim()) || !game.outcome,
   )) {
     gameCards.value.forEach(card => { if (card) card.open = true })
-    error.value = 'Before publishing, add a script, at least one named player and an outcome to each game.'
+    error.value = 'Before publishing, give every player a name and add a script and outcome to each game.'
     return
   }
 
@@ -342,17 +429,47 @@ function revokeLocalPhoto(path) {
   localPhotoUrls.value = remaining
 }
 
-onMounted(load)
-onBeforeUnmount(() => Object.values(localPhotoUrls.value).forEach(URL.revokeObjectURL))
+onMounted(async () => {
+  await load()
+  restoreDraftLocally()
+})
+onBeforeUnmount(() => {
+  clearTimeout(draftSaveTimer)
+  Object.values(localPhotoUrls.value).forEach(URL.revokeObjectURL)
+})
 </script>
 
 <style scoped>
-.clocktower-admin{max-width:1000px}.clocktower-admin>h1{margin:0 0 12px}.clocktower-admin>p:not(.eyebrow){color:var(--muted)}
+.clocktower-admin { --matcha-leaf: var(--saujana-clocktower-accent); --surface-soft: #f6efe7; max-width: 1000px; }
+.admin-masthead {
+  overflow: hidden;
+  padding: clamp(23px, 4.5vw, 43px);
+  border-radius: 12px;
+  background: linear-gradient(90deg, #211a20 32%, #211a20d9 64%, #211a2080),
+    url('/images/clocktower-night.svg') right 34% / auto 250% no-repeat #38262e;
+  color: #fff5e6;
+}
+.admin-masthead .eyebrow { margin: 0; color: #e6be85; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.admin-masthead h1 { margin: 6px 0 8px; font: 400 clamp(1.85rem, 5vw, 3.25rem)/1.12 var(--font-display); text-wrap: balance; }
+.admin-masthead p:last-child { margin: 0; color: #e1d0c8; }
 .editor{display:grid;gap:18px;margin-top:24px}.editor-heading,.game-heading,.saved,.save-row,.section-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}.editor-heading h2{margin:0;font:1.55rem var(--font-display);color:var(--matcha-leaf)}.dirty-note{margin:4px 0 0;color:#855e22;font-size:.82rem}
 .editor-fields{display:grid;gap:18px;min-width:0;margin:0;padding:0;border:0}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}.editor label{display:grid;gap:6px;font-size:.86rem}.editor input:not([type=checkbox]),.editor select,.editor textarea{width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid var(--line);border-radius:6px;font:inherit}.editor textarea{min-height:auto}.editor input:focus-visible,.editor select:focus-visible,.editor textarea:focus-visible{outline:2px solid var(--gold-leaf);outline-offset:1px}
 .game{padding:0;overflow:hidden}.game-summary{display:flex;align-items:center;min-height:62px;padding:15px 20px;color:var(--matcha-leaf);font-weight:700}.game-summary span{display:grid;gap:3px}.game-summary small{font-size:.78rem;color:var(--muted);font-weight:400}.game-content{display:grid;gap:14px;padding:0 20px 20px}.game-heading h3,.story h3{margin:0;color:var(--matcha-leaf)}.game-actions{display:flex;flex-wrap:wrap;gap:8px}.section-heading h4{margin:0}.player-card{display:grid;grid-template-columns:minmax(160px,1.2fr) minmax(160px,1fr) auto minmax(130px,1fr) auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}.player-card .check-label{padding:10px 0}.check-label{display:flex!important;align-items:center;gap:8px}.check-label input{width:18px;height:18px;accent-color:var(--matcha-leaf)}
 .photo-list{display:grid;gap:9px}.photo-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px;border:1px solid var(--line);border-radius:8px}.photo-row img,.photo-placeholder{width:76px;height:60px;object-fit:cover;border-radius:5px}.photo-placeholder{display:grid;place-items:center;padding:4px;background:var(--surface-soft);color:var(--muted);font-size:.7rem;text-align:center}.story{display:grid;gap:14px}.add-game{justify-self:start}.save-row{justify-content:flex-start;flex-wrap:wrap}.save-row .message{margin:0}.admin-primary{background:var(--matcha-leaf);color:#fff;border-color:var(--matcha-leaf);padding:12px 18px;font-weight:700}.admin-primary:disabled,button:disabled{opacity:.65;cursor:wait}.saved{margin:10px 0}.saved span{display:block;color:var(--muted)}.message{padding:12px;background:var(--surface-soft)}.message.error{color:#913f45;background:#fbf0ef}.empty-note{color:var(--muted);font-size:.88rem}
 button{min-height:42px;padding:8px 12px;border:1px solid var(--line);background:var(--white-pure);border-radius:6px;cursor:pointer;font:inherit}.saved-section h2{font:1.55rem var(--font-display);color:var(--matcha-leaf)}
+.visitor-preview { background: #fffcf6; border-color: #e3d6c6; }
+.visitor-preview summary, .preview-reveal summary { cursor: pointer; font-weight: 700; color: var(--matcha-leaf); }
+.preview-note { margin: 9px 0 13px; color: var(--muted); font-size: .86rem; }
+.preview-session { overflow: hidden; padding: 0 16px 14px; border: 1px solid #e3d6c6; border-radius: 9px; background: #fffcf6; overflow-wrap: anywhere; }
+.preview-masthead { margin: 0 -16px 14px; padding: clamp(16px, 3vw, 28px); background: #f5eae4; }
+.preview-masthead .eyebrow { margin: 0; color: var(--matcha-leaf); font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.preview-masthead h3 { margin: 4px 0; color: #35282b; font: 400 clamp(1.25rem, 3vw, 1.85rem)/1.15 var(--font-display); }
+.preview-masthead p:last-child { margin: 6px 0 0; color: #6b5755; }
+.preview-session h4 { margin: 16px 0 0; color: var(--matcha-leaf); }
+.preview-reveal { margin: 10px 0; padding: 12px; border: 1px solid #e3d6c6; border-radius: 7px; background: #f8f1e8; }
+.preview-reveal p { white-space: pre-wrap; }
+.preview-photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 8px; }
+.preview-photos img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; }
 @media(max-width:900px){.player-card{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}.player-card .check-label{align-self:center}.remove-player{justify-self:start}}
 @media(max-width:720px){.clocktower-admin .admin-card{padding:16px}.player-card{grid-template-columns:minmax(0,1fr)}.player-card .check-label{padding:2px 0}.game-heading,.saved,.editor-heading,.section-heading{align-items:flex-start;flex-wrap:wrap}.game-content{padding:0 14px 16px}.game-actions{width:100%}.game-actions button{flex:1}.photo-row{align-items:flex-start}.photo-row label{flex:1 1 150px}.editor-heading>button{width:100%}}
 </style>

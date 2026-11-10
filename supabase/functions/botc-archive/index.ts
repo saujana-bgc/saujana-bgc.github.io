@@ -72,7 +72,7 @@ Deno.serve(async (request) => {
       const id = typeof session.id === 'string' ? session.id : crypto.randomUUID()
       const games = Array.isArray(session.games) ? session.games : []
       if (typeof session.session_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(session.session_date)) return reply(request, 400, { error: 'Choose a valid gathering date.' })
-      if (session.published === true && games.some((game: Record<string, unknown>) => !String(game.script ?? '').trim() || !Array.isArray(game.players) || !game.players.some((player: Record<string, unknown>) => String(player.name ?? '').trim()) || !String(game.outcome ?? '').trim())) return reply(request, 400, { error: 'Add a script, at least one named player and an outcome to each game before publishing.' })
+      if (session.published === true && games.some((game: Record<string, unknown>) => !String(game.script ?? '').trim() || !Array.isArray(game.players) || !game.players.length || game.players.some((player: Record<string, unknown>) => !String(player.name ?? '').trim()) || !String(game.outcome ?? '').trim())) return reply(request, 400, { error: 'Give every player a name and add a script, roster and outcome to each game before publishing.' })
       const people = [...new Set(games.flatMap((game: Record<string, unknown>) => Array.isArray(game.players) ? game.players.map((player: Record<string, unknown>) => String(player.name ?? '').trim()).filter(Boolean) : []))]
       for (const name of people) {
         const { error } = await db.from('botc_players').upsert({ private_name: name }, { onConflict: 'private_name', ignoreDuplicates: true })

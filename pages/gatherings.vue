@@ -356,6 +356,7 @@
 
 <script setup>
 const supabase = useSupabase()
+const route = useRoute()
 
 const PAGE_SIZE = 10
 const MINIMUM_SPEND = 10
@@ -973,6 +974,10 @@ onMounted(async () => {
             loadEventsForTab('present'),
             getAttendeeNameOptions(),
         ])
+        await nextTick()
+        if (route.hash.startsWith('#gathering-')) {
+            document.getElementById(decodeURIComponent(route.hash.slice(1)))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
     } catch {
         showToast('We couldn’t load the gatherings. Please refresh and try again.')
     }
