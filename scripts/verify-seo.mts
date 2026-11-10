@@ -30,7 +30,7 @@ for (const path of publicRoutes) {
   assert.equal(getPublicPage(`${path === '/' ? '' : path}///`)?.canonical, page.canonical, `${path}: trailing slashes share a canonical`)
 }
 
-for (const path of ['admin', 'admin/birthday-club', 'admin/riichi-open']) {
+for (const path of ['admin', 'admin/birthday-club', 'admin/riichi-open', 'admin/only-blood-in-the-clocktower']) {
   const html = readOutput(`${path}/index.html`)
   assert.match(html.split('</head>')[0], /<meta name="robots" content="noindex, nofollow, noarchive"/, `${path}: admin stays out of search`)
 }

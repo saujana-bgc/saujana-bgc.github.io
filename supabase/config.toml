@@ -18,3 +18,8 @@ entrypoint = "./functions/riichi-open-public/index.ts"
 enabled = true
 verify_jwt = true
 entrypoint = "./functions/riichi-open-admin/index.ts"
+
+[functions.botc-archive]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/botc-archive/index.ts"

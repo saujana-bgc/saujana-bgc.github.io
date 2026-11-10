@@ -4,6 +4,7 @@
       <p class="page-eyebrow">One game leads to another</p>
       <h1 class="hero-title">Play History</h1>
       <div class="stats-container">A record of what we’ve played and who joined in. Look back at a gathering, or see which favourites keep making it to the table.</div>
+      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower">Follow our Blood on the Clocktower sessions and find the next game night →</NuxtLink></p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">

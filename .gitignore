@@ -69,6 +69,8 @@ supabase/functions/riichi-open-public/*
 !supabase/functions/riichi-open-admin/
 supabase/functions/riichi-open-admin/*
 !supabase/functions/riichi-open-admin/index.ts
+!supabase/functions/botc-archive/
+!supabase/functions/botc-archive/*.ts
 
 # IDE files
 .vscode/
