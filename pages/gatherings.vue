@@ -1752,7 +1752,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     line-height: 1.35;
     text-align: left;
     white-space: normal;
-    word-break: break-word;
     overflow-wrap: anywhere;
     padding: 8px 10px;
     cursor: pointer;
@@ -1768,8 +1767,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .attendees-table td {
     padding: 4px 6px;
     border-top: 1px solid rgba(201, 190, 239, 0.18);
-    word-break: break-word;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
 }
 
 .attendees-table tbody tr:hover {
@@ -1977,7 +1975,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 
 .card-value-input:focus { background: rgba(255,255,255,0.75); }
-.card-value-input.card-area { resize: none; overflow: hidden; line-height: 1.5; word-break: break-word; overflow-wrap: break-word; }
+.card-value-input.card-area { resize: none; overflow: hidden; line-height: 1.5; overflow-wrap: anywhere; }
 
 /* --- DELETE MODAL --- */
 .modal-overlay {

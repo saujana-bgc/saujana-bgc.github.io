@@ -25,9 +25,29 @@ export function options(request: Request) {
 
 export function serviceClient(): SupabaseClient {
   const url = Deno.env.get('SUPABASE_URL')
-  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  const secretKeys = Deno.env.get('SUPABASE_SECRET_KEYS')
+  let secretKey: string | undefined
+  if (secretKeys) {
+    try {
+      secretKey = JSON.parse(secretKeys).default
+    } catch {
+      throw new Error('Riichi Open server configuration is missing.')
+    }
+  }
+  const key = secretKey ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   if (!url || !key) throw new Error('Riichi Open server configuration is missing.')
-  return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } })
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    ...(key.startsWith('sb_secret_') ? {
+      global: {
+        fetch: (input, init) => {
+          const request = new Request(input, init)
+          request.headers.delete('authorization')
+          return fetch(request)
+        },
+      },
+    } : {}),
+  })
 }
 
 export async function adminUser(request: Request, client: SupabaseClient): Promise<User> {

@@ -716,7 +716,7 @@ function meldLabel(type) { return meldTypes.find(option => option.id === type)?.
 </script>
 
 <style scoped>
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .section-heading { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
 .section-heading h2 { margin: 0; color: var(--matcha-leaf); font-size: 1.08rem; letter-spacing: -.015em; }
 .section-heading p { margin: 4px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }

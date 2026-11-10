@@ -1,7 +1,17 @@
 import { equalSecret, makeMessage, splitMessage, type AttendanceNotificationJob } from './format.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+const secretKeys = Deno.env.get('SUPABASE_SECRET_KEYS')
+let secretKey: string | undefined
+if (secretKeys) {
+  try {
+    secretKey = JSON.parse(secretKeys).default
+  } catch {
+    console.error('Attendance worker Supabase key configuration is invalid')
+  }
+}
+const SUPABASE_KEY = secretKey ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+const usesSecretKey = SUPABASE_KEY.startsWith('sb_secret_')
 const WORKER_SECRET = Deno.env.get('ATTENDANCE_WORKER_SECRET') ?? ''
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN') ?? ''
 const TELEGRAM_CHAT_ID = Deno.env.get('TELEGRAM_CHAT_ID') ?? ''
@@ -12,8 +22,8 @@ async function rpc<T>(name: string, body: Record<string, unknown>): Promise<T> {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
     method: 'POST',
     headers: {
-      apikey: SUPABASE_SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      apikey: SUPABASE_KEY,
+      ...(!usesSecretKey ? { Authorization: `Bearer ${SUPABASE_KEY}` } : {}),
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
@@ -59,7 +69,7 @@ Deno.serve(async (request: Request) => {
   if (!WORKER_SECRET || !equalSecret(request.headers.get('x-webhook-secret') ?? '', WORKER_SECRET)) {
     return new Response('Unauthorized', { status: 401 })
   }
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+  if (!SUPABASE_URL || !SUPABASE_KEY || !TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     return Response.json({ ok: false, error: 'configuration_unavailable' }, { status: 503 })
   }
 

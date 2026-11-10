@@ -154,7 +154,6 @@ const eventError = ref(false)
 const communityEvents = ref([])
 const headers = {
   apikey: config.public.supabaseKey,
-  Authorization: 'Bearer ' + config.public.supabaseKey,
   'Content-Type': 'application/json',
 }
 const localDate = new Intl.DateTimeFormat('en-CA', {

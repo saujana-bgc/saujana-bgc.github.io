@@ -16,6 +16,7 @@
         <p class="sr-only" aria-live="polite">{{ resultAnnouncement }}</p>
         <div class="result-inner">
           <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><UButton v-if="resultReady" type="button" class="reset-button" @click="copyResult">{{ copyLabel }}</UButton><UButton v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</UButton><UButton type="button" class="reset-button" @click="resetCalculator">New hand</UButton></div></div>
+          <UTextarea v-if="copyFallback" id="copy-fallback" class="copy-fallback" :model-value="copyFallback" readonly rows="4" aria-label="Score text to copy manually" />
           <div v-if="resultReady && form.winType === 'ron'" class="result-amount">
             <span>{{ result.pao ? 'Total payment' : 'Discarder pays' }}</span>
             <strong>{{ formatPoints(result.points) }}</strong>
@@ -303,6 +304,7 @@ const tileAkaDoraCount = computed(() => form.tileEntry.tiles.filter(token => typ
 const hasInteracted = ref(false)
 const showBreakdown = ref(false)
 const copyLabel = ref('Copy')
+const copyFallback = ref('')
 const breakdownSection = ref(null)
 const winSection = ref(null)
 const tileEntrySection = ref(null)
@@ -871,28 +873,19 @@ async function jumpToNextIssue() {
 async function copyResult() {
   if (!resultReady.value) return
   const text = resultShareText.value
-  let copied = false
   try {
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text)
-      copied = true
-    } else {
-      throw new Error('Clipboard API unavailable.')
-    }
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable.')
+    await navigator.clipboard.writeText(text)
+    copyFallback.value = ''
+    copyLabel.value = 'Copied'
   } catch {
-    try {
-      const area = document.createElement('textarea')
-      area.value = text
-      area.setAttribute('readonly', '')
-      area.style.position = 'fixed'
-      area.style.opacity = '0'
-      document.body.appendChild(area)
-      area.select()
-      copied = document.execCommand('copy')
-      document.body.removeChild(area)
-    } catch { copied = false }
+    copyFallback.value = text
+    copyLabel.value = 'Select and copy'
+    await nextTick()
+    const textarea = document.getElementById('copy-fallback')
+    textarea?.focus()
+    textarea?.select()
   }
-  copyLabel.value = copied ? 'Copied' : 'Copy failed'
   window.clearTimeout(copyLabelTimer)
   copyLabelTimer = window.setTimeout(() => { copyLabel.value = 'Copy' }, 1600)
 }
@@ -1288,7 +1281,7 @@ onBeforeUnmount(() => {
 .payment-list p, .fu-breakdown p, .result-yaku p { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 5px 0; border-bottom: 1px solid #eeece4; color: var(--muted); font-size: .875rem; line-height: 1.4; }
 .payment-list p strong, .fu-breakdown p strong, .result-yaku p strong { color: var(--clay-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .score-note { margin: 14px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.55; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .choice-button:focus-visible, .yaku-option:focus-visible, .selected-yaku-chip:focus-visible, .stepper button:focus-visible, .group-option-grid button:focus-visible, .remove-group:focus-visible, .reset-button:focus-visible, .breakdown-button:focus-visible, .next-step-button:focus-visible, summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
 .issue-target-flash { animation: issue-target-pulse 1.1s ease-out; border-radius: 9px; }
 @keyframes issue-target-pulse { from { box-shadow: 0 0 0 3px rgba(53, 76, 62, .32); } to { box-shadow: 0 0 0 0 rgba(53, 76, 62, 0); } }

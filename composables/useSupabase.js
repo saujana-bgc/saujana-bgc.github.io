@@ -122,7 +122,6 @@ class SupabaseRestClient {
         this.restUrl = `${this.baseUrl}/rest/v1`
         this.headers = {
             apikey: key,
-            Authorization: `Bearer ${key}`,
         }
     }
 

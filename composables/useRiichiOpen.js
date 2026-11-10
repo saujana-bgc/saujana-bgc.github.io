@@ -16,7 +16,7 @@ export function useRiichiOpen() {
     if (privateRequest) {
       if (!auth.session.value?.access_token) throw new Error('Please sign in again.')
       headers.Authorization = `Bearer ${auth.session.value.access_token}`
-    } else headers.Authorization = `Bearer ${config.public.supabaseKey}`
+    }
 
     const response = privateRequest
       ? await auth.authenticatedFetch(url, { method: 'POST', headers, body: JSON.stringify({ action, ...payload }) })
