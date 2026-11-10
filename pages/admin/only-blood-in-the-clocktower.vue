@@ -62,12 +62,12 @@
             </div>
             <div class="fields game-basics">
               <label>Script
-                <select :value="game.script" @change="applyScript(game, $event)">
+                <select :value="game.script || '__custom__'" @change="applyScript(game, $event)">
+                  <option value="__custom__">Custom script…</option>
                   <option value="Trouble Brewing">Trouble Brewing</option>
                   <option value="Bad Moon Rising">Bad Moon Rising</option>
                   <option value="Sects &amp; Violets">Sects &amp; Violets</option>
                   <option v-if="!scriptPresets[game.script] && game.script" :value="game.script">{{ game.script }} (custom)</option>
-                  <option value="__custom__">Custom script…</option>
                 </select>
               </label>
               <label v-if="!scriptPresets[game.script]">Custom script name<input v-model="game.script" placeholder="Enter the script name"></label>
@@ -79,7 +79,7 @@
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <label>Player name<input v-model="player.name" list="clocktower-players" placeholder="Choose or enter a name"></label>
-              <label>Character<input class="character-field" v-model="player.character" :list="'clocktower-characters-' + game.id" placeholder="Choose or enter a character" @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"></label>
+              <label>Character<input class="character-field" v-model="player.character" :list="'clocktower-characters-' + game.id" :placeholder="scriptPresets[game.script] ? 'Search characters…' : 'Enter a character'" @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
               <button type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</button>
@@ -97,7 +97,15 @@
               <div><button type="button" @click="toggleBulkRoster(game)">Cancel</button><button class="admin-primary" type="button" @click="addPastedPlayers(game)">Add names</button></div>
             </section>
 
-            <label class="outcome-field">Outcome<select v-model="game.outcome"><option value="">Choose result</option><option>Good wins</option><option>Evil wins</option><option>No result</option><option>Unknown</option></select></label>
+            <fieldset class="outcome-field">
+              <legend>Outcome</legend>
+              <div class="outcome-options">
+                <label><input v-model="game.outcome" type="radio" value="Good wins"><span>Good wins</span></label>
+                <label><input v-model="game.outcome" type="radio" value="Evil wins"><span>Evil wins</span></label>
+                <label><input v-model="game.outcome" type="radio" value="No result"><span>No winner</span></label>
+                <label><input v-model="game.outcome" type="radio" value="Unknown"><span>Unknown</span></label>
+              </div>
+            </fieldset>
 
             <details class="game-extras" :open="Boolean(game.notes || game.photos?.length)">
               <summary>Notes and photos <span v-if="game.photos?.length">{{ game.photos.length }} photos</span></summary>
@@ -291,7 +299,9 @@ function addGame(options = {}) {
   const game = {
     id: crypto.randomUUID(),
     script: previousGame?.script || 'Trouble Brewing',
-    script_characters: previousGame?.script_characters || scriptPresets['Trouble Brewing'],
+    script_characters: previousGame
+      ? scriptPresets[previousGame.script] || previousGame.script_characters || ''
+      : scriptPresets['Trouble Brewing'],
     outcome: '', notes: '',
     players: previousGame
       ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name, public_name: player.public_name }))
@@ -342,7 +352,8 @@ function addPastedPlayers(game) {
 }
 
 function characters(game) {
-  return (game.script_characters || '').split(',').map(value => value.trim()).filter(Boolean)
+  const source = scriptPresets[game.script] || game.script_characters || ''
+  return source.split(',').map(value => value.trim()).filter(Boolean)
 }
 
 function applyScript(game, event) {
@@ -721,7 +732,13 @@ button:disabled { opacity: .65; cursor: wait; }
 .player-card .death-check { white-space: nowrap; }
 .legacy-status { grid-column: 1 / -1; }
 .script-hint { margin: -5px 0 0; color: var(--muted); font-size: .78rem; }
-.outcome-field { max-width: 320px; }
+.outcome-field { max-width: 640px; margin: 0; padding: 0; border: 0; }
+.outcome-field legend { margin-bottom: 7px; color: var(--desk-ink); font-size: .86rem; font-weight: 600; }
+.outcome-options { display: flex; flex-wrap: wrap; gap: 7px; }
+.outcome-options label { position: relative; display: flex; align-items: center; gap: 7px; min-height: 42px; padding: 7px 11px; border: 1px solid var(--desk-rule); border-radius: 7px; background: var(--desk-paper); cursor: pointer; }
+.outcome-options label:has(input:checked) { border-color: var(--matcha-leaf); background: #f3e7e2; color: var(--matcha-leaf); }
+.outcome-options input[type="radio"] { width: 16px; min-width: 16px; min-height: 16px; margin: 0; padding: 0; accent-color: var(--matcha-leaf); }
+.outcome-options span { font-size: .84rem; }
 .remove-player { min-height: 40px; padding: 7px 9px; font-size: .8rem; color: var(--matcha-leaf); }
 .keyboard-hint { margin: -3px 0 0; color: var(--muted); font-size: .76rem; }
 .keyboard-hint kbd { padding: 1px 4px; border: 1px solid var(--desk-rule); border-radius: 3px; background: var(--surface-soft); }

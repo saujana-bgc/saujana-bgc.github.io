@@ -22,6 +22,7 @@ export const publicPages = {
   '/only-blood-in-the-clocktower': {
     title: 'Only Blood in the Clocktower | Saujana BGC',
     description: 'Relive Saujana’s Blood on the Clocktower sessions, read Mika’s recaps, and find out when to join the next game night.',
+    image: '/images/only-blood-clocktower-social.png',
   },
   '/birthday-club': {
     title: 'Birthday Club | Saujana BGC',
