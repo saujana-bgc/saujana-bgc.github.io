@@ -14,7 +14,7 @@
     </section>
     <template v-else>
       <header class="admin-topbar"><NuxtLink to="/admin" class="admin-brand" aria-label="Saujana organiser workspace"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>organiser workspace</small></span></NuxtLink><div><NuxtLink to="/" class="admin-public-link">Back to website</NuxtLink><button class="admin-signout" @click="signOut">Sign out</button></div></header>
-      <nav class="admin-nav" aria-label="Admin pages"><NuxtLink v-for="item in adminNavigation" :key="item.id" :to="item.to" :class="{ active: isCurrentPage(item.to) }">{{ item.title }}</NuxtLink></nav>
+      <nav class="admin-nav" aria-label="Admin pages"><NuxtLink v-for="item in adminNavigation" :key="item.id" :to="item.to" :class="{ active: isCurrentPage(item.to) }" :aria-label="item.id === 'botc-archive' ? item.title : undefined">{{ item.id === 'botc-archive' ? 'Clocktower' : item.title }}</NuxtLink></nav>
       <div class="admin-page"><slot /></div>
     </template>
   </main>

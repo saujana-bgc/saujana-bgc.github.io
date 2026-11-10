@@ -6,8 +6,8 @@
         <h1>Only Blood <em>in the Clocktower</em></h1>
         <p class="intro">Blood on the Clocktower is a social game of hidden roles. Talk, share clues and vote to find the Demon. New players are welcome; we’ll explain as you play.</p>
         <div class="hero-links">
-          <a class="hero-primary" :href="heroPrimaryHref">
-            {{ heroPrimaryLabel }}
+          <a class="hero-primary" href="#next-gathering">
+            Find the next game
             <span aria-hidden="true">↗</span>
           </a>
           <a class="hero-secondary" :href="heroSecondaryHref">
@@ -16,32 +16,25 @@
         </div>
         <a v-if="nextGathering && pastSessions.length" class="hero-tertiary" href="#clocktower-archive">Browse past games <span aria-hidden="true">↓</span></a>
       </div>
+      <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
+        <div class="calendar-mark" aria-hidden="true">
+          <template v-if="nextGathering"><strong>{{ nextDateStamp.day }}</strong><span>{{ nextDateStamp.month }}</span></template>
+          <svg v-else viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="22" height="21" rx="2"/><path d="M5 13h22M11 4v6m10-6v6m-5 6v8m-4-4h8"/></svg>
+        </div>
+        <div class="next-copy">
+          <p class="eyebrow">The next gathering</p>
+          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
+          <p v-if="nextGathering?.time || nextGathering?.venue"><template v-if="nextGathering?.time">{{ nextGathering.time }}</template><template v-if="nextGathering?.time && nextGathering?.venue"> · </template><template v-if="nextGathering?.venue">{{ nextGathering.venue }}</template></p>
+          <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
+          <p v-else-if="eventError">We couldn’t load the schedule just now.</p>
+          <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
+          <button v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</button>
+        </div>
+        <a v-if="nextGathering" class="calendar-link" :href="nextCtaHref">{{ nextGathering.signup_url ? 'Save your place' : 'See gathering details' }} <span aria-hidden="true">↗</span></a>
+        <a v-else-if="!eventLoading" class="calendar-link" href="/gatherings/">See all gatherings <span aria-hidden="true">↗</span></a>
+      </section>
       <span class="hero-caption" aria-hidden="true">Ravenswood Bluff <span>✦</span> After dark</span>
     </header>
-
-    <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
-      <div class="calendar-mark" aria-hidden="true">
-        <template v-if="nextGathering">
-          <strong>{{ nextDateStamp.day }}</strong>
-          <span>{{ nextDateStamp.month }}</span>
-        </template>
-        <svg v-else viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="22" height="21" rx="2"/><path d="M5 13h22M11 4v6m10-6v6m-5 6v8m-4-4h8"/></svg>
-      </div>
-      <div class="next-copy">
-        <p class="eyebrow">The next gathering</p>
-        <h2 id="next-night-title">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
-        <p v-if="nextGathering?.time || nextGathering?.venue">
-          <template v-if="nextGathering?.time">{{ nextGathering.time }}</template>
-          <template v-if="nextGathering?.time && nextGathering?.venue"> · </template>
-          <template v-if="nextGathering?.venue">{{ nextGathering.venue }}</template>
-        </p>
-        <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
-        <p v-else-if="eventError">We couldn’t load the schedule just now.</p>
-        <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
-      </div>
-      <a v-if="nextGathering" class="calendar-link" :href="nextCtaHref">{{ nextGathering.signup_url ? 'Save your place' : 'See gathering details' }} <span aria-hidden="true">↗</span></a>
-      <a v-else-if="!eventLoading" class="calendar-link" href="/gatherings/">See all gatherings <span aria-hidden="true">↗</span></a>
-    </section>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
       <div class="welcome-body">
@@ -66,6 +59,7 @@
         <label v-if="archiveScripts.length > 1">Script<select v-model="selectedScript"><option value="all">All scripts</option><option v-for="script in archiveScripts" :key="script" :value="script">{{ script }}</option></select></label>
         <button v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button>
       </div>
+      <p v-if="!loading && !error && pastSessions.length" class="filter-count" role="status">Showing {{ filteredSessions.length }} of {{ pastSessions.length }} gatherings</p>
       <p v-if="error" class="archive-state" role="alert">{{ error }} <button class="share-button" type="button" @click="loadArchive">Try again</button></p>
       <p v-else-if="loading" class="archive-state" role="status">Opening the grimoire…</p>
       <div v-else-if="!pastSessions.length" class="archive-state empty-archive">
@@ -74,17 +68,17 @@
         <p>Mika’s retellings, game results and approved photos will appear here after a gathering.</p>
       </div>
 
-      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state">No gatherings match these filters. <button class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button></p>
+      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <button class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button></p>
       <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id }">
         <p v-if="session.id === featured?.id" class="eyebrow latest-label">Latest gathering</p>
         <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="'Approved table photo from ' + formatDate(session.session_date)" loading="lazy">
         <div class="session-heading">
           <div>
             <p class="eyebrow"><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
-            <h3>{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
+            <h3 tabindex="-1">{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
             <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
-          <button class="share-button" type="button" @click="shareSession(session)">Share gathering</button>
+          <button class="share-button" type="button" @click="shareSession(session)">Share</button>
         </div>
         <div v-if="shareNotices[session.id]" class="share-feedback" role="status">
           {{ shareNotices[session.id] }}
@@ -206,8 +200,6 @@ const nextGathering = computed(() => {
   return null
 })
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
-const heroPrimaryHref = computed(() => nextGathering.value ? nextCtaHref.value : pastSessions.value.length ? '#clocktower-archive' : '#what-to-expect')
-const heroPrimaryLabel = computed(() => nextGathering.value?.signup_url ? 'Save your place' : nextGathering.value ? 'See next gathering' : pastSessions.value.length ? 'Browse past gatherings' : 'First time? Start here')
 const heroSecondaryHref = computed(() => nextGathering.value || pastSessions.value.length ? '#what-to-expect' : '/gatherings/')
 const heroSecondaryLabel = computed(() => nextGathering.value || pastSessions.value.length ? 'First time? Start here' : 'All board game gatherings')
 const featured = computed(() => [...pastSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
@@ -283,11 +275,30 @@ async function loadArchive() {
         : document.getElementById('game-' + sharedGameId)
       if (target) {
         target.scrollIntoView({ block: 'start' })
+        target.querySelector('summary')?.focus({ preventScroll: true })
         return
       }
+      const fallback = typeof sharedId === 'string' ? document.getElementById('session-' + sharedId) : null
+      if (fallback) {
+        fallback.scrollIntoView({ block: 'start' })
+        fallback.querySelector('h3')?.focus({ preventScroll: true })
+        return
+      }
+      error.value = 'This shared gathering or game is no longer available. Browse other gatherings below.'
+      await nextTick()
+      document.querySelector('.archive-state[role="alert"]')?.scrollIntoView({ block: 'center' })
+      document.querySelector('.archive-state[role="alert"]')?.setAttribute('tabindex', '-1')
+      document.querySelector('.archive-state[role="alert"]')?.focus({ preventScroll: true })
+      return
     }
     if (typeof sharedId === 'string') {
-      document.getElementById('session-' + sharedId)?.scrollIntoView({ block: 'start' })
+      const target = document.getElementById('session-' + sharedId)
+      if (target) {
+        target.scrollIntoView({ block: 'start' })
+        target.querySelector('h3')?.focus({ preventScroll: true })
+      } else {
+        error.value = 'This shared gathering is no longer available. Browse other gatherings below.'
+      }
     }
   } catch {
     error.value = 'We couldn’t load the session archive. Please try again.'
@@ -384,10 +395,13 @@ onMounted(() => {
   position: relative;
   isolation: isolate;
   display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+  grid-template-areas: "copy date";
   align-items: center;
   overflow: hidden;
-  min-height: 460px;
-  padding: clamp(36px, 5vw, 66px) clamp(26px, 6vw, 76px);
+  min-height: 430px;
+  gap: clamp(20px, 3vw, 44px);
+  padding: clamp(34px, 4.5vw, 56px);
   text-align: left;
   border-radius: 16px;
   background: radial-gradient(ellipse at 77% 44%, #533132, var(--night) 74%);
@@ -419,7 +433,7 @@ onMounted(() => {
   object-fit: cover;
   object-position: center 62%;
 }
-.hero-copy { max-width: 620px; }
+.hero-copy { grid-area: copy; max-width: 620px; z-index: 1; }
 .hero-caption {
   position: absolute;
   right: 26px;
@@ -478,17 +492,20 @@ onMounted(() => {
   background: var(--paper);
 }
 .next-night {
+  grid-area: date;
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px clamp(15px, 3vw, 25px);
-  margin: -22px clamp(14px, 4.8vw, 54px) clamp(30px, 4.7vw, 54px);
-  padding: clamp(16px, 2.5vw, 24px) var(--panel-pad);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px 16px;
+  margin: 0;
+  padding: clamp(16px, 2.2vw, 24px);
   border-top: 2px solid #af8053;
-  background: linear-gradient(110deg, #f7eee0, var(--paper) 75%);
-  box-shadow: 0 8px 22px #34212512;
+  background: #fffcf6f5;
+  box-shadow: 0 12px 30px #120d1226;
+  z-index: 1;
 }
+.next-night .calendar-link { grid-column: 2; justify-self: start; min-height: 46px; padding: 0 14px; border-radius: 6px; background: var(--wine); color: #fffaf5; white-space: normal; }
 .calendar-mark, .empty-mark {
   display: grid;
   place-items: center;
@@ -519,16 +536,17 @@ onMounted(() => {
 .next-copy p:not(.eyebrow) { margin: 3px 0 0; color: var(--soft-ink); font-size: .91rem; }
 .calendar-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--wine); font-size: .84rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .calendar-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.retry-button { justify-self: start; min-height: 40px; margin-top: 8px; padding: 7px 11px; border: 1px solid #b99577; border-radius: 6px; background: transparent; color: var(--wine); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
+.retry-button:focus-visible { outline: 2px solid var(--wine); outline-offset: 2px; }
 .welcome-note {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px 32px;
   margin: 0 0 clamp(30px, 4.7vw, 54px);
-  padding: clamp(19px, 3vw, 28px) var(--panel-pad);
-  border: 1px solid #dfd0be;
-  border-radius: 10px;
-  background: linear-gradient(110deg, #f1e6d7, #faf5ec 78%);
+  padding: clamp(19px, 3vw, 28px) 0;
+  border-block: 1px solid #dfd0be;
+  background: transparent;
 }
 .welcome-note > div { max-width: 68ch; }
 .welcome-note h2 { margin: 4px 0 6px; color: var(--ink); font: 400 clamp(1.45rem, 3vw, 2rem)/1.15 var(--font-display); letter-spacing: -.025em; }
@@ -539,6 +557,7 @@ onMounted(() => {
 .welcome-link:hover { background: #fffaf2; }
 
 .metadata { margin: 4px 0 0; color: var(--soft-ink); font-size: .92rem; overflow-wrap: anywhere; }
+.filter-count { margin: 12px 0; color: var(--soft-ink); font-size: .84rem; }
 .session-card h3 { overflow-wrap: anywhere; }
 .script-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
 .script-tags li { padding: 4px 9px; border: 1px solid var(--rule); border-radius: 5px; color: var(--wine); font-size: .75rem; overflow-wrap: anywhere; }
@@ -576,12 +595,19 @@ onMounted(() => {
 .empty-archive h3, .session-card h3 { margin: 0; color: var(--ink); font: 400 clamp(1.25rem, 3vw, 1.75rem)/1.2 var(--font-display); }
 .empty-archive p { max-width: 42ch; margin: 8px auto 0; }
 .session-card { margin: 0 0 14px; border-inline-start: 3px solid #b28869; box-shadow: 0 6px 20px #35282b08; }
-.session-card.is-latest-session { border-inline-start-color: var(--wine); background: linear-gradient(110deg, #f8eee6, var(--paper) 70%); box-shadow: 0 9px 26px #34212512; }
+.session-card.is-latest-session { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); column-gap: clamp(18px, 3vw, 34px); border-inline-start-color: var(--wine); background: linear-gradient(110deg, #f8eee6, var(--paper) 70%); box-shadow: 0 9px 26px #34212512; }
 .latest-label { margin-bottom: 5px; }
+.is-latest-session > .latest-label { grid-column: 1 / -1; }
 .session-cover { display: block; width: 100%; max-height: 320px; margin: 0 0 14px; aspect-ratio: 16 / 7; border-radius: 7px; background: var(--parchment); object-fit: cover; }
+.is-latest-session > .session-cover { grid-column: 2; grid-row: 2 / span 4; height: 100%; max-height: 360px; margin: 0; aspect-ratio: 4 / 3; }
 .session-card h3 { margin-top: 3px; }
 .session-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; }
 .session-heading > div { flex: 1 1 110px; min-width: 0; }
+.is-latest-session > .session-heading { grid-column: 1; align-items: flex-start; }
+.is-latest-session > .share-feedback,
+.is-latest-session > .recap-reveal,
+.is-latest-session > .game-grid,
+.is-latest-session > .photo-reveal { grid-column: 1 / -1; }
 .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; margin-top: 14px; align-items: start; }
 .game-grid details { min-width: 0; padding: 2px 14px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
 .game-grid details[open] { grid-column: 1 / -1; padding-bottom: 10px; border-color: #cdb3a4; }
@@ -621,11 +647,11 @@ details[open] > summary .when-open { display: inline; }
 .next-night, .archive, .session-card, .game-grid details { scroll-margin-top: 86px; }
 
 @media (max-width: 760px) {
-  .clocktower-page > .page-header { min-height: 0; padding: 24px 22px 112px; }
-  .page-header::after { background: linear-gradient(180deg, var(--night) 19%, #21171df2 41%, #21171d58 72%, transparent 93%); }
-  .hero-art { width: min(94%, 480px); height: 225px; max-height: none; object-fit: cover; object-position: right center; }
+  .clocktower-page > .page-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "date"; gap: 22px; min-height: 0; padding: 28px 22px 26px; }
+  .page-header::after { background: linear-gradient(180deg, var(--night) 14%, #21171def 42%, #21171db8 75%, #21171d30 100%); }
+  .hero-art { inset: 105px 0 auto auto; z-index: 0; width: min(82%, 370px); height: 320px; max-height: none; object-fit: cover; object-position: right center; opacity: .42; }
   .hero-caption { display: none; }
-  .next-night { margin: 12px 0 30px; }
+  .next-night { margin: 0; }
   .page-header h1 { font-size: clamp(2.2rem, 8.9vw, 4rem); }
   .hero-links { margin-top: 18px; gap: 6px 10px; }
   .hero-primary, .hero-secondary { font-size: .8rem; }
@@ -635,14 +661,34 @@ details[open] > summary .when-open { display: inline; }
   .stat-row div:first-child { border: 0; }
 }
 @media (max-width: 560px) {
-  .clocktower-page > .page-header { padding-bottom: 98px; }
+  .clocktower-page > .page-header { padding: 22px 18px; gap: 18px; }
+  .page-header h1 { font-size: clamp(2rem, 8.2vw, 3rem); }
+  .intro { max-width: 31ch; font-size: .91rem; line-height: 1.5; }
+  .hero-links { margin-top: 12px; }
+  .hero-secondary { font-size: .76rem; }
   .next-night { grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: start; }
+  .next-copy { min-width: 0; }
+  .next-copy p:not(.eyebrow) { overflow-wrap: anywhere; }
   .calendar-mark { width: 50px; height: 58px; }
   .calendar-mark strong { font-size: 1.5rem; }
   .archive-filters label { flex: 1 1 112px; min-width: 0; }
   .welcome-note { align-items: flex-start; flex-direction: column; gap: 13px; }
-  .calendar-link { grid-column: 2; }
+  .next-night .calendar-link { grid-column: 2; }
+  .session-heading { align-items: flex-start; }
+  .session-heading > div { flex-basis: 180px; }
+  .session-heading .share-button { flex: 0 0 auto; }
   .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-gallery img { max-height: 180px; }
+}
+@media (max-width: 760px) {
+  .session-card.is-latest-session { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
+  .is-latest-session > .session-cover { grid-column: 1; grid-row: auto; height: auto; max-height: 260px; margin: 0 0 12px; aspect-ratio: 16 / 9; }
+  .is-latest-session > .session-heading { grid-column: 1; grid-row: auto; display: block; }
+  .is-latest-session > .latest-label,
+  .is-latest-session > .share-feedback,
+  .is-latest-session > .recap-reveal,
+  .is-latest-session > .game-grid,
+  .is-latest-session > .photo-reveal { grid-column: 1; }
+  .is-latest-session > .session-heading .share-button { margin-top: 8px; }
 }
 </style>

@@ -1,17 +1,16 @@
 <template>
   <main class="clocktower-admin">
     <header class="admin-masthead">
-      <p class="eyebrow">The storyteller’s desk</p>
-      <h1>Only Blood in the Clocktower</h1>
-      <p>Log games, write the recap and prepare the next gathering.</p>
+      <div><p class="eyebrow">The storyteller’s desk</p><h1>Clocktower organiser</h1><p>Log games, write the recap and prepare the next gathering.</p></div>
+      <button class="admin-primary" type="button" :disabled="busy" @click="startNew">New gathering</button>
     </header>
     <p v-if="error" class="message error" role="alert">{{ error }}</p>
 
-    <details v-if="saved.length" class="saved-picker">
+    <details v-if="saved.length" ref="savedPicker" class="saved-picker" :open="!draft.id && !isDirty">
       <summary><span>Open a saved gathering</span><span class="saved-count">{{ saved.length }}</span></summary>
       <div class="saved-list">
         <article v-for="session in saved" :key="session.id" class="admin-card saved">
-          <div><strong>{{ session.session_date }} · {{ session.venue || 'Saujana' }}</strong><span class="status-badge" :class="{ 'is-published': session.published }">{{ session.published ? 'Published' : 'Draft' }}</span></div>
+          <div class="saved-details"><time :datetime="session.session_date">{{ new Date(session.session_date + 'T12:00:00').toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' }) }}</time><span class="saved-venue">{{ session.venue || 'Saujana' }}</span><span class="status-badge" :class="{ 'is-published': session.published }">{{ session.published ? 'Published' : 'Draft' }}</span></div>
           <button type="button" :disabled="busy" @click="edit(session)">Edit</button>
         </article>
       </div>
@@ -21,7 +20,7 @@
       <div class="editor-heading">
         <div>
           <p class="eyebrow">Gathering editor</p>
-          <h2>{{ draft.id ? 'Edit gathering' : 'Log a gathering' }}</h2>
+          <h2 ref="editorTitle" tabindex="-1">{{ draft.id ? 'Edit gathering' : 'Log a gathering' }}</h2>
           <div class="editor-status">
             <span class="status-badge" :class="{ 'is-published': baseline.published }">{{ baseline.published ? 'Published' : 'Draft' }}</span>
             <span v-if="isDirty" class="dirty-note">Unsaved changes</span>
@@ -46,7 +45,7 @@
         </section>
         <datalist id="clocktower-players"><option v-for="player in players" :key="player.id" :value="player.private_name"></option></datalist>
 
-        <details v-for="(game,index) in draft.games" :key="game.id" ref="gameCards" class="game admin-card" open>
+        <details v-for="(game,index) in draft.games" :key="game.id" ref="gameCards" class="game admin-card" :open="index === 0">
           <summary class="game-summary">
             <span class="game-number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
             <span class="game-summary-copy"><small>Game {{ index + 1 }}</small><strong>{{ game.script || 'Choose a script' }}</strong></span>
@@ -195,6 +194,8 @@ const photoUrls = ref({})
 const localPhotoUrls = ref({})
 const pendingPhotoDeletes = ref(new Set())
 const gameCards = ref([])
+const savedPicker = ref(null)
+const editorTitle = ref(null)
 const editorForm = ref(null)
 const bulkRosterText = ref({})
 const bulkRosterOpen = ref({})
@@ -310,8 +311,10 @@ function addGame(options = {}) {
   }
   draft.value.games.push(game)
   nextTick(() => {
-    gameCards.value.at(-1)?.scrollIntoView({ block: 'start' })
-    gameCards.value.at(-1)?.querySelector('select')?.focus({ preventScroll: true })
+    gameCards.value.forEach((card, index) => { card.open = index === gameCards.value.length - 1 })
+    const card = gameCards.value.at(-1)
+    card?.scrollIntoView({ block: 'start' })
+    card?.querySelector('select')?.focus({ preventScroll: true })
   })
 }
 
@@ -416,6 +419,11 @@ function setDraft(session) {
 function edit(session) {
   if (busy.value || !confirmDiscard()) return
   setDraft(session)
+  nextTick(() => {
+    if (savedPicker.value) savedPicker.value.open = false
+    editorTitle.value?.focus({ preventScroll: true })
+    editorForm.value?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  })
 }
 
 function confirmDiscard() {
@@ -426,6 +434,11 @@ function startNew() {
   if (busy.value || !confirmDiscard()) return
   const session = emptySession()
   setDraft(session)
+  nextTick(() => {
+    if (savedPicker.value) savedPicker.value.open = false
+    editorTitle.value?.focus({ preventScroll: true })
+    editorForm.value?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  })
 }
 
 function copyRoster(index) {
@@ -582,26 +595,16 @@ onBeforeUnmount(() => {
   max-width: 1000px;
 }
 .admin-masthead {
-  position: relative;
-  overflow: hidden;
-  padding: clamp(23px, 4.5vw, 43px);
-  border-radius: 12px;
-  background: linear-gradient(90deg, #21171d 22%, #21171ddd 58%, #21171d65),
-    url('/images/clocktower-night.svg') right 51% / auto 290% no-repeat #38262e;
-  box-shadow: 0 7px 22px #36252c22;
-  color: #fff5e6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0 18px;
+  border-bottom: 1px solid var(--line);
 }
-.admin-masthead::after {
-  position: absolute;
-  inset: 7px;
-  border: 1px solid #e6be8550;
-  border-radius: 7px;
-  content: '';
-  pointer-events: none;
-}
-.admin-masthead .eyebrow { margin: 0; color: #e6be85; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.admin-masthead h1 { margin: 6px 0 8px; color: #fff5e6; font: 400 clamp(1.85rem, 5vw, 3.25rem)/1.12 var(--font-display); text-wrap: balance; }
-.admin-masthead p:last-child { margin: 0; color: #e1d0c8; }
+.admin-masthead .eyebrow { margin: 0; color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.admin-masthead h1 { margin: 3px 0; color: var(--desk-ink); font: 400 clamp(1.85rem, 4vw, 2.7rem)/1.12 var(--font-display); text-wrap: balance; }
+.admin-masthead p:last-child { margin: 0; color: var(--muted); font-size: .9rem; }
 .editor { display: grid; gap: 18px; margin-top: 16px; padding: var(--desk-pad); border-color: var(--desk-rule); background: #faf5ed; }
 .editor-heading, .game-heading, .saved, .save-row, .section-heading {
   display: flex;
@@ -612,6 +615,7 @@ onBeforeUnmount(() => {
 .editor-heading { padding: 2px 0 14px; border-bottom: 1px solid var(--desk-rule); }
 .editor-heading .eyebrow { margin: 0 0 3px; color: var(--matcha-leaf); font-weight: 750; letter-spacing: .12em; }
 .editor-heading h2 { margin: 0; font: 400 clamp(1.55rem, 3vw, 2rem)/1.15 var(--font-display); color: var(--desk-ink); }
+.editor-heading h2:focus { outline: none; }
 .editor-status { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 8px; }
 .status-badge { display: inline-block; width: fit-content; padding: 3px 8px; border: 1px solid #dec8a9; border-radius: 20px; background: #f6ebda; color: #705122; font-size: .7rem; font-weight: 700; }
 .status-badge.is-published { border-color: #c3d4bf; background: #e8f0e4; color: #38543d; }
@@ -709,9 +713,11 @@ button:disabled { opacity: .65; cursor: wait; }
   transform: rotate(225deg);
 }
 .clocktower-admin .saved-picker > summary::after { margin-inline-start: 0; }
-.saved-list { display: grid; gap: 8px; padding: 0 10px 10px; }
-.saved-list .saved { margin: 0; padding: 12px; border-color: var(--desk-rule); box-shadow: none; }
-.saved strong { display: block; margin-bottom: 3px; overflow-wrap: anywhere; }
+.saved-list { display: grid; gap: 2px; padding: 0 14px 10px; }
+.saved-list .saved { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; margin: 0; padding: 10px 2px; border: 0; border-top: 1px solid var(--desk-rule); border-radius: 0; box-shadow: none; }
+.saved-details { display: grid; grid-template-columns: 125px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-width: 0; font-size: .87rem; }
+.saved-details time { color: var(--desk-ink); font-weight: 700; }
+.saved-venue { min-width: 0; color: var(--muted); overflow-wrap: anywhere; }
 .editor-heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .editor-heading-actions .start-game { border-color: var(--matcha-leaf); color: var(--matcha-leaf); font-weight: 700; }
 .section-heading h4 small { margin-left: 5px; color: var(--muted); font: .75rem var(--font-body); }
@@ -750,6 +756,12 @@ button:disabled { opacity: .65; cursor: wait; }
 .save-row .admin-primary { min-height: 46px; }
 .save-row .publish-button { min-height: 46px; border-color: var(--gold-leaf); color: #704b19; font-weight: 700; }
 @media(max-width:720px) {
+  .admin-masthead { align-items: flex-start; }
+  .admin-masthead { flex-direction: column; gap: 10px; }
+  .saved-details { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; }
+  .saved-details time { grid-column: 1; }
+  .saved-details .status-badge { grid-column: 2; grid-row: 1; }
+  .saved-venue { grid-column: 1 / -1; }
   .game-heading, .editor-heading { align-items: flex-start; flex-wrap: wrap; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
   .player-card { grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: center; }
