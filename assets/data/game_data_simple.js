@@ -1,6 +1,6 @@
 const collectionDataSimple = {
-    "total": 342,
-    "date": "20 Oct 2026",
+    "total": 344,
+    "date": "10 Nov 2026",
     "games": [
         {
             "name": "5-Minute One Piece",
@@ -253,6 +253,20 @@ const collectionDataSimple = {
             ]
         },
         {
+            "name": "Barbecubes",
+            "designers": [
+                "Brett J. Gilbert",
+                "Rob Sparks"
+            ],
+            "img": "images/games/393114.avif",
+            "players": "2-6P",
+            "weight": 1.0,
+            "categories": [
+                "Action / Dexterity",
+                "Party Game"
+            ]
+        },
+        {
             "name": "Barcelona",
             "designers": [
                 "Dani Garcia"
@@ -309,19 +323,6 @@ const collectionDataSimple = {
                 "Adventure",
                 "Exploration",
                 "Horror"
-            ]
-        },
-        {
-            "name": "Biss 20",
-            "designers": [
-                "Lena Burkhardt",
-                "Günter Burkhardt"
-            ],
-            "img": "images/games/318195.avif",
-            "players": "2-8P",
-            "weight": 1.2,
-            "categories": [
-                "Party Game"
             ]
         },
         {
@@ -1089,6 +1090,18 @@ const collectionDataSimple = {
             ]
         },
         {
+            "name": "dnup",
+            "designers": [
+                "Kei Kajino (梶野 桂)"
+            ],
+            "img": "images/games/432456.avif",
+            "players": "2-5P",
+            "weight": 1.3,
+            "categories": [
+                "Card Game"
+            ]
+        },
+        {
             "name": "Do De Li Do",
             "designers": [
                 "Jacques Zeimet"
@@ -1548,6 +1561,20 @@ const collectionDataSimple = {
             "weight": 2.4,
             "categories": [
                 "Dice"
+            ]
+        },
+        {
+            "name": "The Frozen Passage",
+            "designers": [
+                "Emi Kuji"
+            ],
+            "img": "images/games/468616.avif",
+            "players": "1-4P",
+            "weight": 1.3,
+            "categories": [
+                "Card Game",
+                "Exploration",
+                "Nautical"
             ]
         },
         {
@@ -2967,19 +2994,7 @@ const collectionDataSimple = {
             ]
         },
         {
-            "name": "Pick 'n Packers",
-            "designers": [
-                "Kaoru ARISHIMA / æœ‰å³¶è–«"
-            ],
-            "img": "images/games/453785.avif",
-            "players": "3-6P",
-            "weight": 1.0,
-            "categories": [
-                "Action / Dexterity"
-            ]
-        },
-        {
-            "name": "Piles! A Fast-Paced Free-For-All",
+            "name": "Piles!",
             "designers": [
                 "KC Schrimpl"
             ],
@@ -4411,6 +4426,19 @@ const collectionDataSimple = {
                 "Ancient",
                 "Bluffing",
                 "Deduction"
+            ]
+        },
+        {
+            "name": "Viking See-Saw",
+            "designers": [
+                "Reiner Knizia"
+            ],
+            "img": "images/games/351810.avif",
+            "players": "2-4P",
+            "weight": 1.1,
+            "categories": [
+                "Action / Dexterity",
+                "Nautical"
             ]
         },
         {

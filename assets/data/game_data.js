@@ -1,6 +1,6 @@
 const collectionData = {
-    "total": 342,
-    "date": "20 Oct 2026",
+    "total": 344,
+    "date": "10 Nov 2026",
     "games": [
         {
             "name": "5-Minute One Piece",
@@ -271,6 +271,21 @@ const collectionData = {
             "description": "Barbarossa is set in a fictional Second World War setting in which cute German military girls rush against Moscow to defeat the evil magician Stalin.\n\nThe game uses the in-game deck-building mechanism from Dominion – that is, each player starts with a small deck of resource cards and during the course of the game one buys cards from an open card pool to build a deck of cards to play with. Goal of the game is to conquer Moscow. If Moscow falls the player with the most victory points wins. Victory points are acquired by conquering different cities and/or strategical positions during the game. Every time you attack a city, event cards from an event deck are drawn (e.g. General \"Winter\"). Barbarossa uses six different kinds of cards:\n\n\n    Supply Cards: These provide points to buy other cards from the open card pool. \n\n\n\n    Unit Cards: The use of these cards require \"Operation Points\" (Each turn you start with one Operation Point) and deliver the military strength to attack cities or strategic positions (or in other words gain victory point cards).\n\n\n\n    Operation Cards: They give you a one time bonus in different forms. After use they are not just discarded but put out of play.\n\n\n\n    Deploy Cards: They stay in the players play area and deliver bonuses in different forms every turn.\n\n\n\n    Target Cards: The cities and strategic positions which deliver VPs, also if you conquered strategic positions it becomes easier to attack cities.\n\n\n\n    Event Cards: If you attack the Target cards an event is drawn and stuff happens.\n\n\nLike all of Arclight's deck construction games, the illustrations are provided by famous Japanese fanzine artists.\n\nIntegrates with\n\n    El Alamein"
         },
         {
+            "name": "Barbecubes",
+            "designers": [
+                "Brett J. Gilbert",
+                "Rob Sparks"
+            ],
+            "img": "images/games/393114.avif",
+            "players": "2-6P",
+            "weight": 1.0,
+            "categories": [
+                "Action / Dexterity",
+                "Party Game"
+            ],
+            "description": "The BBQ's hot, and it's time to prep the food for cooking, but don't spill on the grill or everyone will go hungry!\n\n1. Draw a card!\n2. Grab food with tongs!\n3. Add it to the grill, but don't drop any!\n\nTake turns to add food to the grill. If any piece fall off, take a card.  Get 2 cards and you're eliminated.  The last player standing, wins.\n\n—description from the publisher"
+        },
+        {
             "name": "Barcelona",
             "designers": [
                 "Dani Garcia"
@@ -332,20 +347,6 @@ const collectionData = {
                 "Horror"
             ],
             "description": "The House on the Hill still sits abandoned, and a fearless group of explorers has been drawn to the house to discover its dark secrets. Immerse yourself in the narrative gameplay as you take on the role of one of those explorers.\n\nThe co-operative board game Betrayal at House on the Hill: 3rd Edition includes fifty haunts and dozens of danger-filled rooms that will terrify even the strongest among you. At first you'll work together, but beware...one explorer will betray the others, and then the haunt begins.\n\nThis edition of the popular haunted house traitor game features content and gaming elements that help new players jump right in. So, gather friends for a game night of monsters, miniatures, and modular board pieces in this immersive, story-driven hidden traitor game.\n\n—description from the publisher"
-        },
-        {
-            "name": "Biss 20",
-            "designers": [
-                "Lena Burkhardt",
-                "Günter Burkhardt"
-            ],
-            "img": "images/games/318195.avif",
-            "players": "2-8P",
-            "weight": 1.2,
-            "categories": [
-                "Party Game"
-            ],
-            "description": "In Biss 20, you count from 1 to 20 together, with each player saying one number in turn.\n\nOkay, that sounds simple! And it would be if not for Fritz the bat who keeps coming up with new rules that you need to remember — and just when you've remembered one rule, he's already waiting around the corner with the next one. How many rules can you recall?\n\n—description from the publisher"
         },
         {
             "name": "Bitoku",
@@ -1167,6 +1168,19 @@ const collectionData = {
             "description": "Once your ancestors found or created a source of magic - the exact knowledge of its origin, as far as you know, has long been lost. A small community has developed around the source, which seeks to protect this place and keep it as secret as possible.\n\nUnfortunately, some magical beings — half corporeal, half ethereal — have now tracked down this source. These beings of dubious character, which you call \"Djinn\", have appeared in various places of the city to dispute your access to the source. You are young members of the Magic Guild, and to prove your abilities, you are tasked with capturing the Djinn so that they can do no harm. You can control them permanently only if you catch them in special Djinn bottles. To seal these bottles, you also need corks made from the bark of a tree near the magic source.\n\nWhichever of you succeeds best in protecting your small town will be accepted into the inner circle of the Magic Guild and will soon be allowed to learn even more secrets...\n\nIn Djinn, you take turns moving across a map that shows thirteen locations. These locations are linked to actions where you can get the resources you need and catch the Djinn that are in six locations. In those locations you can do things like receive bottles and corks, collect magical power, buy magical items, hire mages to accompany you, discover secret passages, and more.\n\nIn each round, you can reach only one of two or three of the locations, so you must plan carefully to have all the resources you need in time to catch the Djinn. The game ends when all six \"Boss Djinn\" have been captured and removed from the map, then you score points for all captured Djinn.\n\n-description from developer"
         },
         {
+            "name": "dnup",
+            "designers": [
+                "Kei Kajino (梶野 桂)"
+            ],
+            "img": "images/games/432456.avif",
+            "players": "2-5P",
+            "weight": 1.3,
+            "categories": [
+                "Card Game"
+            ],
+            "description": "Your goal in dnup is to empty your hand of cards.\n\nEach player starts with eight or ten cards in hand, with each card having different numbers (from 1-10) at top and bottom, e.g. 1 and 7. Pick up all your cards at once; you can rearrange cards from left to right at any time, but you can't revolve them. On a turn, first discard any cards on the table in front of you, then you can:\n\n1. Play cards from your hand.\n2. Add one card to the table.\n3. Take cards from the table.\n4. Rotate all cards in your hand.\n\nWhen you play cards, you can play one or more cards of the same value — but if you play as many cards as another player has in front of them, your cards must be of higher value. If you overplay someone, e.g. playing two 5s when they have two 2s, they must revolve their cards, then return them to their hand.\n\nWhen you add one card, you add a card of the same value to someone else's played cards — but if that player would now have the same number of cards as a third player, the third player's cards must be a lower value, in which case they revolve them and return them to hand.\n\nWhen you pick up cards from in front of another player, revolve them, then add them to your hand.\n\nThe first player to empty their hand scores 2 points, and cards don't return to their hand, even if beaten. The second player to empty their hand scores 1 point. Play multiple rounds until someone has at least 4 points, then whoever has the most points wins."
+        },
+        {
             "name": "Do De Li Do",
             "designers": [
                 "Jacques Zeimet"
@@ -1661,6 +1675,21 @@ const collectionData = {
                 "Dice"
             ],
             "description": "Welcome to the French Quarter, the heart of New Orleans! You're in town for a weekend trip with plans to spend your Saturday evening taking in as many of the city's unique sights and sounds as possible in a mere eight hours.\n\nWhether it's the distinct food, local culture, shopping hotspots, mystic customs, or the vibrant nightlife, there's something to experience on practically every corner. There's live jazz everywhere you go, and NOLA is world-famous for its street performers. Make sure you don't miss the spontaneous wedding parades, known locally as \"second lines\", that roll through the streets!\n\nPlay it safe or go wild — it's your choice. As you navigate the city, your map will serve as both a guidebook and a memento of your trip. Reunite with your friends at the end of the night to compare notes and swap stories.\n\nIn French Quarter, you choose dice from the card row to take actions and travel via different methods of transportation with varying distances: walking, carriage ride, taxi, streetcar, riverboat, or just hanging out to socialize.\n\nAs you travel around the city, you get to visit buildings and see performers where you stop. All these activities slowly fill up tracks that chart your experiences with food, culture, shopping, mysticism, and partying. You have to make tough choices between in-game bonuses and score multipliers! After eight hours of gallivanting about town, players compare their end results to see who had the most memorable night in NOLA.\n\n-description from designer"
+        },
+        {
+            "name": "The Frozen Passage",
+            "designers": [
+                "Emi Kuji"
+            ],
+            "img": "images/games/468616.avif",
+            "players": "1-4P",
+            "weight": 1.3,
+            "categories": [
+                "Card Game",
+                "Exploration",
+                "Nautical"
+            ],
+            "description": "The Northwest Passage. An elusive sea route along the northern coast of America that's said to link the Pacific and Atlantic oceans. Since the 15th century, expeditions were launched with the dream of discovering it, only to then vanish in the icebergs. This is a cooperative game where you aim to connect 15 cards together while meeting the necessary conditions. But if you veer off course even slighty, your voyage will end in failure. Work together and predict which cards the other players hold, make use of items, and successfully traverse the route that humanity has dreamed of!\n\nThe Frozen Passage is an exciting co-op game where players are part of an expedition team trying to navigate at sea, but the journey has become dangerous with lots of icebergs threatening to sink the ship. Players work together to successfully navigate through this dangerous journey and make it out safely. This is a board game filled with adventure and excitement, where you gradually expand and extend your path across the sea towards the goal cards. Which direction should you go? Should you use up your limited special items? Players are limited in how they can communicate, adding to the tension in this game.\n\nPlayers work together to arrange three colors of cards numbered 1 to 9 in an inverted pyramid shape, starting from the bottom and aiming for the goal cards at the top. If all players manage to place all of their cards, everyone wins. However, there are specific rules for how the cards must be arranged. If you lose focus on your turn, you might steer the ship towards disaster. Since everyone’s hand is hidden, you must try to complete the path by predicting each other's cards and helping each other out!\n\n—description from the publisher"
         },
         {
             "name": "Fruit Cocktail",
@@ -3183,20 +3212,7 @@ const collectionData = {
             "description": "Petrichor is the earthy scent produced when rain falls on dry soil. The word is constructed from Greek (Ï€Î­Ï„Ï�Î±) petra, meaning \"stone\", and (á¼°Ï‡ÏŽÏ�) Ä«chor, the fluid that flows in the veins of the gods in Greek mythology.\n\nWelcome to the lush world of Petrichor; you are a cloud. Your entire purpose in life is to expand, sire other clouds and water crops. Unfortunately, your mates (who are also clouds) have a similar plan. It’s up to you to manipulate the weather and assimilate these rogue clouds to contribute to the growth of as many crops as possible - all in order to claim the title of Most Valuable Cloud.\n\nPetrichor is a highly interactive board game, playable by 1-4 people (up to 5 with the expansion, see below). It’s an action selection/area influence game, with 4 simple actions which interact with the various fields in ever surprising ways. The players move clouds with water droplets, and then rain those droplets onto specific fields, to make sure they have the right amount of water for the Harvest. During a Harvest, crops that have been watered enough are scored! Players are able to influence when, and how often the harvest happens. Players need to strike a fine balance between maintaining control of the different fields as well as influencing Harvest, to make sure the two come together at the optimal time.\n\nSolo mode by Dávid Turczi"
         },
         {
-            "name": "Pick 'n Packers",
-            "designers": [
-                "Kaoru ARISHIMA / æœ‰å³¶è–«"
-            ],
-            "img": "images/games/453785.avif",
-            "players": "3-6P",
-            "weight": 1.0,
-            "categories": [
-                "Action / Dexterity"
-            ],
-            "description": "Pick 'n Packers is a balance game where two players work together to carry a drone stacked with presents. Each player uses only one finger to pinch and lift a wooden drone piece. Even the slightest difference in finger pressure causes the drone, and the presents on top, to shake, sparking excitement at the table!\n\nStaying calm and moving in sync is the key, but the drone never quite behaves as you expect, which often leads to hilarious moments of laughter.\n\nMeanwhile, the other players aren’t just watching. They’re guessing how far the drone will make it, cheering on the carriers, or playfully trying to make them laugh and throw off their balance!\n\nWhether you’re refining your teamwork, encouraging or heckling your friends, steadying your nerves to stay focused, or just bursting into laughter as the presents topple off, the whole experience is packed with fun.\n\n—description from the publisher"
-        },
-        {
-            "name": "Piles! A Fast-Paced Free-For-All",
+            "name": "Piles!",
             "designers": [
                 "KC Schrimpl"
             ],
@@ -4734,6 +4750,20 @@ const collectionData = {
                 "Deduction"
             ],
             "description": "Play as a divine being who has sired a demigod in the realm of humankind. The identity of your lineage is known only to you. Use positional play to complete quests—and influence fate to ensure the outcome is in your favor. Strike the perfect balance of misdirection and mischief to capture the throne.\n\nThere are 9 Demigods. At the beginning of the game, each player is secretly assigned one Demigod as their offspring. When the game begins, however, players may control the actions of any Demigod, not just their own. Through strategic play, special powers, and secret voting, players must aid their Demigod in gaining Renown. But be careful! Giving away your lineage too soon may cause the other players to work together toward your Demigod’s demise.\n\nOn their turn, players will have 2 actions with which to send Demigods on quests. Each Quest can result in 2 different ways, which the gods influence with secret voting cards called Fate Cards. When a Quest is completed, the Fate cards are revealed and the winning side of the card is resolved, giving some Demigods Renown and taking it from others. A player wins if their Demigod has the most Renown at the end of 3 rounds called ages, and that Demigod becomes the heir to the throne.\n\nPart social deduction, part strategy, Veiled Fate pits wit against wit. Every move is a new clue to discovering the true lineage of your opponents. Can you foil carefully laid plans, while cementing your own path to victory?\n\n-description from designer"
+        },
+        {
+            "name": "Viking See-Saw",
+            "designers": [
+                "Reiner Knizia"
+            ],
+            "img": "images/games/351810.avif",
+            "players": "2-4P",
+            "weight": 1.1,
+            "categories": [
+                "Action / Dexterity",
+                "Nautical"
+            ],
+            "description": "Let's load our luggage, but don't let the ship tip!\n\nPlayers alternately place their luggage on the 3D ship. The deck is always on a slope where the luggage is put, so place carefully. If the ship tilts, the player has to take a ship's chest and add it their own luggage as a penalty. The ship tilts easily, so it's a race to load luggage before the ship tilts. If a player finishes placing all their luggage or the penalty chests run out, the game ends.\n\nSince each of the different luggage items is a different material like brass, aluminum, iron, glass, acrylic, and wood, the strategy and fun of the game is guessing the weight right as to not tip the ship.\n\n\n船が傾かないように荷物を置いていこう!\n\nプレイヤーは、自分の荷物を交互に船にのせていきます。荷物をのせるのは常に傾きが上のデッキです。もし船が傾いてしまったら、ペナルティとして船のチェストを自分の荷物として引き取らなければなりません。船は必ず傾くので荷物の置き合いのチキンレースが繰り返されます。誰かが全ての荷物をのせ終わるか、ペナルティのチェストがなくなったらゲーム終了となります。\n\n荷物コマは、真鍮、アルミ、鉄、ガラス、アクリル、木、と異なる素材であるため、重さの推測の楽しさと、攻めと守りの戦略が生まれ、一味も二味も違ったシーソーゲームに仕上がっています。\n\n—description from the publisher"
         },
         {
             "name": "Viticulture Essential Edition",
