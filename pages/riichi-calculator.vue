@@ -1,5 +1,5 @@
 <template>
-  <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && (entryMode !== 'tiles' || tileStep === 1) }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
+  <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1) }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
     <header class="calculator-heading">
       <p class="page-eyebrow">A quick table-side guide</p>
       <h1 class="hero-title">Riichi mahjong calculator</h1>
@@ -12,7 +12,7 @@
     <RiichiCalculatorTutorialDialog ref="tutorialDialog" />
 
     <div class="calculator-layout" :class="{ 'tile-entry-active': entryMode === 'tiles' && tileStep === 0 }">
-      <aside ref="resultPanelRef" v-show="!keyboardOpen && (entryMode !== 'tiles' || tileStep === 1)" class="result-panel" :class="{ 'result-ready': resultReady, 'result-tsumo': resultReady && Boolean(result.tsumo), 'result-tile-incomplete': entryMode === 'tiles' && !resultReady }" aria-labelledby="result-heading">
+      <aside ref="resultPanelRef" v-show="!keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1)" class="result-panel" :class="{ 'result-ready': resultReady, 'result-tsumo': resultReady && Boolean(result.tsumo), 'result-tile-incomplete': entryMode === 'tiles' && !resultReady }" aria-labelledby="result-heading">
         <p class="sr-only" aria-live="polite">{{ resultAnnouncement }}</p>
         <div class="result-inner">
           <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><button v-if="resultReady" type="button" class="reset-button" @click="copyResult">{{ copyLabel }}</button><button v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</button><button type="button" class="reset-button" @click="resetCalculator">New hand</button></div></div>

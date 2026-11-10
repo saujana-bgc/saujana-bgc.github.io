@@ -4,7 +4,7 @@
       <p class="page-eyebrow">One game leads to another</p>
       <h1 class="hero-title">Play History</h1>
       <div class="stats-container">A record of what we’ve played and who joined in. Look back at a gathering, or see which favourites keep making it to the table.</div>
-      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower">Follow our Blood on the Clocktower sessions and find the next game night →</NuxtLink></p>
+      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower">Only Blood in the Clocktower: session recaps and the next game night →</NuxtLink></p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -26,7 +26,8 @@
       <template v-else>
         <div class="search-wrap fade-up">
           <input v-model="search" type="search" aria-label="Search play history" class="search-input" placeholder="Find a game we’ve played" />
-          <p class="page-hint">Tap a game, or hover over it, for a closer look.</p>
+          <p class="page-hint">Select a game to see its cover and players.</p>
+          <p v-if="matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
         </div>
 
         <section class="session-card stats-panel fade-up">
@@ -103,11 +104,9 @@
               :key="game.key"
               class="game-pill"
               type="button"
-              @mouseenter="showGameImage($event, game)"
-              @mouseleave="hideGameImage"
-              @focus="showGameImage($event, game)"
-              @blur="hideGameImage"
-              @click="showGameImage($event, game)"
+              :aria-pressed="hoverImage.name === game.name && hoverImage.visible"
+              :class="{ 'game-pill-match': matchingGames && game.name.toLocaleLowerCase().includes(matchingGames) }"
+              @click="toggleGameImage($event, game)"
             >{{ game.name }}</button>
           </div>
         </section>
@@ -150,6 +149,10 @@ const HOVER_CARD_HEIGHT = 245
 const currentPage = ref(1)
 const search = ref('')
 const hoverImage = reactive({ visible: false, src: '', name: '', showPlayers: true, players: [], x: 0, y: 0, above: true })
+const matchingGames = computed(() => search.value.trim().toLocaleLowerCase())
+const matchingGameCount = computed(() => matchingGames.value
+    ? filteredSessions.value.reduce((total, session) => total + session.games.filter(game => game.name.toLocaleLowerCase().includes(matchingGames.value)).length, 0)
+    : 0)
 
 const { data: rawRows, isPending, isError } = usePlaylogData()
 
@@ -342,12 +345,18 @@ function onDocClick(e) {
     if (!e.target.closest('.game-pill') && !e.target.closest('.rankings-panel')) hideGameImage()
 }
 
+function onKeydown(e) {
+    if (e.key === 'Escape') hideGameImage()
+}
+
 onMounted(() => {
     document.addEventListener('click', onDocClick)
+    document.addEventListener('keydown', onKeydown)
 })
 
 onUnmounted(() => {
     document.removeEventListener('click', onDocClick)
+    document.removeEventListener('keydown', onKeydown)
 })
 </script>
 
@@ -517,6 +526,12 @@ onUnmounted(() => {
     background: var(--matcha-leaf);
     color: white;
     transform: translateY(-1px);
+}
+
+.game-pill-match {
+    border-color: var(--matcha-leaf);
+    background: var(--lavender-mist);
+    box-shadow: inset 0 0 0 1px var(--matcha-leaf);
 }
 
 .pagination {

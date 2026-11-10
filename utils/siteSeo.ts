@@ -20,7 +20,7 @@ export const publicPages = {
     description: 'Explore the board games played at Saujana gatherings. Look back at past sessions and discover the games our community keeps coming back to.',
   },
   '/only-blood-in-the-clocktower': {
-    title: 'Blood on the Clocktower Sessions | Saujana BGC',
+    title: 'Only Blood in the Clocktower | Saujana BGC',
     description: 'Relive Saujana’s Blood on the Clocktower sessions, read Mika’s recaps, and find out when to join the next game night.',
   },
   '/birthday-club': {

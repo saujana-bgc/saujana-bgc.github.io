@@ -25,18 +25,19 @@
           placeholder="Find your next game"
           aria-label="Search the collection by title, category, player count, or designer"
         />
+        <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
         <button v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</button>
       </div>
 
-<div class="sort-controls fade-up">
+      <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
         <button class="sort-btn" :class="{ active: currentSort === 'name' }" @click="[currentSort = 'name', resetCategories()]">A to Z</button>
         <button class="sort-btn" :class="{ active: currentSort === 'played' }" @click="[currentSort = 'played', resetCategories()]">Recently played</button>
         <button class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="[generateSurprise(), resetCategories()]">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Card Game') }" @click="[selectedCategories = selectedCategories.includes('Card Game') ? [] : ['Card Game'], resetSort()]">Card games</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Deduction') }" @click="[selectedCategories = selectedCategories.includes('Deduction') ? [] : ['Deduction'], resetSort()]">Deduction</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Animals') }" @click="[selectedCategories = selectedCategories.includes('Animals') ? [] : ['Animals'], resetSort()]">Animals</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Party Game') }" @click="[selectedCategories = selectedCategories.includes('Party Game') ? [] : ['Party Game'], resetSort()]">Party games</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Bluffing') }" @click="[selectedCategories = selectedCategories.includes('Bluffing') ? [] : ['Bluffing'], resetSort()]">Bluffing</button>
+        <button class="sort-btn" :class="{ active: selectedCategories.includes('Card Game') }" :aria-pressed="selectedCategories.includes('Card Game')" @click="selectedCategories = selectedCategories.includes('Card Game') ? [] : ['Card Game']">Card games</button>
+        <button class="sort-btn" :class="{ active: selectedCategories.includes('Deduction') }" :aria-pressed="selectedCategories.includes('Deduction')" @click="selectedCategories = selectedCategories.includes('Deduction') ? [] : ['Deduction']">Deduction</button>
+        <button class="sort-btn" :class="{ active: selectedCategories.includes('Animals') }" :aria-pressed="selectedCategories.includes('Animals')" @click="selectedCategories = selectedCategories.includes('Animals') ? [] : ['Animals']">Animals</button>
+        <button class="sort-btn" :class="{ active: selectedCategories.includes('Party Game') }" :aria-pressed="selectedCategories.includes('Party Game')" @click="selectedCategories = selectedCategories.includes('Party Game') ? [] : ['Party Game']">Party games</button>
+        <button class="sort-btn" :class="{ active: selectedCategories.includes('Bluffing') }" :aria-pressed="selectedCategories.includes('Bluffing')" @click="selectedCategories = selectedCategories.includes('Bluffing') ? [] : ['Bluffing']">Bluffing</button>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">The collection is here, but play history is unavailable. Refresh the page to try again.</div>
@@ -193,7 +194,7 @@ function gameSearchText(game) {
         game.weight,
         ...(game.categories ?? []),
         ...(game.designers ?? []),
-    ].filter(Boolean).join(' ').toLowerCase()
+    ].filter(Boolean).join(' ').replace(/\b(\d+)\s*(?:-|–)\s*(\d+)\s*p\b/gi, '$1p $2p').replace(/\b(\d+)\s*p\b/gi, '$1 players $1p').toLowerCase()
 }
 
 // Catalogue fields are immutable; build searchable text once per page visit.

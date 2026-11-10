@@ -178,7 +178,7 @@ button:disabled { cursor: not-allowed; }
 .visitor-label { color: var(--clay-text); font-size: .55rem; text-transform: uppercase; letter-spacing: 2px; opacity: .72; }
 .visitor-divider { width: 3px; height: 3px; border-radius: 50%; background: rgba(74,68,63,.32); margin: 0 3px; }
 
-@media (max-width: 899px) {
+@media (max-width: 1199px) {
   .site-nav { display: block; min-height: 72px; padding: 0; }
   .mobile-nav-bar { position: relative; z-index: 2; width: 100%; min-height: 72px; padding: 10px 20px; background: var(--bg-silk); }
   .brand-wordmark { font-size: 1.45rem; }

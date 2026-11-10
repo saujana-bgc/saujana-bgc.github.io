@@ -92,6 +92,11 @@
         </button>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
+          <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-quick-details">
+            <span>{{ formatDate(event.date) }} · {{ event.time }}</span>
+            <span>{{ event.venue }}</span>
+            <NuxtLink :to="`#signup-trigger-${event.id}`" :prefetch="false">Add my name ↓</NuxtLink>
+          </div>
           <div class="event-description">
             <template v-if="isSpookyGameDay(event)">
               Celebrate Halloween with Pair of Dice × Saujana at Richeese Factory, the Curve. Join us for Blood on the Clocktower, 20+ board games, Riichi Mahjong and Halloween Bingo, plus a lucky draw and a costume contest with prizes. Come dressed in your Halloween best for an afternoon and evening of games and good company. Entry is free with a minimum RM20 food purchase at Richeese Factory.
@@ -1340,6 +1345,29 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     font-weight: 300;
     line-height: 1.7;
     opacity: 0.85;
+}
+
+.event-quick-details {
+    display: grid;
+    gap: 5px;
+    margin: 20px 0;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-soft);
+    color: var(--clay-text);
+    font-size: .92rem;
+}
+
+.event-quick-details span:first-child {
+    font-weight: 700;
+}
+
+.event-quick-details a {
+    width: fit-content;
+    margin-top: 5px;
+    color: var(--matcha-leaf);
+    font-weight: 700;
 }
 
 .event-card:hover .event-image {
