@@ -15,15 +15,16 @@
           <p class="success-kicker">Birthday saved, {{ submittedName }}.</p>
           <h2>A date worth remembering.</h2>
           <p>Your birthday and greeting preference are on our calendar. Thanks for giving us another reason to celebrate.</p>
-          <button class="secondary-button" type="button" @click="resetForm">
+          <UButton class="secondary-button" color="neutral" variant="outline" type="button" @click="resetForm">
             Add another birthday
-          </button>
+          </UButton>
         </div>
 
         <form v-else novalidate @submit.prevent="submitBirthday">
                <div class="field-group">
             <label for="birthday-name">Name or nickname</label>
-            <input
+            <UInput
+              class="birthday-control"
               id="birthday-name"
               v-model="name"
               type="text"
@@ -34,7 +35,7 @@
               :aria-invalid="Boolean(errors.name)"
               :aria-describedby="errors.name ? 'birthday-name-error' : undefined"
               @input="errors.name = ''"
-            >
+            />
             <p v-if="errors.name" id="birthday-name-error" class="field-error">{{ errors.name }}</p>
           </div>
 
@@ -43,36 +44,36 @@
             <div class="date-grid">
               <div class="field-group">
                 <label for="birth-month">Month</label>
-                <select
+                <USelect
+                  class="birthday-control"
                   id="birth-month"
-                  v-model.number="birthMonth"
+                  v-model="birthMonth"
+                  :items="months"
+                  value-key="value"
+                  label-key="label"
                   name="birth_month"
+                  placeholder="Choose a month"
                   :aria-invalid="Boolean(errors.month)"
                   :aria-describedby="errors.month ? 'birth-month-error' : undefined"
                   @change="errors.month = ''"
-                >
-                  <option :value="null" disabled>Choose a month</option>
-                  <option v-for="month in months" :key="month.value" :value="month.value">
-                    {{ month.label }}
-                  </option>
-                </select>
+                />
                 <p v-if="errors.month" id="birth-month-error" class="field-error">{{ errors.month }}</p>
               </div>
 
               <div class="field-group">
                 <label for="birth-day">Day</label>
-                <select
+                <USelect
+                  class="birthday-control"
                   id="birth-day"
-                  v-model.number="birthDay"
+                  v-model="birthDay"
+                  :items="availableDays"
                   name="birth_day"
+                  :placeholder="birthMonth ? 'Choose a day' : 'Choose a month first'"
                   :disabled="!birthMonth"
                   :aria-invalid="Boolean(errors.day)"
                   :aria-describedby="errors.day ? 'birth-day-error' : undefined"
                   @change="errors.day = ''"
-                >
-                  <option :value="null" disabled>{{ birthMonth ? 'Choose a day' : 'Choose a month first' }}</option>
-                  <option v-for="day in availableDays" :key="day" :value="day">{{ day }}</option>
-                </select>
+                />
                 <p v-if="errors.day" id="birth-day-error" class="field-error">{{ errors.day }}</p>
               </div>
             </div>
@@ -93,9 +94,9 @@
 
           <p v-if="submitError" class="submit-error" role="alert">{{ submitError }}</p>
 
-          <button class="submit-button" type="submit" :disabled="isSubmitting">
+          <UButton class="submit-button" type="submit" :disabled="isSubmitting">
             {{ isSubmitting ? 'Saving your birthday…' : 'Join the Birthday Club' }}
-          </button>
+          </UButton>
         </form>
       </section>
     </main>
@@ -264,6 +265,15 @@ function resetForm() {
   color: var(--clay-text);
   font: inherit;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.field-group :deep(.birthday-control) {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdfa;
+  color: var(--clay-text);
+  font: inherit;
 }
 
 .field-group input::placeholder { color: rgba(74, 68, 61, 0.42); }

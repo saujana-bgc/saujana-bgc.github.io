@@ -4,9 +4,9 @@
       <p class="page-eyebrow">A quick table-side guide</p>
       <h1 class="hero-title">Riichi mahjong calculator</h1>
       <p class="calculator-description">Check a Japanese mahjong hand or enter han and fu to calculate ron and tsumo payments.</p>
-      <button ref="tutorialTrigger" type="button" class="tutorial-trigger" aria-haspopup="dialog" @click="openTutorial">
+      <UButton ref="tutorialTrigger" type="button" class="tutorial-trigger" aria-haspopup="dialog" @click="openTutorial">
         <span aria-hidden="true">▶</span> Watch guide · 90 sec
-      </button>
+      </UButton>
     </header>
 
     <RiichiCalculatorTutorialDialog ref="tutorialDialog" />
@@ -15,7 +15,7 @@
       <aside ref="resultPanelRef" v-show="!keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1)" class="result-panel" :class="{ 'result-ready': resultReady, 'result-tsumo': resultReady && Boolean(result.tsumo), 'result-tile-incomplete': entryMode === 'tiles' && !resultReady }" aria-labelledby="result-heading">
         <p class="sr-only" aria-live="polite">{{ resultAnnouncement }}</p>
         <div class="result-inner">
-          <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><button v-if="resultReady" type="button" class="reset-button" @click="copyResult">{{ copyLabel }}</button><button v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</button><button type="button" class="reset-button" @click="resetCalculator">New hand</button></div></div>
+          <div class="result-heading-row"><span id="result-heading" class="result-kicker">{{ resultReady ? 'Payment' : 'Score' }}</span><div class="result-actions"><UButton v-if="resultReady" type="button" class="reset-button" @click="copyResult">{{ copyLabel }}</UButton><UButton v-if="undoSnapshot" type="button" class="reset-button" @click="undoClear">Undo</UButton><UButton type="button" class="reset-button" @click="resetCalculator">New hand</UButton></div></div>
           <div v-if="resultReady && form.winType === 'ron'" class="result-amount">
             <span>{{ result.pao ? 'Total payment' : 'Discarder pays' }}</span>
             <strong>{{ formatPoints(result.points) }}</strong>
@@ -26,8 +26,8 @@
           </div>
           <div v-if="!resultReady" class="result-empty">
             <p>{{ entryMode === 'tiles' ? tileResultMessage : hasInteracted && directEntryIssue ? 'Review the hand value below.' : hasInteracted ? nextStepLabel : 'Enter han and fu to see the payment.' }}</p>
-            <button v-if="hasInteracted && entryMode === 'hanfu' && directEntryIssue" type="button" class="next-step-button" @click="jumpToNextIssue">Review hand value</button>
-            <button v-else-if="hasInteracted && canJumpToNextIssue && entryMode === 'tiles' && tileStep === 1" type="button" class="next-step-button" @click="jumpToNextIssue">{{ nextStepLabel }}</button>
+            <UButton v-if="hasInteracted && entryMode === 'hanfu' && directEntryIssue" type="button" class="next-step-button" @click="jumpToNextIssue">Review hand value</UButton>
+            <UButton v-else-if="hasInteracted && canJumpToNextIssue && entryMode === 'tiles' && tileStep === 1" type="button" class="next-step-button" @click="jumpToNextIssue">{{ nextStepLabel }}</UButton>
           </div>
 
           <template v-if="resultReady">
@@ -55,7 +55,7 @@
             <div class="score-summary">
               <span v-if="result.isYakuman">{{ result.yakumanUnits > 1 ? `${result.yakumanUnits} × Yakuman` : 'Yakuman' }}</span>
               <template v-else><span>{{ result.han }} han<span v-if="showFu"> · {{ result.fu }} fu</span></span><span v-if="result.handName" class="limit-badge">{{ limitName(result.handName) }}</span></template>
-              <button type="button" class="breakdown-button" :aria-expanded="showBreakdown" aria-controls="score-breakdown" @click="toggleBreakdown">{{ showBreakdown ? 'Hide breakdown' : 'View breakdown' }}</button>
+              <UButton type="button" class="breakdown-button" :aria-expanded="showBreakdown" aria-controls="score-breakdown" @click="toggleBreakdown">{{ showBreakdown ? 'Hide breakdown' : 'View breakdown' }}</UButton>
             </div>
             <p class="payment-context">{{ form.winType === 'ron' ? 'Ron' : 'Tsumo' }} · {{ isDealer ? 'Dealer' : 'Non-dealer' }}<template v-if="form.honba"> · {{ form.honba }} honba included</template></p>
           </template>
@@ -64,14 +64,14 @@
 
       <form class="calculator-form" aria-label="Riichi hand details" @input="hasInteracted = true" @click="hasInteracted = true" @submit.prevent>
         <div class="entry-mode" role="group" aria-label="Scoring entry method">
-          <button type="button" :class="{ selected: entryMode === 'tiles' }" :aria-pressed="entryMode === 'tiles'" @click="setEntryMode('tiles')"><strong>Enter your tiles</strong><small>Tile entry · finds yaku and fu</small></button>
-          <button type="button" :class="{ selected: entryMode === 'hanfu' }" :aria-pressed="entryMode === 'hanfu'" @click="setEntryMode('hanfu')"><strong>Enter han &amp; fu</strong><small>Quick · for a known score</small></button>
+          <UButton type="button" :class="{ selected: entryMode === 'tiles' }" :aria-pressed="entryMode === 'tiles'" @click="setEntryMode('tiles')"><strong>Enter your tiles</strong><small>Tile entry · finds yaku and fu</small></UButton>
+          <UButton type="button" :class="{ selected: entryMode === 'hanfu' }" :aria-pressed="entryMode === 'hanfu'" @click="setEntryMode('hanfu')"><strong>Enter han &amp; fu</strong><small>Quick · for a known score</small></UButton>
         </div>
         <div class="player-count-row" role="group" aria-label="Players at the table">
           <span class="field-label">Players</span>
           <div class="choice-row compact-choice" role="group" aria-label="Players at the table">
-            <button type="button" class="choice-button" :class="{ selected: form.playerCount === 4 }" :aria-pressed="form.playerCount === 4" @click="form.playerCount = 4">Four player</button>
-            <button type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three player</button>
+            <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 4 }" :aria-pressed="form.playerCount === 4" @click="form.playerCount = 4">Four player</UButton>
+            <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three player</UButton>
           </div>
         </div>
         <label class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Optional · off for Riichi Open</small></label>
@@ -83,17 +83,17 @@
               <label for="direct-han">Total han</label>
               <p id="direct-han-hint" class="field-hint">Include yaku and bonus han. Tap a total or enter your own.</p>
               <div class="han-shortcuts" role="group" aria-label="Common han totals">
-                <button v-for="han in 5" :key="han" type="button" class="choice-button" :class="{ selected: form.directHan === han }" :aria-pressed="form.directHan === han" :aria-label="`Set total to ${han} han`" @click="setDirectHanPreset(han)">{{ han }}</button>
+                <UButton v-for="han in 5" :key="han" type="button" class="choice-button" :class="{ selected: form.directHan === han }" :aria-pressed="form.directHan === han" :aria-label="`Set total to ${han} han`" @click="setDirectHanPreset(han)">{{ han }}</UButton>
               </div>
-              <div class="stepper" role="group" aria-label="Total han"><button type="button" aria-label="Remove one han" :disabled="form.directHan <= 0" @click="adjustDirect('directHan', -1)">−</button><input id="direct-han" ref="directHanInput" v-model.number="form.directHan" type="number" inputmode="numeric" min="0" max="99" :aria-invalid="directHanIssue || undefined" :aria-describedby="directHanIssue ? 'direct-entry-error' : 'direct-han-hint'" @change="sanitizeDirect('directHan', 99)" /><button type="button" aria-label="Add one han" @click="adjustDirect('directHan', 1, 99)">+</button></div>
+              <div class="stepper" role="group" aria-label="Total han"><UButton type="button" aria-label="Remove one han" :disabled="form.directHan <= 0" @click="adjustDirect('directHan', -1)">−</UButton><input id="direct-han" ref="directHanInput" v-model.number="form.directHan" type="number" inputmode="numeric" min="0" max="99" :aria-invalid="directHanIssue || undefined" :aria-describedby="directHanIssue ? 'direct-entry-error' : 'direct-han-hint'" @change="sanitizeDirect('directHan', 99)" /><UButton type="button" aria-label="Add one han" @click="adjustDirect('directHan', 1, 99)">+</UButton></div>
             </div>
             <div v-if="form.directHan > 0 && form.directHan < 5" class="direct-field" :class="{ 'direct-field-invalid': directFuIssue }"><label for="direct-fu">Fu</label><p id="direct-fu-hint" class="field-hint">Choose the rounded fu total</p><select id="direct-fu" ref="directFuInput" v-model.number="form.directFu" :aria-invalid="directFuIssue || undefined" :aria-describedby="directFuIssue ? 'direct-entry-error' : 'direct-fu-hint'"><option v-if="!directFuOptions.includes(form.directFu)" :value="form.directFu">{{ form.directFu }} fu · check selection</option><option v-for="fu in directFuOptions" :key="fu" :value="fu" :disabled="(fu === 20 && (form.winType !== 'tsumo' || form.directHan < 2 || !form.isClosed)) || (fu === 25 && (form.directHan < 2 || !form.isClosed || (form.winType === 'tsumo' && form.directHan < 3)))">{{ fu }} fu</option></select></div>
           </div>
           <div v-if="form.directHan > 0 && form.directHan < 5 && (form.directFu === 20 || form.directFu === 25)" ref="directClosedControl" class="direct-closed-control">
             <span class="field-label">Is the hand closed?</span>
             <div class="choice-row" role="group" aria-label="Is the hand closed?">
-              <button type="button" class="choice-button" :class="{ selected: form.isClosed }" :aria-pressed="form.isClosed" @click="form.isClosed = true">Yes</button>
-              <button type="button" class="choice-button" :class="{ selected: !form.isClosed }" :aria-pressed="!form.isClosed" @click="form.isClosed = false">No</button>
+              <UButton type="button" class="choice-button" :class="{ selected: form.isClosed }" :aria-pressed="form.isClosed" @click="form.isClosed = true">Yes</UButton>
+              <UButton type="button" class="choice-button" :class="{ selected: !form.isClosed }" :aria-pressed="!form.isClosed" @click="form.isClosed = false">No</UButton>
             </div>
           </div>
           <p v-if="directEntryIssue" id="direct-entry-error" class="field-problems" role="status">{{ directEntryIssue }}</p>
@@ -101,7 +101,7 @@
           <p v-if="form.directHan >= 13" class="field-hint">For stacked yakuman, double yakuman waits or pao, enter the tiles to calculate each payment correctly.</p>
         </section>
         <div v-if="entryMode === 'tiles' && tileStep === 0 && undoSnapshot" class="tile-clear-undo">
-          <button type="button" class="reset-button" @click="undoClear">Undo new hand</button>
+          <UButton type="button" class="reset-button" @click="undoClear">Undo new hand</UButton>
         </div>
         <RiichiTileHandEntry
           v-if="tileEntryMounted"
@@ -129,16 +129,16 @@
               <div class="section-heading"><div><h2 id="tile-win-context-heading">Win details</h2><p>{{ tileWinningSelected ? 'Your winning tile is marked above. Tap another tile to change it.' : 'Mark the tile that completed the hand above; the payment uses these details.' }}</p></div></div>
               <span class="field-label">How did you win?</span>
               <div class="choice-row" role="group" aria-label="Winning method">
-                <button v-for="option in winOptions" :key="'tile-' + option.id" type="button" class="choice-button" :class="{ selected: form.winType === option.id }" :aria-pressed="form.winType === option.id" @click="form.winType = option.id">{{ option.label }}</button>
+                <UButton v-for="option in winOptions" :key="'tile-' + option.id" type="button" class="choice-button" :class="{ selected: form.winType === option.id }" :aria-pressed="form.winType === option.id" @click="form.winType = option.id">{{ option.label }}</UButton>
               </div>
               <span class="field-label">Are you the dealer?</span>
               <div class="choice-row" role="group" aria-label="Dealer status">
-                <button type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="setDealer(true)">Yes</button>
-                <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="setDealer(false)">No</button>
+                <UButton type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="setDealer(true)">Yes</UButton>
+                <UButton type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="setDealer(false)">No</UButton>
               </div>
               <span class="field-label">Riichi declaration</span>
               <div class="choice-row" role="group" aria-label="Riichi declaration">
-                <button v-for="option in tileRiichiOptions" :key="'context-' + option.id" type="button" class="choice-button" :class="{ selected: form.tileSituation.riichi === option.id }" :aria-pressed="form.tileSituation.riichi === option.id" :disabled="option.id !== 'none' && tileHasOpenMeld" @click="setTileRiichi(option.id)">{{ option.label }}</button>
+                <UButton v-for="option in tileRiichiOptions" :key="'context-' + option.id" type="button" class="choice-button" :class="{ selected: form.tileSituation.riichi === option.id }" :aria-pressed="form.tileSituation.riichi === option.id" :disabled="option.id !== 'none' && tileHasOpenMeld" @click="setTileRiichi(option.id)">{{ option.label }}</UButton>
               </div>
               <label v-if="form.tileSituation.riichi !== 'none'" class="checkbox-row"><input v-model="form.tileSituation.ippatsu" type="checkbox" :disabled="form.tileSituation.rinshan" @change="markTileContextChanged" /><span>Ippatsu · win before your next discard, with no intervening calls or kans</span></label>
               <p v-if="tileHasOpenMeld" class="field-hint">Riichi needs a closed hand. A concealed kan is allowed.</p>
@@ -155,31 +155,31 @@
           </div>
 
           <div v-if="entryMode === 'hanfu'" class="choice-row" role="group" aria-label="Winning method">
-            <button v-for="option in winOptions" :key="option.id" type="button" class="choice-button" :class="{ selected: form.winType === option.id }" :aria-pressed="form.winType === option.id" @click="form.winType = option.id">
+            <UButton v-for="option in winOptions" :key="option.id" type="button" class="choice-button" :class="{ selected: form.winType === option.id }" :aria-pressed="form.winType === option.id" @click="form.winType = option.id">
               {{ option.label }}
-            </button>
+            </UButton>
           </div>
 
           <template v-if="entryMode === 'hanfu'">
           <span class="field-label">Are you the dealer?</span>
           <div class="choice-row" role="group" aria-label="Dealer status">
-            <button type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="setDealer(true)">Yes</button>
-            <button type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="setDealer(false)">No</button>
+            <UButton type="button" class="choice-button" :class="{ selected: isDealer }" :aria-pressed="isDealer" @click="setDealer(true)">Yes</UButton>
+            <UButton type="button" class="choice-button" :class="{ selected: !isDealer }" :aria-pressed="!isDealer" @click="setDealer(false)">No</UButton>
           </div>
           </template>
           <details class="table-settings">
           <summary>Table settings · {{ form.playerCount }} players · {{ isDealer ? 'East seat' : (seatWindConfirmed ? `${windNames[form.seatWind]} seat` : 'Seat not set') }} · {{ roundWindConfirmed ? `${windNames[form.roundWind]} round` : 'Round not set' }}</summary>
           <span class="field-label">Your seat wind</span>
           <div class="choice-row" role="group" aria-label="Your seat wind">
-            <button v-for="option in availableSeatWinds" :key="option.id" type="button" class="choice-button" :class="{ selected: form.seatWind === option.id && seatWindConfirmed }" :aria-pressed="form.seatWind === option.id && seatWindConfirmed" @click="setSeatWind(option.id)">
+            <UButton v-for="option in availableSeatWinds" :key="option.id" type="button" class="choice-button" :class="{ selected: form.seatWind === option.id && seatWindConfirmed }" :aria-pressed="form.seatWind === option.id && seatWindConfirmed" @click="setSeatWind(option.id)">
               <span>{{ option.label }}</span><small v-if="option.id === 'east'">Dealer</small>
-            </button>
+            </UButton>
           </div>
           <span class="field-label">Round wind</span>
           <div class="choice-row" role="group" aria-label="Round wind">
-              <button v-for="option in availableRoundWinds" :key="option.id" type="button" class="choice-button" :class="{ selected: form.roundWind === option.id && roundWindConfirmed }" :aria-pressed="form.roundWind === option.id && roundWindConfirmed" @click="setRoundWind(option.id)">
+              <UButton v-for="option in availableRoundWinds" :key="option.id" type="button" class="choice-button" :class="{ selected: form.roundWind === option.id && roundWindConfirmed }" :aria-pressed="form.roundWind === option.id && roundWindConfirmed" @click="setRoundWind(option.id)">
               {{ option.label }} round
-            </button>
+            </UButton>
           </div>
 
           <details class="hand-help"><summary>Table scoring rules</summary><p>Riichi Open uses kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. Red fives and three-player scoring are optional variants. Riichi sticks are collected separately.</p></details>
@@ -188,18 +188,18 @@
           <div ref="honbaSection" class="bonus-control honba-control" tabindex="-1" aria-labelledby="honba-count-label">
             <div class="bonus-copy"><label id="honba-count-label" for="honba-count">Honba · repeat counter</label><span>+300 on ron; +100 from each payer on tsumo</span></div>
             <div class="stepper" role="group" aria-label="Honba">
-              <button type="button" aria-label="Remove one honba" :disabled="form.honba <= 0" @click="form.honba = Math.max(0, form.honba - 1)">−</button>
+              <UButton type="button" aria-label="Remove one honba" :disabled="form.honba <= 0" @click="form.honba = Math.max(0, form.honba - 1)">−</UButton>
               <input id="honba-count" v-model.number="form.honba" type="number" inputmode="numeric" min="0" max="99" step="1" @change="form.honba = Math.min(99, integerAtLeastZero(form.honba))" />
-              <button type="button" aria-label="Add one honba" :disabled="form.honba >= 99" @click="form.honba = Math.min(99, form.honba + 1)">+</button>
+              <UButton type="button" aria-label="Add one honba" :disabled="form.honba >= 99" @click="form.honba = Math.min(99, form.honba + 1)">+</UButton>
             </div>
           </div>
         </section>
 
         <section v-if="entryMode === 'tiles' && tileStep === 1" ref="tileDetailsSection" class="calc-section tile-situation-section" tabindex="-1" aria-labelledby="tile-situation-heading">
           <div class="section-heading"><div><h2 id="tile-situation-heading">Special circumstances</h2><p>Set nuki tiles and special win details when they apply.</p></div></div>
-          <div v-if="tileWindsNeeded && needsWindsConfirmation" class="wind-prompt"><p>Confirm the winds to score any wind sets and pair correctly.</p><template v-if="!seatWindConfirmed"><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind"><button v-for="wind in promptSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</button></div></template><template v-if="!roundWindConfirmed"><span class="field-label">Round wind</span><div class="choice-row" role="group" aria-label="Confirm round wind"><button v-for="wind in availableRoundWinds" :key="wind.id" type="button" class="choice-button" @click="setRoundWind(wind.id)">{{ wind.label }} round</button></div></template></div>
-          <div v-if="form.playerCount === 3" class="tile-nuki-control"><div><label for="tile-nuki-count">North tiles extracted as nuki dora</label><small>Count each North for tile checks. Its bonus is {{ form.tileEntry.doraEntryMode === 'indicators' ? 'counted automatically.' : 'included in the total above.' }}</small></div><div class="stepper" role="group" aria-label="North tiles extracted as nuki dora"><button type="button" aria-label="Remove one North bonus tile" :disabled="form.bonusHan.nuki <= 0" @click="adjustBonus('nuki', -1)">−</button><input id="tile-nuki-count" v-model.number="form.bonusHan.nuki" type="number" inputmode="numeric" min="0" max="4" step="1" @change="sanitizeBonus('nuki', 4)" /><button type="button" aria-label="Add one North bonus tile" :disabled="form.bonusHan.nuki >= 4" @click="adjustBonus('nuki', 1, 4)">+</button></div></div>
-          <div v-if="form.tileEntry.doraEntryMode === 'total'" class="tile-nuki-control"><div><label for="other-kan-count-total">Other players’ kans</label><small>Used to check first-draw wins.</small></div><div class="stepper" role="group" aria-label="Kans declared by other players"><button type="button" aria-label="Decrease other players’ kans" :disabled="form.tileEntry.otherKanCount <= 0" @click="adjustOpponentKanCount(-1)">−</button><input id="other-kan-count-total" :value="form.tileEntry.otherKanCount" type="number" inputmode="numeric" min="0" :max="4 - tileKanCount" step="1" @change="commitOpponentKanCount($event)" /><button type="button" aria-label="Increase other players’ kans" :disabled="tileKanCount + form.tileEntry.otherKanCount >= 4" @click="adjustOpponentKanCount(1)">+</button></div></div>
+          <div v-if="tileWindsNeeded && needsWindsConfirmation" class="wind-prompt"><p>Confirm the winds to score any wind sets and pair correctly.</p><template v-if="!seatWindConfirmed"><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind"><UButton v-for="wind in promptSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</UButton></div></template><template v-if="!roundWindConfirmed"><span class="field-label">Round wind</span><div class="choice-row" role="group" aria-label="Confirm round wind"><UButton v-for="wind in availableRoundWinds" :key="wind.id" type="button" class="choice-button" @click="setRoundWind(wind.id)">{{ wind.label }} round</UButton></div></template></div>
+          <div v-if="form.playerCount === 3" class="tile-nuki-control"><div><label for="tile-nuki-count">North tiles extracted as nuki dora</label><small>Count each North for tile checks. Its bonus is {{ form.tileEntry.doraEntryMode === 'indicators' ? 'counted automatically.' : 'included in the total above.' }}</small></div><div class="stepper" role="group" aria-label="North tiles extracted as nuki dora"><UButton type="button" aria-label="Remove one North bonus tile" :disabled="form.bonusHan.nuki <= 0" @click="adjustBonus('nuki', -1)">−</UButton><input id="tile-nuki-count" v-model.number="form.bonusHan.nuki" type="number" inputmode="numeric" min="0" max="4" step="1" @change="sanitizeBonus('nuki', 4)" /><UButton type="button" aria-label="Add one North bonus tile" :disabled="form.bonusHan.nuki >= 4" @click="adjustBonus('nuki', 1, 4)">+</UButton></div></div>
+          <div v-if="form.tileEntry.doraEntryMode === 'total'" class="tile-nuki-control"><div><label for="other-kan-count-total">Other players’ kans</label><small>Used to check first-draw wins.</small></div><div class="stepper" role="group" aria-label="Kans declared by other players"><UButton type="button" aria-label="Decrease other players’ kans" :disabled="form.tileEntry.otherKanCount <= 0" @click="adjustOpponentKanCount(-1)">−</UButton><input id="other-kan-count-total" :value="form.tileEntry.otherKanCount" type="number" inputmode="numeric" min="0" :max="4 - tileKanCount" step="1" @change="commitOpponentKanCount($event)" /><UButton type="button" aria-label="Increase other players’ kans" :disabled="tileKanCount + form.tileEntry.otherKanCount >= 4" @click="adjustOpponentKanCount(1)">+</UButton></div></div>
           <details ref="specialWinDetails" class="tile-situation-details"><summary>Special win circumstances</summary><div class="tile-situation-grid">
             <label class="checkbox-row"><input v-model="form.tileSituation.haitei" type="checkbox" :disabled="form.winType !== 'tsumo' || form.tileSituation.rinshan" @change="markTileContextChanged" /><span>Haitei · last draw</span></label>
             <label class="checkbox-row"><input v-model="form.tileSituation.houtei" type="checkbox" :disabled="form.winType !== 'ron' || form.tileSituation.chankan" @change="markTileContextChanged" /><span>Houtei · last discard</span></label>
@@ -209,7 +209,7 @@
             <label v-if="form.winType === 'tsumo'" class="checkbox-row"><input v-model="form.tileSituation.openingWin" type="checkbox" true-value="opening" false-value="" :disabled="form.tileSituation.riichi !== 'none' || tileHasOpenMeld || tileHasKan || form.tileEntry.otherKanCount > 0 || form.bonusHan.nuki > 0 || form.tileSituation.haitei || form.tileSituation.rinshan" @change="markTileContextChanged" /><span>{{ isDealer ? 'Tenhou · dealer’s first draw' : 'Chiihou · non-dealer’s first draw' }}</span></label>
             <p v-if="form.winType === 'tsumo'" class="field-hint">The first draw must be before any player calls or declares a kan.</p>
           </div><p class="field-hint">Special waits do not double yakuman. Distinct yakuman stack.</p></details>
-          <details v-if="hasTilePaoYaku" ref="paoDetails" class="tile-situation-details"><summary>Pao · liability</summary><label class="checkbox-row"><input v-model="form.tilePaoApplies" type="checkbox" @change="markTileContextChanged" /><span>Pao applies under the table rules</span></label><template v-if="form.tilePaoApplies"><p class="field-hint">Pao applies when another player supplied the final required set after the others were visible.</p><template v-if="!seatWindConfirmed"><p class="field-hint">Confirm your seat first so the responsible-player choices are correct.</p><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind for pao"><button v-for="wind in availableSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</button></div></template><template v-else><label class="field-label">Liable yakuman<select v-model="form.tilePaoYakuman" class="tile-select" @change="markTileContextChanged"><option v-for="yaku in tilePaoYakumanOptions" :key="yaku.id" :value="yaku.id">{{ yaku.label }}</option></select></label><label class="field-label">Responsible player<select v-model="form.tilePaoResponsibleSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label><label v-if="form.winType === 'ron'" class="field-label">Who discarded the winning tile?<select v-model="form.tileRonDiscarderSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label></template></template></details>
+          <details v-if="hasTilePaoYaku" ref="paoDetails" class="tile-situation-details"><summary>Pao · liability</summary><label class="checkbox-row"><input v-model="form.tilePaoApplies" type="checkbox" @change="markTileContextChanged" /><span>Pao applies under the table rules</span></label><template v-if="form.tilePaoApplies"><p class="field-hint">Pao applies when another player supplied the final required set after the others were visible.</p><template v-if="!seatWindConfirmed"><p class="field-hint">Confirm your seat first so the responsible-player choices are correct.</p><span class="field-label">Your seat wind</span><div class="choice-row" role="group" aria-label="Confirm your seat wind for pao"><UButton v-for="wind in availableSeatWinds" :key="wind.id" type="button" class="choice-button" @click="setSeatWind(wind.id)">{{ wind.label }}</UButton></div></template><template v-else><label class="field-label">Liable yakuman<select v-model="form.tilePaoYakuman" class="tile-select" @change="markTileContextChanged"><option v-for="yaku in tilePaoYakumanOptions" :key="yaku.id" :value="yaku.id">{{ yaku.label }}</option></select></label><label class="field-label">Responsible player<select v-model="form.tilePaoResponsibleSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label><label v-if="form.winType === 'ron'" class="field-label">Who discarded the winning tile?<select v-model="form.tileRonDiscarderSeat" class="tile-select" @change="markTileContextChanged"><option :value="null">Choose a seat</option><option v-for="wind in otherSeatWinds" :key="wind.id" :value="wind.id">{{ wind.label }}</option></select></label></template></template></details>
           <p v-if="tileScoreIssue" class="field-problems" role="status">{{ tileScoreIssue }}</p>
           <p class="field-hint">Payment updates as you complete these details.</p>
         </section>

@@ -9,7 +9,7 @@
     <div class="tutorial-shell">
       <header class="tutorial-header">
         <h2 id="tutorial-title">Riichi calculator guide</h2>
-        <button
+        <UButton
           type="button"
           class="tutorial-close"
           aria-label="Close guide"
@@ -17,7 +17,7 @@
           @click="dialog?.close()"
         >
           ×
-        </button>
+        </UButton>
       </header>
 
       <div class="tutorial-content">
@@ -40,12 +40,12 @@
           <p v-if="videoLoading" class="video-status" role="status">Loading video…</p>
           <div v-if="videoUnavailable" class="video-error" role="status">
             <span>Video unavailable.</span>
-            <button type="button" class="text-action" :disabled="videoLoading" @click="retryVideo">
+            <UButton type="button" class="text-action" :disabled="videoLoading" @click="retryVideo">
               {{ videoLoading ? 'Retrying…' : 'Try again' }}
-            </button>
+            </UButton>
             <a class="text-action" :href="videoUrl" target="_blank" rel="noreferrer">Open video</a>
           </div>
-          <button
+          <UButton
             v-if="canFullscreen"
             type="button"
             class="fullscreen-button"
@@ -53,7 +53,7 @@
             @click="enterFullscreen"
           >
             <span aria-hidden="true">⛶</span> Full screen
-          </button>
+          </UButton>
         </div>
 
         <details class="tutorial-transcript">

@@ -2,7 +2,7 @@
   <div class="event-results">
     <header class="results-heading">
       <div><p class="eyebrow">At the tables</p><h1>Follow the <em>field.</em></h1><p>Find your table, follow the qualifiers and see who makes the final.</p></div>
-      <button class="refresh-button" :disabled="refreshing" @click="$emit('refresh')">{{ refreshing ? 'Updating…' : '↻ Refresh' }}</button>
+      <UButton class="refresh-button" variant="outline" color="neutral" :disabled="refreshing" @click="$emit('refresh')">{{ refreshing ? 'Updating…' : '↻ Refresh' }}</UButton>
     </header>
 
     <ol class="round-progress" aria-label="Tournament progress">
@@ -13,7 +13,7 @@
     <section v-if="loading" class="results-card empty-results" aria-live="polite"><span class="empty-tile" aria-hidden="true">一</span><h2>Getting the latest update…</h2></section>
     <template v-else-if="snapshot">
       <div class="results-toolbar">
-        <label class="player-search"><span>Find a player</span><input v-model="search" type="search" placeholder="Search by name" autocomplete="off"></label>
+        <label class="player-search"><span>Find a player</span><UInput v-model="search" class="w-full" type="search" placeholder="Search by name" autocomplete="off" /></label>
         <p class="update-note"><span class="live-dot" aria-hidden="true"></span>{{ snapshot.last_certified ? 'Results certified' : 'Latest publication' }}<strong>{{ formattedUpdate }}</strong></p>
       </div>
 
@@ -39,7 +39,7 @@
 
       <p v-if="snapshot.message" class="table-note">{{ snapshot.message }}</p>
     </template>
-    <section v-else class="results-card empty-results"><span class="empty-tile" aria-hidden="true">一</span><p class="eyebrow">The field is taking shape</p><h2>{{ error ? 'Updates are temporarily unavailable' : 'The first draw is still to come.' }}</h2><p>{{ error ? 'Use Refresh above to try again.' : 'Table assignments will appear here when the organiser publishes the draw. Scores follow after each round is certified.' }}</p><button v-if="!error" class="refresh-button" @click="$emit('register')">Back to registration →</button></section>
+    <section v-else class="results-card empty-results"><span class="empty-tile" aria-hidden="true">一</span><p class="eyebrow">The field is taking shape</p><h2>{{ error ? 'Updates are temporarily unavailable' : 'The first draw is still to come.' }}</h2><p>{{ error ? 'Use Refresh above to try again.' : 'Table assignments will appear here when the organiser publishes the draw. Scores follow after each round is certified.' }}</p><UButton v-if="!error" class="refresh-button" @click="$emit('register')">Back to registration →</UButton></section>
     <p class="auto-update-note">Updates automatically every 30 seconds. Draft scores stay private.</p>
   </div>
 </template>

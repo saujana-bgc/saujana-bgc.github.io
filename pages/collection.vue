@@ -18,26 +18,27 @@
       </section>
 
       <div class="collection-search fade-up">
-        <input
+        <UInput
+          class="collection-search-input w-full"
+          :ui="{ base: 'collection-search-field' }"
           v-model="search"
-          class="collection-search-input"
           type="search"
           placeholder="Find your next game"
           aria-label="Search the collection by title, category, player count, or designer"
         />
         <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
-        <button v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</button>
+        <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
       </div>
 
       <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
-        <button class="sort-btn" :class="{ active: currentSort === 'name' }" @click="[currentSort = 'name', resetCategories()]">A to Z</button>
-        <button class="sort-btn" :class="{ active: currentSort === 'played' }" @click="[currentSort = 'played', resetCategories()]">Recently played</button>
-        <button class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="[generateSurprise(), resetCategories()]">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Card Game') }" :aria-pressed="selectedCategories.includes('Card Game')" @click="selectedCategories = selectedCategories.includes('Card Game') ? [] : ['Card Game']">Card games</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Deduction') }" :aria-pressed="selectedCategories.includes('Deduction')" @click="selectedCategories = selectedCategories.includes('Deduction') ? [] : ['Deduction']">Deduction</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Animals') }" :aria-pressed="selectedCategories.includes('Animals')" @click="selectedCategories = selectedCategories.includes('Animals') ? [] : ['Animals']">Animals</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Party Game') }" :aria-pressed="selectedCategories.includes('Party Game')" @click="selectedCategories = selectedCategories.includes('Party Game') ? [] : ['Party Game']">Party games</button>
-        <button class="sort-btn" :class="{ active: selectedCategories.includes('Bluffing') }" :aria-pressed="selectedCategories.includes('Bluffing')" @click="selectedCategories = selectedCategories.includes('Bluffing') ? [] : ['Bluffing']">Bluffing</button>
+        <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="[currentSort = 'name', resetCategories()]">A to Z</UButton>
+        <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="[currentSort = 'played', resetCategories()]">Recently played</UButton>
+        <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="[generateSurprise(), resetCategories()]">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</UButton>
+        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Card Game') }" :aria-pressed="selectedCategories.includes('Card Game')" @click="selectedCategories = selectedCategories.includes('Card Game') ? [] : ['Card Game']">Card games</UButton>
+        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Deduction') }" :aria-pressed="selectedCategories.includes('Deduction')" @click="selectedCategories = selectedCategories.includes('Deduction') ? [] : ['Deduction']">Deduction</UButton>
+        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Animals') }" :aria-pressed="selectedCategories.includes('Animals')" @click="selectedCategories = selectedCategories.includes('Animals') ? [] : ['Animals']">Animals</UButton>
+        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Party Game') }" :aria-pressed="selectedCategories.includes('Party Game')" @click="selectedCategories = selectedCategories.includes('Party Game') ? [] : ['Party Game']">Party games</UButton>
+        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Bluffing') }" :aria-pressed="selectedCategories.includes('Bluffing')" @click="selectedCategories = selectedCategories.includes('Bluffing') ? [] : ['Bluffing']">Bluffing</UButton>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">The collection is here, but play history is unavailable. Refresh the page to try again.</div>
@@ -48,7 +49,7 @@
         <article v-for="game in virtualGames" :key="game.name" class="editorial-card">
           <div class="card-game-title">{{ game.name }}</div>
 
-          <button type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game)">
+          <UButton type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game)">
             <img
               :src="'/' + game.img"
               :alt="game.name"
@@ -58,7 +59,7 @@
               decoding="async"
               @error="handleImgError"
             >
-          </button>
+          </UButton>
 
           <div class="card-meta">
             {{ game.categories ? game.categories.join(' • ') : 'BOARD GAME' }}
@@ -87,14 +88,15 @@
       <div v-if="!isPending && displayedGames.length === 0" class="collection-empty">
         <p>{{ search.trim() ? `No games match “${search.trim()}”.` : 'No games match these filters.' }}</p>
         <p>Try a shorter search, or give the whole shelf another look.</p>
-        <button type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; resetCategories()">Show all games</button>
+        <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; resetCategories()">Show all games</UButton>
       </div>
     </main>
 
-    <div v-if="selectedGame" class="modal" @click="closeModal">
-      <div ref="modalRef" class="modal-container" role="dialog" aria-modal="true" aria-labelledby="game-detail-title" tabindex="-1" @click.stop @keydown="trapModalFocus">
+    <UModal :open="Boolean(selectedGame)" :title="selectedGame?.name || 'Game details'" description="Board game details" :close="false" scrollable :ui="{ overlay: 'bg-[rgba(74,68,63,0.65)] !p-0 flex items-end justify-center sm:!p-10 sm:items-center', content: '!w-full sm:!w-[95vw] !max-w-[900px] !max-h-none !overflow-visible !border-0 !bg-transparent !shadow-none !ring-0 !p-0' }" @update:open="onModalOpenChange">
+      <template #content>
+      <div v-if="selectedGame" class="modal-container">
         <div style="width: 40px; height: 5px; background: #e0e0e0; border-radius: 10px; margin: 15px auto 0; display: block;" class="mobile-handle"></div>
-        <button aria-label="Close game details" @click="closeModal" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.5rem; color: var(--matcha-leaf); cursor: pointer; line-height: 1;">&times;</button>
+        <UButton type="button" aria-label="Close game details" @click="closeModal" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.5rem; color: var(--matcha-leaf); cursor: pointer; line-height: 1;">&times;</UButton>
 
         <div class="modal-content">
           <div style="text-align: center;">
@@ -121,7 +123,8 @@
           </div>
         </div>
       </div>
-    </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -134,24 +137,7 @@ const selectedCategories = ref([])
 function resetSort() { currentSort.value = null }
 function resetCategories() { selectedCategories.value = [] }
 const selectedGame = ref(null)
-const modalRef = ref(null)
 let modalTrigger = null
-
-function trapModalFocus(event) {
-    if (event.key !== 'Tab') return
-    const controls = [...modalRef.value.querySelectorAll('a[href], button:not(:disabled), [tabindex="0"]')]
-        .filter(element => element.getClientRects().length)
-    const first = controls[0]
-    const last = controls.at(-1)
-    if (!first) { event.preventDefault(); return }
-    if (event.shiftKey && (document.activeElement === first || document.activeElement === modalRef.value)) {
-        event.preventDefault()
-        last.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first.focus()
-    }
-}
 const gridRef = ref(null)
 const gridTop = ref(0)
 const scrollY = ref(0)
@@ -286,9 +272,6 @@ async function getFullGame(gameName) {
 const openModal = async (game) => {
     modalTrigger = document.activeElement
     selectedGame.value = { ...game, description: '' }
-    document.body.style.overflow = 'hidden'
-    await nextTick()
-    modalRef.value?.focus()
 
     const fullGame = await getFullGame(game.name)
     if (selectedGame.value?.name === game.name) {
@@ -302,15 +285,13 @@ const openModal = async (game) => {
 const closeModal = () => {
     if (!selectedGame.value) return
     selectedGame.value = null
-    document.body.style.overflow = ''
     modalTrigger?.focus()
 }
+const onModalOpenChange = (open) => { if (!open) closeModal() }
 const handleImgError = (e) => { e.target.src = FALLBACK_IMG }
 
 let rafId = 0
 let resizeObserver = null
-
-function onKeydown(e) { if (e.key === 'Escape') closeModal() }
 
 function measureGridTop() {
     if (!gridRef.value) return
@@ -346,7 +327,6 @@ watch(gridRef, (grid) => {
 
 onMounted(() => {
     nextTick(() => updateViewport({ measure: true }))
-    document.addEventListener('keydown', onKeydown)
     window.addEventListener('scroll', scheduleViewportUpdate, { passive: true })
     window.addEventListener('resize', onResize)
     if ('ResizeObserver' in window) {
@@ -357,10 +337,8 @@ onMounted(() => {
 onUnmounted(() => {
     if (rafId) cancelAnimationFrame(rafId)
     resizeObserver?.disconnect()
-    document.removeEventListener('keydown', onKeydown)
     window.removeEventListener('scroll', scheduleViewportUpdate)
     window.removeEventListener('resize', onResize)
-    document.body.style.overflow = ''
 })
 
 watch([search, currentSort, selectedCategories], () => {
@@ -410,6 +388,9 @@ watch([search, currentSort, selectedCategories], () => {
 
 .collection-search-input {
     width: 100%;
+}
+
+.collection-search-input :deep(.collection-search-field) {
     border: 1px solid rgba(107, 122, 104, 0.2);
     background: var(--white-pure);
     color: inherit;
@@ -422,7 +403,7 @@ watch([search, currentSort, selectedCategories], () => {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.collection-search-input:focus {
+.collection-search-input :deep(.collection-search-field:focus) {
     border-color: var(--matcha-leaf);
     box-shadow: 0 0 0 3px rgba(107, 122, 104, 0.1);
 }

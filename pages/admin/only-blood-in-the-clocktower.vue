@@ -2,7 +2,7 @@
   <main class="clocktower-admin">
     <header class="admin-masthead">
       <div><p class="eyebrow">The storyteller’s desk</p><h1>Clocktower organiser</h1><p>Log games, write the recap and prepare the next gathering.</p></div>
-      <button class="admin-primary" type="button" :disabled="busy" @click="startNew">New gathering</button>
+      <UButton class="admin-primary" type="button" :disabled="busy" @click="startNew">New gathering</UButton>
     </header>
     <p v-if="error" class="message error" role="alert">{{ error }}</p>
 
@@ -11,7 +11,7 @@
       <div class="saved-list">
         <article v-for="session in saved" :key="session.id" class="admin-card saved">
           <div class="saved-details"><time :datetime="session.session_date">{{ new Date(session.session_date + 'T12:00:00').toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' }) }}</time><span class="saved-venue">{{ session.venue || 'Saujana' }}</span><span class="status-badge" :class="{ 'is-published': session.published }">{{ session.published ? 'Published' : 'Draft' }}</span></div>
-          <button type="button" :disabled="busy" @click="edit(session)">Edit</button>
+          <UButton type="button" :disabled="busy" @click="edit(session)">Edit</UButton>
         </article>
       </div>
     </details>
@@ -27,8 +27,8 @@
           </div>
         </div>
         <div class="editor-heading-actions">
-          <button v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</button>
-          <button v-if="draft.id || isDirty" type="button" :disabled="busy" @click="startNew">New gathering</button>
+          <UButton v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</UButton>
+          <UButton v-if="draft.id || isDirty" type="button" :disabled="busy" @click="startNew">New gathering</UButton>
         </div>
       </div>
 
@@ -53,23 +53,21 @@
             <div class="game-heading">
               <h3>Game settings</h3>
               <div class="game-actions">
-                <button v-if="index > 0" type="button" @click="copyRoster(index)">Copy previous roster</button>
-                <button type="button" @click="removeGame(index)">Remove game</button>
+                <UButton v-if="index > 0" type="button" @click="copyRoster(index)">Copy previous roster</UButton>
+                <UButton type="button" @click="removeGame(index)">Remove game</UButton>
               </div>
             </div>
             <div class="fields game-basics">
               <label>Script
-                <select :value="game.script || '__custom__'" @change="applyScript(game, $event)">
-                  <option value="__custom__">Custom script…</option>
-                  <option value="Trouble Brewing">Trouble Brewing</option>
-                  <option value="Bad Moon Rising">Bad Moon Rising</option>
-                  <option value="Sects &amp; Violets">Sects &amp; Violets</option>
-                  <option v-if="!scriptPresets[game.script] && game.script" :value="game.script">{{ game.script }} (custom)</option>
+                <select :value="game.script" @change="applyScript(game, $event)">
+                  <option v-if="!game.script" value="" disabled>Choose a script</option>
+                  <option v-else-if="!scriptNames.includes(game.script)" :value="game.script" disabled>{{ game.script }} (saved script)</option>
+                  <option v-for="script in scriptNames" :key="script" :value="script">{{ script }}</option>
                 </select>
               </label>
-              <label v-if="!scriptPresets[game.script]">Custom script name<input v-model="game.script" placeholder="Enter the script name"></label>
             </div>
-            <p class="script-hint">{{ scriptPresets[game.script] ? `${characters(game).length} character suggestions loaded for ${game.script}.` : 'Enter each character in the player rows below.' }}</p>
+            <p v-if="game.script && !scriptNames.includes(game.script)" class="script-hint">This game uses a previously saved script. You can keep it or switch to one of the listed scripts.</p>
+            <p v-else-if="game.script" class="script-hint">{{ characters(game).length }} character suggestions loaded for {{ game.script }}.</p>
 
             <div class="section-heading">
               <h4>Players and characters <small>{{ game.players.length }} {{ game.players.length === 1 ? 'player' : 'players' }}</small></h4>
@@ -79,18 +77,18 @@
               <label>Character<UInputMenu v-model="player.character" class="character-menu w-full" data-character-field placeholder="Search or enter a character" :items="characters(game)" mode="autocomplete" open-on-focus @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)" /></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
-              <button type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</button>
+              <UButton type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</UButton>
             </div>
             <p v-if="!game.players.length" class="empty-note">No players added to this game yet.</p>
             <div class="roster-actions">
-              <button v-if="game.players.length" type="button" class="add-player-next" @click="addPlayer(game)">Add next player +</button>
-              <button v-else type="button" @click="addPlayer(game)">Add player</button>
-              <button type="button" @click="toggleBulkRoster(game)">{{ bulkRosterOpen[game.id] ? 'Close paste' : 'Paste names' }}</button>
+              <UButton v-if="game.players.length" type="button" class="add-player-next" @click="addPlayer(game)">Add next player +</UButton>
+              <UButton v-else type="button" @click="addPlayer(game)">Add player</UButton>
+              <UButton type="button" @click="toggleBulkRoster(game)">{{ bulkRosterOpen[game.id] ? 'Close paste' : 'Paste names' }}</UButton>
             </div>
             <p v-if="game.players.length" class="keyboard-hint">In a Character field, press <kbd>Alt</kbd> + <kbd>N</kbd> to move to the next player.</p>
             <section v-if="bulkRosterOpen[game.id]" class="bulk-roster-panel">
               <label>Paste one player name per line<textarea v-model="bulkRosterText[game.id]" rows="4" placeholder="Avery&#10;Jordan&#10;Sam"></textarea></label>
-              <div><button type="button" @click="toggleBulkRoster(game)">Cancel</button><button class="admin-primary" type="button" @click="addPastedPlayers(game)">Add names</button></div>
+              <div><UButton type="button" @click="toggleBulkRoster(game)">Cancel</UButton><UButton class="admin-primary" type="button" @click="addPastedPlayers(game)">Add names</UButton></div>
             </section>
 
             <fieldset class="outcome-field">
@@ -113,7 +111,7 @@
                   <span v-else class="photo-placeholder" aria-hidden="true">Photo preview unavailable</span>
                   <label class="check-label"><input v-model="photo.approved" type="checkbox"> Approved to publish</label>
                   <label class="check-label"><input v-model="photo.cover" type="checkbox"> Use as cover</label>
-                  <button type="button" @click="removePhoto(game,photo)">Remove photo</button>
+                  <UButton type="button" @click="removePhoto(game,photo)">Remove photo</UButton>
                 </article>
               </div>
             </details>
@@ -121,8 +119,8 @@
         </details>
 
         <div class="add-game-actions">
-          <button type="button" class="add-game" @click="addGame()">Add game</button>
-          <button v-if="draft.games.length" type="button" class="add-game copy-game" @click="addGame({ copyRoster: true })">Add game with same players</button>
+          <UButton type="button" class="add-game" @click="addGame()">Add game</UButton>
+          <UButton v-if="draft.games.length" type="button" class="add-game copy-game" @click="addGame({ copyRoster: true })">Add game with same players</UButton>
         </div>
 
         <section class="story admin-card">
@@ -146,7 +144,7 @@
               <p>{{ draft.recap }}</p>
             </details>
             <template v-for="game in draft.games" :key="game.id">
-              <h4>{{ game.script || 'Custom script' }}</h4>
+              <h4>{{ game.script || 'Script not recorded' }}</h4>
               <details class="preview-reveal">
                 <summary>Reveal the result</summary>
                 <p v-if="game.players.length">In the circle · {{ game.players.map((player, index) => player.public_name.trim() || `Seat ${index + 1}`).join(', ') }}</p>
@@ -165,12 +163,12 @@
 
       <div class="save-row">
         <template v-if="baseline.published">
-          <button class="admin-primary" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save changes' }}</button>
-          <button type="button" :disabled="busy" @click="unpublish">Unpublish</button>
+          <UButton class="admin-primary" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save changes' }}</UButton>
+          <UButton type="button" :disabled="busy" @click="unpublish">Unpublish</UButton>
         </template>
         <template v-else>
-          <button class="admin-primary" type="button" :disabled="busy" @click="save(false)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save draft' }}</button>
-          <button class="publish-button" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Publish gathering' }}</button>
+          <UButton class="admin-primary" type="button" :disabled="busy" @click="save(false)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save draft' }}</UButton>
+          <UButton class="publish-button" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Publish gathering' }}</UButton>
         </template>
         <p v-if="notice" class="message" role="status">{{ notice }}</p>
       </div>
@@ -208,6 +206,7 @@ const scriptPresets = {
   'Bad Moon Rising': 'Grandmother, Sailor, Chambermaid, Exorcist, Innkeeper, Gossip, Courtier, Professor, Minstrel, Tea Lady, Pacifist, Fool, Goon, Lunatic, Tinker, Moonchild, Godfather, Devil’s Advocate, Assassin, Mastermind, Zombuul, Pukka, Shabaloth, Po',
   'Sects & Violets': 'Clockmaker, Dreamer, Snake Charmer, Mathematician, Flowergirl, Town Crier, Oracle, Savant, Seamstress, Philosopher, Artist, Juggler, Sage, Mutant, Sweetheart, Barber, Klutz, Evil Twin, Witch, Cerenovus, Pit-Hag, Fang Gu, Vigormortis, No Dashii, Vortox',
 }
+const scriptNames = Object.keys(scriptPresets)
 const busy = computed(() => saving.value || uploading.value)
 const isDirty = computed(() => JSON.stringify(cleanSession(draft.value)) !== JSON.stringify(baseline.value))
 onBeforeRouteLeave(() => !busy.value && confirmDiscard())
@@ -295,12 +294,11 @@ function newPlayer() {
 
 function addGame(options = {}) {
   const previousGame = options.copyRoster ? draft.value.games.at(-1) : null
+  const script = scriptNames.includes(previousGame?.script) ? previousGame.script : 'Trouble Brewing'
   const game = {
     id: crypto.randomUUID(),
-    script: previousGame?.script || 'Trouble Brewing',
-    script_characters: previousGame
-      ? scriptPresets[previousGame.script] || previousGame.script_characters || ''
-      : scriptPresets['Trouble Brewing'],
+    script,
+    script_characters: scriptPresets[script],
     outcome: '', notes: '',
     players: previousGame
       ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name, public_name: player.public_name }))
@@ -353,22 +351,18 @@ function addPastedPlayers(game) {
 }
 
 function characters(game) {
-  const source = scriptPresets[game.script] || game.script_characters || ''
-  return source.split(',').map(value => value.trim()).filter(Boolean)
+  const source = scriptNames.includes(game.script) ? scriptPresets[game.script] : game.script_characters
+  return (source || '').split(',').map(value => value.trim()).filter(Boolean)
 }
 
 function applyScript(game, event) {
   const previousScript = game.script
   const nextScript = event.target.value
-  if (nextScript === '__custom__') {
-    game.script = ''
-    game.script_characters = ''
-    return
-  }
-  if (!scriptPresets[nextScript]) return
+  if (!scriptNames.includes(nextScript)) return
   const availableCharacters = new Set(scriptPresets[nextScript].split(',').map(value => value.trim()).filter(Boolean))
   const affectedCount = game.players.filter(player => player.character && !availableCharacters.has(player.character)).length
-  if (affectedCount && !window.confirm(`Switch from ${previousScript} to ${nextScript}? This will clear ${affectedCount} assigned ${affectedCount === 1 ? 'character' : 'characters'} that aren’t in the new script.`)) {
+  const change = previousScript ? `Switch from ${previousScript} to ${nextScript}` : `Use ${nextScript}`
+  if (affectedCount && !window.confirm(`${change}? This will clear ${affectedCount} assigned ${affectedCount === 1 ? 'character' : 'characters'} that aren’t in the new script.`)) {
     event.target.value = previousScript
     return
   }

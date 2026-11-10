@@ -1,6 +1,8 @@
 <template>
   <div class="riichi-tabs" role="tablist" aria-label="Riichi Open sections">
-    <button
+    <UButton
+      color="neutral"
+      variant="ghost"
       v-for="tab in tabs"
       :key="tab.id"
       :id="`riichi-${tab.id}-tab`"
@@ -17,7 +19,7 @@
       @keydown.end.prevent="focusTab(tabs.length - 1)"
     >
       {{ tab.label }}
-    </button>
+    </UButton>
   </div>
 </template>
 

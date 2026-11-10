@@ -28,7 +28,7 @@
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
           <p v-else-if="eventError">We couldn’t load the schedule just now.</p>
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
-          <button v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</button>
+          <UButton v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</UButton>
         </div>
         <a v-if="nextGathering" class="calendar-link" :href="nextCtaHref">{{ nextGathering.signup_url ? 'Save your place' : 'See gathering details' }} <span aria-hidden="true">↗</span></a>
         <a v-else-if="!eventLoading" class="calendar-link" href="/gatherings/">See all gatherings <span aria-hidden="true">↗</span></a>
@@ -55,12 +55,12 @@
         <p v-if="pastSessions.length" class="metadata">Game results and retellings stay tucked away until you reveal them.</p>
       </header>
       <div v-if="!loading && !error && pastSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter past gatherings">
-        <label v-if="archiveYears.length > 1">Year<select v-model="selectedYear"><option value="all">All years</option><option v-for="year in archiveYears" :key="year" :value="year">{{ year }}</option></select></label>
-        <label v-if="archiveScripts.length > 1">Script<select v-model="selectedScript"><option value="all">All scripts</option><option v-for="script in archiveScripts" :key="script" :value="script">{{ script }}</option></select></label>
-        <button v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button>
+        <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" v-model="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" /></label>
+        <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" v-model="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" /></label>
+        <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
       </div>
       <p v-if="!loading && !error && pastSessions.length" class="filter-count" role="status">Showing {{ filteredSessions.length }} of {{ pastSessions.length }} gatherings</p>
-      <p v-if="error" class="archive-state" role="alert">{{ error }} <button class="share-button" type="button" @click="loadArchive">Try again</button></p>
+      <p v-if="error" class="archive-state" role="alert">{{ error }} <UButton class="share-button" type="button" @click="loadArchive">Try again</UButton></p>
       <p v-else-if="loading" class="archive-state" role="status">Opening the grimoire…</p>
       <div v-else-if="!pastSessions.length" class="archive-state empty-archive">
         <span class="empty-mark" aria-hidden="true">✧</span>
@@ -68,7 +68,7 @@
         <p>Mika’s retellings, game results and approved photos will appear here after a gathering.</p>
       </div>
 
-      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <button class="share-button" type="button" @click="clearArchiveFilters">Clear filters</button></p>
+      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
       <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id }">
         <p v-if="session.id === featured?.id" class="eyebrow latest-label">Latest gathering</p>
         <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="'Approved table photo from ' + formatDate(session.session_date)" loading="lazy">
@@ -78,11 +78,11 @@
             <h3 tabindex="-1">{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
             <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
-          <button class="share-button" type="button" @click="shareSession(session)">Share</button>
+          <UButton class="share-button" type="button" @click="shareSession(session)">Share</UButton>
         </div>
         <div v-if="shareNotices[session.id]" class="share-feedback" role="status">
           {{ shareNotices[session.id] }}
-          <button v-if="shareLinks[session.id]" class="share-copy-link" type="button" @click="copyShareLink(session.id)">Copy link</button>
+          <UButton v-if="shareLinks[session.id]" class="share-copy-link" type="button" @click="copyShareLink(session.id)">Copy link</UButton>
         </div>
 
         <details v-if="session.recap" class="recap-reveal">
@@ -94,7 +94,7 @@
           <details v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number">
             <summary>
               <span class="game-label">Game {{ number }}</span>
-              <span class="game-script">{{ game.script || 'Custom script' }}</span>
+              <span class="game-script">{{ game.script || 'Script not recorded' }}</span>
               <span class="game-reveal-label"><span class="when-closed">Reveal spoilers</span><span class="when-open">Hide spoilers</span></span>
             </summary>
             <p v-if="game.outcome" class="outcome">{{ game.outcome }}</p>
@@ -107,10 +107,10 @@
               </li>
             </ol>
             <p v-if="game.notes" class="story-text">{{ game.notes }}</p>
-            <button v-if="game.id" class="share-button" type="button" @click="shareGame(session, game)">Share game link</button>
+            <UButton v-if="game.id" class="share-button" type="button" @click="shareGame(session, game)">Share game link</UButton>
             <div v-if="shareNotices[game.id]" class="share-feedback" role="status">
               {{ shareNotices[game.id] }}
-              <button v-if="shareLinks[game.id]" class="share-copy-link" type="button" @click="copyShareLink(game.id)">Copy link</button>
+              <UButton v-if="shareLinks[game.id]" class="share-copy-link" type="button" @click="copyShareLink(game.id)">Copy link</UButton>
             </div>
           </details>
         </div>

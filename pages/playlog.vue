@@ -25,7 +25,7 @@
 
       <template v-else>
         <div class="search-wrap fade-up">
-          <input v-model="search" type="search" aria-label="Search play history" class="search-input" placeholder="Find a game we’ve played" />
+          <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
           <p class="page-hint">Select a game to see its cover and players.</p>
           <p v-if="matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
         </div>
@@ -59,7 +59,7 @@
             <div class="rankings-panel">
               <div class="ranking-group">
                 <div class="ranking-title">Most played games</div>
-                <button
+                <UButton
                   v-for="game in topPlayedGames"
                   :key="game.label"
                   class="ranking-item"
@@ -72,7 +72,7 @@
                 >
                   <span class="ranking-label">{{ game.label }}</span>
                   <span class="ranking-count">{{ game.value }}</span>
-                </button>
+                </UButton>
               </div>
 
               <div class="ranking-group">
@@ -99,7 +99,7 @@
           <div class="session-date">{{ session.displayDate }}</div>
 
           <div class="game-grid">
-            <button
+            <UButton
               v-for="game in session.games"
               :key="game.key"
               class="game-pill"
@@ -107,7 +107,7 @@
               :aria-pressed="hoverImage.name === game.name && hoverImage.visible"
               :class="{ 'game-pill-match': matchingGames && game.name.toLocaleLowerCase().includes(matchingGames) }"
               @click="toggleGameImage($event, game)"
-            >{{ game.name }}</button>
+            >{{ game.name }}</UButton>
           </div>
         </section>
 
@@ -117,15 +117,15 @@
         </div>
 
         <div v-if="totalPages > 1" class="pagination">
-          <button class="page-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">Previous</button>
-          <button
+          <UButton class="page-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">Previous</UButton>
+          <UButton
             v-for="p in totalPages"
             :key="p"
             class="page-btn"
             :class="{ active: p === currentPage }"
             @click="goToPage(p)"
-          >{{ p }}</button>
-          <button class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">Next</button>
+          >{{ p }}</UButton>
+          <UButton class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">Next</UButton>
         </div>
       </template>
     </main>
@@ -369,6 +369,9 @@ onUnmounted(() => {
 
 .search-input {
     width: 100%;
+}
+
+.search-input :deep(.search-field) {
     border: 1px solid rgba(107, 122, 104, 0.2);
     background: var(--white-pure);
     font-family: inherit;
@@ -381,7 +384,7 @@ onUnmounted(() => {
     box-sizing: border-box;
 }
 
-.search-input:focus {
+.search-input :deep(.search-field:focus) {
     border-color: var(--matcha-leaf);
     box-shadow: 0 0 0 3px rgba(107, 122, 104, 0.1);
 }

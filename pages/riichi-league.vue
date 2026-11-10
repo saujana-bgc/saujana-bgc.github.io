@@ -8,20 +8,16 @@
 
       <div class="season-switcher">
         <label class="league-field-label" for="season-select">Season</label>
-        <select class="league-control" id="season-select" v-model="selectedSeasonId" :disabled="isLoadingLeague || !seasons.length || isSubmittingScore">
-          <option v-for="item in seasons" :key="item.id" :value="item.id">
-            Season {{ item.number }}
-          </option>
-        </select>
+        <USelect class="league-control w-full" id="season-select" v-model="selectedSeasonId" :items="seasons.map(item => ({ label: `Season ${item.number}`, value: item.id }))" :disabled="isLoadingLeague || !seasons.length || isSubmittingScore" />
       </div>
       <nav class="league-shortcuts" aria-label="League sections">
         <a class="league-button" href="#standings-heading">Standings</a>
         <a class="league-button" href="#weeks-heading">Weekly results</a>
-        <button class="league-button league-button-primary" v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add results</button>
+        <UButton class="league-button league-button-primary" v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add results</UButton>
       </nav>
     </header>
 
-    <p v-if="leagueLoadError" class="league-load-error" role="alert">{{ leagueLoadError }} <button type="button" @click="loadLeagueFromSupabase">Try again</button></p>
+    <p v-if="leagueLoadError" class="league-load-error" role="alert">{{ leagueLoadError }} <UButton type="button" @click="loadLeagueFromSupabase">Try again</UButton></p>
     <p v-if="isLoadingLeague && !selectedSeason" role="status">Loading the latest league results…</p>
     <p v-else-if="!isLoadingLeague && !selectedSeason && !leagueLoadError" role="status">There are no league seasons to show yet.</p>
 
@@ -70,7 +66,7 @@
 
       <label class="standing-search">
         <span class="league-field-label">Find a player</span>
-        <input class="league-control" v-model="standingQuery" type="search" placeholder="Search standings" autocomplete="off">
+        <UInput class="league-control" v-model="standingQuery" type="search" placeholder="Search standings" autocomplete="off" />
       </label>
       <p v-if="!filteredStandings.length" role="status">No players match “{{ standingQuery }}”.</p>
       <div class="standings-table-wrap">
@@ -113,9 +109,9 @@
           <strong :class="scoreClass(player.bestTotal)">{{ scoreDisplay(player.bestTotal) }}<small>league pts</small></strong>
         </article>
       </div>
-      <button v-if="!standingQuery && filteredStandings.length > 10" type="button" class="standings-toggle league-button" :aria-expanded="showAllStandings" @click="showAllStandings = !showAllStandings">
+      <UButton v-if="!standingQuery && filteredStandings.length > 10" type="button" class="standings-toggle league-button" :aria-expanded="showAllStandings" @click="showAllStandings = !showAllStandings">
         {{ showAllStandings ? 'Show top 10' : `Show all ${filteredStandings.length} players` }}
-      </button>
+      </UButton>
     </section>
 
     <section class="content-card weeks-card fade-up" aria-labelledby="weeks-heading">
@@ -129,12 +125,10 @@
 
       <label class="mobile-week-select">
         <span class="league-field-label">Week</span>
-        <select class="league-control" v-model="selectedWeekId" :disabled="isSubmittingScore">
-          <option v-for="week in selectedWeeks" :key="week.id" :value="week.id">Week {{ week.weekNumber }} · {{ formatDate(week.date) }} · {{ week.tables.length ? 'Results' : 'Scheduled' }}</option>
-        </select>
+        <USelect class="league-control w-full" v-model="selectedWeekId" :items="selectedWeeks.map(week => ({ label: `Week ${week.weekNumber} · ${formatDate(week.date)} · ${week.tables.length ? 'Results' : 'Scheduled'}`, value: week.id }))" :disabled="isSubmittingScore" />
       </label>
       <div class="week-picker" role="list" aria-label="League weeks">
-        <button
+        <UButton
           v-for="week in selectedWeeks"
           :key="week.id"
           type="button"
@@ -146,7 +140,7 @@
           <span>Week {{ week.weekNumber }}</span>
           <strong>{{ shortDate(week.date) }}</strong>
           <small>{{ week.tables.length ? 'Results' : 'Scheduled' }}</small>
-        </button>
+        </UButton>
       </div>
 
       <article v-if="selectedWeek" class="week-detail">
@@ -181,9 +175,7 @@
             <div class="score-entry-options">
               <label>
                 <span class="league-field-label">Table size</span>
-                <select class="league-control" v-model.number="scoreForm.tableSize" :disabled="isSubmittingScore || Boolean(editingTable)">
-                  <option v-for="size in selectedSeason.supportedTableSizes" :key="size" :value="size">{{ size }} players · {{ seatNames(size).join(', ') }}</option>
-                </select>
+                <USelect class="league-control w-full" v-model.number="scoreForm.tableSize" :items="selectedSeason.supportedTableSizes.map(size => ({ label: `${size} players · ${seatNames(size).join(', ')}`, value: size }))" :disabled="isSubmittingScore || Boolean(editingTable)" />
               </label>
               <p class="score-entry-auto">
                 Enter players in seat order: East, South, West{{ scoreForm.tableSize === 4 ? ', North' : '' }}. This order breaks ties in final points. We’ll assign the table number when you save. Submit by {{ formatDate(scoreEntryCutoffDate, true) }}.
@@ -201,7 +193,7 @@
                 />
                 <label>
                   <span class="league-field-label">Final points</span>
-                  <input class="league-control" v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" placeholder="e.g. 25000" :disabled="isSubmittingScore" required>
+                  <UInput class="league-control" v-model.number="row.finalPoints" type="number" min="-50000" max="200000" step="100" placeholder="e.g. 25000" :disabled="isSubmittingScore" required />
                 </label>
               </div>
             </div>
@@ -211,13 +203,13 @@
                 <p v-if="scoreEntryMessage" class="score-entry-message" role="status">{{ scoreEntryMessage }}</p>
               </div>
               <div class="score-entry-actions">
-                <button type="button" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="resetScoreForm">
+                <UButton type="button" color="neutral" variant="outline" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="resetScoreForm">
                   {{ editingTable ? 'Reset changes' : 'Clear form' }}
-                </button>
-                <button type="submit" class="score-entry-submit league-button league-button-primary" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
+                </UButton>
+                <UButton type="submit" class="score-entry-submit league-button league-button-primary" :disabled="isScoreEntryClosed || isSubmittingScore || Boolean(duplicatePlayerName)">
                   {{ isSubmittingScore ? (editingTable ? 'Updating results…' : 'Saving results…') : (editingTable ? 'Update table results' : 'Save table results') }}
-                </button>
-                <button v-if="editingTable" type="button" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="cancelEditTable">Cancel edit</button>
+                </UButton>
+                <UButton v-if="editingTable" type="button" color="neutral" variant="outline" class="score-entry-reset league-button" :disabled="isSubmittingScore" @click="cancelEditTable">Cancel edit</UButton>
               </div>
             </div>
           </form>
@@ -232,8 +224,8 @@
                 <span>{{ table.results.length }} players</span>
                 <span v-if="table.submittedAt">Submitted {{ formatSubmissionTime(table.submittedAt) }}</span>
                 <div v-if="canManageResults" class="table-actions">
-                  <button type="button" class="league-button table-action-button" :disabled="isSubmittingScore" @click="editTable(table)">Edit</button>
-                  <button type="button" class="league-button table-action-button" :disabled="isSubmittingScore" @click="deleteTable(table)">Delete</button>
+                  <UButton type="button" class="league-button table-action-button" :disabled="isSubmittingScore" @click="editTable(table)">Edit</UButton>
+                  <UButton type="button" class="league-button table-action-button" :disabled="isSubmittingScore" @click="deleteTable(table)">Delete</UButton>
                 </div>
               </div>
             </div>
@@ -295,10 +287,10 @@
           Scores are based only on finishing position. Final mahjong points are recorded for the match result,
           but no uma or oka is added to the league standings.
         </p>
-        <button type="button" class="rules-button league-button league-button-primary" @click="openRules">
+        <UButton type="button" class="rules-button league-button league-button-primary" @click="openRules">
           View full table rules
           <span aria-hidden="true">→</span>
-        </button>
+        </UButton>
       </div>
       <div class="placement-scoring">
         <div>
@@ -329,7 +321,7 @@
               mahjong rules and table settings used in our league.
             </p>
           </div>
-          <button type="button" class="rules-close" aria-label="Close table rules" @click="closeRules">×</button>
+          <UButton type="button" class="rules-close" aria-label="Close table rules" @click="closeRules">×</UButton>
         </header>
 
         <div class="rules-dialog-content">

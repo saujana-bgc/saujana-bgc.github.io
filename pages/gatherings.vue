@@ -23,12 +23,12 @@
       </details>
 
       <div class="tabs fade-up">
-        <button :class="['tab', activeTab === 'present' ? 'tab-active' : '']" :aria-pressed="activeTab === 'present'" @click="switchTab('present')">
+        <UButton :class="['tab', activeTab === 'present' ? 'tab-active' : '']" :aria-pressed="activeTab === 'present'" @click="switchTab('present')">
           Upcoming
-        </button>
-        <button :class="['tab', activeTab === 'past' ? 'tab-active' : '']" :aria-pressed="activeTab === 'past'" @click="switchTab('past')">
+        </UButton>
+        <UButton :class="['tab', activeTab === 'past' ? 'tab-active' : '']" :aria-pressed="activeTab === 'past'" @click="switchTab('past')">
           Past
-        </button>
+        </UButton>
       </div>
 
       <div
@@ -86,16 +86,16 @@
           </div>
         </div>
 
-        <button v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
+        <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>Look back at this gathering</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
-        </button>
+        </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
           <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-quick-details">
             <span>{{ formatDate(event.date) }} · {{ event.time }}</span>
             <span>{{ event.venue }}</span>
-            <button v-if="canEditEvent(event) && !newRows[event.id]" type="button" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }} <span aria-hidden="true">↓</span></button>
+            <UButton v-if="canEditEvent(event) && !newRows[event.id]" type="button" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }} <span aria-hidden="true">↓</span></UButton>
           </div>
           <div class="event-description">
             <template v-if="isSpookyGameDay(event)">
@@ -122,7 +122,7 @@
             <div v-if="canEditEvent(event)" class="signup-section">
               <p v-if="signupSuccess[event.id]" class="signup-success" role="status">{{ signupSuccess[event.id] }}</p>
               <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
-                <button :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }}</button>
+                <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }}</UButton>
               </div>
               <form
                 v-else
@@ -165,8 +165,8 @@
                 <div class="signup-form-footer">
                   <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your signup…' : 'Your signup hasn’t been saved yet.' }}</p>
                   <div class="signup-submit-actions">
-                    <button type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Joining…' : 'Join the list' }}</button>
-                    <button type="button" class="btn-cancel" :disabled="savingRows[event.id]" @click="cancelNewRow(event.id)">Cancel</button>
+                    <UButton type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Joining…' : 'Join the list' }}</UButton>
+                    <UButton type="button" class="btn-cancel" :disabled="savingRows[event.id]" @click="cancelNewRow(event.id)">Cancel</UButton>
                   </div>
                 </div>
               </form>
@@ -235,9 +235,9 @@
                       <textarea v-model="attendee.notes" class="cell-input cell-area" placeholder="—" rows="1" :aria-label="`Notes for ${attendee.name || 'attendee'}`" :readonly="!canEditEvent(event)" @input="autoResize" @blur="saveAttendee(attendee, event)" />
                     </td>
                     <td class="td-delete">
-                      <button v-if="canEditEvent(event)" class="btn-delete" :aria-label="`Remove ${attendee.name || 'attendee'} from the list`" @click="confirmDelete(attendee, event.id, event)" title="Remove this name from the list">
+                      <UButton v-if="canEditEvent(event)" class="btn-delete" :aria-label="`Remove ${attendee.name || 'attendee'} from the list`" @click="confirmDelete(attendee, event.id, event)" title="Remove this name from the list">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" style="width:0.85em;height:0.85em"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>
-                      </button>
+                      </UButton>
                     </td>
                   </tr>
                 </tbody>
@@ -249,7 +249,7 @@
               <div v-for="attendee in attendeesByEvent[event.id] ?? []" :key="attendee.id" class="attendee-card">
                 <div class="card-header">
                   <input v-model="attendee.name" class="card-name-input" autocomplete="off" :aria-label="`Name for ${attendee.name || 'attendee'}`" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === attendee && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === attendee && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" :readonly="!canEditEvent(event)" @focus="showNameAutocomplete($event, attendee)" @input="showNameAutocomplete($event, attendee)" @keydown="onNameAutocompleteKeydown($event, attendee)" @blur="onExistingNameBlur(attendee, event)" />
-                  <button v-if="canEditEvent(event)" class="btn-delete" :aria-label="`Remove ${attendee.name || 'attendee'} from the list`" @click="confirmDelete(attendee, event.id, event)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" style="width:0.85em;height:0.85em"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></button>
+                  <UButton v-if="canEditEvent(event)" class="btn-delete" :aria-label="`Remove ${attendee.name || 'attendee'} from the list`" @click="confirmDelete(attendee, event.id, event)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" style="width:0.85em;height:0.85em"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></UButton>
                 </div>
                 <div class="card-field">
                   <label class="card-label" :for="`attendee-${attendee.id}-eta`">ETA</label>
@@ -272,10 +272,10 @@
 
           </div>
 
-          <button v-if="activeTab === 'past'" class="collapse-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id, true)">
+          <UButton v-if="activeTab === 'past'" class="collapse-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id, true)">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" clip-rule="evenodd"/></svg>
             <span>Hide details</span>
-          </button>
+          </UButton>
         </template>
       </div>
 
@@ -316,16 +316,16 @@
         <div ref="deleteDialog" class="modal-box" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title" tabindex="-1">
           <p id="delete-dialog-title" class="modal-msg">Remove <strong>{{ pendingDelete.attendee.name }}</strong> from this gathering’s sign-up list?</p>
           <div class="modal-actions">
-            <button ref="deleteCancelButton" class="btn-modal-cancel" @click="cancelDelete">Keep on the list</button>
-            <button class="btn-modal-delete" @click="doDelete">Remove name</button>
+            <UButton ref="deleteCancelButton" class="btn-modal-cancel" @click="cancelDelete">Keep on the list</UButton>
+            <UButton class="btn-modal-delete" @click="doDelete">Remove name</UButton>
           </div>
         </div>
       </div>
 
       <div class="pagination fade-up" v-if="activeTab === 'present' && totalCurrentPages > 1">
-        <button class="page-btn" :disabled="currentPage === 1" @click="prevPage">← Previous</button>
+        <UButton class="page-btn" :disabled="currentPage === 1" @click="prevPage">← Previous</UButton>
         <span class="page-info">{{ currentPage }} / {{ totalCurrentPages }}</span>
-        <button class="page-btn" :disabled="currentPage === totalCurrentPages" @click="nextPage">Next →</button>
+        <UButton class="page-btn" :disabled="currentPage === totalCurrentPages" @click="nextPage">Next →</UButton>
       </div>
 
       <template v-if="loading">
@@ -341,7 +341,7 @@
 
       <div v-if="!loading && currentEvents.length === 0 && eventsError[activeTab]" class="empty-state fade-up" role="alert">
         <p>We couldn’t load these gatherings. Check your connection and try again.</p>
-        <button type="button" class="btn-add" @click="retryEvents">Try again</button>
+        <UButton type="button" class="btn-add" @click="retryEvents">Try again</UButton>
       </div>
 
       <div v-else-if="!loading && currentEvents.length === 0" class="empty-state fade-up">
@@ -964,7 +964,7 @@ function onKeydown(e) {
 watch(pendingDelete, async (value) => {
     if (!value) return
     await nextTick()
-    deleteCancelButton.value?.focus()
+    deleteCancelButton.value?.$el?.focus()
 })
 
 onMounted(async () => {

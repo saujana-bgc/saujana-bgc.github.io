@@ -3,7 +3,7 @@
     <a class="skip-link" href="#page-content">Skip to content</a>
     <div v-if="versionUpdateAvailable" class="version-update" role="status">
       <span>A site update is ready.</span>
-      <button type="button" @click="refreshToLatest">Refresh</button>
+      <UButton type="button" size="sm" @click="refreshToLatest">Refresh</UButton>
     </div>
     <nav v-if="!isAdminRoute" class="site-nav" aria-label="Primary navigation">
       <div class="mobile-nav-bar">
@@ -11,46 +11,18 @@
           <img class="mobile-brand-logo" src="/images/saujana-brand.webp" alt="" width="114" height="114" />
           <span class="brand-wordmark">Saujana<span class="brand-caption">Board Game Community</span></span>
         </NuxtLink>
-        <button
-          type="button"
-          class="menu-toggle"
-          :class="{ open: menuOpen }"
-          aria-controls="primary-nav-links"
-          :aria-expanded="menuOpen"
-          :aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'"
-          @click="menuOpen = !menuOpen"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+        <USlideover v-model:open="menuOpen" title="Explore Saujana" description="Browse the Saujana Board Game Community website." side="right" :ui="{ content: 'bg-[var(--bg-silk)]', body: 'p-5' }">
+          <template #default="{ open }">
+            <UButton variant="outline" color="neutral" type="button" class="menu-toggle" :class="{ open }" aria-controls="primary-nav-links" :aria-expanded="open" :aria-label="open ? 'Close navigation menu' : 'Open navigation menu'">
+              <span></span><span></span><span></span>
+            </UButton>
+          </template>
+          <template #body>
+            <UNavigationMenu id="primary-nav-links" class="mobile-navigation" :items="mobileNavigation" orientation="vertical" :ui="mobileNavigationUi" @click.capture="closeMenuOnNavigationLink" />
+          </template>
+        </USlideover>
       </div>
-
-      <div v-if="menuOpen" class="mobile-nav-backdrop" aria-hidden="true" @click="closeMenu"></div>
-
-      <div id="primary-nav-links" class="nav-links" :class="{ open: menuOpen }">
-        <NuxtLink v-for="link in navigation" :key="link.name" :to="link.url" class="nav-item" no-prefetch @click="closeMenu">
-          {{ link.name }}
-        </NuxtLink>
-        <div class="riichi-nav-group" :class="{ expanded: riichiMenuOpen }" @click.stop>
-          <button
-            ref="riichiMenuTrigger"
-            type="button"
-            class="nav-item riichi-nav-trigger"
-            :class="{ 'router-link-exact-active': route.path.startsWith('/riichi-') }"
-            aria-controls="riichi-nav-links"
-            :aria-expanded="riichiMenuOpen"
-            @click="riichiMenuOpen = !riichiMenuOpen"
-          >
-            Riichi Mahjong <span class="riichi-nav-chevron" aria-hidden="true">⌄</span>
-          </button>
-          <div v-show="riichiMenuOpen" id="riichi-nav-links" class="riichi-submenu">
-            <NuxtLink to="/riichi-calculator" no-prefetch @click="closeMenu">Scoring Calculator</NuxtLink>
-            <NuxtLink to="/riichi-league" no-prefetch @click="closeMenu">League &amp; Standings</NuxtLink>
-            <NuxtLink to="/riichi-open" no-prefetch @click="closeMenu">Riichi Open</NuxtLink>
-          </div>
-        </div>
-      </div>
+      <UNavigationMenu class="desktop-navigation" :items="navigation" orientation="horizontal" :ui="desktopNavigationUi" />
     </nav>
 
     <div id="page-content" class="page-content" tabindex="-1">
@@ -71,14 +43,49 @@
 </template>
 
 <script setup>
-const navigation = [
-  { name: 'Home', url: '/' },
-  { name: 'Gatherings', url: '/gatherings' },
-  { name: 'Birthday Club', url: '/birthday-club' },
-  { name: 'Play History', url: '/playlog' },
-  { name: 'Only Blood in the Clocktower', url: '/only-blood-in-the-clocktower' },
-  { name: 'Collection', url: '/collection' }
+const riichiChildren = [
+  { label: 'Scoring Calculator', to: '/riichi-calculator', prefetch: false },
+  { label: 'League & Standings', to: '/riichi-league', prefetch: false },
+  { label: 'Riichi Open', to: '/riichi-open', prefetch: false },
 ]
+const navigation = [
+  { label: 'Home', to: '/', prefetch: false },
+  { label: 'Gatherings', to: '/gatherings', prefetch: false },
+  { label: 'Birthday Club', to: '/birthday-club', prefetch: false },
+  { label: 'Play History', to: '/playlog', prefetch: false },
+  { label: 'Only Blood in the Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
+  { label: 'Collection', to: '/collection', prefetch: false },
+  { label: 'Scoring Calculator', to: '/riichi-calculator', prefetch: false },
+  {
+    label: 'Riichi Mahjong',
+    type: 'trigger',
+    children: riichiChildren.filter(child => child.label !== 'Scoring Calculator'),
+  },
+]
+const mobileNavigation = navigation
+  .filter(item => item.label !== 'Scoring Calculator')
+  .map(item => ({
+    ...item,
+    onSelect: closeMenu,
+    children: item.label === 'Riichi Mahjong'
+      ? riichiChildren.map(child => ({ ...child, onSelect: closeMenu }))
+      : item.children?.map(child => ({ ...child, onSelect: closeMenu })),
+  }))
+const desktopNavigationUi = {
+  root: 'ml-auto',
+  list: 'm-0 list-none items-center gap-1 p-0',
+  link: 'no-underline rounded-lg px-3 py-2 text-sm text-[var(--muted)] hover:text-[var(--matcha-leaf)] data-[active]:text-[var(--matcha-leaf)]',
+  childList: 'm-0 min-w-56 list-none rounded-xl border border-[var(--line)] bg-[var(--bg-silk)] p-2 shadow-lg',
+  childLink: 'no-underline min-h-11 rounded-lg px-3 py-2 text-sm text-[var(--clay-text)] hover:bg-[var(--surface-soft)] hover:text-[var(--matcha-leaf)]',
+}
+const mobileNavigationUi = {
+  root: 'w-full flex-col',
+  list: 'm-0 w-full list-none flex-col gap-1 p-0',
+  item: 'w-full',
+  link: 'no-underline min-h-12 rounded-lg px-3 py-3 text-base text-[var(--clay-text)] hover:bg-[var(--surface-soft)] data-[active]:text-[var(--matcha-leaf)]',
+  childList: 'm-0 ml-3 list-none border-l border-[var(--line)] p-0 pl-3',
+  childLink: 'no-underline min-h-11 rounded-lg px-3 py-2 text-sm text-[var(--muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--matcha-leaf)]',
+}
 
 const { lastUpdated, versionUpdateAvailable, refreshToLatest } = useVersion()
 const route = useRoute()
@@ -88,44 +95,18 @@ const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
 const showVisitorCounter = ref(false)
 const menuOpen = ref(false)
-const riichiMenuOpen = ref(false)
-const riichiMenuTrigger = ref(null)
 
 function closeMenu() {
   menuOpen.value = false
-  riichiMenuOpen.value = false
 }
 
-function handleMenuKeydown(event) {
-  if (event.key === 'Escape' && riichiMenuOpen.value) {
-    riichiMenuOpen.value = false
-    riichiMenuTrigger.value?.focus()
-    return
-  }
-  if (!menuOpen.value) return
-  if (event.key === 'Escape') {
-    closeMenu()
-    document.querySelector('.menu-toggle')?.focus()
-    return
-  }
-  if (event.key !== 'Tab') return
-  const links = [...document.querySelectorAll('#primary-nav-links a, #primary-nav-links button:not(.menu-toggle)')]
-  const toggle = document.querySelector('.menu-toggle')
-  const focusable = [toggle, ...links].filter(element => element?.getClientRects().length)
-  const first = focusable[0], last = focusable.at(-1)
-  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
-  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
-}
-
-function closeRiichiMenuOnOutsideClick(event) {
-  if (!event.target.closest('.riichi-nav-group')) riichiMenuOpen.value = false
+function closeMenuOnNavigationLink(event) {
+  if (event.target instanceof Element && event.target.closest('a')) closeMenu()
 }
 
 watch(() => route.fullPath, closeMenu)
 
 onMounted(() => {
-  window.addEventListener('keydown', handleMenuKeydown)
-  document.addEventListener('click', closeRiichiMenuOnOutsideClick)
   if (!footerRef.value || showVisitorCounter.value) return
   if (!('IntersectionObserver' in window)) {
     showVisitorCounter.value = true
@@ -141,10 +122,6 @@ onMounted(() => {
   observer.observe(footerRef.value)
 })
 
-onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleMenuKeydown)
-  document.removeEventListener('click', closeRiichiMenuOnOutsideClick)
-})
 </script>
 
 <style scoped>

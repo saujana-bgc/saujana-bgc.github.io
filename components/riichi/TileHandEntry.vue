@@ -13,47 +13,47 @@
     <div class="tile-entry-count">
       <strong>{{ tileCountLabel }}</strong>
       <span v-if="stage === 0 && entry.tiles.length === targetCount" class="sr-only" role="status">All hand tiles entered. Continue to choose the win details.</span>
-      <button v-if="!showGroupPicker && history.length" type="button" class="reset-button" @click="undo">Undo tile edit</button>
-      <button v-if="stage === 0 && canClearHand" type="button" class="reset-button" @click="$emit('new-hand')">New hand</button>
+      <UButton v-if="!showGroupPicker && history.length" type="button" class="reset-button" @click="undo">Undo tile edit</UButton>
+      <UButton v-if="stage === 0 && canClearHand" type="button" class="reset-button" @click="$emit('new-hand')">New hand</UButton>
       <template v-else-if="stage === 1">
-        <button type="button" class="reset-button" @click="$emit('previous-step')">← Edit tiles</button>
-        <button type="button" class="reset-button mobile-new-hand" @click="$emit('new-hand')">New hand</button>
+        <UButton type="button" class="reset-button" @click="$emit('previous-step')">← Edit tiles</UButton>
+        <UButton type="button" class="reset-button mobile-new-hand" @click="$emit('new-hand')">New hand</UButton>
       </template>
     </div>
     <div v-if="stage === 0 && entry.tiles.length >= 14" class="tile-group-builder">
-      <button ref="groupTriggerButton" type="button" class="add-tile-group" :disabled="entry.tiles.length < 14 || addingKanReplacement" :aria-expanded="showGroupPicker" @click="toggleGroupPicker">{{ addingKanReplacement ? 'Finish adding the extra tile first' : groupButtonLabel }}</button>
+      <UButton ref="groupTriggerButton" type="button" class="add-tile-group" :disabled="entry.tiles.length < 14 || addingKanReplacement" :aria-expanded="showGroupPicker" @click="toggleGroupPicker">{{ addingKanReplacement ? 'Finish adding the extra tile first' : groupButtonLabel }}</UButton>
       <p v-if="entry.melds.length >= 4" class="field-hint">You have four groups. You can still mark an added kan.</p>
       <p v-else-if="addingKanReplacement" class="field-hint">Add or cancel the extra tile before marking a call or kan.</p>
       <p v-else-if="!showGroupPicker" class="field-hint">Mark any calls or kans before removing tiles.</p>
       <template v-if="showGroupPicker">
         <p class="field-hint group-type-prompt">{{ availableMeldTypes.length > 1 ? 'Choose the call or kan type, then tap a complete group to mark it.' : availableMeldTypes.length ? 'Tap a complete group to mark it.' : 'No unmarked call or kan fits these tiles. Add the extra tile first if you need to mark a kan.' }}</p>
         <div v-if="availableMeldTypes.length > 1" class="tile-group-type-grid" role="group" aria-label="Group type">
-          <button v-for="type in availableMeldTypes" :key="type.id" type="button" class="group-type-option" :class="{ selected: meldType === type.id }" :aria-pressed="meldType === type.id" @click="chooseMeld(type.id)">
+          <UButton v-for="type in availableMeldTypes" :key="type.id" type="button" class="group-type-option" :class="{ selected: meldType === type.id }" :aria-pressed="meldType === type.id" @click="chooseMeld(type.id)">
             <strong>{{ type.label }}</strong>
             <span class="group-type-example" aria-hidden="true"><template v-for="(token, index) in type.example" :key="token + '-' + index"><span v-if="type.id === 'kan-closed' && (index === 0 || index === 3)" class="tile-back"></span><img v-else :src="image(token)" alt="" /></template></span>
-          </button>
+          </UButton>
         </div>
         <p v-if="availableMeldTypes.length" class="group-type-help"><strong>{{ meldLabel(meldType) }}.</strong> {{ selectedMeldHelp }}</p>
         <div class="meld-shortcuts" role="group" :aria-label="`Available ${meldLabel(meldType)} groups`">
-          <button v-for="option in groupShortcuts" :key="option.key" type="button" class="meld-shortcut" :aria-label="`${confirmLabel}: ${option.tokens.map(label).join(', ')}`" @click="markGroup(option.indices)">
+          <UButton v-for="option in groupShortcuts" :key="option.key" type="button" class="meld-shortcut" :aria-label="`${confirmLabel}: ${option.tokens.map(label).join(', ')}`" @click="markGroup(option.indices)">
             <span class="group-type-example" aria-hidden="true"><img v-for="(token, index) in option.tokens" :key="index" :src="image(token)" alt="" /></span>
             <span>{{ confirmLabel }}</span>
-          </button>
+          </UButton>
         </div>
         <p v-if="availableMeldTypes.length" class="field-hint">Or select individual tiles in your hand below.</p>
       </template>
     </div>
     <div ref="tileHandTray" class="tile-hand-entry" :class="{ 'tile-hand-readonly': stage === 1, 'tile-hand-empty': !entry.tiles.length }" role="group" tabindex="-1" aria-label="Tiles in your hand, including the winning tile">
       <template v-for="tile in sortedTiles" :key="'tile-' + tile.token + '-' + tile.index">
-        <button v-if="stage === 0 && !showGroupPicker" type="button" class="entered-tile" :class="{ 'tile-in-group': isTileGrouped(tile.index), 'tile-winning': entry.winningIndex === tile.index }" :disabled="isTileGrouped(tile.index)" :aria-label="isTileGrouped(tile.index) ? label(tile.token) + ', part of a marked group; remove its group annotation below' : (entry.winningIndex === tile.index ? label(tile.token) + ', winning tile. Remove ' + label(tile.token) : 'Remove ' + label(tile.token))" @click="removeTile(tile.index)">
+        <UButton v-if="stage === 0 && !showGroupPicker" type="button" class="entered-tile" :class="{ 'tile-in-group': isTileGrouped(tile.index), 'tile-winning': entry.winningIndex === tile.index }" :disabled="isTileGrouped(tile.index)" :aria-label="isTileGrouped(tile.index) ? label(tile.token) + ', part of a marked group; remove its group annotation below' : (entry.winningIndex === tile.index ? label(tile.token) + ', winning tile. Remove ' + label(tile.token) : 'Remove ' + label(tile.token))" @click="removeTile(tile.index)">
           <img :src="image(tile.token)" alt="" /><span v-if="isTileGrouped(tile.index)" class="entered-tile-group">In group</span><template v-else><span v-if="entry.winningIndex === tile.index" class="entered-tile-win">Win</span><span class="entered-tile-remove" aria-hidden="true">×</span></template>
-        </button>
-        <button v-else-if="stage === 0" type="button" class="entered-tile" :class="{ 'tile-marked': selection.includes(tile.index), 'tile-in-group': isTileGrouped(tile.index), 'tile-winning': entry.winningIndex === tile.index }" :aria-pressed="selection.includes(tile.index)" :disabled="!canSelectTile(tile.index)" :aria-label="(selection.includes(tile.index) ? 'Deselect ' : 'Select ') + label(tile.token) + (entry.winningIndex === tile.index ? ', winning tile; cannot be part of a call' : !canSelectTile(tile.index) ? ', not available for this group' : '') + ' for group'" @click="toggleSelection(tile.index)">
+        </UButton>
+        <UButton v-else-if="stage === 0" type="button" class="entered-tile" :class="{ 'tile-marked': selection.includes(tile.index), 'tile-in-group': isTileGrouped(tile.index), 'tile-winning': entry.winningIndex === tile.index }" :aria-pressed="selection.includes(tile.index)" :disabled="!canSelectTile(tile.index)" :aria-label="(selection.includes(tile.index) ? 'Deselect ' : 'Select ') + label(tile.token) + (entry.winningIndex === tile.index ? ', winning tile; cannot be part of a call' : !canSelectTile(tile.index) ? ', not available for this group' : '') + ' for group'" @click="toggleSelection(tile.index)">
           <img :src="image(tile.token)" alt="" /><span v-if="entry.winningIndex === tile.index" class="entered-tile-win">Win</span>
-        </button>
-        <button v-else type="button" class="entered-tile" :class="{ 'tile-marked': entry.winningIndex === tile.index, 'tile-in-group': isTileGrouped(tile.index) }" :aria-pressed="entry.winningIndex === tile.index" :disabled="isTileGrouped(tile.index)" :aria-label="label(tile.token) + (isTileGrouped(tile.index) ? ', part of a marked group' : entry.winningIndex === tile.index ? ', winning tile' : ', set as winning tile')" @click="setWinning(tile.index)">
+        </UButton>
+        <UButton v-else type="button" class="entered-tile" :class="{ 'tile-marked': entry.winningIndex === tile.index, 'tile-in-group': isTileGrouped(tile.index) }" :aria-pressed="entry.winningIndex === tile.index" :disabled="isTileGrouped(tile.index)" :aria-label="label(tile.token) + (isTileGrouped(tile.index) ? ', part of a marked group' : entry.winningIndex === tile.index ? ', winning tile' : ', set as winning tile')" @click="setWinning(tile.index)">
           <img :src="image(tile.token)" alt="" />
-        </button>
+        </UButton>
       </template>
       <span v-if="!entry.tiles.length" class="tile-entry-empty">Tiles appear here</span>
     </div>
@@ -62,19 +62,19 @@
       <p v-if="groupError" class="field-problems" role="status">{{ groupError }}</p>
       <div class="group-selection-actions">
         <span class="group-selection-count" aria-live="polite">{{ selection.length }} selected</span>
-        <button v-if="selection.length" type="button" class="reset-button" @click="clearGroupSelection">Clear</button>
-        <button type="button" class="choice-button confirm-tile-group" :disabled="!canConfirmGroup" @click="confirmGroup">{{ confirmLabel }}</button>
+        <UButton v-if="selection.length" type="button" class="reset-button" @click="clearGroupSelection">Clear</UButton>
+        <UButton type="button" class="choice-button confirm-tile-group" :disabled="!canConfirmGroup" @click="confirmGroup">{{ confirmLabel }}</UButton>
       </div>
     </template>
     <p v-if="stage === 1 && shapeError" class="field-problems" role="status">{{ shapeError }} Tap “Edit tiles” above to correct the hand.</p>
     <p v-if="stage === 0 && (addingKanReplacement || entry.tiles.length > targetCount)" class="field-hint">{{ countHint }}</p>
     <div v-if="stage === 0 && entry.tiles.length >= targetCount && !showGroupPicker" class="tile-entry-extra-actions">
-      <button v-if="!showTilePicker && !addingKanReplacement" type="button" class="reset-button" @click="editTiles">Edit tiles</button>
-      <button v-if="entry.tiles.length - targetCount < 4 && !addingKanReplacement && entry.tiles.length < 18" ref="kanReplacementTriggerButton" type="button" class="reset-button" @click="startKanReplacementEntry">＋ Add an extra tile for a kan</button>
-      <button v-if="addingKanReplacement" type="button" class="reset-button" @click="cancelKanReplacement">Cancel extra tile</button>
+      <UButton v-if="!showTilePicker && !addingKanReplacement" type="button" class="reset-button" @click="editTiles">Edit tiles</UButton>
+      <UButton v-if="entry.tiles.length - targetCount < 4 && !addingKanReplacement && entry.tiles.length < 18" ref="kanReplacementTriggerButton" type="button" class="reset-button" @click="startKanReplacementEntry">＋ Add an extra tile for a kan</UButton>
+      <UButton v-if="addingKanReplacement" type="button" class="reset-button" @click="cancelKanReplacement">Cancel extra tile</UButton>
       <span v-if="addingKanReplacement" class="field-hint">Choose the extra tile below. Add one for each kan.</span>
       <span v-if="showTilePicker && !addingKanReplacement" class="field-hint">To replace a tile, tap its × above, then choose the new tile here.</span>
-      <button v-if="showTilePicker && !addingKanReplacement" type="button" class="reset-button" @click="doneEditingTiles">Done editing</button>
+      <UButton v-if="showTilePicker && !addingKanReplacement" type="button" class="reset-button" @click="doneEditingTiles">Done editing</UButton>
     </div>
 
     <template v-if="stage === 0">
@@ -87,17 +87,17 @@
             </template>
           </div>
           <strong>{{ meldLabel(meld.type) }}</strong>
-          <button type="button" class="remove-group" :disabled="showGroupPicker" :aria-label="'Remove ' + meldLabel(meld.type) + ' annotation; keep tiles in hand'" @click="removeMeld(index)">Remove</button>
+          <UButton type="button" class="remove-group" :disabled="showGroupPicker" :aria-label="'Remove ' + meldLabel(meld.type) + ' annotation; keep tiles in hand'" @click="removeMeld(index)">Remove</UButton>
         </div>
       </div>
       <template v-if="showTilePicker && !showGroupPicker">
       <div class="tile-suit-tabs" role="group" aria-label="Choose tiles">
-        <button v-for="suit in suits" :key="suit.id" type="button" class="choice-button" :class="{ selected: activeSuit === suit.id }" :aria-pressed="activeSuit === suit.id" @click="activeSuit = suit.id">{{ suit.label }}</button>
+        <UButton v-for="suit in suits" :key="suit.id" type="button" class="choice-button" :class="{ selected: activeSuit === suit.id }" :aria-pressed="activeSuit === suit.id" @click="activeSuit = suit.id">{{ suit.label }}</UButton>
       </div>
       <div class="tile-picker-grid" role="group" :aria-label="activeSuitLabel + ' tiles'">
-        <button v-for="token in pickerTokens" :key="token" ref="tilePickerButtons" type="button" class="tile-picker-button" :disabled="!canAdd(token)" :aria-label="'Add ' + label(token) + (handCount(token) ? ', ' + handCount(token) + ' already in hand' : '')" @click="addTile(token, $event)">
+        <UButton v-for="token in pickerTokens" :key="token" ref="tilePickerButtons" type="button" class="tile-picker-button" :disabled="!canAdd(token)" :aria-label="'Add ' + label(token) + (handCount(token) ? ', ' + handCount(token) + ' already in hand' : '')" @click="addTile(token, $event)">
           <span v-if="handCount(token)" class="tile-count-badge" aria-hidden="true">×{{ handCount(token) }}</span><img :src="image(token)" alt="" /><small>{{ pickerLabel(token) }}</small>
-        </button>
+        </UButton>
       </div>
       </template>
 
@@ -105,13 +105,13 @@
         <summary>Calls, kans and hand options</summary>
         <p>Enter all 14 tiles first, including tiles from calls. Add one extra tile for each kan, then mark the call or kan above.</p>
         <p>Clear tile entry removes the tiles, call and kan marks, and dora markers. Win details such as riichi and dealer stay set.</p>
-        <button v-if="canClearHand" type="button" class="reset-button clear-tile-entry" @click="clearTiles">Clear tile entry</button>
+        <UButton v-if="canClearHand" type="button" class="reset-button clear-tile-entry" @click="clearTiles">Clear tile entry</UButton>
       </details>
 
       <p v-if="physicalError" class="field-problems" role="status">{{ physicalError }}</p>
       <div v-if="!showGroupPicker" class="tile-step-actions">
-        <button v-if="canUseLastTile" ref="lastTileButton" type="button" class="next-step-button last-tile-shortcut" @click="useLastTileAndContinue"><img :src="image(entry.tiles.at(-1))" alt="" /><span>Win with last-entered tile · {{ label(entry.tiles.at(-1)) }} →</span></button>
-        <button ref="nextStepButton" type="button" :class="canUseLastTile ? 'choice-button' : 'next-step-button'" :disabled="!canContinue" @click="$emit('next-step')">{{ canUseLastTile ? 'Choose a different winning tile →' : 'Choose win details →' }}</button>
+        <UButton v-if="canUseLastTile" ref="lastTileButton" type="button" class="next-step-button last-tile-shortcut" @click="useLastTileAndContinue"><img :src="image(entry.tiles.at(-1))" alt="" /><span>Win with last-entered tile · {{ label(entry.tiles.at(-1)) }} →</span></UButton>
+        <UButton ref="nextStepButton" type="button" :class="canUseLastTile ? 'choice-button' : 'next-step-button'" :disabled="!canContinue" @click="$emit('next-step')">{{ canUseLastTile ? 'Choose a different winning tile →' : 'Choose win details →' }}</UButton>
       </div>
     </template>
     <template v-else>
@@ -125,26 +125,26 @@
       <div class="tile-indicators" tabindex="-1">
         <span class="field-label">Bonus han</span>
         <div class="choice-row bonus-entry-modes" role="group" aria-label="How to enter bonus han">
-          <button type="button" class="choice-button" :class="{ selected: bonusEntryMode === 'total' }" :aria-pressed="bonusEntryMode === 'total'" @click="setBonusEntryMode('total')">Enter other bonus han</button>
-          <button type="button" class="choice-button" :class="{ selected: bonusEntryMode === 'indicators' }" :aria-pressed="bonusEntryMode === 'indicators'" @click="setBonusEntryMode('indicators')">Count indicators</button>
+          <UButton type="button" class="choice-button" :class="{ selected: bonusEntryMode === 'total' }" :aria-pressed="bonusEntryMode === 'total'" @click="setBonusEntryMode('total')">Enter other bonus han</UButton>
+          <UButton type="button" class="choice-button" :class="{ selected: bonusEntryMode === 'indicators' }" :aria-pressed="bonusEntryMode === 'indicators'" @click="setBonusEntryMode('indicators')">Count indicators</UButton>
         </div>
         <p class="automatic-red-dora">Red dora · {{ akaDoraCount }} han, counted automatically</p>
         <template v-if="bonusEntryMode === 'total'">
           <p id="other-bonus-han-hint" class="field-hint">Enter visible dora, ura dora and extracted North bonuses together. Red tiles are counted from your hand.</p>
           <label class="field-label" for="other-bonus-han">Other bonus han</label>
           <div class="stepper" role="group" aria-label="Other bonus han">
-            <button type="button" aria-label="Remove one other bonus han" :disabled="totalBonusHan <= 0" @click="adjustTotalBonusHan(-1)">−</button>
+            <UButton type="button" aria-label="Remove one other bonus han" :disabled="totalBonusHan <= 0" @click="adjustTotalBonusHan(-1)">−</UButton>
             <input id="other-bonus-han" :value="totalBonusHan" type="number" inputmode="numeric" min="0" max="99" step="1" aria-describedby="other-bonus-han-hint" @change="setTotalBonusHan($event.target.value)" />
-            <button type="button" aria-label="Add one other bonus han" :disabled="totalBonusHan >= 99" @click="adjustTotalBonusHan(1)">+</button>
+            <UButton type="button" aria-label="Add one other bonus han" :disabled="totalBonusHan >= 99" @click="adjustTotalBonusHan(1)">+</UButton>
           </div>
         </template>
         <template v-else>
         <span class="field-label">Dora and ura indicators <small>{{ indicatorInstructions }}</small></span>
         <div class="stepper indicator-kan-stepper" role="group" aria-label="Kans declared by other players">
           <span class="indicator-kan-label">Other players’ kans</span>
-          <button type="button" aria-label="Decrease other players’ kans" :disabled="otherKanCount <= 0" @click="adjustOtherKanCount(-1)">−</button>
+          <UButton type="button" aria-label="Decrease other players’ kans" :disabled="otherKanCount <= 0" @click="adjustOtherKanCount(-1)">−</UButton>
           <span class="indicator-kan-count" aria-live="polite">{{ otherKanCount }}</span>
-          <button type="button" aria-label="Increase other players’ kans" :disabled="kanCount + otherKanCount >= 4" @click="adjustOtherKanCount(1)">+</button>
+          <UButton type="button" aria-label="Increase other players’ kans" :disabled="kanCount + otherKanCount >= 4" @click="adjustOtherKanCount(1)">+</UButton>
         </div>
         <p class="field-hint indicator-kan-hint">{{ indicatorRowSize }} face-up {{ indicatorRowSize === 1 ? 'marker' : 'markers' }} total, including the starting marker.</p>
         <div class="indicator-examples">
@@ -154,7 +154,7 @@
         <div class="indicator-list"><span>Entered</span><div class="group-tile-samples">
           <template v-for="(indicator, index) in indicatorEntries" :key="indicator.field + '-' + indicator.index">
             <span v-if="indicator.field !== indicatorEntries[index - 1]?.field" class="indicator-category-label">{{ indicator.field === 'uraIndicators' ? 'Ura' : 'Face-up' }}</span>
-            <button type="button" class="indicator-tile" :aria-label="'Remove ' + (indicator.field === 'uraIndicators' ? 'ura' : 'face-up') + ' marker ' + (indicator.index + 1) + ', ' + label(indicator.token)" @click="removeIndicator(indicator.field, indicator.index)"><img :src="image(indicator.token)" alt="" /><span aria-hidden="true">×</span></button>
+            <UButton type="button" class="indicator-tile" :aria-label="'Remove ' + (indicator.field === 'uraIndicators' ? 'ura' : 'face-up') + ' marker ' + (indicator.index + 1) + ', ' + label(indicator.token)" @click="removeIndicator(indicator.field, indicator.index)"><img :src="image(indicator.token)" alt="" /><span aria-hidden="true">×</span></UButton>
           </template>
           <span class="field-hint">{{ indicatorProgress }}</span>
         </div></div>
@@ -162,12 +162,12 @@
         <template v-else>
           <span class="field-label indicator-active-target">Add {{ nextIndicatorCategory }} marker</span>
           <div class="tile-suit-tabs" role="group" aria-label="Choose indicator tile suit">
-            <button v-for="suit in suits" :key="'indicator-' + suit.id" type="button" class="choice-button" :class="{ selected: activeSuit === suit.id }" :aria-pressed="activeSuit === suit.id" @click="activeSuit = suit.id">{{ suit.label }}</button>
+            <UButton v-for="suit in suits" :key="'indicator-' + suit.id" type="button" class="choice-button" :class="{ selected: activeSuit === suit.id }" :aria-pressed="activeSuit === suit.id" @click="activeSuit = suit.id">{{ suit.label }}</UButton>
           </div>
           <div class="tile-picker-grid" role="group" :aria-label="activeSuitLabel + ' indicator tiles'">
-            <button v-for="token in pickerTokens" :key="'indicator-' + token" ref="indicatorPickerButtons" type="button" class="tile-picker-button" :disabled="!canAddIndicator(token)" :aria-label="'Add ' + label(token) + ' ' + nextIndicatorCategory + ' marker'" @click="addIndicator(token, $event)">
+            <UButton v-for="token in pickerTokens" :key="'indicator-' + token" ref="indicatorPickerButtons" type="button" class="tile-picker-button" :disabled="!canAddIndicator(token)" :aria-label="'Add ' + label(token) + ' ' + nextIndicatorCategory + ' marker'" @click="addIndicator(token, $event)">
               <img :src="image(token)" alt="" /><small>{{ pickerLabel(token) }}</small>
-            </button>
+            </UButton>
           </div>
         </template>
         </template>
@@ -441,11 +441,11 @@ function addTile(token, event) {
   if (addingKanReplacement.value) {
     addingKanReplacement.value = false
     showTilePicker.value = false
-    nextTick(() => groupTriggerButton.value?.focus())
+    nextTick(() => groupTriggerButton.value?.$el?.focus())
   }
   else if (next.tiles.length >= targetCount.value) {
     showTilePicker.value = false
-    nextTick(() => (canUseLastTile.value ? lastTileButton.value : canContinue.value ? nextStepButton.value : tileHandTray.value)?.focus())
+    nextTick(() => (canUseLastTile.value ? lastTileButton.value?.$el : canContinue.value ? nextStepButton.value?.$el : tileHandTray.value)?.focus())
   } else {
     nextTick(() => {
       if (trigger?.disabled) focusFirstEnabled(tilePickerButtons.value)
@@ -461,7 +461,7 @@ function startKanReplacementEntry() {
 function cancelKanReplacement() {
   addingKanReplacement.value = false
   showTilePicker.value = false
-  nextTick(() => kanReplacementTriggerButton.value?.focus())
+  nextTick(() => kanReplacementTriggerButton.value?.$el?.focus())
 }
 function doneEditingTiles() {
   showTilePicker.value = false
@@ -583,7 +583,7 @@ function markGroup(indices) {
 function toggleGroupPicker() {
   if (showGroupPicker.value) {
     cancelGroupDraft()
-    nextTick(() => groupTriggerButton.value?.focus())
+    nextTick(() => groupTriggerButton.value?.$el?.focus())
     return
   }
   showGroupPicker.value = true
@@ -594,12 +594,12 @@ function toggleGroupPicker() {
 function cancelGroupDraft() {
   selection.value = []
   showGroupPicker.value = false
-  nextTick(() => groupTriggerButton.value?.focus())
+  nextTick(() => groupTriggerButton.value?.$el?.focus())
 }
 function chooseMeld(type) { meldType.value = type; selection.value = [] }
 function clearGroupSelection() {
   selection.value = []
-  nextTick(() => focusFirstRemovableTile() || groupTriggerButton.value?.focus())
+  nextTick(() => focusFirstRemovableTile() || groupTriggerButton.value?.$el?.focus())
 }
 function toggleSelection(index) {
   if (!canSelectTile(index)) return
@@ -647,11 +647,11 @@ function confirmGroup() {
   })
   selection.value = []
   showGroupPicker.value = false
-  nextTick(() => groupTriggerButton.value?.focus())
+  nextTick(() => groupTriggerButton.value?.$el?.focus())
 }
 function focusFirstEnabled(buttons) {
-  const target = buttons.find(button => button && !button.disabled)
-  target?.focus()
+  const target = buttons.find(button => button && !button.$el?.disabled)
+  target?.$el?.focus()
   return Boolean(target)
 }
 function focusFirstRemovableTile() {
@@ -667,7 +667,7 @@ function removeMeld(index) {
     next.otherKanCount = Math.min(4 - next.melds.filter(group => group.type.startsWith('kan')).length, next.otherKanCount ?? 0)
   })
   showTilePicker.value = true
-  nextTick(() => groupTriggerButton.value?.focus())
+  nextTick(() => groupTriggerButton.value?.$el?.focus())
 }
 function isTileGrouped(index) { return entry.value.melds.some(meld => (meld.tileIndices ?? []).includes(index)) }
 function canSelectTile(index) {

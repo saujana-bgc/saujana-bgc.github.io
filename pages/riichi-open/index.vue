@@ -9,10 +9,10 @@
         <p class="hero-intro">A Japanese riichi mahjong tournament with two East–South qualifiers and one final for the Top 4. A friendly day of serious mahjong.</p>
         <div class="event-facts"><span>Saturday, 14 November 2026</span><span>Starts at 2:30 pm</span><span>Boardroom Bandit, Ara Damansara</span></div>
         <div class="event-offer"><strong>RM10</strong><span>entry fee</span><i aria-hidden="true"></i><span>A prize for the winner</span></div>
-        <div class="hero-actions"><button class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></button><button class="hero-guide" @click="openGuide">Tournament guide</button></div>
+        <div class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton><UButton class="hero-guide" color="neutral" variant="outline" @click="openGuide">Tournament guide</UButton></div>
         <p class="hero-reassurance">16 places · No account needed · Receipt verified by the organiser</p>
       </div>
-      <figure class="poster-card"><button type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster.png" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="1122" height="1402"></button><figcaption>Tap or click to view the full poster</figcaption></figure>
+      <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster.png" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="1122" height="1402"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
     </section>
 
     <section id="registration" ref="registrationPanel" class="registration-panel" aria-labelledby="register-heading" tabindex="-1">
@@ -21,35 +21,35 @@
       <ol class="signup-progress" aria-label="Registration progress"><li :class="{ current: !hold && !complete, done: hold || complete }" :aria-current="!hold && !complete ? 'step' : undefined"><span>{{ hold || complete ? '✓' : '1' }}</span>Your name</li><li :class="{ current: hold && !complete, done: complete }" :aria-current="hold && !complete ? 'step' : undefined"><span>{{ complete ? '✓' : '2' }}</span>Pay & upload</li><li :class="{ current: complete }" :aria-current="complete ? 'step' : undefined"><span>3</span>Organiser review</li></ol>
       <p v-if="notice" class="notice" role="status">{{ notice }}</p>
 
-    <section v-if="complete" ref="confirmationPanel" class="confirmation" tabindex="-1" aria-live="polite"><span class="confirm-mark">{{ registrationStatus === 'verified' ? '✓' : '·' }}</span><h3>{{ confirmationTitle }}</h3><p>{{ confirmationMessage }}</p><p class="reference">Keep your registration reference <strong>{{ registrationRef }}</strong></p><span v-if="registrationStatus === 'pending' || !registrationStatus" class="pending-badge">Awaiting payment verification</span><span v-else-if="registrationStatus === 'verified'" class="verified-badge">Payment verified</span><button v-if="registrationStatus === 'cancelled'" type="button" class="event-button" :disabled="busy || restorePending || (!canRegister && !restartRecoveryAvailable)" @click="restartRecoveryAvailable ? restoreSavedHold() : restartCancelledRegistration">{{ restorePending ? 'Restoring…' : restartRecoveryAvailable ? 'Try restoring saved place' : busy ? 'Reserving…' : canRegister ? 'Register again' : 'Registration is unavailable' }}</button><p v-if="registrationStatus === 'cancelled'" class="small-print">If you already paid and were not refunded, upload your original receipt. Contact the organiser before paying again.</p><p v-if="error" class="form-error" role="alert">{{ error }}</p><a v-else-if="registrationStatus === 'needs_clarification' || registrationStatus === 'rejected' || registrationStatus === 'cancelled'" class="confirmation-contact" href="tel:+60162459482">Contact the organiser · +60 16-245 9482</a></section>
+    <section v-if="complete" ref="confirmationPanel" class="confirmation" tabindex="-1" aria-live="polite"><span class="confirm-mark">{{ registrationStatus === 'verified' ? '✓' : '·' }}</span><h3>{{ confirmationTitle }}</h3><p>{{ confirmationMessage }}</p><p class="reference">Keep your registration reference <strong>{{ registrationRef }}</strong></p><span v-if="registrationStatus === 'pending' || !registrationStatus" class="pending-badge">Awaiting payment verification</span><span v-else-if="registrationStatus === 'verified'" class="verified-badge">Payment verified</span><UButton v-if="registrationStatus === 'cancelled'" type="button" class="event-button" :disabled="busy || restorePending || (!canRegister && !restartRecoveryAvailable)" @click="restartRecoveryAvailable ? restoreSavedHold() : restartCancelledRegistration">{{ restorePending ? 'Restoring…' : restartRecoveryAvailable ? 'Try restoring saved place' : busy ? 'Reserving…' : canRegister ? 'Register again' : 'Registration is unavailable' }}</UButton><p v-if="registrationStatus === 'cancelled'" class="small-print">If you already paid and were not refunded, upload your original receipt. Contact the organiser before paying again.</p><p v-if="error" class="form-error" role="alert">{{ error }}</p><a v-else-if="registrationStatus === 'needs_clarification' || registrationStatus === 'rejected' || registrationStatus === 'cancelled'" class="confirmation-contact" href="tel:+60162459482">Contact the organiser · +60 16-245 9482</a></section>
       <div v-else-if="restorePending || restoreFailed" class="signup-step restore-state" role="status">
         <h3>{{ restorePending ? 'Restoring your saved place…' : savedHoldCanDiscard ? 'Your saved details could not be recovered' : 'Your saved place needs reconnecting' }}</h3>
         <p>{{ restorePending ? 'Checking the reservation saved in this browser.' : savedHoldCanDiscard ? 'Clear the incomplete saved details to start again. Any previous unpaid reservation will expire automatically.' : 'Your saved reservation is still here. Restore or release it before starting another registration.' }}</p>
         <p v-if="restoreFailed && savedHoldCanDiscard">Already paid? <a href="tel:+60162459482">Contact the organiser with your receipt</a>.</p>
         <p v-if="restoreFailed && error" class="form-error" role="alert">{{ error }}</p>
-        <div class="restore-actions"><button v-if="!savedHoldCanDiscard" type="button" class="event-button" :disabled="busy || restorePending" @click="restoreSavedHold">{{ restorePending ? 'Restoring…' : 'Try restoring place' }}</button><button v-if="restoreFailed && savedHoldCanRelease" type="button" class="inline-button" :disabled="busy" @click="releaseSavedHold">Release saved place</button><button v-if="restoreFailed && savedHoldCanDiscard" type="button" class="inline-button" :disabled="busy" @click="clearSavedHoldDetails">Clear saved details</button></div>
+        <div class="restore-actions"><UButton v-if="!savedHoldCanDiscard" type="button" class="event-button" :disabled="busy || restorePending" @click="restoreSavedHold">{{ restorePending ? 'Restoring…' : 'Try restoring place' }}</UButton><UButton v-if="restoreFailed && savedHoldCanRelease" type="button" class="inline-button" :disabled="busy" @click="releaseSavedHold">Release saved place</UButton><UButton v-if="restoreFailed && savedHoldCanDiscard" type="button" class="inline-button" :disabled="busy" @click="clearSavedHoldDetails">Clear saved details</UButton></div>
       </div>
       <div v-else-if="!hold" class="signup-step">
-        <p v-if="!publicLoaded" role="status">{{ refreshing ? 'Checking available places…' : 'Availability could not be loaded.' }} <button v-if="!refreshing" class="inline-button" @click="loadPublic">Try again</button></p>
-        <div v-else-if="!canRegister" class="registration-closed"><h3>{{ event?.stage !== 'registration' ? 'Registration has ended.' : availablePlaces === 0 ? 'All places are currently reserved.' : 'Registration is closed.' }}</h3><p>{{ event?.stage !== 'registration' ? 'The playing roster is set. Follow table assignments and certified scores in Standings.' : 'Please check back for availability before sending a payment.' }}</p><button class="inline-button" @click="activeTab = 'standings'">View standings →</button></div>
+        <p v-if="!publicLoaded" role="status">{{ refreshing ? 'Checking available places…' : 'Availability could not be loaded.' }} <UButton v-if="!refreshing" class="inline-button" @click="loadPublic">Try again</UButton></p>
+        <div v-else-if="!canRegister" class="registration-closed"><h3>{{ event?.stage !== 'registration' ? 'Registration has ended.' : availablePlaces === 0 ? 'All places are currently reserved.' : 'Registration is closed.' }}</h3><p>{{ event?.stage !== 'registration' ? 'The playing roster is set. Follow table assignments and certified scores in Standings.' : 'Please check back for availability before sending a payment.' }}</p><UButton class="inline-button" @click="activeTab = 'standings'">View standings →</UButton></div>
         <p v-else-if="registrationStorageUnavailable" class="form-error" role="alert">This browser can’t access your saved registration details. Enable site storage or use another browser before reserving a place.</p>
         <form v-else @submit.prevent="reservePlace">
           <label for="display-name">Name for the public participant list</label>
-          <input id="display-name" v-model="name" maxlength="80" autocomplete="name" required placeholder="Your name">
+          <UInput id="display-name" class="event-control" v-model="name" maxlength="80" autocomplete="name" required placeholder="Your name" />
           <p v-if="error" class="form-error" role="alert">{{ error }}</p>
-          <button class="event-button" :disabled="busy || !canRegister">{{ busy ? 'Reserving…' : canRegister ? 'Continue to payment' : 'Registration is closed' }}</button>
+          <UButton class="event-button" type="submit" :disabled="busy || !canRegister">{{ busy ? 'Reserving…' : canRegister ? 'Continue to payment' : 'Registration is closed' }}</UButton>
           <p class="small-print">A reservation holds one place for {{ holdDuration }} minutes. No participant account is needed.</p>
         </form>
       </div>
       <div v-else ref="paymentPanel" class="payment-step" tabindex="-1">
-        <div class="hold-note"><div><strong>{{ holdExpired ? 'Your place reservation has expired.' : `${holdCountdown} left to complete registration` }}</strong><small>{{ holdExpired ? 'Already paid? Submit your receipt for organiser review. Your place will need to be checked.' : `Held for ${hold.name} until ${holdExpiry}. Already paid? Upload your receipt before leaving.` }}</small></div><button type="button" class="inline-button" :disabled="busy" @click="cancelHold">Release place</button></div>
-        <div class="payment-instructions"><h3>{{ hold.restarted_from_registration_id ? 'Submit your receipt' : 'Pay RM10' }}</h3><p v-if="hold.restarted_from_registration_id">If your entry fee was refunded, contact the organiser before paying again. Otherwise, upload your original receipt so the organiser can review the payment.</p><template v-else><p>Send your entry fee by Touch ’n Go or DuitNow to:</p><a href="tel:+60162459482">+60 16-245 9482</a><p>Recipient name: <strong>NICHOLAS</strong></p><button type="button" class="copy-button" @click="copyNumber">{{ copied ? 'Number copied' : 'Copy number' }}</button></template></div>
+        <div class="hold-note"><div><strong>{{ holdExpired ? 'Your place reservation has expired.' : `${holdCountdown} left to complete registration` }}</strong><small>{{ holdExpired ? 'Already paid? Submit your receipt for organiser review. Your place will need to be checked.' : `Held for ${hold.name} until ${holdExpiry}. Already paid? Upload your receipt before leaving.` }}</small></div><UButton type="button" class="inline-button" :disabled="busy" @click="cancelHold">Release place</UButton></div>
+        <div class="payment-instructions"><h3>{{ hold.restarted_from_registration_id ? 'Submit your receipt' : 'Pay RM10' }}</h3><p v-if="hold.restarted_from_registration_id">If your entry fee was refunded, contact the organiser before paying again. Otherwise, upload your original receipt so the organiser can review the payment.</p><template v-else><p>Send your entry fee by Touch ’n Go or DuitNow to:</p><a href="tel:+60162459482">+60 16-245 9482</a><p>Recipient name: <strong>NICHOLAS</strong></p><UButton type="button" class="copy-button" @click="copyNumber">{{ copied ? 'Number copied' : 'Copy number' }}</UButton></template></div>
         <form @submit.prevent="submitReceipt">
           <label for="receipt">Upload your payment receipt <span>(JPG, PNG or PDF · up to 5 MB)</span></label>
-          <input id="receipt" ref="receiptInput" type="file" accept="image/jpeg,image/png,application/pdf" required :disabled="busy" @change="chooseReceipt">
-          <div v-if="receipt" class="receipt-selection"><img v-if="receipt.type.startsWith('image/')" :src="receiptPreviewUrl" alt="Selected receipt preview"><div><strong>{{ receipt.name }}</strong><small>{{ (receipt.size / 1024).toFixed(0) }} KB · {{ receipt.type === 'application/pdf' ? 'PDF document' : 'Image receipt' }}</small></div><button type="button" class="inline-button" :disabled="busy" @click="removeReceipt">Remove</button></div>
+          <input id="receipt" ref="receiptInput" class="event-control" type="file" accept="image/jpeg,image/png,application/pdf" required :disabled="busy" @change="chooseReceipt" />
+          <div v-if="receipt" class="receipt-selection"><img v-if="receipt.type.startsWith('image/')" :src="receiptPreviewUrl" alt="Selected receipt preview"><div><strong>{{ receipt.name }}</strong><small>{{ (receipt.size / 1024).toFixed(0) }} KB · {{ receipt.type === 'application/pdf' ? 'PDF document' : 'Image receipt' }}</small></div><UButton type="button" class="inline-button" :disabled="busy" @click="removeReceipt">Remove</UButton></div>
           <p v-if="error" class="form-error" role="alert">{{ error }}</p>
-          <button class="event-button" :disabled="busy || !receipt">{{ busy ? 'Uploading securely…' : 'Submit receipt and register' }}</button>
+          <UButton class="event-button" type="submit" :disabled="busy || !receipt">{{ busy ? 'Uploading securely…' : 'Submit receipt and register' }}</UButton>
         </form>
       </div>
     </section>
@@ -60,7 +60,7 @@
       <ul v-else class="registrant-list"><li v-for="player in registrations" :key="player.id"><strong>{{ player.display_name }}</strong><span :class="player.status==='verified'?'verified-badge':'pending-badge'">{{ player.status==='verified'?'Verified':'Awaiting verification' }}</span></li></ul>
     </section>
 
-    <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The four highest eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><button ref="guideTrigger" type="button" class="guide-trigger" @click="openGuide">Read the tournament guide <span aria-hidden="true">↗</span></button></section>
+    <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The four highest eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><UButton ref="guideTrigger" type="button" class="guide-trigger" @click="openGuide">Read the tournament guide <span aria-hidden="true">↗</span></UButton></section>
 
     <section class="event-schedule" aria-labelledby="schedule-heading">
       <div class="schedule-intro"><p class="eyebrow">Saturday, 14 November</p><h2 id="schedule-heading">Tournament schedule</h2><p>Each qualifying round has a 75-minute limit to help the tournament finish at a reasonable time.</p></div>
@@ -91,26 +91,26 @@
 
     <dialog ref="guideDialog" class="guide-dialog" aria-label="Riichi Open I tournament rules" @click="closeGuideFromBackdrop" @close="restoreGuideFocus">
       <div class="guide-shell">
-        <div class="guide-topbar"><span><i aria-hidden="true"></i> RIICHI OPEN I · TOURNAMENT RULES</span><button type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</button></div>
+        <div class="guide-topbar"><span><i aria-hidden="true"></i> RIICHI OPEN I · TOURNAMENT RULES</span><UButton type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</UButton></div>
         <div class="guide-body">
           <aside class="guide-toc-desktop" aria-label="Rules sections">
             <nav aria-label="Jump to a rules section">
-              <button v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</button>
+              <UButton v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</UButton>
             </nav>
           </aside>
           <div class="guide-toc-mobile">
             <details ref="guideMobileToc">
               <summary>Jump to section</summary>
               <nav aria-label="Jump to a rules section">
-                <button v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</button>
+                <UButton v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</UButton>
               </nav>
             </details>
           </div>
           <div ref="guideReader" class="guide-reader" tabindex="-1" aria-live="polite">
             <p v-if="guideLoading" class="guide-state">Opening the guide…</p>
-            <div v-else-if="guideError" class="guide-state guide-error"><p>{{ guideError }}</p><button type="button" class="guide-retry" @click="loadGuide">Try again</button></div>
+            <div v-else-if="guideError" class="guide-state guide-error"><p>{{ guideError }}</p><UButton type="button" class="guide-retry" @click="loadGuide">Try again</UButton></div>
             <article v-else class="guide-content" v-html="guideHtml"></article>
-            <footer v-if="!guideLoading && !guideError && guideMarkdown" class="guide-footer"><span>Gameplay follows WRC Rules 2025 and its official clarification.</span><button type="button" @click="closeGuide">Back to event</button></footer>
+            <footer v-if="!guideLoading && !guideError && guideMarkdown" class="guide-footer"><span>Gameplay follows WRC Rules 2025 and its official clarification.</span><UButton type="button" @click="closeGuide">Back to event</UButton></footer>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@
     </section>
 
     <dialog ref="posterDialog" class="poster-dialog" aria-label="Riichi Open I event poster" @click="closePosterFromBackdrop" @close="restorePosterFocus">
-      <button type="button" class="poster-close" aria-label="Close event poster" @click="closePoster">×</button>
+      <UButton type="button" class="poster-close" aria-label="Close event poster" @click="closePoster">×</UButton>
       <img src="/images/riichi-open/riichi-open-i-poster.png" alt="Full Riichi Open I tournament poster">
     </dialog>
 

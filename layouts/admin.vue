@@ -3,17 +3,17 @@
     <section v-if="isRestoring || !isAuthenticated" class="admin-login-wrap">
       <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>One organiser sign-in for Birthday Club and Riichi Open.</p></div>
       <form class="admin-login-card" @submit.prevent="submitLogin">
-        <label>Username<input v-model="username" autocomplete="username" required></label>
-        <label>Password<input v-model="password" type="password" autocomplete="current-password" required></label>
-        <label class="remember"><input v-model="remember" type="checkbox"> Remember me on this device</label>
+        <label>Username<UInput v-model="username" class="admin-login-input" autocomplete="username" required /></label>
+        <label>Password<UInput v-model="password" class="admin-login-input" type="password" autocomplete="current-password" required /></label>
+        <label class="remember"><UCheckbox v-model="remember" /> Remember me on this device</label>
         <p v-if="isRestoring" class="admin-help" role="status">Checking for a saved session. You can sign in here if needed.</p>
         <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
-        <button class="admin-primary" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</button>
+        <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</UButton>
         <p class="admin-help">Use the existing Birthday Club admin username and password.</p>
       </form>
     </section>
     <template v-else>
-      <header class="admin-topbar"><NuxtLink to="/admin" class="admin-brand" aria-label="Saujana organiser workspace"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>organiser workspace</small></span></NuxtLink><div><NuxtLink to="/" class="admin-public-link">Back to website</NuxtLink><button class="admin-signout" @click="signOut">Sign out</button></div></header>
+      <header class="admin-topbar"><NuxtLink to="/admin" class="admin-brand" aria-label="Saujana organiser workspace"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>organiser workspace</small></span></NuxtLink><div><NuxtLink to="/" class="admin-public-link">Back to website</NuxtLink><UButton class="admin-signout" color="neutral" variant="outline" @click="signOut">Sign out</UButton></div></header>
       <nav class="admin-nav" aria-label="Admin pages"><NuxtLink v-for="item in adminNavigation" :key="item.id" :to="item.to" :class="{ active: isCurrentPage(item.to) }" :aria-label="item.id === 'botc-archive' ? item.title : undefined">{{ item.id === 'botc-archive' ? 'Clocktower' : item.title }}</NuxtLink></nav>
       <div class="admin-page"><slot /></div>
     </template>

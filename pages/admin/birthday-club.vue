@@ -12,15 +12,15 @@
         <section v-if="loadError" class="state-card error-card" role="alert">
           <h2>We couldn&rsquo;t open the calendar.</h2>
           <p>{{ loadError }}</p>
-          <button class="secondary-button" type="button" @click="loadBirthdays">Try again</button>
+          <UButton class="secondary-button" type="button" @click="loadBirthdays">Try again</UButton>
         </section>
 
         <section v-else class="calendar-content" aria-label="Birthday calendar">
           <div class="calendar-toolbar fade-up">
             <div class="year-control" aria-label="Calendar year">
-              <button type="button" aria-label="Previous year" @click="calendarYear--">&larr;</button>
+              <UButton type="button" aria-label="Previous year" @click="calendarYear--">&larr;</UButton>
               <strong>{{ calendarYear }}</strong>
-              <button type="button" aria-label="Next year" @click="calendarYear++">&rarr;</button>
+              <UButton type="button" aria-label="Next year" @click="calendarYear++">&rarr;</UButton>
             </div>
 
             <div class="summary-stats" aria-live="polite">
@@ -28,9 +28,9 @@
               <span><strong>{{ publicGreetingCount }}</strong> public greetings allowed</span>
             </div>
 
-            <button v-if="calendarYear !== currentYear" class="today-button" type="button" @click="calendarYear = currentYear">
+            <UButton v-if="calendarYear !== currentYear" class="today-button" type="button" @click="calendarYear = currentYear">
               Back to {{ currentYear }}
-            </button>
+            </UButton>
           </div>
 
           <div v-if="isLoading" class="state-card loading-card" aria-live="polite">
