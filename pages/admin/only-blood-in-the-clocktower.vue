@@ -7,13 +7,26 @@
     </header>
     <p v-if="error" class="message error" role="alert">{{ error }}</p>
 
-    <form class="editor admin-card" @submit.prevent="save">
+    <details v-if="saved.length" class="saved-picker">
+      <summary>Open a saved gathering <span>{{ saved.length }}</span></summary>
+      <div class="saved-list">
+        <article v-for="session in saved" :key="session.id" class="admin-card saved">
+          <div><strong>{{ session.session_date }} · {{ session.venue || 'Saujana' }}</strong><span>{{ session.published ? 'Published' : 'Draft' }}</span></div>
+          <button type="button" :disabled="busy" @click="edit(session)">Edit</button>
+        </article>
+      </div>
+    </details>
+
+    <form ref="editorForm" class="editor admin-card" @submit.prevent>
       <div class="editor-heading">
         <div>
           <h2>{{ draft.id ? 'Edit gathering' : 'Log a gathering' }}</h2>
           <p v-if="isDirty" class="dirty-note">Unsaved changes</p>
         </div>
-        <button v-if="draft.id || isDirty" type="button" :disabled="busy" @click="startNew">New gathering</button>
+        <div class="editor-heading-actions">
+          <button v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</button>
+          <button v-if="draft.id || isDirty" type="button" :disabled="busy" @click="startNew">New gathering</button>
+        </div>
       </div>
 
       <fieldset class="editor-fields" :disabled="busy">
@@ -38,7 +51,7 @@
             </div>
             <div class="fields">
               <label>Script
-                <select v-model="game.script" @change="applyScript(game)">
+                <select :value="game.script" @change="applyScript(game, $event)">
                   <option value="Trouble Brewing">Trouble Brewing</option>
                   <option value="Bad Moon Rising">Bad Moon Rising</option>
                   <option value="Sects &amp; Violets">Sects &amp; Violets</option>
@@ -49,40 +62,60 @@
               <label v-if="!scriptPresets[game.script]">Custom script name<input v-model="game.script" placeholder="Enter the script name"></label>
               <label>Outcome<select v-model="game.outcome"><option value="">Choose result</option><option>Good wins</option><option>Evil wins</option><option>No result</option><option>Unknown</option></select></label>
             </div>
-            <label>Characters on this script<input v-model="game.script_characters" placeholder="Washerwoman, Librarian, Investigator…"></label>
+            <details class="script-list">
+              <summary>Script characters <span>{{ characters(game).length }} available</span></summary>
+              <label>Character list, separated by commas<input v-model="game.script_characters" placeholder="Washerwoman, Librarian, Investigator…"></label>
+            </details>
 
-            <div class="section-heading"><h4>Players and characters</h4><button type="button" @click="game.players.push(newPlayer())">Add player</button></div>
+            <div class="section-heading">
+              <h4>Players and characters <small>{{ game.players.length }}</small></h4>
+            </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <label>Player name<input v-model="player.name" list="clocktower-players" placeholder="Choose or enter a name"></label>
-              <label>Character<input v-model="player.character" :list="'clocktower-characters-' + game.id" placeholder="Choose or enter a character"></label>
+              <label>Character<input class="character-field" v-model="player.character" :list="'clocktower-characters-' + game.id" placeholder="Choose or enter a character" @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"></label>
               <label class="check-label"><input v-model="player.died" type="checkbox"> Died</label>
-              <label>Final status<input v-model="player.final_status" placeholder="Optional"></label>
-              <button type="button" class="remove-player" @click="game.players.splice(playerIndex,1)">Remove player</button>
+              <details class="player-more"><summary>More</summary><label>Final status<input v-model="player.final_status" placeholder="Optional"></label></details>
+              <button type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</button>
             </div>
             <datalist :id="'clocktower-characters-' + game.id"><option v-for="character in characters(game)" :key="character" :value="character"></option></datalist>
             <p v-if="!game.players.length" class="empty-note">No players added to this game yet.</p>
-
-            <label>Game notes<textarea v-model="game.notes" rows="2"></textarea></label>
-            <label>Photos<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple @change="uploadPhotos($event,game)"></label>
-            <div v-if="game.photos?.length" class="photo-list">
-              <article v-for="photo in game.photos" :key="photo.path" class="photo-row">
-                <img v-if="photoSource(photo)" :src="photoSource(photo)" alt="Clocktower session photo preview">
-                <span v-else class="photo-placeholder" aria-hidden="true">Photo preview unavailable</span>
-                <label class="check-label"><input v-model="photo.approved" type="checkbox"> Approved to publish</label>
-                <label class="check-label"><input v-model="photo.cover" type="checkbox"> Use as cover</label>
-                <button type="button" @click="removePhoto(game,photo)">Remove photo</button>
-              </article>
+            <div class="roster-actions">
+              <button v-if="game.players.length" type="button" class="add-player-next" @click="addPlayer(game)">Add next player +</button>
+              <button v-else type="button" @click="addPlayer(game)">Add player</button>
+              <button type="button" @click="toggleBulkRoster(game)">{{ bulkRosterOpen[game.id] ? 'Close paste' : 'Paste names' }}</button>
             </div>
+            <p v-if="game.players.length" class="keyboard-hint">In a Character field, press <kbd>Alt</kbd> + <kbd>N</kbd> to move to the next player.</p>
+            <section v-if="bulkRosterOpen[game.id]" class="bulk-roster-panel">
+              <label>Paste one player name per line<textarea v-model="bulkRosterText[game.id]" rows="4" placeholder="Avery&#10;Jordan&#10;Sam"></textarea></label>
+              <div><button type="button" @click="toggleBulkRoster(game)">Cancel</button><button class="admin-primary" type="button" @click="addPastedPlayers(game)">Add names</button></div>
+            </section>
+
+            <details class="game-extras" :open="Boolean(game.notes || game.photos?.length)">
+              <summary>Game extras <span v-if="game.photos?.length">{{ game.photos.length }} photos</span></summary>
+              <label>Game notes<textarea v-model="game.notes" rows="2"></textarea></label>
+              <label>Photos<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple @change="uploadPhotos($event,game)"></label>
+              <div v-if="game.photos?.length" class="photo-list">
+                <article v-for="photo in game.photos" :key="photo.path" class="photo-row">
+                  <img v-if="photoSource(photo)" :src="photoSource(photo)" alt="Clocktower session photo preview">
+                  <span v-else class="photo-placeholder" aria-hidden="true">Photo preview unavailable</span>
+                  <label class="check-label"><input v-model="photo.approved" type="checkbox"> Approved to publish</label>
+                  <label class="check-label"><input v-model="photo.cover" type="checkbox"> Use as cover</label>
+                  <button type="button" @click="removePhoto(game,photo)">Remove photo</button>
+                </article>
+              </div>
+            </details>
           </div>
         </details>
 
-        <button type="button" class="add-game" @click="addGame">Add game</button>
+        <div class="add-game-actions">
+          <button type="button" class="add-game" @click="addGame()">Add game</button>
+          <button v-if="draft.games.length" type="button" class="add-game copy-game" @click="addGame({ copyRoster: true })">Add game with same players</button>
+        </div>
 
         <section class="story admin-card">
           <h3>Meetup story</h3>
           <label>Teaser<input v-model="draft.teaser" maxlength="240" placeholder="A spoiler free hook"></label>
           <label>Mika’s retelling<textarea v-model="draft.recap" rows="4" maxlength="3000" placeholder="What did the town believe? What changed? What did everyone talk about?"></textarea></label>
-          <label class="check-label"><input v-model="draft.published" type="checkbox"> Publish this gathering</label>
         </section>
 
         <details class="visitor-preview admin-card">
@@ -101,9 +134,9 @@
             </details>
             <template v-for="game in draft.games" :key="game.id">
               <h4>{{ game.script || 'Custom script' }}</h4>
-              <p v-if="game.players.length">In the circle · {{ game.players.map((player, index) => player.public_name.trim() || `Seat ${index + 1}`).join(', ') }}</p>
               <details class="preview-reveal">
                 <summary>Reveal the result</summary>
+                <p v-if="game.players.length">In the circle · {{ game.players.map((player, index) => player.public_name.trim() || `Seat ${index + 1}`).join(', ') }}</p>
                 <p v-if="game.outcome">{{ game.outcome }}</p>
                 <ul><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Seat ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · died</template></li></ul>
                 <p v-if="game.notes">{{ game.notes }}</p>
@@ -118,19 +151,18 @@
       </fieldset>
 
       <div class="save-row">
-        <button class="admin-primary" type="submit" :disabled="busy">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : draft.published ? 'Save and publish' : 'Save draft' }}</button>
+        <template v-if="baseline.published">
+          <button class="admin-primary" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save changes' }}</button>
+          <button type="button" :disabled="busy" @click="unpublish">Unpublish</button>
+        </template>
+        <template v-else>
+          <button class="admin-primary" type="button" :disabled="busy" @click="save(false)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save draft' }}</button>
+          <button class="publish-button" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Publish gathering' }}</button>
+        </template>
         <p v-if="notice" class="message" role="status">{{ notice }}</p>
       </div>
     </form>
 
-    <section class="admin-section saved-section">
-      <h2>Saved gatherings</h2>
-      <p v-if="!saved.length" class="empty-note">No gatherings saved yet.</p>
-      <article v-for="session in saved" :key="session.id" class="admin-card saved">
-        <div><strong>{{ session.session_date }} · {{ session.venue || 'Saujana' }}</strong><span>{{ session.published ? 'Published' : 'Draft' }}</span></div>
-        <button type="button" :disabled="busy" @click="edit(session)">Edit</button>
-      </article>
-    </section>
   </main>
 </template>
 
@@ -146,6 +178,9 @@ const photoUrls = ref({})
 const localPhotoUrls = ref({})
 const pendingPhotoDeletes = ref(new Set())
 const gameCards = ref([])
+const editorForm = ref(null)
+const bulkRosterText = ref({})
+const bulkRosterOpen = ref({})
 const saving = ref(false)
 const uploading = ref(false)
 const error = ref('')
@@ -242,11 +277,58 @@ function newPlayer() {
   return { name: '', public_name: '', character: '', alignment: '', died: false, final_status: '' }
 }
 
-function addGame() {
-  draft.value.games.push({
-    id: crypto.randomUUID(), script: 'Trouble Brewing',
-    script_characters: scriptPresets['Trouble Brewing'],
-    outcome: '', notes: '', players: [], photos: [],
+function addGame(options = {}) {
+  const previousGame = options.copyRoster ? draft.value.games.at(-1) : null
+  const game = {
+    id: crypto.randomUUID(),
+    script: previousGame?.script || 'Trouble Brewing',
+    script_characters: previousGame?.script_characters || scriptPresets['Trouble Brewing'],
+    outcome: '', notes: '',
+    players: previousGame
+      ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name, public_name: player.public_name }))
+      : [],
+    photos: [],
+  }
+  draft.value.games.push(game)
+  nextTick(() => {
+    gameCards.value.at(-1)?.scrollIntoView({ block: 'start' })
+    gameCards.value.at(-1)?.querySelector('select')?.focus({ preventScroll: true })
+  })
+}
+
+function addPlayer(game) {
+  game.players.push(newPlayer())
+  nextTick(() => {
+    const card = gameCards.value.find(item => item?.querySelector(`[id="clocktower-characters-${game.id}"]`))
+    const playerFields = card?.querySelectorAll('.player-card input[list="clocktower-players"]')
+    playerFields?.item(playerFields.length - 1)?.focus()
+  })
+}
+
+function focusNextCharacter(game, playerIndex) {
+  nextTick(() => {
+    const card = gameCards.value.find(item => item?.querySelector(`[id="clocktower-characters-${game.id}"]`))
+    card?.querySelectorAll('.character-field').item(playerIndex + 1)?.focus()
+  })
+}
+
+function toggleBulkRoster(game) {
+  bulkRosterOpen.value = { ...bulkRosterOpen.value, [game.id]: !bulkRosterOpen.value[game.id] }
+}
+
+function addPastedPlayers(game) {
+  const names = (bulkRosterText.value[game.id] || '')
+    .split(/\r?\n/)
+    .map(line => line.split('\t')[0].trim())
+    .filter(Boolean)
+  if (!names.length) return
+  const firstNewPlayerIndex = game.players.length
+  game.players.push(...names.map(name => ({ ...newPlayer(), name })))
+  bulkRosterText.value = { ...bulkRosterText.value, [game.id]: '' }
+  bulkRosterOpen.value = { ...bulkRosterOpen.value, [game.id]: false }
+  nextTick(() => {
+    const card = gameCards.value.find(item => item?.querySelector(`[id="clocktower-characters-${game.id}"]`))
+    card?.querySelectorAll('.character-field').item(firstNewPlayerIndex)?.focus()
   })
 }
 
@@ -254,18 +336,25 @@ function characters(game) {
   return (game.script_characters || '').split(',').map(value => value.trim()).filter(Boolean)
 }
 
-function applyScript(game) {
-  if (game.script === '__custom__') {
+function applyScript(game, event) {
+  const previousScript = game.script
+  const nextScript = event.target.value
+  if (nextScript === '__custom__') {
     game.script = ''
     game.script_characters = ''
     return
   }
-  if (scriptPresets[game.script]) {
-    game.script_characters = scriptPresets[game.script]
-    const availableCharacters = new Set(characters(game))
-    for (const player of game.players) {
-      if (player.character && !availableCharacters.has(player.character)) player.character = ''
-    }
+  if (!scriptPresets[nextScript]) return
+  const availableCharacters = new Set(scriptPresets[nextScript].split(',').map(value => value.trim()).filter(Boolean))
+  const affectedCount = game.players.filter(player => player.character && !availableCharacters.has(player.character)).length
+  if (affectedCount && !window.confirm(`Switch from ${previousScript} to ${nextScript}? This will clear ${affectedCount} assigned ${affectedCount === 1 ? 'character' : 'characters'} that aren’t in the new script.`)) {
+    event.target.value = previousScript
+    return
+  }
+  game.script = nextScript
+  game.script_characters = scriptPresets[nextScript]
+  for (const player of game.players) {
+    if (player.character && !availableCharacters.has(player.character)) player.character = ''
   }
 }
 
@@ -333,21 +422,39 @@ function removeGame(index) {
   draft.value.games.splice(index, 1)
 }
 
-async function save() {
+async function save(published = baseline.value.published) {
   if (busy.value) return
   error.value = ''
   notice.value = ''
-  if (draft.value.published && draft.value.games.some(game =>
+  if (!editorForm.value.reportValidity()) return
+  if (published && draft.value.games.some(game =>
     !game.script.trim() || !game.players.length || game.players.some(player => !player.name.trim()) || !game.outcome,
   )) {
     gameCards.value.forEach(card => { if (card) card.open = true })
     error.value = 'Before publishing, give every player a name and add a script and outcome to each game.'
+    nextTick(() => {
+      const firstIncomplete = draft.value.games.findIndex(game =>
+        !game.script.trim() || !game.players.length || game.players.some(player => !player.name.trim()) || !game.outcome,
+      )
+      const card = gameCards.value[firstIncomplete]
+      const game = draft.value.games[firstIncomplete]
+      const missingPlayerIndex = game.players.findIndex(player => !player.name.trim())
+      const field = !game.script.trim()
+        ? card?.querySelector('.fields select')
+        : !game.players.length
+          ? card?.querySelector('.roster-actions > button')
+          : missingPlayerIndex >= 0
+            ? card?.querySelectorAll('input[list="clocktower-players"]')[missingPlayerIndex]
+            : card?.querySelectorAll('.fields select')[1]
+      field?.focus()
+      field?.scrollIntoView({ block: 'center' })
+    })
     return
   }
 
   saving.value = true
   try {
-    const result = await call('save', { session: cleanSession(draft.value) })
+    const result = await call('save', { session: cleanSession({ ...draft.value, published }) })
     const committed = result.session
     const refreshed = await load()
     const referencedPaths = new Set(refreshed ? saved.value.flatMap(session =>
@@ -381,6 +488,11 @@ async function save() {
   } finally {
     saving.value = false
   }
+}
+
+function unpublish() {
+  if (!window.confirm('Unpublish this gathering? It will no longer appear on the public page.')) return
+  save(false)
 }
 
 async function uploadPhotos(event, game) {
@@ -472,4 +584,51 @@ button{min-height:42px;padding:8px 12px;border:1px solid var(--line);background:
 .preview-photos img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; }
 @media(max-width:900px){.player-card{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}.player-card .check-label{align-self:center}.remove-player{justify-self:start}}
 @media(max-width:720px){.clocktower-admin .admin-card{padding:16px}.player-card{grid-template-columns:minmax(0,1fr)}.player-card .check-label{padding:2px 0}.game-heading,.saved,.editor-heading,.section-heading{align-items:flex-start;flex-wrap:wrap}.game-content{padding:0 14px 16px}.game-actions{width:100%}.game-actions button{flex:1}.photo-row{align-items:flex-start}.photo-row label{flex:1 1 150px}.editor-heading>button{width:100%}}
+.saved-picker { margin-top: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
+.saved-picker > summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 9px 14px; cursor: pointer; color: var(--matcha-leaf); font-weight: 700; }
+.saved-picker > summary span { display: grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px; border-radius: 20px; background: var(--surface-soft); font-size: .8rem; }
+.saved-list { display: grid; gap: 8px; padding: 0 10px 10px; }
+.saved-list .saved { margin: 0; padding: 12px; }
+.editor-heading-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.editor-heading-actions .start-game { border-color: var(--matcha-leaf); color: var(--matcha-leaf); font-weight: 700; }
+.section-heading h4 small { margin-left: 5px; color: var(--muted); font: .75rem var(--font-body); }
+.roster-actions { display: flex; align-items: center; gap: 8px; }
+.script-list, .game-extras { padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--white-pure); }
+.script-list > summary, .game-extras > summary, .player-more > summary { display: flex; align-items: center; gap: 9px; min-height: 40px; cursor: pointer; font-size: .86rem; font-weight: 650; }
+.script-list > summary span, .game-extras > summary span { color: var(--muted); font-size: .78rem; font-weight: 400; }
+.script-list label, .game-extras > label { margin-top: 9px; }
+.bulk-roster-panel { display: grid; gap: 9px; margin: 0 0 8px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.bulk-roster-panel > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.bulk-roster-panel .admin-primary { border: 0; }
+.bulk-roster-panel textarea { min-height: 96px; resize: vertical; }
+.player-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto auto; gap: 8px 10px; align-items: center; padding: 8px 10px; }
+.player-card > label:not(.check-label) { font-size: .8rem; }
+.player-card .check-label { align-self: end; min-height: 44px; padding: 0 3px; font-size: .82rem; }
+.player-more summary { min-width: 68px; justify-content: center; font-size: .8rem; }
+.player-more label { min-width: 155px; margin-top: 6px; }
+.player-more[open] { grid-column: 1 / -1; }
+.remove-player { min-height: 40px; padding: 7px 9px; font-size: .8rem; }
+.add-game-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.add-game-actions button { border-color: var(--matcha-leaf); color: var(--matcha-leaf); font-weight: 650; }
+.add-player-next { justify-self: start; border-style: dashed; color: var(--matcha-leaf); }
+.save-row { position: sticky; bottom: 8px; z-index: 3; width: fit-content; max-width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fffcf6ee; box-shadow: 0 4px 18px #211a201c; backdrop-filter: blur(10px); }
+.save-row .admin-primary { min-height: 46px; }
+.save-row .publish-button { min-height: 46px; border-color: var(--gold-leaf); color: #704b19; font-weight: 700; }
+@media(max-width:720px) {
+  .editor-heading-actions { width: 100%; justify-content: flex-start; }
+  .section-heading { align-items: center; }
+  .roster-actions { flex-wrap: wrap; }
+  .player-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+  .player-card .check-label { min-height: 38px; }
+  .player-more { grid-column: 1 / 3; }
+  .remove-player { justify-self: end; }
+  .save-row { position: sticky; bottom: max(8px, env(safe-area-inset-bottom)); width: 100%; }
+  .save-row .admin-primary { flex: 0 0 auto; }
+}
+@media(max-width:420px) {
+  .player-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 7px; }
+  .player-card .check-label { align-self: center; }
+  .player-more { grid-column: 1; }
+  .remove-player { grid-column: 2; grid-row: 3; }
+}
 </style>

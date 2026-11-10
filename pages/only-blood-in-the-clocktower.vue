@@ -19,16 +19,16 @@
       </span>
       <div class="next-copy">
         <p class="eyebrow">The next gathering</p>
-        <h2 id="next-night-title">{{ nextNight ? formatDate(nextNight.date) : nextSession ? formatDate(nextSession.session_date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'The town will meet again' }}</h2>
-        <p v-if="nextNight?.time || nextNight?.venue || nextSession?.session_time || nextSession?.venue">
-          <template v-if="nextNight?.time || nextSession?.session_time">{{ nextNight?.time || nextSession?.session_time }}</template>
-          <template v-if="(nextNight?.time || nextSession?.session_time) && (nextNight?.venue || nextSession?.venue)"> · </template>
-          <template v-if="nextNight?.venue || nextSession?.venue">{{ nextNight?.venue || nextSession?.venue }}</template>
+        <h2 id="next-night-title">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'The town will meet again' }}</h2>
+        <p v-if="nextGathering?.time || nextGathering?.venue">
+          <template v-if="nextGathering?.time">{{ nextGathering.time }}</template>
+          <template v-if="nextGathering?.time && nextGathering?.venue"> · </template>
+          <template v-if="nextGathering?.venue">{{ nextGathering.venue }}</template>
         </p>
-        <p>{{ nextSession?.first_timer_note || (eventError ? 'We couldn’t check the schedule just now. Please try again.' : 'New to Clocktower? Come along. We’ll walk you through your first game.') }}</p>
+        <p>{{ nextGathering?.first_timer_note || (eventError && !nextGathering ? 'We couldn’t check the schedule just now. Please try again.' : 'New to Clocktower? Come along. We’ll walk you through your first game.') }}</p>
       </div>
-      <a class="primary-link" :href="gatheringHref">
-        {{ nextNight ? 'See gathering details ↗' : nextSession?.signup_url ? 'Save your place ↗' : 'See community gatherings ↗' }}
+      <a class="primary-link" :href="nextGathering?.href || '/gatherings/'">
+        {{ nextGathering?.signup_url ? 'Save your place ↗' : nextGathering?.href.startsWith('/gatherings/#') ? 'See gathering details ↗' : 'See community gatherings ↗' }}
       </a>
     </section>
 
@@ -38,14 +38,17 @@
       </figure>
       <div class="featured-copy">
         <p class="eyebrow"><span aria-hidden="true">✦</span> From the storyteller’s desk</p>
-        <h2 id="featured-title">{{ featured.teaser || 'The final reveal' }}</h2>
+        <h2 id="featured-title">{{ featured.teaser || 'The latest night in Ravenswood Bluff' }}</h2>
         <p class="metadata">{{ formatDate(featured.session_date) }}<template v-if="featured.venue"> · {{ featured.venue }}</template></p>
-        <details v-if="featured.recap" class="recap-reveal" :open="isShared(featured)">
+        <details v-if="featured.recap" class="recap-reveal">
           <summary>Reveal Mika’s retelling</summary>
           <p>{{ featured.recap }}</p>
         </details>
-        <a v-else class="text-link" :href="'#session-' + featured.id">View gathering <span aria-hidden="true">↓</span></a>
-        <button v-if="featured.recap" class="share-button" type="button" @click="shareSession(featured)">Copy recap link</button>
+        <div v-if="!featured.recap" class="featured-prompt">
+          <p>{{ featured.games?.length ? `${featured.games.length} game${featured.games.length === 1 ? '' : 's'} played` : 'A new story from the circle' }}<template v-if="featured.games?.length"> · {{ [...new Set(featured.games.map(game => game.script).filter(Boolean))].join(' · ') }}</template></p>
+          <a class="text-link" :href="'#session-' + featured.id">Explore this gathering <span aria-hidden="true">↓</span></a>
+        </div>
+        <button v-if="featured.recap" class="share-button" type="button" @click="shareSession(featured)">Share recap</button>
         <p v-if="shareNotices[featured.id]" role="status" class="share-feedback">{{ shareNotices[featured.id] }}</p>
       </div>
     </section>
@@ -66,6 +69,11 @@
         <h2 id="archive-title">Every town has a story</h2>
         <p v-if="pastSessions.length" class="metadata">Game results and retellings stay tucked away until you reveal them.</p>
       </header>
+      <div v-if="!loading && !error && pastSessions.length" class="archive-filters" aria-label="Filter past gatherings">
+        <label>Year<select v-model="selectedYear"><option value="all">All years</option><option v-for="year in archiveYears" :key="year" :value="year">{{ year }}</option></select></label>
+        <label>Script<select v-model="selectedScript"><option value="all">All scripts</option><option v-for="script in archiveScripts" :key="script" :value="script">{{ script }}</option></select></label>
+        <button v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="selectedYear = 'all'; selectedScript = 'all'">Clear filters</button>
+      </div>
       <p v-if="error" class="archive-state" role="alert">{{ error }} <button class="share-button" type="button" @click="loadArchive">Try again</button></p>
       <p v-else-if="loading" class="archive-state" role="status">Opening the grimoire…</p>
       <div v-else-if="!pastSessions.length" class="archive-state empty-archive">
@@ -74,35 +82,45 @@
         <p>After a gathering, look here for Mika’s retelling, game results and photos from the table.</p>
       </div>
 
-      <article v-for="session in pastSessions" :id="'session-' + session.id" :key="session.id" class="session-card">
+      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state">No gatherings match these filters. <button class="share-button" type="button" @click="selectedYear = 'all'; selectedScript = 'all'">Clear filters</button></p>
+      <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card">
         <div class="session-heading">
           <div>
             <h3>{{ formatDate(session.session_date) }}</h3>
             <p class="metadata">{{ session.venue || 'Saujana gathering' }} · {{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</p>
           </div>
-          <button class="share-button" type="button" @click="shareSession(session)">Copy gathering link</button>
+          <button class="share-button" type="button" @click="shareSession(session)">Share gathering</button>
         </div>
         <p v-if="shareNotices[session.id]" role="status" class="share-feedback">{{ shareNotices[session.id] }}</p>
 
-        <details v-if="session.recap" class="recap-reveal" :open="isShared(session)">
+        <details v-if="session.recap" class="recap-reveal">
           <summary>Reveal Mika’s retelling</summary>
           <p>{{ session.recap }}</p>
         </details>
 
         <div v-if="sessionPhotos(session).length" class="photo-gallery" :aria-label="'Photos from ' + formatDate(session.session_date)">
-          <img v-for="photo in sessionPhotos(session)" :key="photo.path" :src="photoUrls[photo.path]" :alt="photo.alt || 'Photo from this Blood on the Clocktower gathering'" loading="lazy">
+          <a v-for="photo in sessionPhotos(session)" :key="photo.path" class="photo-link" :href="photoUrls[photo.path]" target="_blank" rel="noopener noreferrer" :aria-label="'Open full-size photo from ' + formatDate(session.session_date) + ' in a new tab'">
+            <img :src="photoUrls[photo.path]" :alt="photo.alt || 'Photo from this Blood on the Clocktower gathering'" loading="lazy">
+          </a>
         </div>
 
         <div v-if="session.games?.length" class="game-grid">
-          <details v-for="(game, index) in session.games" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || index" :open="isSharedGame(session, game)">
+          <details v-for="(game, index) in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || index">
             <summary>
               <span class="game-label">Game {{ index + 1 }}</span>
-              <span>{{ game.script || 'Custom script' }}</span>
+              <span>{{ game.script || 'Custom script' }} · reveal spoilers</span>
             </summary>
             <p v-if="game.outcome" class="outcome">{{ game.outcome }}</p>
-            <ul v-if="game.players?.length" class="roster"><li v-for="(player, pIndex) in game.players" :key="pIndex">{{ player.public_name || player.name || 'Seat ' + (pIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · died</template></li></ul>
+            <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
+              <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
+                <span class="seat-number">{{ String(pIndex + 1).padStart(2, '0') }}</span>
+                <span class="seat-name">{{ player.public_name || player.name || 'Seat ' + (pIndex + 1) }}</span>
+                <span v-if="player.character" class="seat-character">{{ player.character }}</span>
+                <span v-if="player.died" class="death-mark">Died</span>
+              </li>
+            </ol>
             <p v-if="game.notes" class="story-text">{{ game.notes }}</p>
-            <button v-if="game.id" class="share-button" type="button" @click="shareGame(session, game)">Copy game link</button>
+            <button v-if="game.id" class="share-button" type="button" @click="shareGame(session, game)">Share game link</button>
             <p v-if="shareNotices[game.id]" role="status" class="share-feedback">{{ shareNotices[game.id] }}</p>
           </details>
         </div>
@@ -118,6 +136,8 @@ const route = useRoute()
 const sessions = ref([])
 const photoUrls = ref({})
 const shareNotices = ref({})
+const selectedYear = ref('all')
+const selectedScript = ref('all')
 const loading = ref(true)
 const error = ref('')
 const eventLoading = ref(true)
@@ -142,10 +162,42 @@ const nextNight = computed(() => communityEvents.value
 const nextSession = computed(() => sessions.value
   .filter(session => session.session_date >= localDate && !hasResults(session))
   .sort((a, b) => a.session_date.localeCompare(b.session_date))[0])
-const gatheringHref = computed(() => nextNight.value
-  ? `/gatherings/#gathering-${nextNight.value.id}`
-  : nextSession.value?.signup_url || '/gatherings/')
-const featured = computed(() => pastSessions.value.find(session => session.featured_game_id || session.recap || session.teaser))
+const nextGathering = computed(() => {
+  const event = nextNight.value
+  const session = nextSession.value
+  if (event && session && event.date === session.session_date && (!event.venue || !session.venue || event.venue.trim().toLowerCase() === session.venue.trim().toLowerCase())) {
+    return {
+      date: event.date,
+      time: event.time || session.session_time,
+      venue: event.venue || session.venue,
+      first_timer_note: session.first_timer_note,
+      signup_url: session.signup_url,
+      href: `/gatherings/#gathering-${event.id}`,
+    }
+  }
+  if (event && (!session || event.date <= session.session_date)) {
+    return { ...event, href: `/gatherings/#gathering-${event.id}` }
+  }
+  if (session) {
+    return {
+      date: session.session_date,
+      time: session.session_time,
+      venue: session.venue,
+      first_timer_note: session.first_timer_note,
+      signup_url: session.signup_url,
+      href: session.signup_url || '/gatherings/',
+    }
+  }
+  return null
+})
+const latestSession = computed(() => [...pastSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
+const featured = computed(() => latestSession.value)
+const archiveYears = computed(() => [...new Set(pastSessions.value.map(session => session.session_date?.slice(0, 4)).filter(Boolean))].sort((a, b) => b.localeCompare(a)))
+const archiveScripts = computed(() => [...new Set(pastSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean))].sort((a, b) => a.localeCompare(b)))
+const filteredSessions = computed(() => pastSessions.value.filter(session =>
+  (selectedYear.value === 'all' || session.session_date?.startsWith(selectedYear.value)) &&
+  (selectedScript.value === 'all' || session.games?.some(game => game.script === selectedScript.value)),
+))
 const statistics = computed(() => ({
   sessions: pastSessions.value.length,
   games: pastSessions.value.reduce((total, session) => total + (session.games?.length || 0), 0),
@@ -172,12 +224,10 @@ function cover(session) {
   return (photos.find(photo => photo.cover) || photos[0])?.path
 }
 
-function isShared(session) {
-  return route.query.session === session.id && !route.query.game && Boolean(session.recap)
-}
-
-function isSharedGame(session, game) {
-  return route.query.game === game.id && (!route.query.session || route.query.session === session.id)
+function visibleGames(session) {
+  return selectedScript.value === 'all'
+    ? session.games || []
+    : (session.games || []).filter(game => game.script === selectedScript.value)
 }
 
 async function loadArchive() {
@@ -236,9 +286,11 @@ async function loadCommunityEvents() {
 async function shareSession(session) {
   const link = new URL('/only-blood-in-the-clocktower/', window.location.origin)
   link.searchParams.set('session', session.id)
+  const nativeShare = Boolean(navigator.share)
   try {
-    await navigator.clipboard.writeText(link.toString())
-    shareNotices.value = { ...shareNotices.value, [session.id]: 'Recap link copied.' }
+    if (nativeShare) await navigator.share({ title: 'Only Blood in the Clocktower', url: link.toString() })
+    else await navigator.clipboard.writeText(link.toString())
+    shareNotices.value = { ...shareNotices.value, [session.id]: nativeShare ? 'Recap shared.' : 'Recap link copied.' }
   } catch {
     shareNotices.value = { ...shareNotices.value, [session.id]: link.toString() }
   }
@@ -248,9 +300,11 @@ async function shareGame(session, game) {
   const link = new URL('/only-blood-in-the-clocktower/', window.location.origin)
   link.searchParams.set('session', session.id)
   link.searchParams.set('game', game.id)
+  const nativeShare = Boolean(navigator.share)
   try {
-    await navigator.clipboard.writeText(link.toString())
-    shareNotices.value = { ...shareNotices.value, [game.id]: 'Game link copied.' }
+    if (nativeShare) await navigator.share({ title: 'Blood on the Clocktower · ' + game.script, url: link.toString() })
+    else await navigator.clipboard.writeText(link.toString())
+    shareNotices.value = { ...shareNotices.value, [game.id]: nativeShare ? 'Game link shared.' : 'Game link copied.' }
   } catch {
     shareNotices.value = { ...shareNotices.value, [game.id]: link.toString() }
   }
@@ -416,6 +470,8 @@ onMounted(() => {
 .featured-copy { position: relative; min-width: 0; padding: var(--panel-pad); }
 .featured-copy .eyebrow span { margin-right: 6px; }
 .metadata { margin: 4px 0 0; color: var(--soft-ink); font-size: .92rem; }
+.featured-prompt { display: grid; gap: 5px; margin-top: 13px; }
+.featured-prompt p { margin: 0; color: var(--soft-ink); }
 .recap-reveal { margin-top: 14px; }
 .recap-reveal summary { color: var(--wine); }
 .recap-reveal p, .story-text { max-width: 68ch; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -439,6 +495,9 @@ onMounted(() => {
 
 .clocktower-page .archive-heading { margin-bottom: 18px; padding: 0; text-align: left; }
 .archive-state, .session-card { padding: var(--panel-pad); }
+.archive-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 9px; background: var(--parchment); }
+.archive-filters label { display: grid; gap: 4px; min-width: min(100%, 190px); color: var(--soft-ink); font-size: .76rem; font-weight: 700; }
+.archive-filters select { min-height: 42px; padding: 7px 32px 7px 10px; border: 1px solid #d3bdb1; border-radius: 6px; background: var(--paper); color: var(--ink); font: inherit; }
 .archive-state { margin: 0; color: var(--soft-ink); }
 .empty-archive { text-align: center; background: linear-gradient(var(--paper), #f7efe3); }
 .empty-mark { margin: 0 auto 12px; font-size: 1.7rem; }
@@ -459,8 +518,17 @@ onMounted(() => {
 .game-label { color: var(--wine); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
 .outcome { display: inline-block; margin: 7px 0 0; padding: 4px 9px; border-radius: 5px; background: #eee0d5; color: #63323d; font-weight: 700; }
 .roster { margin: 10px 0; padding-left: 20px; font-size: .9rem; overflow-wrap: anywhere; }
+.grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 7px; margin: 12px 0; padding: 0; list-style: none; }
+.grimoire-seat { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 3px 8px; align-items: center; min-height: 56px; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 7px; background: var(--paper); }
+.seat-number { grid-row: span 2; display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--wine); font-size: .66rem; font-weight: 750; }
+.seat-name { min-width: 0; overflow-wrap: anywhere; font-weight: 700; }
+.seat-character { grid-column: 2; color: var(--soft-ink); font-size: .8rem; }
+.death-mark { grid-column: 3; grid-row: 1 / 3; padding: 3px 6px; border: 1px solid #743c4640; border-radius: 4px; color: var(--wine); font-size: .68rem; font-weight: 750; text-transform: uppercase; }
+.grimoire-seat.is-dead { background: #f1e7e2; }
 .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; margin: 16px 0 0; }
-.photo-gallery img { width: 100%; aspect-ratio: 4 / 3; max-height: 210px; object-fit: cover; border-radius: 7px; background: var(--parchment); }
+.photo-link { display: block; overflow: hidden; border-radius: 7px; background: var(--parchment); }
+.photo-gallery img { display: block; width: 100%; max-height: 300px; object-fit: cover; background: var(--parchment); transition: transform .2s ease; }
+.photo-link:hover img { transform: scale(1.025); }
 .share-button { min-height: 44px; padding: 7px 11px; border: 1px solid #d3bdb1; border-radius: 6px; background: transparent; color: var(--wine); font: 700 .85rem var(--font-body); cursor: pointer; }
 .share-button:hover { background: #743c460a; border-color: var(--wine); }
 .game-grid .share-button { margin-top: 7px; }
@@ -470,22 +538,25 @@ onMounted(() => {
 .next-night, .archive, .session-card, .game-grid details { scroll-margin-top: 86px; }
 
 @media (max-width: 760px) {
-  .clocktower-page > .page-header { min-height: 0; padding: 29px 24px 182px; }
-  .page-header::after { background: linear-gradient(180deg, var(--night) 15%, #211a20f5 33%, #211a2085 59%, transparent 78%); }
-  .hero-art { width: min(100%, 480px); height: auto; max-height: 100%; object-fit: contain; object-position: right bottom; }
-  .page-header h1 { font-size: clamp(2.25rem, 8.9vw, 4rem); }
-  .hero-links { margin-top: 18px; }
+  .clocktower-page > .page-header { min-height: 0; padding: 25px 20px 142px; }
+  .page-header::after { background: linear-gradient(180deg, var(--night) 20%, #211a20f5 43%, #211a2085 72%, transparent 90%); }
+  .hero-art { width: min(82%, 400px); height: 168px; max-height: none; object-fit: contain; object-position: right bottom; }
+  .page-header h1 { font-size: clamp(2.2rem, 8.9vw, 4rem); }
+  .hero-links { margin-top: 18px; gap: 6px 10px; }
+  .hero-primary, .hero-secondary { font-size: .8rem; }
+  .hero-primary { padding-inline: 10px; }
   .stats { grid-template-columns: 1fr; text-align: center; gap: 2px; }
   .stat-row { grid-column: 1; grid-row: auto; margin-top: 10px; }
   .stat-row div:first-child { border: 0; }
 }
 @media (max-width: 560px) {
-  .clocktower-page > .page-header { padding-bottom: 152px; }
+  .clocktower-page > .page-header { padding-bottom: 130px; }
   .next-night { grid-template-columns: minmax(0, 1fr); }
   .calendar-mark { display: none; }
   .next-night .primary-link { justify-self: start; }
   .featured.has-cover { grid-template-columns: minmax(0, 1fr); }
   .featured-photo { min-height: 0; aspect-ratio: 16 / 10; }
-  .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .photo-gallery { grid-template-columns: 1fr; }
+  .photo-gallery img { max-height: 340px; }
 }
 </style>
