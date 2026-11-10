@@ -159,6 +159,15 @@ button:disabled { cursor: not-allowed; }
 .nav-item::after { content: ''; position: absolute; left: 0; right: 0; bottom: 3px; height: 1px; background: var(--gold-leaf); transform: scaleX(0); transition: transform .2s; }
 .nav-item:hover, .nav-item.router-link-exact-active { color: var(--matcha-leaf); }
 .nav-item.router-link-exact-active::after, .nav-item:hover::after { transform: scaleX(1); }
+.riichi-nav-group { position: relative; }
+.riichi-nav-trigger { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; cursor: pointer; }
+.riichi-nav-trigger.router-link-exact-active { color: var(--matcha-leaf); }
+.riichi-nav-trigger.router-link-exact-active::after { transform: scaleX(1); }
+.riichi-nav-chevron { font-size: .9em; transition: transform .18s ease; }
+.riichi-nav-group.expanded .riichi-nav-chevron { transform: rotate(180deg); }
+.riichi-submenu { position: absolute; top: calc(100% + 8px); left: -16px; z-index: 1002; display: grid; min-width: 210px; padding: 7px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-silk); box-shadow: 0 12px 28px rgba(32,43,34,.12); }
+.riichi-submenu a { display: flex; align-items: center; min-height: 44px; padding: 9px 12px; border-radius: 6px; color: var(--clay-text); font-size: .84rem; text-decoration: none; }
+.riichi-submenu a:hover, .riichi-submenu a:focus-visible, .riichi-submenu a.router-link-exact-active { background: var(--surface-soft); color: var(--matcha-leaf); }
 
 /* Editorial page introductions. */
 .page-content header { padding: clamp(40px, 6vw, 72px) 20px 38px; text-align: center; width: 100%; }
@@ -194,6 +203,11 @@ button:disabled { cursor: not-allowed; }
   .nav-links.open { display: grid; gap: 0; }
   .nav-item { min-height: 48px; padding: 12px 0; font-size: .95rem; }
   .nav-item::after { right: auto; width: 26px; }
+  .riichi-nav-group { border-bottom: 1px solid var(--line); }
+  .riichi-nav-trigger { width: 100%; justify-content: space-between; text-align: left; }
+  .riichi-nav-trigger::after { display: none; }
+  .riichi-submenu { position: static; min-width: 0; margin: 0 0 8px; padding: 0 0 4px 14px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+  .riichi-submenu a { min-height: 44px; padding-left: 12px; font-size: .92rem; }
   .page-content header { padding: 38px 20px 30px; }
   [id] { scroll-margin-top: 90px; }
   input:not([type=checkbox]):not([type=radio]), select, textarea { font-size: 16px; }

@@ -32,6 +32,24 @@
         <NuxtLink v-for="link in navigation" :key="link.name" :to="link.url" class="nav-item" no-prefetch @click="closeMenu">
           {{ link.name }}
         </NuxtLink>
+        <div class="riichi-nav-group" :class="{ expanded: riichiMenuOpen }" @click.stop>
+          <button
+            ref="riichiMenuTrigger"
+            type="button"
+            class="nav-item riichi-nav-trigger"
+            :class="{ 'router-link-exact-active': route.path.startsWith('/riichi-') }"
+            aria-controls="riichi-nav-links"
+            :aria-expanded="riichiMenuOpen"
+            @click="riichiMenuOpen = !riichiMenuOpen"
+          >
+            Riichi Mahjong <span class="riichi-nav-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div v-show="riichiMenuOpen" id="riichi-nav-links" class="riichi-submenu">
+            <NuxtLink to="/riichi-calculator" no-prefetch @click="closeMenu">Scoring Calculator</NuxtLink>
+            <NuxtLink to="/riichi-league" no-prefetch @click="closeMenu">League &amp; Standings</NuxtLink>
+            <NuxtLink to="/riichi-open" no-prefetch @click="closeMenu">Riichi Open</NuxtLink>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -59,9 +77,6 @@ const navigation = [
   { name: 'Birthday Club', url: '/birthday-club' },
   { name: 'Play History', url: '/playlog' },
   { name: 'Only Blood in the Clocktower', url: '/only-blood-in-the-clocktower' },
-  { name: 'Calculator', url: '/riichi-calculator' },
-  { name: 'Riichi League', url: '/riichi-league' },
-  { name: 'Riichi Open Tournament', url: '/riichi-open' },
   { name: 'Collection', url: '/collection' }
 ]
 
@@ -73,12 +88,20 @@ const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
 const showVisitorCounter = ref(false)
 const menuOpen = ref(false)
+const riichiMenuOpen = ref(false)
+const riichiMenuTrigger = ref(null)
 
 function closeMenu() {
   menuOpen.value = false
+  riichiMenuOpen.value = false
 }
 
 function handleMenuKeydown(event) {
+  if (event.key === 'Escape' && riichiMenuOpen.value) {
+    riichiMenuOpen.value = false
+    riichiMenuTrigger.value?.focus()
+    return
+  }
   if (!menuOpen.value) return
   if (event.key === 'Escape') {
     closeMenu()
@@ -86,7 +109,7 @@ function handleMenuKeydown(event) {
     return
   }
   if (event.key !== 'Tab') return
-  const links = [...document.querySelectorAll('#primary-nav-links a')]
+  const links = [...document.querySelectorAll('#primary-nav-links a, #primary-nav-links button:not(.menu-toggle)')]
   const toggle = document.querySelector('.menu-toggle')
   const focusable = [toggle, ...links].filter(element => element?.getClientRects().length)
   const first = focusable[0], last = focusable.at(-1)
@@ -94,10 +117,15 @@ function handleMenuKeydown(event) {
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
 }
 
+function closeRiichiMenuOnOutsideClick(event) {
+  if (!event.target.closest('.riichi-nav-group')) riichiMenuOpen.value = false
+}
+
 watch(() => route.fullPath, closeMenu)
 
 onMounted(() => {
   window.addEventListener('keydown', handleMenuKeydown)
+  document.addEventListener('click', closeRiichiMenuOnOutsideClick)
   if (!footerRef.value || showVisitorCounter.value) return
   if (!('IntersectionObserver' in window)) {
     showVisitorCounter.value = true
@@ -113,7 +141,10 @@ onMounted(() => {
   observer.observe(footerRef.value)
 })
 
-onBeforeUnmount(() => window.removeEventListener('keydown', handleMenuKeydown))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleMenuKeydown)
+  document.removeEventListener('click', closeRiichiMenuOnOutsideClick)
+})
 </script>
 
 <style scoped>
