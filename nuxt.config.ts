@@ -2,6 +2,8 @@
 import { publicRoutes } from './utils/siteSeo'
 
 export default defineNuxtConfig({
+  modules: ['@nuxt/ui'],
+  ui: { colorMode: false, fonts: false },
   // Generate page content and metadata as HTML for GitHub Pages and crawlers.
   ssr: true,
   nitro: {

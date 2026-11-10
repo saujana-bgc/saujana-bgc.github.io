@@ -43,9 +43,7 @@
           </div>
           <label>First timer note<textarea v-model="draft.first_timer_note" rows="2" placeholder="What should a first timer know?"></textarea></label>
         </section>
-        <datalist id="clocktower-players"><option v-for="player in players" :key="player.id" :value="player.private_name"></option></datalist>
-
-        <details v-for="(game,index) in draft.games" :key="game.id" ref="gameCards" class="game admin-card" :open="index === 0">
+        <details v-for="(game,index) in draft.games" :key="game.id" ref="gameCards" class="game admin-card" :data-game-id="game.id" :open="index === 0">
           <summary class="game-summary">
             <span class="game-number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
             <span class="game-summary-copy"><small>Game {{ index + 1 }}</small><strong>{{ game.script || 'Choose a script' }}</strong></span>
@@ -77,13 +75,12 @@
               <h4>Players and characters <small>{{ game.players.length }} {{ game.players.length === 1 ? 'player' : 'players' }}</small></h4>
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
-              <label>Player name<input v-model="player.name" list="clocktower-players" placeholder="Choose or enter a name"></label>
-              <label>Character<input class="character-field" v-model="player.character" :list="'clocktower-characters-' + game.id" :placeholder="scriptPresets[game.script] ? 'Search characters…' : 'Enter a character'" @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"></label>
+              <label>Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
+              <label>Character<UInputMenu v-model="player.character" class="character-menu w-full" data-character-field placeholder="Search or enter a character" :items="characters(game)" mode="autocomplete" open-on-focus @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)" /></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
               <button type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</button>
             </div>
-            <datalist :id="'clocktower-characters-' + game.id"><option v-for="character in characters(game)" :key="character" :value="character"></option></datalist>
             <p v-if="!game.players.length" class="empty-note">No players added to this game yet.</p>
             <div class="roster-actions">
               <button v-if="game.players.length" type="button" class="add-player-next" @click="addPlayer(game)">Add next player +</button>
@@ -190,6 +187,7 @@ const auth = useAdminAuth()
 const endpoint = config.public.supabaseUrl + '/functions/v1/botc-archive'
 const saved = ref([])
 const players = ref([])
+const playerNames = computed(() => [...new Set(players.value.map(player => player.private_name).filter(Boolean))])
 const photoUrls = ref({})
 const localPhotoUrls = ref({})
 const pendingPhotoDeletes = ref(new Set())
@@ -321,16 +319,16 @@ function addGame(options = {}) {
 function addPlayer(game) {
   game.players.push(newPlayer())
   nextTick(() => {
-    const card = gameCards.value.find(item => item?.querySelector(`[id="clocktower-characters-${game.id}"]`))
-    const playerFields = card?.querySelectorAll('.player-card input[list="clocktower-players"]')
+    const card = gameCards.value.find(item => item?.dataset.gameId === game.id)
+    const playerFields = card?.querySelectorAll('.player-card input[data-player-name]')
     playerFields?.item(playerFields.length - 1)?.focus()
   })
 }
 
 function focusNextCharacter(game, playerIndex) {
   nextTick(() => {
-    const card = gameCards.value.find(item => item?.querySelector(`[id="clocktower-characters-${game.id}"]`))
-    card?.querySelectorAll('.character-field').item(playerIndex + 1)?.focus()
+    const card = gameCards.value.find(item => item?.dataset.gameId === game.id)
+    card?.querySelectorAll('input[data-character-field]').item(playerIndex + 1)?.focus()
   })
 }
 
@@ -349,8 +347,8 @@ function addPastedPlayers(game) {
   bulkRosterText.value = { ...bulkRosterText.value, [game.id]: '' }
   bulkRosterOpen.value = { ...bulkRosterOpen.value, [game.id]: false }
   nextTick(() => {
-    const card = gameCards.value.find(item => item?.querySelector(`[id="clocktower-characters-${game.id}"]`))
-    card?.querySelectorAll('.character-field').item(firstNewPlayerIndex)?.focus()
+    const card = gameCards.value.find(item => item?.dataset.gameId === game.id)
+    card?.querySelectorAll('input[data-character-field]').item(firstNewPlayerIndex)?.focus()
   })
 }
 
@@ -477,7 +475,7 @@ async function save(published = baseline.value.published) {
         : !game.players.length
           ? card?.querySelector('.roster-actions > button')
           : missingPlayerIndex >= 0
-            ? card?.querySelectorAll('input[list="clocktower-players"]')[missingPlayerIndex]
+            ? card?.querySelectorAll('input[data-player-name]')[missingPlayerIndex]
             : card?.querySelector('.outcome-field input[type="radio"]')
       field?.focus()
       field?.scrollIntoView({ block: 'center' })
@@ -642,6 +640,23 @@ onBeforeUnmount(() => {
   color: var(--desk-ink);
   font: inherit;
   font-weight: 400;
+}
+.player-card :deep(input[data-player-name]), .player-card :deep(input[data-character-field]) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 10px;
+  border: 1px solid #daccbd;
+  border-radius: 6px;
+  background: #fffdfa;
+  color: var(--desk-ink);
+  font: inherit;
+  font-weight: 400;
+  box-shadow: none;
+}
+.player-card :deep(input[data-player-name]:focus-visible), .player-card :deep(input[data-character-field]:focus-visible) {
+  outline: 2px solid var(--matcha-leaf);
+  outline-offset: 2px;
 }
 .editor textarea { min-height: auto; resize: vertical; }
 .clocktower-admin :is(input, select, textarea, button, summary):focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
