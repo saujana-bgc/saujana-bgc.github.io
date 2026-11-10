@@ -465,7 +465,7 @@ async function save(published = baseline.value.published) {
           ? card?.querySelector('.roster-actions > button')
           : missingPlayerIndex >= 0
             ? card?.querySelectorAll('input[list="clocktower-players"]')[missingPlayerIndex]
-            : card?.querySelector('.outcome-field select')
+            : card?.querySelector('.outcome-field input[type="radio"]')
       field?.focus()
       field?.scrollIntoView({ block: 'center' })
     })

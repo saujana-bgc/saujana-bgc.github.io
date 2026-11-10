@@ -95,7 +95,7 @@
           <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-quick-details">
             <span>{{ formatDate(event.date) }} · {{ event.time }}</span>
             <span>{{ event.venue }}</span>
-            <NuxtLink :to="`#signup-trigger-${event.id}`" :prefetch="false">Add my name ↓</NuxtLink>
+            <button v-if="canEditEvent(event) && !newRows[event.id]" type="button" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }} <span aria-hidden="true">↓</span></button>
           </div>
           <div class="event-description">
             <template v-if="isSpookyGameDay(event)">
@@ -1368,11 +1368,19 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     font-weight: 700;
 }
 
-.event-quick-details a {
+.event-quick-details button {
     width: fit-content;
+    min-height: 44px;
     margin-top: 5px;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: var(--matcha-leaf);
-    font-weight: 700;
+    font: 700 .92rem var(--font-body);
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
 }
 
 .event-card:hover .event-image {
