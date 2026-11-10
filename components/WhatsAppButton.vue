@@ -75,15 +75,14 @@
 
 @media (max-width: 540px) {
   .whatsapp-button {
-    right: max(16px, env(safe-area-inset-right));
-    bottom: max(16px, env(safe-area-inset-bottom));
-    width: 58px;
-    padding: 0;
+    position: static;
+    align-self: flex-end;
+    width: auto;
+    margin: 16px max(16px, env(safe-area-inset-right)) 18px;
+    padding: 0 16px;
   }
 
-  .whatsapp-label {
-    display: none;
-  }
+  .whatsapp-label { display: inline; }
 }
 
 @media (prefers-reduced-motion: reduce) {

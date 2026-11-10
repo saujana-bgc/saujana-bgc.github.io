@@ -3,12 +3,11 @@
     <header class="page-header">
       <img class="hero-art" src="/images/clocktower-night.svg" alt="" width="640" height="500" fetchpriority="high">
       <div class="hero-copy">
-        <p class="eyebrow hero-kicker">Saujana Board Game Community</p>
         <h1>Only Blood <em>in the Clocktower</em></h1>
         <p class="intro">Good games, impossible choices and the moment the town finds out.</p>
         <div class="hero-links">
           <a class="hero-primary" :href="nextCtaHref">
-            {{ nextGathering?.signup_url ? 'Save your place' : nextGathering ? 'See next gathering' : 'Find the next game' }}
+            {{ nextGathering?.signup_url ? 'Save your place' : nextGathering ? 'See next gathering' : eventLoading ? 'Checking dates' : 'Browse gatherings' }}
             <span v-if="nextGathering" class="hero-date">· {{ nextDateStamp.day }} {{ nextDateStamp.month }}</span>
             <span aria-hidden="true">↗</span>
           </a>
@@ -30,16 +29,16 @@
       </div>
       <div class="next-copy">
         <p class="eyebrow">The next gathering</p>
-        <h2 id="next-night-title">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'The town will meet again' }}</h2>
+        <h2 id="next-night-title">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
         <p v-if="nextGathering?.time || nextGathering?.venue">
           <template v-if="nextGathering?.time">{{ nextGathering.time }}</template>
           <template v-if="nextGathering?.time && nextGathering?.venue"> · </template>
           <template v-if="nextGathering?.venue">{{ nextGathering.venue }}</template>
         </p>
-        <p>{{ nextGathering?.first_timer_note || (eventError && !nextGathering ? 'We couldn’t check the schedule just now. Please try again.' : 'New to Clocktower? Come along. We’ll walk you through your first game.') }}</p>
+        <p>{{ nextGathering?.first_timer_note || (eventError ? 'We couldn’t load the schedule. Browse all gatherings for the latest dates.' : nextGathering ? 'New to Clocktower? Come along. We’ll walk you through your first game.' : eventLoading ? 'Upcoming dates will appear here.' : 'We haven’t announced another Clocktower session yet. Browse all gatherings for what’s coming up.') }}</p>
       </div>
       <a class="primary-link" :href="nextCtaHref">
-        {{ nextGathering?.signup_url ? 'Save your place ↗' : nextGathering?.href.startsWith('/gatherings/#') ? 'See gathering details ↗' : 'See community gatherings ↗' }}
+        {{ nextGathering?.signup_url ? 'Save your place ↗' : nextGathering ? nextGathering.href.startsWith('/gatherings/#') ? 'See gathering details ↗' : 'See community gatherings ↗' : 'Browse gatherings ↗' }}
       </a>
     </section>
 
@@ -47,7 +46,7 @@
       <div>
         <p class="eyebrow">Your first night?</p>
         <h2 id="welcome-title">You don’t need to know every secret.</h2>
-        <p>Blood on the Clocktower is a social deduction game of hidden roles, lively discussion and dramatic votes. Get a feel for the basics, then come see how the story unfolds around the table.</p>
+        <p>Come solo or bring a friend. No experience is needed. The host can help you find a seat and explain your first game. Check the gathering details and add your name to the signup list. Still deciding? Mark yourself tentative when the list allows it.</p>
       </div>
       <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Read the official guide <span aria-hidden="true">↗</span></a>
     </section>
@@ -462,10 +461,8 @@ onMounted(() => {
   line-height: 1.5;
   text-transform: uppercase;
 }
-.hero-kicker { display: flex; align-items: center; gap: 10px; color: var(--gold); }
-.hero-kicker::before { content: ''; width: 24px; border-top: 1px solid currentColor; }
 .page-header h1 {
-  margin: 13px 0 18px;
+  margin: 0 0 18px;
   font: 400 clamp(2.7rem, 6.25vw, 5rem)/1.02 var(--font-display);
   letter-spacing: -.055em;
 }
@@ -640,7 +637,7 @@ onMounted(() => {
 .session-heading > div { flex: 1 1 110px; min-width: 0; }
 .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; margin-top: 14px; align-items: start; }
 .game-grid details { min-width: 0; padding: 2px 14px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
-.game-grid details[open] { padding-bottom: 10px; border-color: #cdb3a4; }
+.game-grid details[open] { grid-column: 1 / -1; padding-bottom: 10px; border-color: #cdb3a4; }
 .clocktower-page summary { min-height: 44px; padding: 9px 25px 7px 0; cursor: pointer; font-weight: 700; overflow-wrap: anywhere; }
 .game-grid summary { display: grid; gap: 2px; padding-block: 11px; }
 .game-grid summary, .recap-reveal summary { position: relative; list-style: none; }
