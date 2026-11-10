@@ -62,6 +62,33 @@
 
     <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The four highest eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><button ref="guideTrigger" type="button" class="guide-trigger" @click="openGuide">Read the tournament guide <span aria-hidden="true">↗</span></button></section>
 
+    <section class="event-schedule" aria-labelledby="schedule-heading">
+      <div class="schedule-intro"><p class="eyebrow">Saturday, 14 November</p><h2 id="schedule-heading">Tournament schedule</h2><p>Each qualifying round has a 75-minute limit to help the tournament finish at a reasonable time.</p></div>
+      <div class="schedule-details">
+        <div class="qualifier-time-limit">
+          <h3>How we’ll enforce the limit</h3>
+          <ol>
+            <li>Start one shared countdown timer for all four tables.</li>
+            <li>Announce when 15 minutes remain.</li>
+            <li>At 75 minutes, finish the current hand.</li>
+            <li>Do not start another hand after the timer expires.</li>
+            <li>Record the scores even if the South round hasn’t finished.</li>
+          </ol>
+        </div>
+        <table class="schedule-table">
+          <caption>Event timetable</caption>
+          <tbody>
+            <tr><th scope="row">2:30–3:45 PM</th><td>Qualifier 1</td></tr>
+            <tr><th scope="row">3:45–3:55 PM</th><td>Scores and seating</td></tr>
+            <tr><th scope="row">3:55–5:10 PM</th><td>Qualifier 2</td></tr>
+            <tr><th scope="row">5:10–5:25 PM</th><td>Calculate Top 4 and break</td></tr>
+            <tr><th scope="row">5:25–6:55 PM</th><td>Grand Final</td></tr>
+            <tr><th scope="row">6:55–7:10 PM</th><td>Prize presentation and photos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <dialog ref="guideDialog" class="guide-dialog" aria-label="Riichi Open I tournament rules" @click="closeGuideFromBackdrop" @close="restoreGuideFocus">
       <div class="guide-shell">
         <div class="guide-topbar"><span><i aria-hidden="true"></i> RIICHI OPEN I · TOURNAMENT RULES</span><button type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</button></div>
@@ -580,6 +607,24 @@ async function cancelHold() {
 .event-page{width:min(1120px,92%);margin:0 auto;color:var(--clay-text);padding:0 0 30px}.event-hero{position:relative;display:grid;grid-template-columns:1.15fr .85fr;align-items:center;min-height:580px;overflow:hidden;padding:28px clamp(20px,5vw,64px);background:radial-gradient(ellipse at 76% 40%,#ebe8d8 0,#f7f5ef 55%);border:1px solid var(--line);border-radius:12px}.hero-copy{z-index:1;max-width:610px}.eyebrow{margin:0 0 12px;color:var(--gold-leaf);font-size:.72rem;letter-spacing:.11em;text-transform:uppercase}.event-hero h1{font:400 clamp(3rem,7vw,5.6rem)/.98 var(--font-display);letter-spacing:-.045em;color:var(--matcha-leaf);margin:0}.event-hero h1 em{font-style:italic;color:var(--gold-leaf)}.hero-intro{max-width:490px;font:1.12rem/1.6 var(--font-display);color:#4b5148}.event-facts{display:grid;gap:8px;margin:26px 0 20px;font-size:.92rem}.event-facts span:before{content:'✳';color:var(--gold-leaf);margin-right:10px}.event-offer{display:flex;align-items:center;gap:11px;margin:20px 0 18px}.event-offer strong{font:2.4rem var(--font-display);color:var(--matcha-leaf)}.event-offer>span{font-size:.82rem}.event-offer i{height:28px;border-left:1px solid var(--line);margin:0 7px}.text-link{display:inline-flex;color:var(--matcha-leaf);font-weight:650;text-underline-offset:4px}.mika-frame{align-self:end;justify-self:center;width:min(100%,410px);height:510px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}.mika-frame img{height:100%;width:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 14px 20px #354c3e20)}.registration-panel{display:grid;grid-template-columns:1fr minmax(180px,.45fr);gap:24px;margin:30px 0;padding:clamp(22px,4vw,40px);background:var(--matcha-leaf);color:white;border-radius:10px}.register-heading h2,.registrant-section h2,.format-strip h2{font:2rem var(--font-display);margin:0 0 10px}.register-heading p:last-child{max-width:570px;line-height:1.65;color:#f0f1e9}.availability{align-self:center;padding:17px;background:#ffffff10;border:1px solid #ffffff30;border-radius:8px;display:grid;gap:6px}.availability>strong{font:2.2rem var(--font-display)}.availability>span,.availability small{font-size:.78rem;opacity:.8}.capacity-track{height:7px;background:#ffffff30;border-radius:10px;margin:6px 0;overflow:hidden}.capacity-track i{display:block;height:100%;background:#d9c087;border-radius:10px}.signup-step,.payment-step,.confirmation{grid-column:1/-1;padding:21px;background:var(--white-pure);border-radius:8px;color:var(--clay-text)}.signup-step form,.payment-step form{display:grid;gap:10px}.signup-step label,.payment-step label{font-size:.87rem;font-weight:650}.signup-step input:not([type=file]){width:min(100%,520px);padding:12px;border:1px solid var(--line);border-radius:6px;font:inherit}.small-print,.payment-step label span{font-size:.78rem;color:var(--muted)}.event-button{background:var(--gold-leaf);color:white;border:0;border-radius:6px;padding:13px 17px;font:inherit;font-weight:700;cursor:pointer;width:max-content;max-width:100%}.event-button:disabled{opacity:.6;cursor:wait}.payment-step{display:grid;grid-template-columns:minmax(220px,.8fr) 1fr;gap:22px}.payment-instructions{padding:18px;background:var(--surface-soft);border-radius:8px}.payment-instructions h3{font:1.35rem var(--font-display);color:var(--matcha-leaf);margin:0}.payment-instructions a{font-weight:750;color:var(--matcha-leaf);font-size:1.2rem}.copy-button,.inline-button{border:1px solid var(--line);background:var(--white-pure);border-radius:5px;padding:8px 12px;color:var(--matcha-leaf);font:inherit;cursor:pointer}.hold-note{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;color:var(--matcha-leaf)}.payment-step input[type=file]{border:1px dashed var(--line);padding:14px;border-radius:6px}.file-selected{font-size:.8rem;color:var(--muted)}.form-error{color:#963f47}.confirmation{text-align:center;padding:35px}.confirm-mark{display:grid;place-items:center;width:42px;height:42px;margin:auto;border-radius:50%;background:#e6ede5;color:var(--matcha-leaf);font-size:1.2rem}.confirmation h3{font:1.7rem var(--font-display);color:var(--matcha-leaf)}.reference{font-size:.82rem}.pending-badge,.verified-badge{display:inline-block;padding:5px 9px;border-radius:99px;background:#f3ead4;color:#705525;font-size:.72rem}.verified-badge{background:#e4eee5;color:#35583b}.registrant-section{padding:30px 0;border-top:1px solid var(--line)}.registrant-section>div:first-child p:last-child{color:var(--muted)}.registrant-counts{display:flex;gap:22px;font-size:.82rem;color:var(--muted);margin:18px 0}.registrant-counts strong{color:var(--matcha-leaf)}.registrant-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.registrant-list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:7px}.registrant-list li strong{overflow-wrap:anywhere}.empty-list{padding:18px;background:var(--surface-soft);border-radius:7px;color:var(--muted)}.format-strip{display:grid;grid-template-columns:1fr 1fr;gap:10px 40px;align-items:center;padding:28px 0;border-top:1px solid var(--line)}.format-strip>p{line-height:1.7;color:var(--muted)}.format-strip .text-link{grid-column:2}.notice{grid-column:1/-1;background:#fff5df;color:#71592c;padding:10px;border-radius:5px}
 @media(max-width:760px){.event-hero{grid-template-columns:1fr;min-height:auto;padding:28px 24px 0}.hero-copy{padding-bottom:16px}.mika-frame{height:min(94vw,460px);width:min(100%,390px)}.registration-panel{grid-template-columns:1fr}.availability{width:auto}.payment-step{grid-template-columns:1fr}.registrant-list{grid-template-columns:1fr}.format-strip{grid-template-columns:1fr}.format-strip .text-link{grid-column:auto}}
 .hold-note small{display:block;margin-top:4px;font-size:.75rem;color:var(--muted)}
+</style>
+
+<style scoped>
+.event-schedule{display:grid;grid-template-columns:minmax(210px,.7fr) minmax(0,1.3fr);gap:28px;padding:34px 0;border-top:1px solid var(--line)}
+.schedule-intro h2{margin:0 0 10px;color:var(--matcha-leaf);font:400 clamp(1.7rem,3vw,2.25rem)/1.15 var(--font-display)}
+.schedule-intro>p:last-child{color:var(--muted);font-size:.9rem;line-height:1.65}
+.schedule-details{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,1.1fr);gap:22px;align-items:start}
+.qualifier-time-limit{padding:16px;border-radius:9px;background:var(--surface-soft)}
+.qualifier-time-limit h3{margin:0 0 10px;color:var(--matcha-leaf);font:650 .95rem 'Segoe UI',sans-serif}
+.qualifier-time-limit ol{margin:0;padding-left:1.25rem;color:var(--muted);font-size:.82rem;line-height:1.55}
+.qualifier-time-limit li{padding-left:3px;margin:5px 0}
+.schedule-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.schedule-table caption{margin-bottom:8px;text-align:left;color:var(--matcha-leaf);font-weight:700}
+.schedule-table th,.schedule-table td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.schedule-table th{width:118px;color:var(--matcha-leaf);font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
+.schedule-table td{color:var(--muted)}
+@media(max-width:900px){.event-schedule{grid-template-columns:1fr;gap:14px}.schedule-details{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.schedule-details{grid-template-columns:1fr}.event-schedule{padding:26px 0}.schedule-table{font-size:.78rem}.schedule-table th,.schedule-table td{padding:9px 6px}}
 </style>
 
 <style scoped>

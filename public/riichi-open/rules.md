@@ -217,9 +217,9 @@ There is therefore no double ron or triple ron.
 
 ### Time Limits
 
-**Event setting:** hanchans are untimed unless the organiser announces a time limit before the event starts. The organiser must announce whether a limit also applies to the Final.
+**Riichi Open I qualifier setting:** each qualifying hanchan has a 75-minute limit. Use one shared countdown timer for all four tables and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop: do not start another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the additional-hand procedure below for the qualifiers. The published 75-minute limit applies to the qualifying rounds; the Grand Final has its own scheduled time slot.
 
-**WRC Section 10.1 procedure if a limit is announced:** at the signal, finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. A chombo after the signal still requires the affected hand to be replayed.
+**WRC Section 10.1 procedure for other timed hanchans:** unless the event announces a different procedure, at the signal finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. A chombo after the signal still requires the affected hand to be replayed.
 
 ---
 
