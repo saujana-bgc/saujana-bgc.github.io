@@ -1,5 +1,5 @@
 <template>
-  <div class="visitor-counter" aria-label="Visit counts for today and all time">
+  <div v-if="visitorStats" class="visitor-counter" aria-label="Visit counts for today and all time">
     <span class="visitor-label">Visits</span>
     <span class="visitor-num">{{ dailyVisitors }}</span>
     <span class="visitor-label">today</span>

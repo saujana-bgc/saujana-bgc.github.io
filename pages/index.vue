@@ -23,8 +23,8 @@
     </section>
 
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
-      <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-      <p class="section-intro">Check the date, venue and sign-up details for <NuxtLink to="/gatherings" no-prefetch>an upcoming gathering</NuxtLink>.</p>
+      <h2 id="first-visit-title" class="hero-title story-title">What to expect at your first gathering</h2>
+      <p class="section-intro">New to Saujana? Here’s how a first visit can go. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
       <div class="expect-guide">
         <article v-for="item in expectations" :key="item.title" class="expect-card">
           <h3>{{ item.title }}</h3>
@@ -36,7 +36,7 @@
     <section class="riichi-panel" aria-labelledby="riichi-title">
       <div>
         <h2 id="riichi-title" class="hero-title story-title">Explore riichi mahjong</h2>
-        <p class="section-intro">Curious about Japanese mahjong? Ask the host about riichi at a gathering.</p>
+        <p class="section-intro">Curious about Japanese mahjong? Explore our tools, league standings and tournament.</p>
       </div>
       <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
         <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch>Scoring calculator <span aria-hidden="true">→</span></NuxtLink>
@@ -82,7 +82,7 @@
         >
           <img
             :src="getInstagramThumb(post.img)"
-            :alt="post.caption || 'Instagram post'"
+            :alt="getInstagramAlt(post.caption)"
             width="360"
             height="360"
             loading="lazy"
@@ -111,6 +111,11 @@ import { instagramData } from '~/assets/data/instagram_data.js'
 
 const posts = computed(() => (instagramData?.posts ?? []).slice(0, 4))
 const getInstagramThumb = (src) => `/${src.replace('images/instagram/', 'images/instagram/thumbs/')}`
+const getInstagramAlt = (caption) => {
+  const summary = caption?.replace(/\s+/g, ' ').trim()
+  if (!summary) return 'Saujana community gathering, shared on Instagram.'
+  return `Saujana on Instagram: ${summary.slice(0, 100)}${summary.length > 100 ? '…' : ''}`
+}
 
 const pillars = [
   {
@@ -146,9 +151,12 @@ const expectations = [
 <style scoped>
 .home {
   width: min(1160px, calc(100% - 40px));
+  min-width: 0;
   margin-inline: auto;
   padding-bottom: 12px;
 }
+
+.home > * { min-width: 0; }
 
 .hero-section {
   display: grid;
@@ -203,9 +211,19 @@ const expectations = [
 
 .hero-gatherings-link:hover { background: #293d31; }
 
-.hero-artwork { margin: 0; }
+.hero-artwork {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
 
-.hero-banner,
+.hero-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-card);
+}
+
 .table-scenes img {
   display: block;
   width: 100%;
@@ -283,6 +301,7 @@ const expectations = [
 .riichi-discovery a {
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
+  text-decoration: none;
 }
 
 .riichi-discovery a:last-child { border-bottom: 0; }
@@ -366,17 +385,34 @@ const expectations = [
   -webkit-box-orient: vertical;
 }
 
-.ig-badge { position: absolute; top: 14px; left: 14px; color: white; }
+.ig-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(25, 39, 28, .78);
+  color: white;
+}
 
-@media (max-width: 760px) {
+@media (hover: none) {
+  .ig-overlay { opacity: 1; }
+}
+
+@media (max-width: 900px) {
   .hero-section,
   .riichi-panel { grid-template-columns: minmax(0, 1fr); }
-  .hero-section { gap: 22px; }
+  .hero-section { gap: 16px; }
   .hero-artwork { max-width: 640px; }
 }
 
 @media (max-width: 600px) {
   .home { width: calc(100% - 32px); }
+  .hero-copy,
+  .hero-copy h1 { min-width: 0; max-width: 100%; }
   .expect-guide,
   .care-guide { grid-template-columns: minmax(0, 1fr); }
   .table-scenes,

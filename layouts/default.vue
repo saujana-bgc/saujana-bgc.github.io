@@ -7,7 +7,7 @@
     </div>
     <nav v-if="!isAdminRoute" class="site-nav" aria-label="Primary navigation">
       <div class="mobile-nav-bar">
-        <NuxtLink to="/" class="mobile-brand" aria-label="Saujana Board Game Community home" no-prefetch @click="closeMenu">
+        <NuxtLink to="/" class="mobile-brand" no-prefetch @click="closeMenu">
           <img class="mobile-brand-logo" src="/images/saujana-brand.webp" alt="" width="114" height="114" />
           <span class="brand-wordmark">Saujana<span class="brand-caption">Board Game Community</span></span>
         </NuxtLink>
@@ -127,7 +127,7 @@ onMounted(() => {
 
 <style scoped>
 .site-meta {
-  width: min(1120px, 92%);
+  width: min(1160px, calc(100% - 40px));
   margin: 40px auto 0;
   padding: 22px 0 28px;
   border-top: 1px solid var(--line);
@@ -147,8 +147,8 @@ onMounted(() => {
 
 .footer-copyright {
   color: var(--muted);
-  font-size: 0.62rem;
-  letter-spacing: 0.13em;
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
 }
 
 .footer-riichi-links {
@@ -173,11 +173,9 @@ onMounted(() => {
 
 .last-updated {
   margin-top: 3px;
-  color: var(--clay-text);
-  font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  opacity: 0.68;
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
 }
 
 </style>
