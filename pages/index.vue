@@ -1,16 +1,19 @@
 <template>
-  <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <section class="hero-section fade-up">
+  <main class="home">
+    <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
-        <h1 class="hero-title">Pull up a chair. Let’s play.</h1>
-        <p>No experience needed. Curiosity is plenty.</p>
-        <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+        <h1 id="home-title" class="hero-title">Pull up a chair. Let’s play.</h1>
+        <p>Join us for board games and riichi mahjong. Come on your own or bring a friend. We’ll teach you the rules.</p>
+        <div class="hero-actions">
+          <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+          <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
+        </div>
       </div>
       <figure class="hero-artwork">
         <img
           class="hero-banner"
           src="/images/site/saujana-home-hero.webp"
-          alt="Saujana Board Game Community: Pull up a chair. Let’s play. No experience needed; curiosity is plenty. A collage of players enjoying board games and riichi mahjong."
+          alt="A collage of Saujana players at board game and riichi mahjong gatherings."
           width="1671"
           height="941"
           loading="eager"
@@ -19,81 +22,53 @@
       </figure>
     </section>
 
-    <div class="welcome-strip"><span>New faces welcome</span><span>Come on your own</span><span>We’ll teach the rules</span></div>
-
-    <section class="announcement-box fade-up" style="animation-delay: 0.2s;">
-      <div class="name-story" aria-labelledby="name-story-title">
-        <p class="porch-label">Why Saujana?</p>
-        <h2 id="name-story-title" class="hero-title story-title">There’s more to discover</h2>
-        <svg class="horizon-mark" viewBox="0 0 320 48" fill="none" aria-hidden="true" focusable="false">
-          <path d="M1 38H319" />
-          <path d="M128 38a32 32 0 0 1 64 0" />
-        </svg>
-        <p>In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
-        <p>There’s room here for the first-time player, the regular with a favourite, and the person who’s just curious. Start wherever you are.</p>
-      </div>
-
-      <div class="welcome-note">
-        <h2>Make a little time for play</h2>
-        <p>Choose a date that suits you, check the venue, and add your name. We’ll see you there.</p>
-        <NuxtLink to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
-      </div>
-
-      <div class="welcome-note">
-        <h2>Explore riichi mahjong</h2>
-        <p>Curious about Japanese mahjong? Ask the host about riichi at a gathering. You can also check a hand’s score, follow our league, or find out about Riichi Open I.</p>
-        <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
-          <NuxtLink to="/riichi-calculator" no-prefetch>Riichi mahjong calculator →</NuxtLink>
-          <NuxtLink to="/riichi-league" no-prefetch>League and standings →</NuxtLink>
-          <NuxtLink to="/riichi-open" no-prefetch>Riichi Open I tournament →</NuxtLink>
-        </nav>
-      </div>
-
+    <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
+      <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
+      <p class="section-intro">Check the date, venue and sign-up details for <NuxtLink to="/gatherings" no-prefetch>an upcoming gathering</NuxtLink>.</p>
       <div class="expect-guide">
         <article v-for="item in expectations" :key="item.title" class="expect-card">
-          <span>{{ item.step }}</span>
           <h3>{{ item.title }}</h3>
           <p>{{ item.copy }}</p>
         </article>
       </div>
-
-      <div class="table-scenes" aria-label="Scenes from Saujana gatherings">
-        <figure>
-          <img src="/images/site/table_scene_1.avif" alt="Players gathered around a Saujana board game table" loading="lazy" decoding="async" width="640" height="480">
-          <figcaption>The rules get explained. The fun follows.</figcaption>
-        </figure>
-        <figure>
-          <img src="/images/site/table_scene_2.avif" alt="Friends playing together at a Saujana gathering" loading="lazy" decoding="async" width="640" height="480">
-          <figcaption>A few rounds. Plenty to talk about.</figcaption>
-        </figure>
-        <figure>
-          <img src="/images/site/table_scene_3.avif" alt="Board games prepared for a Saujana meetup" loading="lazy" decoding="async" width="640" height="480">
-          <figcaption>What shall we try next?</figcaption>
-        </figure>
-      </div>
-
-      <section class="community-values" aria-labelledby="community-values-title">
-        <p class="porch-label">A little care goes a long way</p>
-        <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
-        <div class="care-guide">
-          <div v-for="(pillar, i) in pillars" :key="pillar.title" class="pillar" :style="{ animationDelay: (0.15 + i * 0.1) + 's' }">
-            <div class="pillar-icon" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</div>
-            <h3>{{ pillar.title }}</h3>
-            <p>{{ pillar.content }}</p>
-          </div>
-        </div>
-        <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, message an admin privately.</p>
-      </section>
     </section>
 
-    <section v-if="posts.length" class="ig-section fade-up" style="animation-delay: 0.1s;">
-      <div class="ig-header">
-        <span class="ig-icon" v-html="igSvg" aria-hidden="true"></span>
-        <div>
-          <p class="ig-sub">A glimpse of Saujana</p>
-          <h2 class="ig-handle">The games end. The stories stay.</h2>
+    <section class="riichi-panel" aria-labelledby="riichi-title">
+      <div>
+        <h2 id="riichi-title" class="hero-title story-title">Explore riichi mahjong</h2>
+        <p class="section-intro">Curious about Japanese mahjong? Ask the host about riichi at a gathering.</p>
+      </div>
+      <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
+        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch>Scoring calculator <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-league" no-prefetch>League and standings <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-open" no-prefetch>Riichi Open I tournament <span aria-hidden="true">→</span></NuxtLink>
+      </nav>
+    </section>
+
+    <section class="home-section" aria-labelledby="name-story-title">
+      <h2 id="name-story-title" class="hero-title story-title">Why Saujana?</h2>
+      <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
+      <div class="table-scenes">
+        <img src="/images/site/table_scene_1.avif" alt="A group of Saujana players holding their board games." loading="lazy" decoding="async" width="640" height="480">
+        <img src="/images/site/table_scene_2.avif" alt="Saujana players posing with games at a café." loading="lazy" decoding="async" width="640" height="480">
+      </div>
+    </section>
+
+    <section class="home-section" aria-labelledby="community-values-title">
+      <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
+      <div class="care-guide">
+        <div v-for="pillar in pillars" :key="pillar.title" class="pillar">
+          <h3>{{ pillar.title }}</h3>
+          <p>{{ pillar.content }}</p>
         </div>
-        <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer" class="ig-follow-btn">Find us on Instagram ↗</a>
+      </div>
+      <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, message an admin privately.</p>
+    </section>
+
+    <section v-if="posts.length" class="home-section" aria-labelledby="instagram-title">
+      <div class="ig-header">
+        <h2 id="instagram-title" class="hero-title story-title">Saujana on Instagram</h2>
+        <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer" class="text-link">Visit our profile <span aria-hidden="true">↗</span></a>
       </div>
 
       <div class="ig-grid">
@@ -113,7 +88,8 @@
             loading="lazy"
             decoding="async"
           />
-          <div class="ig-overlay">
+          <span class="ig-open" aria-hidden="true">↗</span>
+          <div class="ig-overlay" aria-hidden="true">
             <span v-if="post.is_sidecar" class="ig-badge">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M3 4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2H3a1 1 0 0 1-1-1V4zm2 9v1h10V6h-1v7a1 1 0 0 1-1 1H5zm-1-2h9V4H4v7z"/></svg>
             </span>
@@ -136,8 +112,6 @@ import { instagramData } from '~/assets/data/instagram_data.js'
 const posts = computed(() => (instagramData?.posts ?? []).slice(0, 4))
 const getInstagramThumb = (src) => `/${src.replace('images/instagram/', 'images/instagram/thumbs/')}`
 
-const igSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" width="28" height="28"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>`
-
 const pillars = [
   {
     title: 'Make the first hello',
@@ -155,17 +129,14 @@ const pillars = [
 
 const expectations = [
   {
-    step: 'Arrive',
     title: 'Say hello',
     copy: 'Find the host when you arrive. Let us know it’s your first visit, and take a moment to settle in.'
   },
   {
-    step: 'Learn',
     title: 'Find your game',
     copy: 'Fancy something quick, clever, or a little chaotic? Ask for a suggestion. We’ll walk you through the rules.'
   },
   {
-    step: 'Play',
     title: 'See where it goes',
     copy: 'Watch a round, start with something light, or settle into a longer game. You can find your pace as you go.'
   }
@@ -173,77 +144,243 @@ const expectations = [
 </script>
 
 <style scoped>
-.hero-section { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); align-items: center; gap: clamp(28px, 5vw, 72px); width: min(1440px, 96%); padding: 12px 0 36px; }
-.hero-copy { padding-left: clamp(12px, 3vw, 48px); }
-.hero-copy h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); }
-.hero-copy p { max-width: 28ch; margin: 20px 0 0; color: var(--muted); font-family: var(--font-display); font-size: clamp(1.15rem, 2vw, 1.65rem); font-style: italic; line-height: 1.45; }
-.hero-artwork { width: 100%; aspect-ratio: 1.36; margin: 0; overflow: hidden; border-radius: 12px; }
-.hero-banner { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 88% center; transform: scale(2.6) translateX(4%); transform-origin: right center; }
-.hero-gatherings-link { display: flex; width: fit-content; min-height: 48px; align-items: center; justify-content: center; gap: 10px; margin: 28px 0 0; padding: 0 24px; border-radius: 6px; background: var(--matcha-leaf); color: var(--white-pure); font-size: .95rem; font-weight: 600; text-decoration: none; }
-.hero-gatherings-link:hover { background: #293d31; }
-.welcome-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 64px; width: min(1200px,92%); padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); font-size: .67rem; letter-spacing: .1em; text-transform: uppercase; }
-.welcome-strip span { display: flex; align-items: center; gap: 14px; }
-.welcome-strip span::before { content: '✧'; color: var(--gold-leaf); }
-.announcement-box { width: min(1120px,92%); margin: 72px auto 0; text-align: center; }
-.porch-label { font-size: .65rem; text-transform: uppercase; letter-spacing: .15em; color: var(--gold-leaf); }
-.story-title { font-size: clamp(1.8rem, 6vw, 2.5rem); }
-.name-story { max-width: 680px; margin: 0 auto; }
-.name-story > p:not(.porch-label) { font-size: 1rem; line-height: 1.9; color: var(--muted); margin: 18px 0 0; }
-.horizon-mark { display: block; width: min(320px, 75%); height: 48px; margin: 22px auto; color: var(--gold-leaf); stroke: currentColor; stroke-width: 1; }
-.welcome-note { margin: 32px auto; max-width: 760px; padding: 28px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
-.welcome-note h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 0 0 10px; }
-.welcome-note p { font-size: .9rem; color: var(--muted); margin: 0; }
-.welcome-note a { display: inline-block; color: var(--matcha-leaf); font-size: .8rem; margin-top: 16px; }
-.riichi-discovery { display: flex; justify-content: center; flex-wrap: wrap; gap: 0 24px; }
-.expect-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin: 44px 0 32px; }
-.expect-card { padding: 12px 0; border-top: 1px solid var(--line); }
-.expect-card span { color: var(--gold-leaf); font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; }
-.expect-card h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; color: var(--matcha-leaf); margin: 12px 0; }
-.expect-card p { color: var(--muted); font-size: .9rem; line-height: 1.8; margin: 0; }
-.table-scenes { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
-.table-scenes figure { min-width: 0; margin: 0; text-align: left; }
-.table-scenes img { width: 100%; height: 230px; object-fit: cover; border-radius: 8px; }
-.table-scenes figcaption { margin-top: 10px; color: var(--muted); font-size: .78rem; line-height: 1.6; }
-.community-values { margin-top: 52px; padding-top: 32px; border-top: 1px solid var(--line); }
-.care-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; text-align: left; margin-top: 28px; padding: 12px 0 28px; }
-.respect-note { max-width: 760px; margin: 0 auto; padding: 20px 0 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; line-height: 1.8; }
-.pillar-icon { color: var(--gold-leaf); font-size: .7rem; letter-spacing: .1em; }
-.pillar h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; color: var(--matcha-leaf); margin: 12px 0; }
-.pillar p { font-size: .85rem; line-height: 1.8; color: var(--muted); margin: 0; }
-.ig-section { width: min(1120px,92%); margin: 44px auto 20px; padding: 36px 0 0; border-top: 1px solid var(--line); }
-.ig-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
-.ig-icon { display: none; }
-.ig-handle { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem,3vw,2rem); color: var(--matcha-leaf); margin: 6px 0 0; }
-.ig-sub { font-size: .62rem; text-transform: uppercase; letter-spacing: .15em; color: var(--gold-leaf); margin: 0; }
-.ig-follow-btn { margin-left: auto; color: var(--matcha-leaf); font-size: .8rem; text-decoration: none; border-bottom: 1px solid var(--line); padding: 12px 0; white-space: nowrap; }
-.ig-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
-.ig-cell { position: relative; aspect-ratio: 1; overflow: hidden; display: block; border-radius: 6px; background: var(--surface-soft); }
-.ig-cell img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
-.ig-cell:hover img { transform: scale(1.04); }
-.ig-overlay { position: absolute; inset: 0; background: linear-gradient(to top,rgba(25,39,28,.85),transparent 90%); opacity: 0; transition: opacity .2s; display: flex; align-items: flex-end; padding: 16px; }
-.ig-cell:hover .ig-overlay, .ig-cell:focus-visible .ig-overlay { opacity: 1; }
-.ig-caption { color: white; font-size: .75rem; line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.ig-badge { position: absolute; top: 10px; right: 10px; color: white; }
-@media (max-width: 899px) {
- .hero-section { grid-template-columns: minmax(0, 1fr); gap: 22px; width: 100%; padding: 8px 0 28px; }
- .hero-copy { padding: 12px 22px 0; text-align: center; }
- .hero-copy h1 { max-width: 15ch; margin-inline: auto; font-size: clamp(2.35rem, 8vw, 3.5rem); }
- .hero-copy p { margin: 12px auto 0; }
- .hero-gatherings-link { margin: 18px auto 0; }
- .hero-artwork { width: min(100% - 32px, 680px); aspect-ratio: 1.6; margin-inline: auto; }
- .welcome-strip { gap: 12px 24px; font-size: .6rem; }
- .announcement-box { margin-top: 44px; }
+.home {
+  width: min(1160px, calc(100% - 40px));
+  margin-inline: auto;
+  padding-bottom: 12px;
 }
+
+.hero-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 80px);
+}
+
+.hero-copy h1 {
+  max-width: 14ch;
+  font-size: clamp(2.45rem, 5.5vw, 4.8rem);
+}
+
+.hero-copy p {
+  max-width: 37ch;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.65;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  margin-top: 24px;
+}
+
+.hero-gatherings-link,
+.text-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  color: var(--matcha-leaf);
+  font-size: .95rem;
+  font-weight: 600;
+  text-underline-offset: .2em;
+}
+
+.text-link:hover { text-decoration-thickness: 2px; }
+
+.hero-gatherings-link {
+  min-height: 48px;
+  padding-inline: 18px;
+  border-radius: var(--radius-control);
+  background: var(--matcha-leaf);
+  color: var(--white-pure);
+  text-decoration: none;
+}
+
+.hero-gatherings-link:hover { background: #293d31; }
+
+.hero-artwork { margin: 0; }
+
+.hero-banner,
+.table-scenes img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-card);
+}
+
+.home-section,
+.riichi-panel {
+  margin-top: clamp(32px, 5.5vw, 68px);
+}
+
+.home-section {
+  padding-top: clamp(24px, 3.5vw, 40px);
+  border-top: 1px solid var(--line);
+}
+
+.story-title { font-size: clamp(1.7rem, 4vw, 2.55rem); }
+
+.section-intro {
+  max-width: 64ch;
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.section-intro a { color: var(--matcha-leaf); }
+
+.expect-guide,
+.care-guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.expect-card {
+  padding: clamp(16px, 2.2vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--white-pure);
+}
+
+.expect-card h3,
+.pillar h3 {
+  margin: 0 0 6px;
+  color: var(--matcha-leaf);
+  font: 400 1.25rem/1.3 var(--font-display);
+}
+
+.expect-card p,
+.pillar p,
+.respect-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: .95rem;
+  line-height: 1.65;
+}
+
+.riichi-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px 28px;
+  padding: clamp(20px, 4vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--lavender-mist);
+}
+
+.riichi-discovery {
+  display: grid;
+}
+
+.riichi-discovery a {
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.riichi-discovery a:last-child { border-bottom: 0; }
+
+.table-scenes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.care-guide { gap: 20px 28px; }
+
+.respect-note {
+  max-width: 75ch;
+  margin-top: 22px;
+}
+
+.ig-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 16px;
+  margin-bottom: 14px;
+}
+
+.ig-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.ig-cell {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: var(--surface-soft);
+}
+
+.ig-cell img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.ig-open {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--white-pure);
+  color: var(--matcha-leaf);
+}
+
+.ig-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  background: linear-gradient(to top, rgba(25, 39, 28, .9), transparent 85%);
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.ig-cell:hover .ig-overlay,
+.ig-cell:focus-visible .ig-overlay { opacity: 1; }
+
+.ig-caption {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: white;
+  font-size: .8rem;
+  line-height: 1.4;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.ig-badge { position: absolute; top: 14px; left: 14px; color: white; }
+
+@media (max-width: 760px) {
+  .hero-section,
+  .riichi-panel { grid-template-columns: minmax(0, 1fr); }
+  .hero-section { gap: 22px; }
+  .hero-artwork { max-width: 640px; }
+}
+
 @media (max-width: 600px) {
- .hero-section { padding-bottom: 24px; }
- .expect-guide, .care-guide { grid-template-columns: 1fr; gap: 22px; }
- .care-guide { margin-top: 28px; }
- .pillar { padding-bottom: 10px; }
- .table-scenes { gap: 8px; }
- .table-scenes img { height: 130px; }
- .ig-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
- .welcome-note { padding: 24px 18px; }
- .ig-header { gap: 8px; }
- .ig-follow-btn { font-size: .72rem; }
+  .home { width: calc(100% - 32px); }
+  .expect-guide,
+  .care-guide { grid-template-columns: minmax(0, 1fr); }
+  .table-scenes,
+  .ig-grid { gap: 10px; }
+  .ig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 </style>
