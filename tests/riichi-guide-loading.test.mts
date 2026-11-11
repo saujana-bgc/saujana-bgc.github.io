@@ -45,7 +45,7 @@ test('a failed guide request clears loading and can be retried', async () => {
   app.fail(true)
   await app.state.loadGuide()
   assert.equal(app.state.guideLoading.value, false)
-  assert.ok(app.state.guideError.value.includes('could not be loaded'))
+  assert.ok(app.state.guideError.value.includes('couldn’t load the tournament rules'))
   assert.equal(app.state.guideMarkdown.value, '')
   app.fail(false)
   await app.state.loadGuide()

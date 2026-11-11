@@ -34,9 +34,6 @@
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Good games. Good company. See you soon.</p>
       <span class="footer-copyright">&copy; {{ year }} Saujana Board Game Community</span>
-      <nav class="footer-riichi-links" aria-label="Riichi mahjong pages">
-        <NuxtLink v-for="page in riichiChildren" :key="page.to" :to="page.to" no-prefetch>{{ page.label }}</NuxtLink>
-      </nav>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
       </ClientOnly>
@@ -149,26 +146,6 @@ onMounted(() => {
   color: var(--muted);
   font-size: 0.72rem;
   letter-spacing: 0.09em;
-}
-
-.footer-riichi-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 18px;
-  margin-top: 6px;
-}
-
-.footer-riichi-links a {
-  color: var(--muted);
-  font-size: 0.72rem;
-  text-decoration-color: var(--line);
-  text-underline-offset: 3px;
-}
-
-.footer-riichi-links a:hover {
-  color: var(--matcha-leaf);
-  text-decoration-color: currentColor;
 }
 
 .last-updated {
