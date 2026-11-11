@@ -25,7 +25,7 @@
       </section>
       <nav class="hero-actions" aria-label="Clocktower page links">
         <a class="hero-secondary" :href="heroSecondaryHref">{{ heroSecondaryLabel }} <span aria-hidden="true">↓</span></a>
-        <a v-if="recapSessions.length" class="hero-tertiary" href="#clocktower-archive">Browse game recaps <span aria-hidden="true">↓</span></a>
+        <a v-if="recapSessions.length" class="hero-tertiary" href="#clocktower-archive">Browse gathering recaps <span aria-hidden="true">↓</span></a>
       </nav>
       <span class="hero-caption" aria-hidden="true">Ravenswood Bluff <span>✦</span> After dark</span>
     </header>
@@ -35,7 +35,7 @@
         <p class="eyebrow">New to the game?</p>
         <h2 id="welcome-title">Your first game</h2>
         <ul class="welcome-steps">
-          <li><strong>Before you arrive</strong><span>Check the gathering’s time, venue and any event-specific costs. Follow its signup details; mark yourself tentative if you’re still deciding.</span></li>
+          <li><strong>Before you arrive</strong><span>Check the gathering’s date, time, venue and costs. Follow its sign-up details and mark yourself tentative if you’re still deciding.</span></li>
           <li><strong>When you arrive</strong><span>Come solo or bring a friend. The host will help you find a seat and explain what you need as you play.</span></li>
         </ul>
         <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Optional: read the official guide <span aria-hidden="true">↗</span></a>
@@ -51,18 +51,18 @@
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
         <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" v-model="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" /></label>
         <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" v-model="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" /></label>
-        <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
+        <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
       </div>
       <p v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="filter-count" role="status">Showing {{ filteredSessions.length }} of {{ recapSessions.length }} gatherings</p>
-      <p v-if="error" class="archive-state" role="alert">{{ error }} <UButton class="share-button" type="button" @click="loadArchive">Try again</UButton></p>
-      <p v-else-if="loading" class="archive-state" role="status">Opening the grimoire…</p>
+      <p v-if="error" class="archive-state" role="alert">{{ error }} <UButton class="archive-button" type="button" @click="loadArchive">Try again</UButton></p>
+      <p v-else-if="loading" class="archive-state" role="status">Loading recaps…</p>
       <div v-else-if="!recapSessions.length" class="archive-state empty-archive">
         <span class="empty-mark" aria-hidden="true">✧</span>
         <h3>No recaps yet</h3>
         <p>Retellings, game results and approved photos will appear here after a gathering.</p>
       </div>
 
-      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
+      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
       <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id, 'has-cover': session.id === featured?.id && Boolean(coverPhoto(session)) }">
         <p v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</p>
         <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="'Approved table photo from ' + formatDate(session.session_date)" loading="lazy">
@@ -82,14 +82,14 @@
           <article v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number" class="game-recap">
             <header class="game-recap-heading">
               <span class="game-label">Game {{ number }}</span>
-              <h4 class="game-script">{{ game.script || 'Script not recorded' }}</h4>
+              <h4 class="game-script" tabindex="-1">{{ game.script || 'Script not recorded' }}</h4>
             </header>
-            <p v-if="game.outcome" class="outcome">{{ game.outcome }}</p>
+            <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
             <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
               <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
                 <img class="character-art" :src="characterIcon(player.character)" alt="" loading="lazy" decoding="async">
                 <div class="seat-copy">
-                  <span class="seat-name">{{ player.public_name || player.name || 'Anonymous player' }}</span>
+                  <span class="seat-name">{{ publicPlayerName(player, pIndex) }}</span>
                   <span class="seat-character">{{ player.character || 'Character not recorded' }}</span>
                 </div>
                 <span v-if="player.died" class="death-mark">Died</span>
@@ -114,18 +114,27 @@
       <p class="eyebrow">The tally</p>
       <h2 id="stats-title">Clocktower in numbers</h2>
       <div class="stat-row">
-        <div><strong>{{ statistics.sessions }}</strong><span>gatherings</span></div>
-        <div><strong>{{ statistics.games }}</strong><span>games played</span></div>
-        <div><strong>{{ statistics.scripts }}</strong><span>scripts explored</span></div>
+        <div><strong>{{ statistics.sessions }}</strong><span>{{ statistics.sessions === 1 ? 'gathering' : 'gatherings' }}</span></div>
+        <div><strong>{{ statistics.games }}</strong><span>{{ statistics.games === 1 ? 'game played' : 'games played' }}</span></div>
+        <div><strong>{{ statistics.scripts }}</strong><span>{{ statistics.scripts === 1 ? 'script played' : 'scripts played' }}</span></div>
       </div>
     </section>
-    <footer class="art-credit">Character icons by the Blood on the Clocktower community <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">View icon credits <span aria-hidden="true">↗</span></a></footer>
+    <footer class="art-credit">
+      <span>Blood on the Clocktower is published by <a href="https://bloodontheclocktower.com/" target="_blank" rel="noopener noreferrer">The Pandemonium Institute</a>.</span>
+      <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">Character icon credits <span aria-hidden="true">↗</span></a>
+    </footer>
   </main>
 </template>
 
 <script setup>
 const config = useRuntimeConfig()
 const route = useRoute()
+
+function publicPlayerName(player, index) {
+  const publicName = (player.public_name ?? player.name)?.trim()
+  return publicName && publicName !== 'Seat ' + (index + 1) ? publicName : 'Anonymous player'
+}
+
 const sessions = ref([])
 const photoUrls = ref({})
 const selectedYear = ref('all')
@@ -259,11 +268,11 @@ async function loadArchive() {
     if (typeof sharedGameId === 'string') {
       const sharedSession = typeof sharedId === 'string' ? document.getElementById('session-' + sharedId) : null
       const target = sharedSession
-        ? [...sharedSession.querySelectorAll('.game-grid details')].find(game => game.id === 'game-' + sharedGameId)
+        ? [...sharedSession.querySelectorAll('.game-recap')].find(game => game.id === 'game-' + sharedGameId)
         : document.getElementById('game-' + sharedGameId)
       if (target) {
         target.scrollIntoView({ block: 'start' })
-        target.querySelector('summary')?.focus({ preventScroll: true })
+        target.querySelector('.game-script')?.focus({ preventScroll: true })
         return
       }
       const fallback = typeof sharedId === 'string' ? document.getElementById('session-' + sharedId) : null
@@ -289,7 +298,7 @@ async function loadArchive() {
       }
     }
   } catch {
-    error.value = 'We couldn’t load the session archive. Please try again.'
+    error.value = 'We couldn’t load the recaps. Try again.'
   } finally {
     loading.value = false
   }
@@ -564,8 +573,8 @@ onMounted(() => {
 .grimoire-seat.is-dead { background: radial-gradient(ellipse at 42% 50%, #553039 0%, #301c25 70%); }
 .character-art { display: block; width: 70px; height: 70px; object-fit: contain; filter: drop-shadow(0 3px 8px #120b1690); }
 .seat-copy { display: grid; gap: 4px; min-width: 0; }
-.seat-name { min-width: 0; overflow-wrap: anywhere; color: #e9d7ca; font-size: .82rem; }
-.seat-character { min-width: 0; color: #fff5e9; font: 400 1.05rem/1.2 var(--font-display); overflow-wrap: anywhere; }
+.seat-name { min-width: 0; color: #fff5e9; font: 400 1.05rem/1.2 var(--font-display); overflow-wrap: anywhere; }
+.seat-character { min-width: 0; overflow-wrap: anywhere; color: #e9d7ca; font-size: .82rem; }
 .death-mark { grid-column: 3; grid-row: 1; align-self: start; padding: 4px 7px; border: 1px solid #efa6a455; border-radius: 4px; background: #873e4b40; color: #ffd9c7; font-size: .65rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
 .art-credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--soft-ink); font-size: .72rem; }
 .art-credit a { color: var(--wine); text-underline-offset: 3px; }
@@ -578,9 +587,8 @@ onMounted(() => {
 .photo-link { display: block; overflow: hidden; border-radius: 7px; background: var(--parchment); }
 .photo-gallery img { display: block; width: 100%; max-height: 300px; object-fit: cover; background: var(--parchment); transition: transform .2s ease; }
 .photo-link:hover img { transform: scale(1.025); }
-.share-button { min-height: 44px; padding: 7px 11px; border: 1px solid #d3bdb1; border-radius: 6px; background: transparent; color: var(--wine); font: 700 .85rem var(--font-body); cursor: pointer; }
-.share-copy-link { min-height: 36px; padding: 5px 9px; border: 1px solid #d3bdb1; border-radius: 5px; background: transparent; color: var(--wine); font: 700 .8rem var(--font-body); cursor: pointer; }
-.next-night, .archive, .session-card, .game-grid details { scroll-margin-top: 86px; }
+.archive-button { min-height: 44px; padding: 7px 11px; border: 1px solid #d3bdb1; border-radius: 6px; background: transparent; color: var(--wine); font: 700 .85rem var(--font-body); cursor: pointer; }
+.next-night, .archive, .session-card, .game-recap { scroll-margin-top: 86px; }
 
 @media (max-width: 760px) {
   .clocktower-page > .page-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "date" "actions"; gap: 18px; min-height: 0; padding: 28px 22px 26px; }
@@ -611,7 +619,6 @@ onMounted(() => {
   .next-night .calendar-link { grid-column: 2; }
   .session-heading { align-items: flex-start; }
   .session-heading > div { flex-basis: 180px; }
-  .session-heading .share-button { flex: 0 0 auto; }
   .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-gallery img { max-height: 180px; }
 }

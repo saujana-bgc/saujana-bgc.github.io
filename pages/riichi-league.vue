@@ -76,9 +76,9 @@
               <th scope="col">Rank</th>
               <th scope="col">Player</th>
               <th scope="col">Sessions</th>
-              <th scope="col">1sts</th>
-              <th scope="col">2nds</th>
-              <th scope="col">High game</th>
+              <th scope="col">1st places</th>
+              <th scope="col">2nd places</th>
+              <th scope="col">Highest score</th>
               <th scope="col">Season total (best {{ selectedSeason.bestResultsCount }} days)</th>
             </tr>
           </thead>
@@ -106,7 +106,7 @@
               {{ player.wins }} 1st · {{ player.seconds }} 2nd
             </p>
           </div>
-          <strong :class="scoreClass(player.bestTotal)">{{ scoreDisplay(player.bestTotal) }}<small>league pts</small></strong>
+          <strong :class="scoreClass(player.bestTotal)">{{ scoreDisplay(player.bestTotal) }}<small>league points</small></strong>
         </article>
       </div>
       <UButton v-if="!standingQuery && filteredStandings.length > 10" type="button" class="standings-toggle league-button" :aria-expanded="showAllStandings" @click="showAllStandings = !showAllStandings">
@@ -260,7 +260,7 @@
                   <h5>{{ playerName(result.playerId) }}</h5>
                   <p>{{ result.seatWind ? `${seatLabel(result.seatWind)} seat · ` : '' }}{{ numberFormat(result.finalPoints) }} pts</p>
                 </div>
-                <strong :class="scoreClass(leagueScore(result, table))">{{ scoreDisplay(leagueScore(result, table)) }}<small>league pts</small></strong>
+                <strong :class="scoreClass(leagueScore(result, table))">{{ scoreDisplay(leagueScore(result, table)) }}<small>league points</small></strong>
               </article>
             </div>
           </section>

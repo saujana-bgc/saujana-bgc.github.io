@@ -8,7 +8,7 @@
   >
     <div class="tutorial-shell">
       <header class="tutorial-header">
-        <h2 id="tutorial-title">Riichi calculator guide</h2>
+        <h2 id="tutorial-title">Riichi mahjong calculator guide</h2>
         <UButton
           type="button"
           class="tutorial-close"
@@ -59,8 +59,8 @@
         <details class="tutorial-transcript">
           <summary>Scoring steps</summary>
           <ol>
-            <li>Enter han and fu, or build the hand with tiles. Fu is ignored at 5 han or more.</li>
-            <li>Select the winning tile, then choose Ron or Tsumo.</li>
+            <li>Enter han and fu, or build the hand with tiles. Fu does not affect the score at 5 han or more.</li>
+            <li>Select the winning tile, then choose ron or tsumo.</li>
             <li>Set the dealer, riichi, and any bonuses or special circumstances.</li>
             <li>Check the payment, including honba.</li>
           </ol>

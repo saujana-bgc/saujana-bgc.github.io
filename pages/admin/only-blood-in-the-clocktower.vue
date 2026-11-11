@@ -78,7 +78,10 @@
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <span class="seat-number" aria-label="Seat">{{ String(playerIndex + 1).padStart(2, '0') }}</span>
-              <label>Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
+              <div class="player-name-fields">
+                <label>Player name (private)<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
+                <label>Public display name<input v-model.trim="player.public_name" placeholder="Optional"></label>
+              </div>
               <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
@@ -112,7 +115,7 @@
               <label>Photos<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple @change="uploadPhotos($event,game)"></label>
               <div v-if="game.photos?.length" class="photo-list">
                 <article v-for="photo in game.photos" :key="photo.path" class="photo-row">
-                  <img v-if="photoSource(photo)" :src="photoSource(photo)" alt="Clocktower session photo preview">
+                  <img v-if="photoSource(photo)" :src="photoSource(photo)" alt="Clocktower gathering photo preview">
                   <span v-else class="photo-placeholder" aria-hidden="true">Photo preview unavailable</span>
                   <label class="check-label"><input v-model="photo.approved" type="checkbox"> Approved to publish</label>
                   <label class="check-label"><input v-model="photo.cover" type="checkbox"> Use as cover</label>
@@ -129,38 +132,36 @@
         </div>
 
         <section class="story admin-card">
-          <h3>Meetup story</h3>
-          <label>Teaser<input v-model="draft.teaser" maxlength="240" placeholder="A spoiler free hook"></label>
+          <h3>Gathering recap</h3>
+          <label>Recap title<input v-model="draft.teaser" maxlength="240" placeholder="Give this gathering a title"></label>
           <label>Retelling<textarea v-model="draft.recap" rows="4" maxlength="3000" placeholder="What did the town believe? What changed? What did everyone talk about?"></textarea></label>
         </section>
 
         <details class="visitor-preview admin-card">
-          <summary>Preview as visitors will see it</summary>
-          <p class="preview-note">Private preview. Players appear by seat unless they have a public name.</p>
+          <summary>Preview the public recap</summary>
+          <p class="preview-note">Players appear as “Anonymous player” when their public display name is blank.</p>
           <article class="preview-session">
             <header class="preview-masthead">
               <p class="eyebrow">From the storyteller’s desk</p>
               <h3>{{ draft.teaser || 'A night in Ravenswood Bluff' }}</h3>
-              <p>{{ draft.session_date }}<template v-if="draft.venue"> · {{ draft.venue }}</template></p>
+              <p>{{ formatGatheringDate(draft.session_date) }}<template v-if="draft.venue"> · {{ draft.venue }}</template></p>
             </header>
-            <details v-if="draft.recap" class="preview-reveal">
-              <summary>Reveal retelling</summary>
+            <section v-if="draft.recap" class="preview-content" aria-label="Retelling">
+              <p class="eyebrow">Retelling</p>
               <p>{{ draft.recap }}</p>
-            </details>
+            </section>
             <template v-for="game in draft.games" :key="game.id">
               <h4>{{ game.script || 'Script not recorded' }}</h4>
-              <details class="preview-reveal">
-                <summary>Reveal the result</summary>
-                <p v-if="game.players.length">In the circle · {{ game.players.map((player, index) => player.public_name.trim() || `Seat ${index + 1}`).join(', ') }}</p>
-                <p v-if="game.outcome">{{ game.outcome }}</p>
-                <ul><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Seat ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · died</template></li></ul>
+              <div class="preview-content">
+                <p v-if="game.outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
+                <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Anonymous player' }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
                 <p v-if="game.notes">{{ game.notes }}</p>
-              </details>
+              </div>
               <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
                 <img v-for="photo in game.photos.filter(photo => photo.approved && photoSource(photo))" :key="photo.path" :src="photoSource(photo)" alt="Approved gathering photo">
               </div>
             </template>
-            <p v-if="!draft.games.length && !draft.recap" class="empty-note">Add a game or write a retelling to preview the session story.</p>
+            <p v-if="!draft.games.length && !draft.recap" class="empty-note">Add a game or write a retelling to preview the recap.</p>
           </article>
         </details>
       </fieldset>
@@ -764,7 +765,7 @@ button:disabled { opacity: .65; cursor: wait; }
 .admin-primary { border-color: var(--matcha-leaf); background: var(--matcha-leaf); color: #fff; padding-inline: 15px; font-weight: 700; }
 .admin-primary:enabled:hover { background: #5b3039; }
 .visitor-preview { padding: var(--desk-pad); background: var(--desk-paper); border-color: var(--desk-rule); }
-.visitor-preview summary, .preview-reveal summary { cursor: pointer; font-weight: 700; color: var(--matcha-leaf); }
+.visitor-preview summary { cursor: pointer; font-weight: 700; color: var(--matcha-leaf); }
 .preview-note { margin: 9px 0 13px; color: var(--muted); font-size: .86rem; }
 .preview-session { overflow: hidden; padding: 0 16px 14px; border: 1px solid #e3d6c6; border-radius: 9px; background: #fffcf6; overflow-wrap: anywhere; }
 .preview-masthead { margin: 0 -16px 14px; padding: clamp(16px, 3vw, 28px); background: #f5eae4; }
@@ -772,8 +773,8 @@ button:disabled { opacity: .65; cursor: wait; }
 .preview-masthead h3 { margin: 4px 0; color: #35282b; font: 400 clamp(1.25rem, 3vw, 1.85rem)/1.15 var(--font-display); }
 .preview-masthead p:last-child { margin: 6px 0 0; color: #6b5755; }
 .preview-session h4 { margin: 16px 0 0; color: var(--matcha-leaf); }
-.preview-reveal { margin: 10px 0; padding: 12px; border: 1px solid #e3d6c6; border-radius: 7px; background: #f8f1e8; }
-.preview-reveal p { white-space: pre-wrap; }
+.preview-content { margin: 10px 0; padding: 12px; border: 1px solid #e3d6c6; border-radius: 7px; background: #f8f1e8; }
+.preview-content p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .preview-photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 8px; }
 .preview-photos img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; }
 .saved-picker { margin-top: 16px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--desk-paper); }
@@ -819,6 +820,7 @@ button:disabled { opacity: .65; cursor: wait; }
 .player-card:focus-within { border-color: #b48977; }
 .seat-number { display: grid; place-items: center; align-self: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--matcha-leaf); font-size: .68rem; font-weight: 750; }
 .player-card > label:not(.check-label) { font-size: .8rem; }
+.player-name-fields { display: grid; gap: 6px; min-width: 0; font-size: .8rem; }
 .player-card .check-label { align-self: end; min-height: 44px; padding: 0 3px; font-size: .82rem; }
 .player-card .death-check { white-space: nowrap; }
 .legacy-status { grid-column: 1 / -1; }
@@ -850,7 +852,7 @@ button:disabled { opacity: .65; cursor: wait; }
   .game-heading, .editor-heading { align-items: flex-start; flex-wrap: wrap; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
   .player-card { grid-template-columns: 28px repeat(6, minmax(0, 1fr)); align-items: center; }
-  .player-card > label:not(.check-label) { grid-column: span 3; }
+  .player-card > label:not(.check-label), .player-name-fields { grid-column: span 3; }
   .player-card > .seat-number { grid-row: 1; }
   .player-card > .death-check { grid-column: span 4; }
   .player-card > .remove-player { grid-column: span 2; }

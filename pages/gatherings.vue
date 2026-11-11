@@ -3,7 +3,7 @@
     <header class="fade-up">
       <p class="page-eyebrow">Something to look forward to</p>
       <h1 class="hero-title">Board game gatherings</h1>
-      <div class="stats-container">Find your next game night, check the details, and come as you are. New to Saujana? We’ll help you find your seat.</div>
+      <div class="stats-container">Find your next gathering and check the details. New to Saujana? Ask the host to help you get started.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -16,7 +16,7 @@
         <div class="first-time-details-content">
           <p>The host can help you find a seat and choose a game. You can watch a round, join in, or bring a game to share.</p>
           <ul class="first-time-details">
-            <li><strong>Before you come:</strong> Check the date, time, and venue, then follow that gathering’s signup details. Still deciding? Mark yourself tentative when there’s a signup list.</li>
+            <li><strong>Before you come:</strong> Check the date, time, and venue, then follow that gathering’s sign-up details. Still deciding? Mark yourself tentative when there’s a sign-up list.</li>
             <li><strong>At regular gatherings:</strong> Order at least RM10 per person to support our hosts. Add your spend to the list after ordering, and pay at the counter.</li>
           </ul>
         </div>
@@ -95,7 +95,7 @@
           <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-quick-details">
             <span>{{ formatDate(event.date) }} · {{ event.time }}</span>
             <span>{{ event.venue }}</span>
-            <UButton v-if="canEditEvent(event) && !newRows[event.id]" type="button" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }} <span aria-hidden="true">↓</span></UButton>
+            <UButton v-if="canEditEvent(event) && !newRows[event.id]" type="button" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }} <span aria-hidden="true">↓</span></UButton>
           </div>
           <div class="event-description">
             <template v-if="isSpookyGameDay(event)">
@@ -105,7 +105,7 @@
           </div>
 
           <div v-if="isSpookyGameDay(event) && activeTab === 'present'" class="external-rsvp">
-            <h3>RSVP for Spooky Game Day</h3>
+            <h3>Sign up for Spooky Game Day</h3>
             <p>Sign up with Pair of Dice BGC to save your spot.</p>
             <a href="https://www.pairofdicebgc.com/" target="_blank" rel="noopener noreferrer" class="btn-add external-rsvp-link">
               RSVP at Pair of Dice BGC
@@ -115,14 +115,14 @@
 
           <div v-else-if="!isSpookyGameDay(event)" class="attendees-section">
             <div v-if="activeTab === 'present'" class="signup-intro">
-              <h3>Join us</h3>
+              <h3>Sign up</h3>
               <p>Use the name you’d like us to know you by. Still deciding? Add “tentative” in the notes.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
               <p v-if="signupSuccess[event.id]" class="signup-success" role="status">{{ signupSuccess[event.id] }}</p>
               <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
-                <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Add my name' }}</UButton>
+                <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
               </div>
               <form
                 v-else
@@ -133,8 +133,8 @@
                 @submit.prevent="saveNewRow(event.id)"
               >
                 <div class="signup-form-heading">
-                  <h4 :id="`signup-title-${event.id}`">Your signup</h4>
-                  <p>Only your name is required. Regular gatherings have a RM10 minimum spend per person. Tap “Join the list” below to save your signup.</p>
+                  <h4 :id="`signup-title-${event.id}`">Your sign-up</h4>
+                  <p>Only your name is required. Regular gatherings have a RM10 minimum spend per person.</p>
                 </div>
                 <fieldset class="signup-fields" :disabled="savingRows[event.id]">
                   <legend class="signup-sr-only">Your details</legend>
@@ -163,9 +163,9 @@
                 </fieldset>
                 <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
                 <div class="signup-form-footer">
-                  <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your signup…' : 'Your signup hasn’t been saved yet.' }}</p>
+                  <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your sign-up…' : '' }}</p>
                   <div class="signup-submit-actions">
-                    <UButton type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Joining…' : 'Join the list' }}</UButton>
+                    <UButton type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Signing up…' : 'Sign up' }}</UButton>
                     <UButton type="button" class="btn-cancel" :disabled="savingRows[event.id]" @click="cancelNewRow(event.id)">Cancel</UButton>
                   </div>
                 </div>
@@ -173,7 +173,7 @@
             </div>
 
             <div class="attendees-header">
-              <h3 class="attendees-title">{{ activeTab === 'past' ? 'Who signed up' : 'Who’s coming' }}</h3>
+              <h3 class="attendees-title">{{ activeTab === 'past' ? 'Who signed up' : 'Who’s signed up' }}</h3>
               <div class="attendees-stats">
                 <div class="stat-pill">
                   <span class="stat-num">{{ attendeesByEvent[event.id]?.length ?? 0 }}</span>
@@ -208,7 +208,7 @@
                 <thead>
                   <tr>
                     <th @mouseenter="showTooltip($event, 'The name you’d like us to know you by.')" @mouseleave="hideTooltip">Name</th>
-                    <th @mouseenter="showTooltip($event, 'When you expect to arrive. You can leave this blank if you’re unsure.')" @mouseleave="hideTooltip">ETA</th>
+                    <th @mouseenter="showTooltip($event, 'When you expect to arrive. You can leave this blank if you’re unsure.')" @mouseleave="hideTooltip">Arrival time</th>
                     <th @mouseenter="showTooltip($event, 'Minimum spend is RM10 per person. Update this after ordering.')" @mouseleave="hideTooltip">
                       Spent (RM)<br><span class="th-sub">min. RM10</span>
                     </th>
@@ -252,7 +252,7 @@
                   <UButton v-if="canEditEvent(event)" class="btn-delete" :aria-label="`Remove ${attendee.name || 'attendee'} from the list`" @click="confirmDelete(attendee, event.id, event)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" style="width:0.85em;height:0.85em"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></UButton>
                 </div>
                 <div class="card-field">
-                  <label class="card-label" :for="`attendee-${attendee.id}-eta`">ETA</label>
+                  <label class="card-label" :for="`attendee-${attendee.id}-eta`">Arrival time</label>
                   <input :id="`attendee-${attendee.id}-eta`" v-model="attendee.eta" type="time" class="card-value-input" :aria-label="`Arrival time for ${attendee.name || 'attendee'}`" :min="eventStartTime(event) || undefined" :readonly="!canEditEvent(event)" @change="validateEtaForEvent(event, attendee)" @blur="saveAttendee(attendee, event)" />
                 </div>
                 <div class="card-field">
@@ -935,7 +935,7 @@ async function saveNewRow(eventId) {
             .single()
 
         if (error || !data) {
-            signupErrors[eventId] = 'Your signup hasn’t been saved. Your details are still here; please try “Join the list” again.'
+            signupErrors[eventId] = 'Your sign-up hasn’t been saved. Your details are still here. Try again.'
             return
         }
         if (!attendeesByEvent[eventId]) attendeesByEvent[eventId] = []
@@ -944,11 +944,11 @@ async function saveNewRow(eventId) {
         // Remembering a name is optional; blocked storage must not hide a successful signup.
         try { localStorage.setItem('saujana_name', data.name) } catch {}
         mergeAttendeeNameOptions([data.name])
-        signupSuccess[eventId] = `You’re on the list, ${data.name}. Your signup is saved.`
+        signupSuccess[eventId] = `You’re on the sign-up list, ${data.name}.`
         delete newRows[eventId]
         focusSignupTrigger(eventId)
     } catch {
-        signupErrors[eventId] = 'We couldn’t save your signup. Check your connection and try “Join the list” again.'
+        signupErrors[eventId] = 'We couldn’t save your sign-up. Check your connection and try again.'
     } finally {
         delete savingRows[eventId]
     }

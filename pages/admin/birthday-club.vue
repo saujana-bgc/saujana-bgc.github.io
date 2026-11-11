@@ -4,8 +4,8 @@
         <header class="calendar-header fade-up">
           <div>
             <p class="eyebrow">For community organisers</p>
-            <h1>Birthday Club <em>Calendar</em></h1>
-            <p class="header-copy">A year of people to celebrate. Check the greeting preference beside each name before posting a birthday wish.</p>
+            <h1>Birthday Club <em>calendar</em></h1>
+            <p class="header-copy">Check the greeting preference beside each name before posting a public birthday greeting.</p>
           </div>
         </header>
 
@@ -66,7 +66,7 @@
                         :class="birthday.allow_public_greeting ? 'public-wish' : 'private-wish'"
                         :title="birthday.allow_public_greeting ? 'Public birthday greeting is allowed' : 'No public birthday greeting'"
                       >
-                        {{ birthday.allow_public_greeting ? 'Public wish OK' : 'No public wish' }}
+                        {{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}
                       </span>
                     </li>
                   </ul>
@@ -76,7 +76,7 @@
           </div>
 
           <section v-if="!isLeapCalendarYear && leapDayBirthdays.length" class="leap-day-card" aria-labelledby="leap-day-heading">
-            <h2 id="leap-day-heading">February 29 birthdays</h2>
+            <h2 id="leap-day-heading">29 February birthdays</h2>
             <p>These birthdays are listed separately in {{ calendarYear }}, which has no February 29.</p>
             <ul><li v-for="birthday in leapDayBirthdays" :key="birthday.id"><strong>{{ birthday.name }}</strong><span>{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</span></li></ul>
           </section>
@@ -104,7 +104,7 @@
 <script setup>
 definePageMeta({ layout: 'admin' })
 useHead({
-  title: 'Birthday Club Calendar | Saujana BGC',
+  title: 'Birthday Club calendar | Saujana BGC',
   meta: [
     { name: 'robots', content: 'noindex, nofollow, noarchive' },
     { name: 'description', content: 'Private Saujana BGC birthday calendar.' },

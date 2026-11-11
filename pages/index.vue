@@ -85,9 +85,9 @@
         <p class="section-intro">Curious about Japanese mahjong? Explore our tools, league standings and tournament.</p>
       </div>
       <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
-        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2m-8 4h2m4 0h2"/></svg>Scoring calculator <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-league" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V11m8 9V4m8 16v-6M2 20h20"/><path d="m4 8 6-4 6 5 5-5"/></svg>League and standings <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-open" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Riichi Open I tournament <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2m-8 4h2m4 0h2"/></svg>Riichi mahjong calculator <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-league" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V11m8 9V4m8 16v-6M2 20h20"/><path d="m4 8 6-4 6 5 5-5"/></svg>Riichi mahjong league <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-open" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Riichi Open I <span aria-hidden="true">→</span></NuxtLink>
       </nav>
     </section>
 

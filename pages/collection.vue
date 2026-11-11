@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <div v-if="isError" class="page-hint" role="status">The collection is here, but play history is unavailable. Refresh the page to try again.</div>
+      <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
 
       <div ref="gridRef" class="editorial-grid">
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>

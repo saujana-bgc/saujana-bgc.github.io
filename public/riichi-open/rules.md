@@ -1,14 +1,14 @@
-# Riichi Open I — Tournament Rules
+# Riichi Open I — Tournament rules
 
-Riichi Open I is a four-player Japanese Riichi Mahjong tournament organised by Saujana Board Game Community.
+Riichi Open I is a four-player Japanese riichi mahjong tournament organised by Saujana Board Game Community.
 
-Each entrant is scheduled to play exactly **two qualifying East–South (South) hanchans**. After those rounds, the Top 4 entrants play **one Final South hanchan**. Finalists do not play additional qualifying hanchans.
+Each entrant is scheduled to play exactly **two qualifying East–South (South) hanchans**. After those rounds, the top four entrants play **one final South hanchan**. Finalists do not play additional qualifying hanchans.
 
 The event uses **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025**, and the **29 June 2025 Official Rules Clarification**. The official documents govern gameplay, scoring, conduct and penalties, including details not restated in this participant guide. Where the clarification amends an earlier document, the clarification takes precedence. No WRC optional rules are adopted.
 
 The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open I tournament arrangements, not the format of the World Championship itself. If this guide's gameplay summary conflicts with the official documents, use the official documents. Pause play and call the organiser for a disputed ruling.
 
-### Official References
+### Official references
 
 - [WRC Rules 2025](https://www.worldriichi.org/s/WRC-Rules-2025-42fx.pdf), by Sylvain Malbec / World Riichi Championship.
 - [WRC Penalties 2025](https://www.worldriichi.org/s/WRC-Penalties-2025.pdf).
@@ -19,10 +19,10 @@ The main rulebook and penalties document are published under [CC BY-NC-SA 4.0](h
 
 ---
 
-## 1. Tournament Format (Event Rules)
+## 1. Tournament format (event rules)
 
-- The tournament is played using **four-player Riichi Mahjong only**.
-- Each entrant plays exactly **two qualifying South hanchans**. The Top 4 each play in the event's one **Final South hanchan**.
+- The tournament is played using **four-player riichi mahjong only**.
+- Each entrant plays exactly **two qualifying South hanchans**. The top four each play in the event's one **final South hanchan**.
 - Each hanchan is an East–South game, beginning at East 1 and normally ending after South 4 under Section 9.
 - The event has no additional qualifying rounds or playoff hanchans.
 - **First qualifying hanchan:** at the start of the event, randomly assign entrants to tables of four and randomly assign the initial East, South, West and North seats at each table. There is no seeding for this round.
@@ -44,29 +44,29 @@ This is the **snake assignment pattern**. The last table receives consecutive ra
 | Table 3 | 3, 6, 11, 14 |
 | Table 4 | 4, 5, 12, 13 |
 
-- For equal first-hanchan tournament scores, apply the standings tie-breakers in Section 4 using the first qualifier only. After both qualifiers, use the same order with both qualifying hanchans included. Table assignment and qualification are event arrangements; WRC does not prescribe this event's snake seating or Top 4 format.
+- For equal first-hanchan tournament scores, apply the standings tie-breakers in Section 4 using the first qualifier only. After both qualifiers, use the same order with both qualifying hanchans included. Table assignment and qualification are event arrangements; WRC does not prescribe this event's snake seating or top four format.
 - The organiser publishes table and seat assignments before each hanchan. The playing field must fill tables of four; any required substitutes must be announced before the first draw. Substitutes play normally, are included when forming qualifying tables, and are excluded from qualification for the Final.
-- **Final:** the Top 4 eligible entrants after both qualifiers play together. Final seats are assigned by random draw; qualification seed is used only for Final tie-breaking.
+- **Final:** the top four eligible entrants after both qualifiers play together. Final seats are assigned by random draw; qualification seed is used only for Final tie-breaking.
 - Tournament scores from both qualifying hanchans are added together.
-- After two hanchans, the **Top 4 players** advance to the Final.
+- After two hanchans, the **top four players** advance to the Final.
 - Qualification scores **do not carry forward** into the Final.
 - The four finalists begin the Final from equal starting scores.
 - Entrants who do not reach the Final are ranked below the finalists in qualification order.
 - Final finishing position determines the final tournament ranking:
-  - 1st — Riichi Open I Champion
+  - 1st — Riichi Open I champion
   - 2nd — Runner-up
   - 3rd
   - 4th
 
 ---
 
-## 2. Starting Points
+## 2. Starting points
 
 Each player begins every event hanchan with **30,000 points**, as in WRC. There is no oka. Play continues even if a player's score becomes negative; bankruptcy does not end the hanchan.
 
 ---
 
-## 3. Tournament Scoring
+## 3. Tournament scoring
 
 Use the WRC hanchan score formula and uma below. Placement and uma are determined from final mahjong points before tournament-point penalties. Unclaimed riichi sticks are not awarded to any player and are not included in their final mahjong points.
 
@@ -101,7 +101,7 @@ Record final points, uma, hanchan scores, unclaimed riichi sticks and penalties 
 
 ---
 
-## 4. Qualification (Event Rules)
+## 4. Qualification (event rules)
 
 After both qualifying hanchans:
 
@@ -109,14 +109,14 @@ After both qualifying hanchans:
 
 The four eligible entrants with the highest qualification scores advance to the Final. All qualifying tournament-point penalties are counted once, including any recorded between qualifying hanchans. The second-hanchan table ranking does not replace the first-hanchan score: both scores count towards qualification.
 
-### Standings Tie-Breakers (Event Rule)
+### Standings tie-breakers (event rule)
 
 Use the **same tie-breaker order** for equal tournament scores after the first qualifier (to assign second-hanchan tables) and after both qualifiers (to determine qualification and seeds). Count only qualifying hanchans completed at that stage.
 
 1. Most first-place finishes.
 2. Fewest fourth-place finishes.
 3. Highest single-hanchan score before tournament-point penalties.
-4. A secure random order for the complete group of players still tied, when needed to determine second-qualifier table assignments or the Top 4 qualification and seeds. The organiser's system generates and records this order automatically when the next round is prepared; no manual draw is needed.
+4. A secure random order for the complete group of players still tied, when needed to determine second-qualifier table assignments or the top four qualification and seeds. The organiser's system generates and records this order automatically when the next round is prepared; no manual draw is needed.
 
 The first three priorities follow WRC Section 5's recommended tie-breakers. WRC recommends a coin toss as the last step; this event uses an automatic secure random order for groups of two or more tied players. The order is retained for event administration and is not shown as a draw list on public standings. These choices are **event rules**, not mandatory WRC gameplay rules.
 
@@ -124,23 +124,23 @@ For these event counts, a player with the highest final mahjong points at their 
 
 ---
 
-## 5. Final Hanchan (Event Rules)
+## 5. Final hanchan (event rules)
 
-The Final is the event's one East–South (South) hanchan for the Top 4 qualifiers.
+The Final is the event's one East–South (South) hanchan for the top four qualifiers.
 
 - All four finalists begin with **30,000 points**.
 - Qualification scores do not carry over.
 - Calculate WRC hanchan scores using the same uma as the qualifiers, including shared uma for ties on final mahjong points.
 - Subtract any tournament-point penalties incurred during the Final stage from that player's Final hanchan score. Do not deduct these penalties from table points or recalculate placement uma after penalties.
-- The player with the highest resulting Final score becomes the **Riichi Open I Champion**.
+- The player with the highest resulting Final score becomes the **Riichi Open I champion**.
 
 Final finishing positions are ranked by **Final hanchan score minus Final-stage tournament-point penalties**. With no penalties, this gives the same order as final mahjong points. If two or more finalists tie on this Final score, the player with the better qualification rank (the higher seed, with seed 1 being the highest) ranks higher. Apply this event tie-breaker only after calculating shared WRC uma; it does not change table points or uma. This rule applies to every finishing place, including a tie involving three or four finalists. Qualifying penalties do not carry into the Final; Final-stage penalties do not change qualification scores or seeds.
 
 ---
 
-# Table Rules
+# Table rules
 
-## 6. Basic Settings
+## 6. Basic settings
 
 - Each qualifying hanchan and the Final hanchan are four-player East–South games.
 - Each player starts with 30,000 points.
@@ -155,7 +155,7 @@ Final finishing positions are ranked by **Final hanchan score minus Final-stage 
 
 ---
 
-## 7. Calls and Draws
+## 7. Calls and draws
 
 WRC chi, pon, kan, riichi, tsumo and ron procedures apply. A discard can be claimed until the next player draws. Once the next player touches the wall, that player can no longer claim the discard, even before drawing. Another player's meld call does not remove the opportunity to declare ron with precedence. When the table is unsure whether an action was timely, stop play and call the organiser.
 
@@ -165,7 +165,7 @@ Riichi is permitted with fewer than four tiles remaining in the live wall, inclu
 
 Only an added kan can be robbed. A concealed kan cannot be robbed, including for kokushi musou.
 
-### Kan Dora
+### Kan dora
 
 Kan-dora is used.
 
@@ -173,7 +173,7 @@ Kan-dora is used.
 - Do not reveal a kan-dora indicator for an added kan that is robbed; turn it face down again if it was revealed prematurely.
 - A maximum of four kans may be made in a hand. After the fourth kan the hand continues, but a fifth kan is forbidden.
 
-### Abortive Draws
+### Abortive draws
 
 Abortive draws are not used. None of the following automatically ends the hand:
 
@@ -186,7 +186,7 @@ The last discard of the live wall may be won by ron, but cannot be called for ch
 
 ---
 
-## 8. Head Bump
+## 8. Head bump
 
 **Head bump (atama hane) applies.**
 
@@ -202,7 +202,7 @@ There is therefore no double ron or triple ron.
 
 ---
 
-## 9. Dealer and Match Progression
+## 9. Dealer and match progression
 
 - The dealer continues after winning a hand.
 - The dealer continues after an exhaustive draw when tenpai.
@@ -211,11 +211,11 @@ There is therefore no double ron or triple ron.
 - An untimed hanchan ends after South 4 when the dealer does not repeat. If the dealer repeats in South 4, play continues in South 4 until the dealer stops repeating. For a timed hanchan, the WRC Section 10.1 ending procedure below can end play even if the dealer would otherwise repeat. There is no West round.
 - Any riichi sticks still on the table when the hanchan ends remain unclaimed. Record them separately; no player receives them.
 
-### Agari-Yame
+### Agari-yame
 
 **Agari-yame is not used.** A dealer who wins South 4 must continue even when in 1st place. Normal tenpai continuation also applies after a South 4 exhaustive draw.
 
-### Time Limits
+### Time limits
 
 **Riichi Open I qualifier setting:** each qualifying hanchan has a 75-minute limit. Use one shared countdown timer for all four tables and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop: do not start another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the additional-hand procedure below for the qualifiers. The published 75-minute limit applies to the qualifying rounds; the Grand Final has its own scheduled time slot.
 
@@ -223,7 +223,7 @@ There is therefore no double ron or triple ron.
 
 ---
 
-## 10. Exhaustive Draws
+## 10. Exhaustive draws
 
 Standard 3,000-point noten payments apply.
 
@@ -235,7 +235,7 @@ The dealer continues only if tenpai.
 
 ---
 
-## 11. Hand Scoring
+## 11. Hand scoring
 
 Use the WRC yaku list, fu rules and scoring table.
 
@@ -259,7 +259,7 @@ The organiser's ruling is final.
 
 ---
 
-# Penalties and Irregularities
+# Penalties and irregularities
 
 ## 12. Chombo
 
@@ -285,7 +285,7 @@ Chombo penalties do not award additional tournament points to the other players.
 
 ---
 
-## 13. Situations That May Result in Chombo
+## 13. Situations that may result in chombo
 
 Use the official WRC penalties document, as amended by the 29 June clarification, to determine the penalty for each incident. Examples of chombo include:
 
@@ -316,7 +316,7 @@ The organiser's decision is final.
 
 ---
 
-## 14. Procedure After Chombo
+## 14. Procedure after chombo
 
 When a chombo is applied (subject to the simultaneous-win exception in Section 13):
 
@@ -330,7 +330,7 @@ When a chombo is applied (subject to the simultaneous-win exception in Section 1
 
 ---
 
-## 15. Minor Mistakes
+## 15. Minor mistakes
 
 Use WRC's warning, point-penalty, dead-hand, chombo and disqualification procedures. Correct mistakes only where those procedures permit a correction. A dead hand cannot chi, pon, kan, declare riichi or win, and is noten at an exhaustive draw.
 
@@ -348,9 +348,9 @@ Players should immediately inform the table or organiser when an irregularity oc
 
 ---
 
-# Table Conduct
+# Table conduct
 
-## 16. Player Conduct
+## 16. Player conduct
 
 Players are expected to maintain good tournament etiquette.
 
@@ -368,7 +368,7 @@ Players are expected to maintain good tournament etiquette.
 
 ---
 
-## 17. Tournament Administration
+## 17. Tournament administration
 
 Call the organiser for a rules dispute, an illegal action, uncertainty about whether play should continue, a scoring disagreement, a possible chombo, or a significantly disrupted game state. Players should not resolve serious disputes themselves if the outcome could affect tournament standings. The organiser may make rulings necessary to preserve fair play and tournament integrity.
 
@@ -376,7 +376,7 @@ The organiser acts as the event's referee and applies the official WRC documents
 
 ---
 
-## 18. Spirit of the Event
+## 18. Spirit of the event
 
 Riichi Open I is a competitive tournament, but it remains a Saujana Board Game Community event.
 

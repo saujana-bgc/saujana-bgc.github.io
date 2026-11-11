@@ -2,9 +2,9 @@
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="fade-up">
       <p class="page-eyebrow">One game leads to another</p>
-      <h1 class="hero-title">Play History</h1>
+      <h1 class="hero-title">Play history</h1>
       <div class="stats-container">A record of what we’ve played and who joined in. Look back at a gathering, or see which favourites keep making it to the table.</div>
-      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower">Only Blood in the Clocktower: session recaps and the next game night →</NuxtLink></p>
+      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower">See Clocktower recaps and the next gathering →</NuxtLink></p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -19,7 +19,7 @@
       </template>
 
       <div v-else-if="isError" class="loading-state" role="alert">
-        <p>We couldn’t load the play history. Refresh the page to try again.</p>
+        <p>We couldn’t load play history. Refresh the page to try again.</p>
         <NuxtLink class="context-link" to="/collection" no-prefetch>Browse the collection while you’re here <span aria-hidden="true">→</span></NuxtLink>
       </div>
 

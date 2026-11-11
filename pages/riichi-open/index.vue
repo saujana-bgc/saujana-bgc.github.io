@@ -1,15 +1,15 @@
 <template>
   <main class="event-page">
     <RiichiOpenTabs v-model="activeTab" />
-    <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><small>14 November · Ara Damansara</small><UButton v-if="standingsError" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Retry</UButton></div>
+    <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><small>14 November · Ara Damansara</small><UButton v-if="standingsError" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>
     <section v-show="activeTab === 'registration'" id="riichi-registration-panel" role="tabpanel" aria-labelledby="riichi-registration-tab">
     <section class="event-hero">
       <div class="hero-copy">
         <h1>Riichi <em>Open I</em></h1>
-        <p class="hero-intro">Two East–South qualifying rounds, then a final for the Top 4. A friendly day of serious mahjong.</p>
+        <p class="hero-intro">Two East–South qualifying rounds, then a final for the top four eligible players. A friendly day of serious mahjong.</p>
         <div class="event-facts"><span>Saturday, 14 November 2026</span><span>Starts at 2:30 pm</span><span>Boardroom Bandit, Ara Damansara</span></div>
         <div class="event-offer"><strong>RM10</strong><span>entry fee</span><i aria-hidden="true"></i><span>A prize for the winner</span></div>
-        <div class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton><UButton class="hero-guide" color="neutral" variant="outline" @click="openGuide">Tournament guide</UButton></div>
+        <div class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton><UButton class="hero-guide" color="neutral" variant="outline" @click="openGuide">Tournament rules</UButton></div>
         <p class="hero-reassurance">16 places · No account needed · Receipt verified by the organiser</p>
       </div>
       <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster.png" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="1122" height="1402"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
@@ -18,7 +18,7 @@
     <section id="registration" ref="registrationPanel" class="registration-panel" aria-labelledby="register-heading" tabindex="-1">
       <div class="register-heading"><p class="eyebrow">16 places · four-player tables</p><h2 id="register-heading">Save your place</h2><p>Enter your name, reserve a place, then upload your RM10 payment receipt. Your name appears in the public list while payment is awaiting verification.</p></div>
       <div class="availability" v-if="event"><strong>{{ availablePlaces }}</strong><span>places left</span><div class="capacity-track"><i :style="{ width: `${usedPercent}%` }"></i></div><small>{{ registrations.length }} registered<span v-if="activeHolds"> · {{ activeHolds }} temporarily held during payment</span><span v-else> · no places currently held during payment</span></small></div>
-      <ol class="signup-progress" aria-label="Registration progress"><li :class="{ current: !hold && !complete, done: hold || complete }" :aria-current="!hold && !complete ? 'step' : undefined"><span>{{ hold || complete ? '✓' : '1' }}</span>Your name</li><li :class="{ current: hold && !complete, done: complete }" :aria-current="hold && !complete ? 'step' : undefined"><span>{{ complete ? '✓' : '2' }}</span>Pay & upload</li><li :class="{ current: complete }" :aria-current="complete ? 'step' : undefined"><span>3</span>Organiser review</li></ol>
+      <ol class="signup-progress" aria-label="Registration progress"><li :class="{ current: !hold && !complete, done: hold || complete }" :aria-current="!hold && !complete ? 'step' : undefined"><span>{{ hold || complete ? '✓' : '1' }}</span>Your name</li><li :class="{ current: hold && !complete, done: complete }" :aria-current="hold && !complete ? 'step' : undefined"><span>{{ complete ? '✓' : '2' }}</span>Pay and upload</li><li :class="{ current: complete }" :aria-current="complete ? 'step' : undefined"><span>3</span>Organiser review</li></ol>
       <p v-if="notice" class="notice" role="status">{{ notice }}</p>
 
     <section v-if="complete" ref="confirmationPanel" class="confirmation" tabindex="-1" aria-live="polite"><span class="confirm-mark">{{ registrationStatus === 'verified' ? '✓' : '·' }}</span><h3>{{ confirmationTitle }}</h3><p>{{ confirmationMessage }}</p><p class="reference">Keep your registration reference <strong>{{ registrationRef }}</strong></p><span v-if="registrationStatus === 'pending' || !registrationStatus" class="pending-badge">Awaiting payment verification</span><span v-else-if="registrationStatus === 'verified'" class="verified-badge">Payment verified</span><UButton v-if="registrationStatus === 'cancelled'" type="button" class="event-button" :disabled="busy || restorePending || (!canRegister && !restartRecoveryAvailable)" @click="restartRecoveryAvailable ? restoreSavedHold() : restartCancelledRegistration">{{ restorePending ? 'Restoring…' : restartRecoveryAvailable ? 'Try restoring saved place' : busy ? 'Reserving…' : canRegister ? 'Register again' : 'Registration is unavailable' }}</UButton><p v-if="registrationStatus === 'cancelled'" class="small-print">If you already paid and were not refunded, upload your original receipt. Contact the organiser before paying again.</p><p v-if="error" class="form-error" role="alert">{{ error }}</p><a v-else-if="registrationStatus === 'needs_clarification' || registrationStatus === 'rejected' || registrationStatus === 'cancelled'" class="confirmation-contact" href="tel:+60162459482">Contact the organiser · +60 16-245 9482</a></section>
@@ -60,7 +60,7 @@
       <ul v-else class="registrant-list"><li v-for="player in registrations" :key="player.id"><strong>{{ player.display_name }}</strong><span :class="player.status==='verified'?'verified-badge':'pending-badge'">{{ player.status==='verified'?'Verified':'Awaiting verification' }}</span></li></ul>
     </section>
 
-    <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The four highest eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><UButton ref="guideTrigger" type="button" class="guide-trigger" @click="openGuide">Read the tournament guide <span aria-hidden="true">↗</span></UButton></section>
+    <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The top four eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><UButton ref="guideTrigger" type="button" class="guide-trigger" @click="openGuide">Read the tournament rules <span aria-hidden="true">↗</span></UButton></section>
 
     <section class="event-schedule" aria-labelledby="schedule-heading">
       <div class="schedule-intro"><p class="eyebrow">Saturday, 14 November</p><h2 id="schedule-heading">Tournament schedule</h2><p>Each qualifying round has a 75-minute limit to help the tournament finish at a reasonable time.</p></div>
@@ -78,12 +78,12 @@
         <table class="schedule-table">
           <caption>Event timetable</caption>
           <tbody>
-            <tr><th scope="row">2:30–3:45 PM</th><td>Qualifier 1</td></tr>
-            <tr><th scope="row">3:45–3:55 PM</th><td>Scores and seating</td></tr>
-            <tr><th scope="row">3:55–5:10 PM</th><td>Qualifier 2</td></tr>
-            <tr><th scope="row">5:10–5:25 PM</th><td>Calculate Top 4 and break</td></tr>
-            <tr><th scope="row">5:25–6:55 PM</th><td>Grand Final</td></tr>
-            <tr><th scope="row">6:55–7:10 PM</th><td>Prize presentation and photos</td></tr>
+            <tr><th scope="row">2:30–3:45 pm</th><td>Qualifier 1</td></tr>
+            <tr><th scope="row">3:45–3:55 pm</th><td>Scores and seating</td></tr>
+            <tr><th scope="row">3:55–5:10 pm</th><td>Qualifier 2</td></tr>
+            <tr><th scope="row">5:10–5:25 pm</th><td>Confirm finalists and take a break</td></tr>
+            <tr><th scope="row">5:25–6:55 pm</th><td>Final</td></tr>
+            <tr><th scope="row">6:55–7:10 pm</th><td>Prize presentation and photos</td></tr>
           </tbody>
         </table>
       </div>
@@ -91,7 +91,7 @@
 
     <dialog ref="guideDialog" class="guide-dialog" aria-label="Riichi Open I tournament rules" @click="closeGuideFromBackdrop" @close="restoreGuideFocus">
       <div class="guide-shell">
-        <div class="guide-topbar"><span><i aria-hidden="true"></i> RIICHI OPEN I · TOURNAMENT RULES</span><UButton type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</UButton></div>
+        <div class="guide-topbar"><span><i aria-hidden="true"></i> Riichi Open I · Tournament rules</span><UButton type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</UButton></div>
         <div class="guide-body">
           <aside class="guide-toc-desktop" aria-label="Rules sections">
             <nav aria-label="Jump to a rules section">
@@ -107,7 +107,7 @@
             </details>
           </div>
           <div ref="guideReader" class="guide-reader" tabindex="-1" aria-live="polite">
-            <p v-if="guideLoading" class="guide-state">Opening the guide…</p>
+            <p v-if="guideLoading" class="guide-state">Loading tournament rules…</p>
             <div v-else-if="guideError" class="guide-state guide-error"><p>{{ guideError }}</p><UButton type="button" class="guide-retry" @click="loadGuide">Try again</UButton></div>
             <article v-else class="guide-content" v-html="guideHtml"></article>
             <footer v-if="!guideLoading && !guideError && guideMarkdown" class="guide-footer"><span>Gameplay follows WRC Rules 2025 and its official clarification.</span><UButton type="button" @click="closeGuide">Back to event</UButton></footer>
@@ -248,11 +248,11 @@ async function loadGuide() {
       import('marked'),
       import('dompurify'),
     ])
-    if (!response.ok) throw new Error('The tournament guide could not be loaded. Please try again.')
+    if (!response.ok) throw new Error('We couldn’t load the tournament rules. Try again.')
     guideLibraries.value = { marked: markdown.marked, DOMPurify: sanitizer.default }
     guideMarkdown.value = await response.text()
   } catch (cause) {
-    guideError.value = cause.message || 'The tournament guide could not be loaded. Please try again.'
+    guideError.value = cause.message || 'We couldn’t load the tournament rules. Try again.'
   } finally {
     guideLoading.value = false
   }

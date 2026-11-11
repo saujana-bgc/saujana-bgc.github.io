@@ -1,7 +1,7 @@
 <template>
   <main class="admin-root">
     <section v-if="isRestoring || !isAuthenticated" class="admin-login-wrap">
-      <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>One organiser sign-in for Birthday Club, Clocktower and Riichi Open.</p></div>
+      <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>Sign in to manage the Birthday Club calendar, Clocktower recaps and Riichi Open I.</p></div>
       <form class="admin-login-card" @submit.prevent="submitLogin">
         <label>Username<UInput v-model="username" class="admin-login-input" autocomplete="username" required /></label>
         <label>Password<UInput v-model="password" class="admin-login-input" type="password" autocomplete="current-password" required /></label>
@@ -9,11 +9,11 @@
         <p v-if="isRestoring" class="admin-help" role="status">Checking for a saved session. You can sign in here if needed.</p>
         <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</UButton>
-        <p class="admin-help">Use the existing organiser username and password for Birthday Club, Clocktower and Riichi Open.</p>
+        <p class="admin-help">Use your organiser username and password.</p>
       </form>
     </section>
     <template v-else>
-      <header class="admin-topbar"><NuxtLink to="/admin" class="admin-brand" aria-label="Saujana organiser workspace"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>organiser workspace</small></span></NuxtLink><div><NuxtLink to="/" class="admin-public-link">Back to website</NuxtLink><UButton class="admin-signout" color="neutral" variant="outline" @click="signOut">Sign out</UButton></div></header>
+      <header class="admin-topbar"><NuxtLink to="/admin" class="admin-brand" aria-label="Saujana organiser workspace"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>organiser workspace</small></span></NuxtLink><div><NuxtLink to="/" class="admin-public-link">Back to the website</NuxtLink><UButton class="admin-signout" color="neutral" variant="outline" @click="signOut">Sign out</UButton></div></header>
       <nav class="admin-nav" aria-label="Admin pages"><NuxtLink v-for="item in adminNavigation" :key="item.id" :to="item.to" :class="{ active: isCurrentPage(item.to) }" :aria-label="item.id === 'botc-archive' ? item.title : undefined">{{ item.id === 'botc-archive' ? 'Clocktower' : item.title }}</NuxtLink></nav>
       <div class="admin-page"><slot /></div>
     </template>
@@ -46,7 +46,7 @@ onMounted(async () => {
     auth.cancelRestore()
     error.value = 'Session check timed out. Sign in with your admin username and password.'
   }, 12000)
-  try { await auth.restoreSession() } catch { error.value = 'We could not check your saved session. Please sign in again.' }
+  try { await auth.restoreSession() } catch { error.value = 'We couldn’t check your saved session. Sign in again.' }
   finally { clearTimeout(restoreWatchdog) }
 })
 

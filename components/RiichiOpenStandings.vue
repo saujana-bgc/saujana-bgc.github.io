@@ -10,7 +10,7 @@
     </ol>
 
     <p v-if="error" class="results-notice" role="status">{{ snapshot ? 'Showing the last available update. ' : '' }}{{ error }}</p>
-    <section v-if="loading" class="results-card empty-results" aria-live="polite"><span class="empty-tile" aria-hidden="true">一</span><h2>Getting the latest update…</h2></section>
+    <section v-if="loading" class="results-card empty-results" aria-live="polite"><span class="empty-tile" aria-hidden="true">一</span><h2>Loading standings…</h2></section>
     <template v-else-if="snapshot">
       <div class="results-toolbar">
         <label class="player-search"><span>Find a player</span><UInput v-model="search" class="w-full" type="search" placeholder="Search by name" autocomplete="off" /></label>
@@ -30,7 +30,7 @@
 
       <section v-if="snapshot.standings?.length" class="results-card">
         <div class="card-heading"><div><p class="eyebrow">Certified results</p><h2>{{ event?.stage === 'completed' ? 'Final qualification standings' : 'Qualification standings' }}</h2></div><span class="soft-badge">Certified only</span></div>
-        <p class="table-note">Penalties are already deducted from the total. The Top 4 advance to the final.</p>
+        <p class="table-note">Penalties are already deducted from the total. The top four eligible players advance to the final.</p>
         <div class="desktop-standings table-scroll"><table><caption class="sr-only">Certified qualification scores</caption><thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Q1</th><th scope="col">Q2</th><th scope="col">Penalties</th><th scope="col">Total</th></tr></thead><tbody><tr v-for="row in filteredStandings" :key="row.participant_id" :class="{ finalist: isFinalist(row) }"><td><span class="rank-number">{{ row.rank }}</span></td><th scope="row">{{ row.display_name }}<small v-if="row.is_substitute">Substitute · not eligible for final</small><small v-else-if="isFinalist(row)" class="finalist-label">Finalist</small></th><td>{{ score(row.qualifier_1) }}</td><td>{{ score(row.qualifier_2) }}</td><td>{{ deduction(row.penalties) }}</td><td class="total-score">{{ score(row.total) }}</td></tr></tbody></table></div>
         <ol class="mobile-standings"><li v-for="row in filteredStandings" :key="row.participant_id" :class="{ finalist: isFinalist(row) }"><div class="player-line"><span class="rank-number">{{ row.rank }}</span><div><strong>{{ row.display_name }}</strong><small v-if="row.is_substitute">Substitute</small><small v-else-if="isFinalist(row)" class="finalist-label">Finalist</small></div><strong class="total-score">{{ score(row.total) }}<small>total</small></strong></div><dl><div><dt>Qualifier 1</dt><dd>{{ score(row.qualifier_1) }}</dd></div><div><dt>Qualifier 2</dt><dd>{{ score(row.qualifier_2) }}</dd></div><div><dt>Penalties</dt><dd>{{ deduction(row.penalties) }}</dd></div></dl></li></ol>
         <p v-if="!filteredStandings.length" class="no-matches">No certified player matches “{{ search }}”.</p>

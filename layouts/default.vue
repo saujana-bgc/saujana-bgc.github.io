@@ -33,7 +33,7 @@
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Good games. Good company. See you soon.</p>
-      <span class="footer-copyright">&copy; {{ year }} SAUJANA BOARD GAME COMMUNITY</span>
+      <span class="footer-copyright">&copy; {{ year }} Saujana Board Game Community</span>
       <nav class="footer-riichi-links" aria-label="Riichi mahjong pages">
         <NuxtLink v-for="page in riichiChildren" :key="page.to" :to="page.to" no-prefetch>{{ page.label }}</NuxtLink>
       </nav>
@@ -47,18 +47,18 @@
 
 <script setup>
 const riichiChildren = [
-  { label: 'Scoring Calculator', to: '/riichi-calculator', prefetch: false },
-  { label: 'League & Standings', to: '/riichi-league', prefetch: false },
-  { label: 'Riichi Open', to: '/riichi-open', prefetch: false },
+  { label: 'Riichi mahjong calculator', to: '/riichi-calculator', prefetch: false },
+  { label: 'Riichi mahjong league', to: '/riichi-league', prefetch: false },
+  { label: 'Riichi Open I', to: '/riichi-open', prefetch: false },
 ]
 const navigation = [
   { label: 'Home', to: '/', prefetch: false },
   { label: 'Gatherings', to: '/gatherings', prefetch: false },
   { label: 'Collection', to: '/collection', prefetch: false },
-  { label: 'Play History', to: '/playlog', prefetch: false },
+  { label: 'Play history', to: '/playlog', prefetch: false },
   { label: 'Only Blood in the Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
   {
-    label: 'Riichi Mahjong',
+    label: 'Riichi mahjong',
     type: 'trigger',
     children: riichiChildren,
   },
@@ -68,7 +68,7 @@ const mobileNavigation = navigation
   .map(item => ({
     ...item,
     onSelect: closeMenu,
-    children: item.label === 'Riichi Mahjong'
+    children: item.label === 'Riichi mahjong'
       ? riichiChildren.map(child => ({ ...child, onSelect: closeMenu }))
       : item.children?.map(child => ({ ...child, onSelect: closeMenu })),
   }))

@@ -66,19 +66,19 @@
       <form class="calculator-form" aria-label="Riichi hand details" @input="hasInteracted = true" @click="hasInteracted = true" @submit.prevent>
         <div class="entry-mode" role="group" aria-label="Scoring entry method">
           <UButton type="button" :class="{ selected: entryMode === 'tiles' }" :aria-pressed="entryMode === 'tiles'" @click="setEntryMode('tiles')"><strong>Enter your tiles</strong><small>Tile entry · finds yaku and fu</small></UButton>
-          <UButton type="button" :class="{ selected: entryMode === 'hanfu' }" :aria-pressed="entryMode === 'hanfu'" @click="setEntryMode('hanfu')"><strong>Enter han &amp; fu</strong><small>Quick · for a known score</small></UButton>
+          <UButton type="button" :class="{ selected: entryMode === 'hanfu' }" :aria-pressed="entryMode === 'hanfu'" @click="setEntryMode('hanfu')"><strong>Enter han and fu</strong><small>Quick · for a known score</small></UButton>
         </div>
         <div class="player-count-row" role="group" aria-label="Players at the table">
           <span class="field-label">Players</span>
           <div class="choice-row compact-choice" role="group" aria-label="Players at the table">
-            <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 4 }" :aria-pressed="form.playerCount === 4" @click="form.playerCount = 4">Four player</UButton>
-            <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three player</UButton>
+            <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 4 }" :aria-pressed="form.playerCount === 4" @click="form.playerCount = 4">Four players</UButton>
+            <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three players</UButton>
           </div>
         </div>
-        <label class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Optional · off for Riichi Open</small></label>
+        <label class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Optional · off for Riichi Open I</small></label>
 
         <section v-if="entryMode === 'hanfu'" class="calc-section direct-entry" aria-labelledby="direct-heading">
-          <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect 5 han and above.</p></div></div>
+          <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect the score at 5 han or more.</p></div></div>
           <div class="direct-fields">
             <div class="direct-field" :class="{ 'direct-field-invalid': directHanIssue }">
               <label for="direct-han">Total han</label>
@@ -98,7 +98,7 @@
             </div>
           </div>
           <p v-if="directEntryIssue" id="direct-entry-error" class="field-problems" role="status">{{ directEntryIssue }}</p>
-          <p v-else-if="form.directHan >= 5" class="field-hint">Fu is ignored at 5 han and above.</p>
+          <p v-else-if="form.directHan >= 5" class="field-hint">Fu does not affect the score at 5 han or more.</p>
           <p v-if="form.directHan >= 13" class="field-hint">For stacked yakuman, double yakuman waits or pao, enter the tiles to calculate each payment correctly.</p>
         </section>
         <div v-if="entryMode === 'tiles' && tileStep === 0 && undoSnapshot" class="tile-clear-undo">
@@ -183,7 +183,7 @@
             </UButton>
           </div>
 
-          <details class="hand-help"><summary>Table scoring rules</summary><p>Riichi Open uses kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. Red fives and three-player scoring are optional variants. Riichi sticks are collected separately.</p></details>
+          <details class="hand-help"><summary>Table scoring rules</summary><p>Riichi Open I uses kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. Red fives and three-player scoring are optional variants. Riichi sticks are collected separately.</p></details>
           </details>
 
           <div ref="honbaSection" class="bonus-control honba-control" tabindex="-1" aria-labelledby="honba-count-label">

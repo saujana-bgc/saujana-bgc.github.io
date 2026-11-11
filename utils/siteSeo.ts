@@ -4,24 +4,24 @@ export const siteName = 'Saujana Board Game Community'
 // Keep public search metadata and the static export's route list together.
 export const publicPages = {
   '/': {
-    title: 'Board Games & Riichi Mahjong | Saujana Board Game Community',
+    title: 'Board games and riichi mahjong | Saujana Board Game Community',
     description: 'Join Saujana for board games and riichi mahjong. Find a welcoming gathering, browse our board game collection, or try our riichi scoring calculator.',
   },
   '/gatherings': {
-    title: 'Board Game Gatherings & Meetups | Saujana BGC',
-    description: 'Find your next Saujana board game gathering. Check dates, venues and signup details for our meetups. New to board games or riichi mahjong? Start here.',
+    title: 'Board game gatherings | Saujana BGC',
+    description: 'Find your next Saujana board game gathering. Check dates, venues and sign-up details. New to board games or riichi mahjong? Start here.',
   },
   '/collection': {
-    title: 'Board Game Collection | Saujana BGC',
+    title: 'Board game collection | Saujana BGC',
     description: 'Explore the Saujana host’s board game collection. Search by title, designer, player count or category, and find a game to try at your next gathering.',
   },
   '/playlog': {
-    title: 'Board Game Play History | Saujana BGC',
-    description: 'Explore the board games played at Saujana gatherings. Look back at past sessions and discover the games our community keeps coming back to.',
+    title: 'Board game play history | Saujana BGC',
+    description: 'Explore the board games played at Saujana gatherings. Look back at past gatherings and discover the games our community keeps coming back to.',
   },
   '/only-blood-in-the-clocktower': {
     title: 'Only Blood in the Clocktower | Saujana BGC',
-    description: 'Relive Saujana’s Blood on the Clocktower sessions, read Mika’s recaps, and find out when to join the next game night.',
+    description: 'Read retellings and game results from Saujana’s Blood on the Clocktower gatherings, and find the next gathering.',
     image: '/images/only-blood-clocktower-social.png',
   },
   '/birthday-club': {
@@ -29,15 +29,15 @@ export const publicPages = {
     description: 'Share your birthday with Saujana Board Game Community and choose whether you’d like a public greeting. Just your name, month and day.',
   },
   '/riichi-league': {
-    title: 'Riichi Mahjong League & Standings | Saujana BGC',
+    title: 'Riichi mahjong league and standings | Saujana BGC',
     description: 'Follow the Saujana Riichi Mahjong League: season standings, weekly schedules and table results. New to Japanese mahjong? Ask us how to get started.',
   },
   '/riichi-calculator': {
-    title: 'Riichi Mahjong Calculator – Han, Fu & Points | Saujana BGC',
+    title: 'Riichi mahjong calculator – han, fu and points | Saujana BGC',
     description: 'Calculate riichi mahjong scores from tiles or han and fu. Check yaku, dora, ron and tsumo payments for three-player sanma and four-player Japanese mahjong.',
   },
   '/riichi-open': {
-    title: 'Riichi Open I – Mahjong Tournament, Ara Damansara | Saujana BGC',
+    title: 'Riichi Open I – Mahjong tournament, Ara Damansara | Saujana BGC',
     description: 'Join Riichi Open I, a Japanese mahjong tournament on 14 November 2026 at Boardroom Bandit, Ara Damansara. Read the format, register and follow standings.',
     image: '/images/riichi-open/riichi-open-i-poster.png',
   },
