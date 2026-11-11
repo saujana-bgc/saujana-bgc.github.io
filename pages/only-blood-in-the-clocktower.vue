@@ -628,7 +628,7 @@ onMounted(() => {
 .when-open, details[open] > summary .when-closed { display: none; }
 details[open] > summary .when-open { display: inline; }
 .outcome { display: inline-block; margin: 7px 0 0; padding: 4px 9px; border-radius: 5px; background: #eee0d5; color: #63323d; font-weight: 700; }
-.grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px; margin: 14px 0; padding: 0; list-style: none; }
+.grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; margin: 14px 0; padding: 0; list-style: none; }
 .grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 30px 70px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 112px; overflow: hidden; padding: 12px; border: 1px solid #806274; border-radius: 9px; background: radial-gradient(ellipse at 42% 50%, #493141 0%, #291d29 68%); color: #fff5e9; box-shadow: inset 0 0 0 3px #e6be8512, 0 5px 16px #21171d20; }
 .grimoire-seat::after { position: absolute; z-index: -1; inset: 5px; border: 1px solid #e6be8524; border-radius: 5px; content: ''; pointer-events: none; }
 .grimoire-seat.is-dead { background: radial-gradient(ellipse at 42% 50%, #553039 0%, #301c25 70%); }
