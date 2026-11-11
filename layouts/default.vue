@@ -55,15 +55,13 @@ const navigation = [
   { label: 'Play History', to: '/playlog', prefetch: false },
   { label: 'Only Blood in the Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
   { label: 'Collection', to: '/collection', prefetch: false },
-  { label: 'Scoring Calculator', to: '/riichi-calculator', prefetch: false },
   {
     label: 'Riichi Mahjong',
     type: 'trigger',
-    children: riichiChildren.filter(child => child.label !== 'Scoring Calculator'),
+    children: riichiChildren,
   },
 ]
 const mobileNavigation = navigation
-  .filter(item => item.label !== 'Scoring Calculator')
   .map(item => ({
     ...item,
     onSelect: closeMenu,
