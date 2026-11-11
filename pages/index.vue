@@ -23,13 +23,18 @@
     </section>
 
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
-      <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-      <p class="section-intro">New to Saujana? Here’s how a first visit can go. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
-      <div class="expect-guide">
-        <article v-for="item in expectations" :key="item.title" class="expect-card">
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.copy }}</p>
-        </article>
+      <div class="first-visit-layout">
+        <div class="first-visit-copy">
+          <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
+          <p class="section-intro">New to Saujana? Here’s how a first visit can go. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
+          <div class="expect-guide">
+            <article v-for="item in expectations" :key="item.title" class="expect-card">
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.copy }}</p>
+            </article>
+          </div>
+        </div>
+        <img class="first-visit-photo" src="/images/site/table_scene_2.avif" alt="Saujana players sharing a game at a café." loading="lazy" decoding="async" width="640" height="480">
       </div>
     </section>
 
@@ -45,25 +50,16 @@
       </nav>
     </section>
 
-    <section class="home-section" aria-labelledby="name-story-title">
-      <div class="story-layout">
-        <div class="story-copy">
-          <h2 id="name-story-title" class="hero-title story-title">Why Saujana?</h2>
-          <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
-        </div>
-        <img class="story-photo" src="/images/site/table_scene_2.avif" alt="Saujana players posing with games at a café." loading="lazy" decoding="async" width="640" height="480">
-      </div>
-    </section>
-
     <section class="home-section" aria-labelledby="community-values-title">
       <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
+      <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
       <div class="care-guide">
         <div v-for="pillar in pillars" :key="pillar.title" class="pillar">
           <h3>{{ pillar.title }}</h3>
           <p>{{ pillar.content }}</p>
         </div>
       </div>
-      <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, message an admin privately.</p>
+      <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
     </section>
 
     <section class="social-note" aria-label="Follow Saujana on Instagram">
@@ -182,7 +178,7 @@ const expectations = [
   border-radius: var(--radius-card);
 }
 
-.story-photo {
+.first-visit-photo {
   display: block;
   width: 100%;
   height: auto;
@@ -205,6 +201,13 @@ const expectations = [
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--surface-soft);
+}
+
+.first-visit-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 48px);
 }
 
 .story-title { font-size: clamp(1.7rem, 4vw, 2.55rem); }
@@ -273,15 +276,9 @@ const expectations = [
 
 .riichi-discovery a:last-child { border-bottom: 0; }
 
-.story-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, .82fr);
-  align-items: center;
-  gap: clamp(24px, 5vw, 64px);
-}
-
-.story-copy .section-intro {
-  max-width: 48ch;
+.first-visit-photo {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
 }
 
 .social-note {
@@ -308,10 +305,12 @@ const expectations = [
   margin-top: 22px;
 }
 
+.respect-note a { color: var(--matcha-leaf); }
+
 @media (max-width: 900px) {
   .hero-section,
   .riichi-panel,
-  .story-layout { grid-template-columns: minmax(0, 1fr); }
+  .first-visit-layout { grid-template-columns: minmax(0, 1fr); }
   .hero-section { gap: 16px; }
   .hero-artwork { max-width: none; }
 }
@@ -328,7 +327,6 @@ const expectations = [
     border-left: 0;
   }
   .expect-card + .expect-card { border-top: 1px solid var(--line); }
-  .story-layout { gap: 18px; }
-  .story-photo { max-width: none; }
+  .first-visit-layout { gap: 18px; }
 }
 </style>
