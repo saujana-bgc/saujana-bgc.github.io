@@ -136,8 +136,8 @@ const config = useRuntimeConfig()
 const route = useRoute()
 
 function publicPlayerName(player, index) {
-  const publicName = (player.public_name ?? player.name)?.trim()
-  return publicName && publicName !== 'Seat ' + (index + 1) ? publicName : 'Anonymous player'
+  const name = [player.name, player.public_name].find(value => typeof value === 'string' && value.trim())?.trim()
+  return name && name !== 'Seat ' + (index + 1) ? name : 'Player ' + (index + 1)
 }
 
 const sessions = ref([])

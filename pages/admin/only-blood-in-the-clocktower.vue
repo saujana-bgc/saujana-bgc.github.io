@@ -78,10 +78,7 @@
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <span class="seat-number" aria-label="Seat">{{ String(playerIndex + 1).padStart(2, '0') }}</span>
-              <div class="player-name-fields">
-                <label>Player name (private)<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
-                <label>Public display name<input v-model.trim="player.public_name" placeholder="Optional"></label>
-              </div>
+              <label class="player-name-field">Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
               <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
@@ -139,7 +136,7 @@
 
         <details class="visitor-preview admin-card">
           <summary>Preview the public recap</summary>
-          <p class="preview-note">Players appear as “Anonymous player” when their public display name is blank.</p>
+          <p class="preview-note">Player names appear in the public recap.</p>
           <article class="preview-session">
             <header class="preview-masthead">
               <p class="eyebrow">From the storyteller’s desk</p>
@@ -154,7 +151,7 @@
               <h4>{{ game.script || 'Script not recorded' }}</h4>
               <div class="preview-content">
                 <p v-if="game.outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
-                <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Anonymous player' }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
+                <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ (player.name || player.public_name || '').trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
                 <p v-if="game.notes">{{ game.notes }}</p>
               </div>
               <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
@@ -298,7 +295,7 @@ function cleanSession(session) {
 }
 
 function newPlayer() {
-  return { name: '', public_name: '', character: '', alignment: '', died: false, final_status: '' }
+  return { name: '', character: '', alignment: '', died: false, final_status: '' }
 }
 
 function addGame(options = {}) {
@@ -310,7 +307,7 @@ function addGame(options = {}) {
     script_characters: scriptPresets[script],
     outcome: '', notes: '',
     players: previousGame
-      ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name, public_name: player.public_name }))
+      ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name }))
       : [],
     photos: [],
   }
@@ -335,7 +332,7 @@ function addPlayer(game) {
 function focusNextCharacter(game, playerIndex) {
   nextTick(() => {
     const card = gameCards.value.find(item => item?.dataset.gameId === game.id)
-    card?.querySelectorAll('input[data-character-field]').item(playerIndex + 1)?.focus()
+    card?.querySelectorAll('select[data-character-field]').item(playerIndex + 1)?.focus()
   })
 }
 
@@ -711,7 +708,7 @@ onBeforeUnmount(() => {
   font: inherit;
   font-weight: 400;
 }
-.player-card :deep(input[data-player-name]), .player-card :deep(input[data-character-field]) {
+.player-card :deep(input[data-player-name]) {
   width: 100%;
   min-width: 0;
   min-height: 44px;
@@ -724,7 +721,7 @@ onBeforeUnmount(() => {
   font-weight: 400;
   box-shadow: none;
 }
-.player-card :deep(input[data-player-name]:focus-visible), .player-card :deep(input[data-character-field]:focus-visible) {
+.player-card :deep(input[data-player-name]:focus-visible) {
   outline: 2px solid var(--matcha-leaf);
   outline-offset: 2px;
 }
@@ -816,11 +813,11 @@ button:disabled { opacity: .65; cursor: wait; }
 .bulk-roster-panel > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .bulk-roster-panel .admin-primary { border: 0; }
 .bulk-roster-panel textarea { min-height: 96px; resize: vertical; }
-.player-card { display: grid; grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) auto auto; gap: 6px 10px; align-items: end; padding: 8px 10px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--surface-soft); }
+.player-card { display: grid; grid-template-columns: 28px minmax(150px, .95fr) minmax(170px, 1.1fr) auto auto; gap: 10px 14px; align-items: end; padding: 12px 14px; border: 1px solid var(--desk-rule); border-radius: 9px; background: var(--surface-soft); }
 .player-card:focus-within { border-color: #b48977; }
 .seat-number { display: grid; place-items: center; align-self: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--matcha-leaf); font-size: .68rem; font-weight: 750; }
 .player-card > label:not(.check-label) { font-size: .8rem; }
-.player-name-fields { display: grid; gap: 6px; min-width: 0; font-size: .8rem; }
+.player-name-field { min-width: 0; font-size: .8rem; }
 .player-card .check-label { align-self: end; min-height: 44px; padding: 0 3px; font-size: .82rem; }
 .player-card .death-check { white-space: nowrap; }
 .legacy-status { grid-column: 1 / -1; }
@@ -851,11 +848,12 @@ button:disabled { opacity: .65; cursor: wait; }
   .saved-venue { grid-column: 1 / -1; }
   .game-heading, .editor-heading { align-items: flex-start; flex-wrap: wrap; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
-  .player-card { grid-template-columns: 28px repeat(6, minmax(0, 1fr)); align-items: center; }
-  .player-card > label:not(.check-label), .player-name-fields { grid-column: span 3; }
-  .player-card > .seat-number { grid-row: 1; }
-  .player-card > .death-check { grid-column: span 4; }
-  .player-card > .remove-player { grid-column: span 2; }
+  .player-card { grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+  .player-card > .player-name-field { grid-column: 2 / -1; }
+  .player-card > label:not(.check-label):not(.player-name-field) { grid-column: 2 / -1; }
+  .player-card > .seat-number { grid-column: 1; grid-row: 1; }
+  .player-card > .death-check { grid-column: 2 / 4; }
+  .player-card > .remove-player { grid-column: 3; }
   .player-card .check-label { min-height: 38px; }
   .remove-player { justify-self: end; }
   .photo-row label { flex: 1 1 150px; }

@@ -31,7 +31,8 @@ Deno.serve(async (request) => {
             photos: (Array.isArray(game.photos) ? game.photos : []).filter((photo: Record<string, unknown>) => photo.approved === true).map((photo: Record<string, unknown>) => ({ path: photo.path, cover: photo.cover === true, approved: true })),
             players: (Array.isArray(game.players) ? game.players : []).map((rawPlayer: unknown, index: number) => {
               const player = object(rawPlayer)
-              return { name: typeof player.public_name === 'string' ? player.public_name : 'Seat ' + (index + 1), character: player.character, died: player.died === true }
+              const name = [player.name, player.public_name].find(value => typeof value === 'string' && value.trim())
+              return { name: typeof name === 'string' ? name.trim() : 'Player ' + (index + 1), character: player.character, died: player.died === true }
             }),
           }
         }),
