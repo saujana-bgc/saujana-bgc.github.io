@@ -61,7 +61,7 @@
       <div v-else-if="!pastSessions.length" class="archive-state empty-archive">
         <span class="empty-mark" aria-hidden="true">✧</span>
         <h3>No recaps yet</h3>
-        <p>Mika’s retellings, game results and approved photos will appear here after a gathering.</p>
+        <p>Retellings, game results and approved photos will appear here after a gathering.</p>
       </div>
 
       <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
@@ -82,7 +82,7 @@
         </div>
 
         <details v-if="session.recap" class="recap-reveal">
-          <summary>Reveal Mika’s retelling</summary>
+          <summary>Reveal retelling</summary>
           <p>{{ session.recap }}</p>
         </details>
 

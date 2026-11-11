@@ -35,13 +35,17 @@
       <fieldset class="editor-fields" :disabled="busy">
         <section class="gathering-details">
           <h3>Gathering details</h3>
+          <label>Start from an active gathering
+            <select v-model="activeGatheringId" @change="applyActiveGathering">
+              <option value="">Choose a gathering, or enter a date below</option>
+              <option v-for="event in activeGatherings" :key="event.id" :value="String(event.id)">{{ formatGatheringDate(event.date) }} · {{ event.name }}<template v-if="event.venue"> · {{ event.venue }}</template></option>
+            </select>
+          </label>
+          <p v-if="activeGatheringError" class="script-hint">Active gatherings could not be loaded. Enter the date and venue below.</p>
           <div class="fields">
             <label>Date<input v-model="draft.session_date" type="date" required></label>
-            <label>Time<input v-model="draft.session_time" type="time"></label>
-            <label>Venue<input v-model="draft.venue" maxlength="160"></label>
-            <label>Signup link<input v-model="draft.signup_url" type="url" placeholder="https://…"></label>
+            <label>Venue<UInputMenu v-model="draft.venue" :items="venueOptions" mode="autocomplete" open-on-focus placeholder="Choose or search for a venue" /></label>
           </div>
-          <label>First timer note<textarea v-model="draft.first_timer_note" rows="2" placeholder="What should a first timer know?"></textarea></label>
         </section>
         <details v-for="(game,index) in draft.games" :key="game.id" ref="gameCards" class="game admin-card" :data-game-id="game.id" :open="index === 0">
           <summary class="game-summary">
@@ -74,7 +78,7 @@
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <label>Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
-              <label>Character<UInputMenu v-model="player.character" class="character-menu w-full" data-character-field placeholder="Search or enter a character" :items="characters(game)" mode="autocomplete" open-on-focus @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)" /></label>
+              <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
               <UButton type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</UButton>
@@ -126,7 +130,7 @@
         <section class="story admin-card">
           <h3>Meetup story</h3>
           <label>Teaser<input v-model="draft.teaser" maxlength="240" placeholder="A spoiler free hook"></label>
-          <label>Mika’s retelling<textarea v-model="draft.recap" rows="4" maxlength="3000" placeholder="What did the town believe? What changed? What did everyone talk about?"></textarea></label>
+          <label>Retelling<textarea v-model="draft.recap" rows="4" maxlength="3000" placeholder="What did the town believe? What changed? What did everyone talk about?"></textarea></label>
         </section>
 
         <details class="visitor-preview admin-card">
@@ -136,11 +140,10 @@
             <header class="preview-masthead">
               <p class="eyebrow">From the storyteller’s desk</p>
               <h3>{{ draft.teaser || 'A night in Ravenswood Bluff' }}</h3>
-              <p>{{ draft.session_date }}<template v-if="draft.session_time"> · {{ draft.session_time }}</template><template v-if="draft.venue"> · {{ draft.venue }}</template></p>
+              <p>{{ draft.session_date }}<template v-if="draft.venue"> · {{ draft.venue }}</template></p>
             </header>
-            <p v-if="draft.first_timer_note">{{ draft.first_timer_note }}</p>
             <details v-if="draft.recap" class="preview-reveal">
-              <summary>Reveal Mika’s retelling</summary>
+              <summary>Reveal retelling</summary>
               <p>{{ draft.recap }}</p>
             </details>
             <template v-for="game in draft.games" :key="game.id">
@@ -185,7 +188,11 @@ const auth = useAdminAuth()
 const endpoint = config.public.supabaseUrl + '/functions/v1/botc-archive'
 const saved = ref([])
 const players = ref([])
+const activeGatherings = ref([])
+const activeGatheringId = ref('')
+const activeGatheringError = ref(false)
 const playerNames = computed(() => [...new Set(players.value.map(player => player.private_name).filter(Boolean))])
+const venueOptions = computed(() => [...new Set([...activeGatherings.value.map(event => event.venue), ...saved.value.map(session => session.venue)].filter(Boolean))].sort((a, b) => a.localeCompare(b)))
 const photoUrls = ref({})
 const localPhotoUrls = ref({})
 const pendingPhotoDeletes = ref(new Set())
@@ -352,7 +359,70 @@ function addPastedPlayers(game) {
 
 function characters(game) {
   const source = scriptNames.includes(game.script) ? scriptPresets[game.script] : game.script_characters
-  return (source || '').split(',').map(value => value.trim()).filter(Boolean)
+  return (source || '').split(',').map(value => value.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b))
+}
+
+function characterGroups(game) {
+  const groups = [
+    { name: 'Good · Townsfolk', characters: [] },
+    { name: 'Good · Outsiders', characters: [] },
+    { name: 'Evil · Minions', characters: [] },
+    { name: 'Evil · Demons', characters: [] },
+    { name: 'Team unknown', characters: [] },
+  ]
+  const script = game.script
+  const roleSets = {
+    'Trouble Brewing': [
+      ['Washerwoman', 'Librarian', 'Investigator', 'Chef', 'Empath', 'Fortune Teller', 'Undertaker', 'Monk', 'Ravenkeeper', 'Virgin', 'Slayer', 'Soldier', 'Mayor'],
+      ['Butler', 'Drunk', 'Recluse', 'Saint'],
+      ['Poisoner', 'Spy', 'Scarlet Woman', 'Baron'],
+      ['Imp'],
+    ],
+    'Bad Moon Rising': [
+      ['Grandmother', 'Sailor', 'Chambermaid', 'Exorcist', 'Innkeeper', 'Gossip', 'Courtier', 'Professor', 'Minstrel', 'Tea Lady', 'Pacifist', 'Fool'],
+      ['Goon', 'Lunatic', 'Tinker', 'Moonchild'],
+      ['Godfather', 'Devil’s Advocate', 'Assassin', 'Mastermind'],
+      ['Zombuul', 'Pukka', 'Shabaloth', 'Po'],
+    ],
+    'Sects & Violets': [
+      ['Clockmaker', 'Dreamer', 'Snake Charmer', 'Mathematician', 'Flowergirl', 'Town Crier', 'Oracle', 'Savant', 'Seamstress', 'Philosopher', 'Artist', 'Juggler', 'Sage'],
+      ['Mutant', 'Sweetheart', 'Barber', 'Klutz'],
+      ['Witch', 'Cerenovus', 'Pit-Hag'],
+      ['Fang Gu', 'Vigormortis', 'No Dashii', 'Vortox'],
+    ],
+  }
+  const roles = roleSets[script]
+  for (const character of characters(game)) {
+    const teamIndex = roles?.findIndex(team => team.includes(character)) ?? -1
+    groups[character === 'Evil Twin' ? 0 : teamIndex < 0 ? 4 : teamIndex].characters.push(character)
+  }
+  return groups.filter(group => group.characters.length)
+}
+
+function formatGatheringDate(value) {
+  if (!value) return ''
+  return new Intl.DateTimeFormat('en-MY', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kuala_Lumpur' }).format(new Date(`${value}T12:00:00+08:00`))
+}
+
+function applyActiveGathering() {
+  const event = activeGatherings.value.find(item => String(item.id) === activeGatheringId.value)
+  if (!event) return
+  draft.value.session_date = event.date
+  draft.value.venue = event.venue || ''
+}
+
+async function loadActiveGatherings() {
+  try {
+    const { data, error: requestError } = await useSupabase()
+      .from('events')
+      .select('id,name,date,venue')
+      .gte('date', new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' }))
+      .order('date', { ascending: true })
+    if (requestError) throw requestError
+    activeGatherings.value = data || []
+  } catch {
+    activeGatheringError.value = true
+  }
 }
 
 function applyScript(game, event) {
@@ -404,6 +474,7 @@ async function load() {
 function setDraft(session) {
   draft.value = cleanSession(session)
   baseline.value = cleanSession(session)
+  activeGatheringId.value = String(activeGatherings.value.find(event => event.date === session.session_date && (!event.venue || !session.venue || event.venue === session.venue))?.id ?? '')
   notice.value = ''
   error.value = ''
 }
@@ -568,7 +639,7 @@ function revokeLocalPhoto(path) {
 }
 
 onMounted(async () => {
-  await load()
+  await Promise.all([loadActiveGatherings(), load()])
   restoreDraftLocally()
 })
 onBeforeUnmount(() => {
@@ -623,6 +694,8 @@ onBeforeUnmount(() => {
   background: var(--desk-paper);
 }
 .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr)); gap: 12px; }
+.gathering-details > label { max-width: 720px; margin-bottom: 12px; }
+.editor .character-select { appearance: auto; }
 .editor label { display: grid; gap: 6px; min-width: 0; color: var(--desk-ink); font-size: .86rem; font-weight: 600; }
 .editor :is(input:not([type=checkbox]), select, textarea) {
   width: 100%;
