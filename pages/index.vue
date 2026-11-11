@@ -2,7 +2,7 @@
   <main class="home">
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
-        <h1 id="home-title" class="hero-title">Pull up a chair. Let’s play.</h1>
+        <h1 id="home-title" class="hero-title">Come play with Saujana</h1>
         <p>Join us for board games and riichi mahjong. Come on your own or bring a friend. We’ll teach you the rules.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
@@ -23,7 +23,7 @@
     </section>
 
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
-      <h2 id="first-visit-title" class="hero-title story-title">What to expect at your first gathering</h2>
+      <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
       <p class="section-intro">New to Saujana? Here’s how a first visit can go. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
       <div class="expect-guide">
         <article v-for="item in expectations" :key="item.title" class="expect-card">
@@ -160,7 +160,7 @@ const expectations = [
 
 .hero-section {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
   align-items: center;
   gap: clamp(28px, 6vw, 80px);
 }
@@ -239,6 +239,13 @@ const expectations = [
 .home-section {
   padding-top: clamp(24px, 3.5vw, 40px);
   border-top: 1px solid var(--line);
+}
+
+#first-visit {
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface-soft);
 }
 
 .story-title { font-size: clamp(1.7rem, 4vw, 2.55rem); }
