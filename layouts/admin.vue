@@ -1,7 +1,7 @@
 <template>
   <main class="admin-root">
     <section v-if="isRestoring || !isAuthenticated" class="admin-login-wrap">
-      <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>One organiser sign-in for Birthday Club and Riichi Open.</p></div>
+      <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>One organiser sign-in for Birthday Club, Clocktower and Riichi Open.</p></div>
       <form class="admin-login-card" @submit.prevent="submitLogin">
         <label>Username<UInput v-model="username" class="admin-login-input" autocomplete="username" required /></label>
         <label>Password<UInput v-model="password" class="admin-login-input" type="password" autocomplete="current-password" required /></label>
@@ -9,7 +9,7 @@
         <p v-if="isRestoring" class="admin-help" role="status">Checking for a saved session. You can sign in here if needed.</p>
         <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</UButton>
-        <p class="admin-help">Use the existing Birthday Club admin username and password.</p>
+        <p class="admin-help">Use the existing organiser username and password for Birthday Club, Clocktower and Riichi Open.</p>
       </form>
     </section>
     <template v-else>

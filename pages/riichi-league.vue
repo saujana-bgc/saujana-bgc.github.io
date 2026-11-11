@@ -2399,5 +2399,20 @@ onBeforeUnmount(() => {
 .standings-table thead, .result-table thead { background: var(--surface-soft); }
 .standings-table td, .result-table td { font-variant-numeric: tabular-nums; }
 .rules-button { border-radius: 6px; box-shadow: none; }
+@media (max-width: 760px) {
+  .league-page { display: flex; flex-direction: column; }
+  .league-hero { padding-bottom: 22px; }
+  .league-hero .hero-title { max-width: 12ch; margin-inline: auto; line-height: 1.08; }
+  .league-intro { max-width: 34rem; margin-inline: auto; }
+  .standings-card { order: 1; }
+  .season-card { order: 2; }
+  .weeks-card { order: 3; }
+  .rules-card { order: 4; }
+  .season-switcher { justify-content: center; }
+  .season-switcher .league-control { min-width: 150px; }
+  .league-shortcuts { gap: 8px; }
+  .league-shortcuts > * { flex: 1 1 auto; }
+  .season-card { margin-bottom: 18px; }
+}
 
 </style>

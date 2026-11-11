@@ -1374,6 +1374,13 @@ onBeforeUnmount(() => {
   .group-tile-samples img { width: 20px; height: 29px; }
   .group-tile-samples .tile-back { width: 20px; height: 29px; }
 }
+@media (max-width: 760px) {
+  .calculator-page .calculator-heading { margin-bottom: 6px; }
+  .calculator-heading > .calculator-description { max-width: 38rem; }
+  .tutorial-trigger { min-height: 40px; padding: 7px 13px; }
+  .entry-mode button { min-height: 54px; }
+  .calculator-form { gap: 10px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .choice-button { transition: none; }
   .tutorial-trigger { transition: none; }

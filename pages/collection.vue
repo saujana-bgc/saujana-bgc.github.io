@@ -600,6 +600,7 @@ watch([search, currentSort, selectedCategories], () => {
 .collection-invite h2 { font-style: normal; }
 .collection-invite p { opacity: 1; color: var(--muted); }
 .collection-search-input { border-color: var(--line); border-radius: 8px; min-height: 50px; }
+.collection-result-count { flex: 0 0 auto; white-space: nowrap; }
 .sort-controls { display: flex; flex-direction: column; max-width: 720px; gap: 10px; margin-bottom: 8px; }
 .collection-sort-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .collection-category-options { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: thin; }
@@ -620,6 +621,27 @@ watch([search, currentSort, selectedCategories], () => {
     .collection-search { flex-wrap: wrap; }
     .collection-search-input { flex: 1 0 100%; }
     .collection-result-count { flex: 1; }
+}
+
+/* Put browsing first, with the invitation close to the shelf itself. */
+main:has(.collection-search) { gap: 10px; }
+main:has(.collection-search) > .collection-search { order: 1; margin-bottom: 0; }
+main:has(.collection-search) > .sort-controls { order: 2; width: 90%; margin: 0 auto 8px; }
+main:has(.collection-search) > .editorial-grid,
+main:has(.collection-search) > .collection-empty { order: 4; }
+main:has(.collection-search) > .collection-invite { order: 5; width: 90%; max-width: 720px; margin: 22px auto 18px; }
+.collection-header { padding-bottom: 10px; }
+.collection-header .hero-title { margin-bottom: 8px; }
+.collection-updated { margin-top: 6px; }
+.collection-sort-options .surprise { line-height: 1.25; }
+@media (max-width: 480px) {
+  .collection-summary { gap: 4px 14px; font-size: .78rem; }
+  .collection-search { align-items: center; }
+  .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
+  .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .collection-sort-options .surprise { grid-column: 1 / -1; }
+  .collection-category-options { gap: 6px; }
+  .collection-invite { text-align: left; }
 }
 
 </style>

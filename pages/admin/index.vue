@@ -2,7 +2,7 @@
   <section>
     <p class="eyebrow">Organiser workspace</p>
     <h1>Master admin</h1>
-    <p class="admin-lede">Choose a page to manage the community calendar or Riichi Open I.</p>
+    <p class="admin-lede">Choose a page to manage the community calendar, Clocktower recaps, or Riichi Open I.</p>
     <div v-for="group in groups" :key="group.name" class="admin-section">
       <h2 class="admin-group-title">{{ group.name }}</h2>
       <div class="admin-grid">

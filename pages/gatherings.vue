@@ -3,7 +3,7 @@
     <header class="fade-up">
       <p class="page-eyebrow">Something to look forward to</p>
       <h1 class="hero-title">Board game gatherings</h1>
-      <div class="stats-container">Join Saujana for board games and good company. Choose a date, check the venue, and follow the signup details. Your first visit starts here.</div>
+      <div class="stats-container">Find your next game night, check the details, and come as you are. New to Saujana? We’ll help you find your seat.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -2193,6 +2193,18 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     .signup-submit-actions { flex-direction: column; align-items: stretch; }
     .signup-submit-actions .btn-save { min-height: 48px; }
     .signup-submit-actions .btn-cancel { border: 1px solid var(--line); }
+}
+
+/* Keep the welcome useful without letting it push the gathering out of view. */
+.first-time-panel { text-align: left; }
+.first-time-panel summary { cursor: pointer; }
+.first-time-panel .first-time-summary-title { font-style: normal; font-weight: 650; }
+.first-time-panel .first-time-summary-hint { color: var(--muted); }
+.gatherings-main > .tabs { margin-top: 2px; }
+@media (max-width: 600px) {
+  .first-time-panel { padding: 15px 17px; margin-bottom: 12px; }
+  .first-time-panel summary { gap: 3px 8px; }
+  .first-time-summary-hint { font-size: .78rem; line-height: 1.45; }
 }
 
 </style>
