@@ -77,6 +77,7 @@
               <h4>Players and characters <small>{{ game.players.length }} {{ game.players.length === 1 ? 'player' : 'players' }}</small></h4>
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
+              <span class="seat-number" aria-label="Seat">{{ String(playerIndex + 1).padStart(2, '0') }}</span>
               <label>Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
               <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
@@ -166,7 +167,7 @@
 
       <div class="save-row">
         <template v-if="baseline.published">
-          <UButton class="admin-primary" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save changes' }}</UButton>
+          <UButton class="admin-primary" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Update public gathering' }}</UButton>
           <UButton type="button" :disabled="busy" @click="unpublish">Unpublish</UButton>
         </template>
         <template v-else>
@@ -669,7 +670,7 @@ onBeforeUnmount(() => {
 .admin-masthead .eyebrow { margin: 0; color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .admin-masthead h1 { margin: 3px 0; color: var(--desk-ink); font: 400 clamp(1.85rem, 4vw, 2.7rem)/1.12 var(--font-display); text-wrap: balance; }
 .admin-masthead p:last-child { margin: 0; color: var(--muted); font-size: .9rem; }
-.editor { display: grid; gap: 18px; margin-top: 16px; padding: var(--desk-pad); border-color: var(--desk-rule); background: #faf5ed; }
+.editor { display: grid; gap: 18px; margin-top: 16px; padding: var(--desk-pad); padding-bottom: calc(var(--desk-pad) + 58px); border-color: var(--desk-rule); background: #faf5ed; }
 .editor-heading, .game-heading, .saved, .save-row, .section-heading {
   display: flex;
   justify-content: space-between;
@@ -814,8 +815,9 @@ button:disabled { opacity: .65; cursor: wait; }
 .bulk-roster-panel > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .bulk-roster-panel .admin-primary { border: 0; }
 .bulk-roster-panel textarea { min-height: 96px; resize: vertical; }
-.player-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto; gap: 6px 10px; align-items: end; padding: 8px 10px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--surface-soft); }
+.player-card { display: grid; grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr) auto auto; gap: 6px 10px; align-items: end; padding: 8px 10px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--surface-soft); }
 .player-card:focus-within { border-color: #b48977; }
+.seat-number { display: grid; place-items: center; align-self: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--matcha-leaf); font-size: .68rem; font-weight: 750; }
 .player-card > label:not(.check-label) { font-size: .8rem; }
 .player-card .check-label { align-self: end; min-height: 44px; padding: 0 3px; font-size: .82rem; }
 .player-card .death-check { white-space: nowrap; }
@@ -847,8 +849,9 @@ button:disabled { opacity: .65; cursor: wait; }
   .saved-venue { grid-column: 1 / -1; }
   .game-heading, .editor-heading { align-items: flex-start; flex-wrap: wrap; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
-  .player-card { grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: center; }
+  .player-card { grid-template-columns: 28px repeat(6, minmax(0, 1fr)); align-items: center; }
   .player-card > label:not(.check-label) { grid-column: span 3; }
+  .player-card > .seat-number { grid-row: 1; }
   .player-card > .death-check { grid-column: span 4; }
   .player-card > .remove-player { grid-column: span 2; }
   .player-card .check-label { min-height: 38px; }
