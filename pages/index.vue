@@ -3,7 +3,7 @@
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
         <h1 id="home-title" class="hero-title">Come play with Saujana</h1>
-        <p>Join us for board games and riichi mahjong. Come on your own or bring a friend. We’ll teach you the rules.</p>
+        <p>Board games and riichi mahjong, with help learning the rules. Come solo or bring a friend.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
@@ -26,7 +26,20 @@
       <div>
         <p class="next-gathering-label">Something to look forward to</p>
         <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering ? nextGathering.name : 'Find your next gathering' }}</h2>
-        <p v-if="nextGathering" class="next-gathering-details">{{ formatGatheringDate(nextGathering.date) }} · {{ nextGathering.time }} · {{ nextGathering.venue }}</p>
+        <div v-if="nextGathering" class="next-gathering-details">
+          <span class="gathering-detail">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg>
+            {{ formatGatheringDate(nextGathering.date) }}
+          </span>
+          <span class="gathering-detail">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>
+            {{ nextGathering.time }}
+          </span>
+          <span class="gathering-detail">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>
+            {{ nextGathering.venue }}
+          </span>
+        </div>
         <p v-else class="next-gathering-details">See upcoming dates, venues and sign-up details.</p>
       </div>
       <NuxtLink class="next-gathering-link" :to="nextGathering ? `/gatherings#gathering-${nextGathering.id}` : '/gatherings'" no-prefetch>
@@ -43,8 +56,11 @@
         <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
         <div class="expect-guide">
           <article v-for="item in expectations" :key="item.title" class="expect-card">
+            <svg class="guide-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="item.icon"/></svg>
+            <div>
             <h3>{{ item.title }}</h3>
             <p>{{ item.copy }}</p>
+            </div>
           </article>
         </div>
       </div>
@@ -55,8 +71,11 @@
       <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
       <div class="care-guide">
         <div v-for="pillar in pillars" :key="pillar.title" class="pillar">
+          <svg class="pillar-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="pillar.icon"/></svg>
+          <div>
           <h3>{{ pillar.title }}</h3>
           <p>{{ pillar.content }}</p>
+          </div>
         </div>
       </div>
       <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
@@ -68,9 +87,9 @@
         <p class="section-intro">Curious about Japanese mahjong? Explore our tools, league standings and tournament.</p>
       </div>
       <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
-        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch>Scoring calculator <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-league" no-prefetch>League and standings <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-open" no-prefetch>Riichi Open I tournament <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2m-8 4h2m4 0h2"/></svg>Scoring calculator <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-league" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V11m8 9V4m8 16v-6M2 20h20"/><path d="m4 8 6-4 6 5 5-5"/></svg>League and standings <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-open" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Riichi Open I tournament <span aria-hidden="true">→</span></NuxtLink>
       </nav>
     </section>
 
@@ -113,14 +132,17 @@ function formatGatheringDate(dateValue) {
 const pillars = [
   {
     title: 'Make the first hello',
+    icon: 'M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6a7.5 7.5 0 1 1 17-3.5Z',
     content: 'Notice someone new? Introduce yourself and invite them into a game. A small welcome makes arriving alone much easier.'
   },
   {
     title: 'Stay curious',
+    icon: 'M12 3a7 7 0 0 0-4 12.7c.7.5 1 1 1 1.8h6c0-.8.3-1.3 1-1.8A7 7 0 0 0 12 3ZM9.5 20h5M10 17.5h4',
     content: 'Ask questions, try an unfamiliar game, and give each other time to learn. Nobody needs to get every rule right on the first go.'
   },
   {
     title: 'Care for the table',
+    icon: 'M12 21s8-4 8-11V5l-8-3-8 3v5c0 7 8 11 8 11Z M9 12l2 2 4-4',
     content: 'Handle the games with care, order something at the venue, and lend a hand packing up. Keep your sign-up current so the host can plan for everyone.'
   }
 ]
@@ -128,14 +150,17 @@ const pillars = [
 const expectations = [
   {
     title: 'Say hello',
+    icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
     copy: 'Find the host, mention it’s your first visit, and take a moment to settle in.'
   },
   {
     title: 'Find your game',
+    icon: 'M3 7h18v13H3zM7 7V4h10v3M8 12h8M8 16h5',
     copy: 'Tell us what you enjoy. We’ll suggest a game and walk you through the rules.'
   },
   {
     title: 'Watch or join in',
+    icon: 'M3 5h18v12H3zM8 21h8m-4-4v4M10 9l5 2-5 2z',
     copy: 'Watch a round or play at your own pace.'
   }
 ]
@@ -157,18 +182,18 @@ const expectations = [
   border-radius: var(--radius-card);
   background: var(--surface-soft);
   display: grid;
-  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
   align-items: center;
-  gap: clamp(28px, 6vw, 80px);
+  gap: clamp(24px, 3vw, 36px);
 }
 
 .hero-copy h1 {
-  max-width: 14ch;
-  font-size: clamp(2.45rem, 5.5vw, 4.8rem);
+  max-width: 15ch;
+  font-size: clamp(2.35rem, 5vw, 4.5rem);
 }
 
 .hero-copy p {
-  max-width: 37ch;
+  max-width: 46ch;
   margin: 18px 0 0;
   color: var(--muted);
   font-size: clamp(1rem, 1.8vw, 1.2rem);
@@ -250,11 +275,29 @@ const expectations = [
 }
 
 .next-gathering-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
   margin: 5px 0 0;
   color: var(--muted);
   font-size: .92rem;
   line-height: 1.5;
 }
+
+.gathering-detail { display: inline-flex; min-width: 0; align-items: center; gap: 7px; }
+.gathering-detail:last-child { overflow-wrap: anywhere; }
+.gathering-detail svg, .guide-icon, .pillar-icon, .link-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.gathering-detail svg { color: var(--matcha-leaf); }
 
 .next-gathering-link {
   display: inline-flex;
@@ -293,12 +336,13 @@ const expectations = [
 
 .first-visit-layout {
   display: grid;
-  grid-template-areas: "copy photo" "steps steps";
-  grid-template-columns: minmax(0, 1fr) minmax(320px, .95fr);
+  grid-template-areas: "copy copy" "photo steps";
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
   align-items: center;
-  gap: clamp(24px, 4vw, 48px);
+  gap: 20px 28px;
 }
 .first-visit-copy { grid-area: copy; }
+.first-visit-copy .section-intro { max-width: 78ch; }
 .first-visit-photo { grid-area: photo; }
 .first-visit-layout > .expect-guide { grid-area: steps; width: 100%; }
 
@@ -316,18 +360,22 @@ const expectations = [
 .expect-guide,
 .care-guide {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   margin-top: 20px;
 }
 
 .expect-card {
-  padding: 4px clamp(14px, 2.2vw, 26px) 4px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
 }
 
 .expect-card + .expect-card {
-  padding-left: clamp(14px, 2.2vw, 26px);
-  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
 }
+
+.guide-icon, .pillar-icon { color: var(--gold-leaf); margin-top: 2px; }
 
 .expect-card h3,
 .pillar h3 {
@@ -347,7 +395,7 @@ const expectations = [
 
 .riichi-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 12px 28px;
   padding: clamp(20px, 4vw, 40px);
@@ -358,15 +406,22 @@ const expectations = [
 
 .riichi-discovery {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .riichi-discovery a {
-  justify-content: space-between;
-  border-bottom: 1px solid var(--line);
+  min-height: 56px;
+  justify-content: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
   text-decoration: none;
 }
 
-.riichi-discovery a:last-child { border-bottom: 0; }
+.riichi-discovery a:hover { background: rgba(255, 254, 250, .65); }
+.riichi-discovery a span { margin-left: auto; }
+.link-icon { color: var(--gold-leaf); }
 
 .first-visit-photo {
   aspect-ratio: 4 / 3;
@@ -390,7 +445,8 @@ const expectations = [
   line-height: 1.5;
 }
 
-.care-guide { gap: 20px 28px; }
+.care-guide { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 28px; }
+.pillar { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
 
 .respect-note {
   max-width: 75ch;
@@ -402,7 +458,6 @@ const expectations = [
 @media (max-width: 900px) {
   .hero-section,
   .riichi-panel { grid-template-columns: minmax(0, 1fr); }
-  .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .hero-section { gap: 16px; }
   .hero-artwork { max-width: none; }
 }
@@ -411,15 +466,11 @@ const expectations = [
   .home { width: calc(100% - 32px); }
   .hero-copy,
   .hero-copy h1 { min-width: 0; max-width: 100%; }
-  .expect-guide,
-  .care-guide { grid-template-columns: minmax(0, 1fr); }
-  .expect-card,
-  .expect-card + .expect-card {
-    padding: 14px 0;
-    border-left: 0;
-  }
-  .expect-card + .expect-card { border-top: 1px solid var(--line); }
-  .first-visit-layout { gap: 18px; }
+  .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .care-guide, .riichi-discovery { grid-template-columns: minmax(0, 1fr); }
+  .riichi-discovery { gap: 0; }
+  .riichi-discovery a { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding-inline: 0; }
+  .riichi-discovery a:last-child { border-bottom: 0; }
   .next-gathering { align-items: flex-start; padding: 18px; }
   .next-gathering-link { width: 100%; }
 }
