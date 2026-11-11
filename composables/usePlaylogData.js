@@ -55,6 +55,7 @@ async function loadPlaylog() {
         isError.value = false
     } catch {
         isError.value = true
+        loadPromise = null
     } finally {
         isPending.value = false
     }

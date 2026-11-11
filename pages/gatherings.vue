@@ -6,7 +6,7 @@
       <div class="stats-container">Join Saujana for board games and good company. Choose a date, check the venue, and follow the signup details. Your first visit starts here.</div>
     </header>
 
-    <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
       <details class="first-time-panel fade-up">
         <summary>
@@ -990,7 +990,17 @@ onMounted(async () => {
         ])
         await nextTick()
         if (route.hash.startsWith('#gathering-')) {
-            document.getElementById(decodeURIComponent(route.hash.slice(1)))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            const targetId = decodeURIComponent(route.hash.slice(1))
+            let target = document.getElementById(targetId)
+            if (!target) {
+                const targetIndex = presentEventsList.value.findIndex(event => `gathering-${event.id}` === targetId)
+                if (targetIndex >= 0) {
+                    presentPage.value = Math.floor(targetIndex / PAGE_SIZE) + 1
+                    await nextTick()
+                    target = document.getElementById(targetId)
+                }
+            }
+            target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
     } catch {
         showToast('We couldn’t load the gatherings. Please refresh and try again.')
@@ -1053,6 +1063,12 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 12px 32px rgba(160, 100, 110, 0.08);
     text-align: center;
 }
+.gatherings-main > .tabs { order: 1; }
+.gatherings-main > .event-card,
+.gatherings-main > .loading-copy,
+.gatherings-main > .empty-state { order: 2; }
+.gatherings-main > .first-time-panel { order: 3; }
+.gatherings-main > .pagination { order: 4; }
 
 .first-time-panel h2 {
     margin: 0 0 8px;

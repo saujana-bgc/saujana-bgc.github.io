@@ -31,14 +31,14 @@
       </div>
 
       <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
-        <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="[currentSort = 'name', resetCategories()]">A to Z</UButton>
-        <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="[currentSort = 'played', resetCategories()]">Recently played</UButton>
-        <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="[generateSurprise(), resetCategories()]">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</UButton>
-        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Card Game') }" :aria-pressed="selectedCategories.includes('Card Game')" @click="selectedCategories = selectedCategories.includes('Card Game') ? [] : ['Card Game']">Card games</UButton>
-        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Deduction') }" :aria-pressed="selectedCategories.includes('Deduction')" @click="selectedCategories = selectedCategories.includes('Deduction') ? [] : ['Deduction']">Deduction</UButton>
-        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Animals') }" :aria-pressed="selectedCategories.includes('Animals')" @click="selectedCategories = selectedCategories.includes('Animals') ? [] : ['Animals']">Animals</UButton>
-        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Party Game') }" :aria-pressed="selectedCategories.includes('Party Game')" @click="selectedCategories = selectedCategories.includes('Party Game') ? [] : ['Party Game']">Party games</UButton>
-        <UButton class="sort-btn" :class="{ active: selectedCategories.includes('Bluffing') }" :aria-pressed="selectedCategories.includes('Bluffing')" @click="selectedCategories = selectedCategories.includes('Bluffing') ? [] : ['Bluffing']">Bluffing</UButton>
+        <div class="collection-sort-options" aria-label="Sort games">
+          <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="[currentSort = 'name', resetCategories()]">A to Z</UButton>
+          <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="[currentSort = 'played', resetCategories()]">Recently played</UButton>
+          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="[generateSurprise(), resetCategories()]">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</UButton>
+        </div>
+        <div class="collection-category-options" aria-label="Filter by category">
+          <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
+        </div>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">The collection is here, but play history is unavailable. Refresh the page to try again.</div>
@@ -600,8 +600,11 @@ watch([search, currentSort, selectedCategories], () => {
 .collection-invite h2 { font-style: normal; }
 .collection-invite p { opacity: 1; color: var(--muted); }
 .collection-search-input { border-color: var(--line); border-radius: 8px; min-height: 50px; }
-.sort-controls { max-width: 720px; gap: 8px; margin-bottom: 8px; }
+.sort-controls { display: flex; flex-direction: column; max-width: 720px; gap: 10px; margin-bottom: 8px; }
+.collection-sort-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.collection-category-options { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: thin; }
 .sort-btn { padding: 10px 12px; min-height: 44px; border-radius: 6px; text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
+.category-btn { flex: 0 0 auto; }
 .sort-btn:hover { transform: none; box-shadow: none; }
 .editorial-card { border: 1px solid var(--line); border-radius: 10px; padding: 18px; box-shadow: var(--shadow-card); text-align: left; }
 .editorial-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(44,55,40,.08); }
@@ -611,7 +614,7 @@ watch([search, currentSort, selectedCategories], () => {
 .card-players { font-size: .73rem; letter-spacing: 0; text-transform: none; }
 .last-played { font-size: .7rem; letter-spacing: 0; text-transform: none; font-weight: 400; padding-top: 12px; }
 .modal-container { border-radius: 16px 16px 0 0; }
-@media (min-width: 768px) { .sort-controls { grid-template-columns: repeat(4, 1fr); } .editorial-card { padding: 22px; border-radius: 10px; } .modal-container { border-radius: 16px; } }
+@media (min-width: 768px) { .collection-category-options { flex-wrap: wrap; overflow-x: visible; } .editorial-card { padding: 22px; border-radius: 10px; } .modal-container { border-radius: 16px; } }
 @media (max-width: 400px) { .editorial-card { padding: 12px; } .card-game-title { font-size: 1.05rem; } .sort-btn { font-size: .75rem; } }
 @media (max-width: 480px) {
     .collection-search { flex-wrap: wrap; }

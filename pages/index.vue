@@ -13,14 +13,13 @@
       <div class="banner-container">
         <img
           class="hero-banner"
-          src="/images/site/saujana_bgc_banner_640.avif?v=20260806-hero-v6"
-          :srcset="heroImageSrcset"
-          :sizes="heroImageSizes"
-          alt="Saujana BG Community banner"
-          width="1920"
-          height="1080"
+          src="/images/site/table_scene_1.avif"
+          alt="Players gathered around a Saujana board game table"
+          width="640"
+          height="480"
           loading="eager"
           fetchpriority="high"
+          decoding="async"
         >
       </div>
     </section>
@@ -138,8 +137,6 @@
 <script setup>
 import { instagramData } from '~/assets/data/instagram_data.js'
 
-const heroImageSrcset = '/images/site/saujana_bgc_banner_640.avif?v=20260806-hero-v6 640w, /images/site/saujana_bgc_banner_800.avif?v=20260806-hero-v6 800w, /images/site/saujana_bgc_banner_900.avif?v=20260806-hero-v6 900w, /images/site/saujana_bgc_banner_1000.avif?v=20260806-hero-v6 1000w, /images/site/saujana_bgc_banner_1200.avif?v=20260806-hero-v6 1200w, /images/site/saujana_bgc_banner.avif?v=20260806-hero-v6 1920w'
-const heroImageSizes = '(min-width: 1200px) 580px, (min-width: 900px) 48vw, 92vw'
 
 const posts = computed(() => (instagramData?.posts ?? []).slice(0, 4))
 const getInstagramThumb = (src) => `/${src.replace('images/instagram/', 'images/instagram/thumbs/')}`

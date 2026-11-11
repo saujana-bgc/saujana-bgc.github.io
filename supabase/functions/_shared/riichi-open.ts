@@ -42,7 +42,9 @@ export function serviceClient(): SupabaseClient {
       global: {
         fetch: (input, init) => {
           const request = new Request(input, init)
-          request.headers.delete('authorization')
+          if (!new URL(request.url).pathname.endsWith('/auth/v1/user')) {
+            request.headers.delete('authorization')
+          }
           return fetch(request)
         },
       },

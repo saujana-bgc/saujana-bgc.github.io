@@ -479,6 +479,7 @@ async function save(published = baseline.value.published) {
 
   saving.value = true
   try {
+    draft.value.id ||= crypto.randomUUID()
     const result = await call('save', { session: cleanSession({ ...draft.value, published }) })
     const committed = result.session
     const refreshed = await load()
