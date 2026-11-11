@@ -68,14 +68,12 @@
 
     <section class="home-section" aria-labelledby="community-values-title">
       <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
-      <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
+      <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse as far as the eye can see. To us, it’s another game to try, another story to hear, someone new to meet.</p>
       <div class="care-guide">
         <div v-for="pillar in pillars" :key="pillar.title" class="pillar">
           <svg class="pillar-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="pillar.icon"/></svg>
-          <div>
           <h3>{{ pillar.title }}</h3>
           <p>{{ pillar.content }}</p>
-          </div>
         </div>
       </div>
       <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
@@ -342,14 +340,12 @@ const expectations = [
   gap: 20px 28px;
 }
 .first-visit-copy { grid-area: copy; }
-.first-visit-copy .section-intro { max-width: 78ch; }
 .first-visit-photo { grid-area: photo; }
 .first-visit-layout > .expect-guide { grid-area: steps; width: 100%; }
 
 .story-title { font-size: clamp(1.7rem, 4vw, 2.55rem); }
 
 .section-intro {
-  max-width: 64ch;
   margin: 12px 0 0;
   color: var(--muted);
   line-height: 1.7;
@@ -446,14 +442,28 @@ const expectations = [
 }
 
 .care-guide { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 28px; }
-.pillar { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.pillar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  gap: 6px 12px;
+  min-width: 0;
+}
+
+.pillar h3 { margin: 0; }
+.pillar p { grid-column: 2; }
 
 .respect-note {
-  max-width: 75ch;
   margin-top: 22px;
 }
 
 .respect-note a { color: var(--matcha-leaf); }
+
+@media (min-width: 901px) {
+  .hero-copy p { max-width: none; }
+  .pillar p { grid-column: 1 / -1; }
+}
 
 @media (max-width: 900px) {
   .hero-section,
