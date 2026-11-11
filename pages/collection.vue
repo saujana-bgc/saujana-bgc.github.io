@@ -32,9 +32,9 @@
 
       <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
         <div class="collection-sort-options" aria-label="Sort games">
-          <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="[currentSort = 'name', resetCategories()]">A to Z</UButton>
-          <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="[currentSort = 'played', resetCategories()]">Recently played</UButton>
-          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="[generateSurprise(), resetCategories()]">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</UButton>
+          <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="currentSort = 'name'">A to Z</UButton>
+          <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="currentSort = 'played'">Recently played</UButton>
+          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="generateSurprise">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</UButton>
         </div>
         <div class="collection-category-options" aria-label="Filter by category">
           <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>

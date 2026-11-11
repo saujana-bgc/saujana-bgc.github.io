@@ -134,7 +134,7 @@
               >
                 <div class="signup-form-heading">
                   <h4 :id="`signup-title-${event.id}`">Your signup</h4>
-                  <p>Only your name is required. Tap “Join the list” below to save your signup.</p>
+                  <p>Only your name is required. Regular gatherings have a RM10 minimum spend per person. Tap “Join the list” below to save your signup.</p>
                 </div>
                 <fieldset class="signup-fields" :disabled="savingRows[event.id]">
                   <legend class="signup-sr-only">Your details</legend>
@@ -436,7 +436,7 @@ function showNameAutocomplete(e, row) {
     nameAutocomplete.row = row
     nameAutocomplete.input = e.currentTarget
     activeNameOptionIndex.value = -1
-    nameAutocomplete.visible = true
+    nameAutocomplete.visible = Boolean(String(row.name ?? '').trim())
     updateNameAutocompletePosition()
 }
 
@@ -1063,11 +1063,11 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 12px 32px rgba(160, 100, 110, 0.08);
     text-align: center;
 }
-.gatherings-main > .tabs { order: 1; }
+.gatherings-main > .first-time-panel { order: 1; }
+.gatherings-main > .tabs { order: 2; }
 .gatherings-main > .event-card,
 .gatherings-main > .loading-copy,
-.gatherings-main > .empty-state { order: 2; }
-.gatherings-main > .first-time-panel { order: 3; }
+.gatherings-main > .empty-state { order: 3; }
 .gatherings-main > .pagination { order: 4; }
 
 .first-time-panel h2 {

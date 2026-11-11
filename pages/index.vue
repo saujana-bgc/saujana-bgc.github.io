@@ -13,6 +13,7 @@
           fetchpriority="high"
         >
       </figure>
+      <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
     </section>
 
     <div class="welcome-strip"><span>New faces welcome</span><span>Come on your own</span><span>We’ll teach the rules</span></div>
@@ -172,6 +173,8 @@ const expectations = [
 .hero-section { width: min(1440px, 96%); padding: 0 0 36px; }
 .hero-artwork { width: 100%; margin: 0; }
 .hero-banner { display: block; width: 100%; height: auto; }
+.hero-gatherings-link { display: flex; width: fit-content; min-height: 48px; align-items: center; justify-content: center; gap: 10px; margin: 20px auto 0; padding: 0 24px; border-radius: 6px; background: var(--matcha-leaf); color: var(--white-pure); font-size: .95rem; font-weight: 600; text-decoration: none; }
+.hero-gatherings-link:hover { background: #293d31; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .welcome-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 64px; width: min(1200px,92%); padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); font-size: .67rem; letter-spacing: .1em; text-transform: uppercase; }
 .welcome-strip span { display: flex; align-items: center; gap: 14px; }
