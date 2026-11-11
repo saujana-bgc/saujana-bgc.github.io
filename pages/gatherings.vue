@@ -2107,6 +2107,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .stat-lbl, .attendees-title, .card-label { opacity: 1; color: var(--muted); }
 .btn-add, .btn-save, .btn-cancel, .page-btn { min-height: 44px; border-radius: 6px; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 @media (max-width: 600px) { .first-time-panel { padding: 20px; } }
+@media (max-width: 600px) {
+  .page-content > div:has(> .gatherings-main) > header { padding-bottom: 12px; }
+  .first-time-panel { padding: 14px 18px; }
+  .tabs { margin: 8px auto 18px; }
+  .event-card { padding: 18px; }
+  .event-image-wrap { margin-bottom: 14px; }
+  .event-quick-details { margin-top: 8px; }
+}
 
 /* Keep signup separate from the attendee list, with the action after the fields. */
 .signup-section { margin-bottom: 28px; }

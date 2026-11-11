@@ -1,7 +1,7 @@
 <template>
   <main class="event-page">
     <RiichiOpenTabs v-model="activeTab" />
-    <div class="event-status-bar" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><small>14 November · Ara Damansara</small></div>
+    <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><small>14 November · Ara Damansara</small><UButton v-if="standingsError" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Retry</UButton></div>
     <section v-show="activeTab === 'registration'" id="riichi-registration-panel" role="tabpanel" aria-labelledby="riichi-registration-tab">
     <section class="event-hero">
       <div class="hero-copy">
@@ -682,6 +682,9 @@ async function cancelHold() {
 @media(max-width:760px){.event-hero{display:block;min-height:0;padding:26px 22px}.hero-copy{padding-bottom:0}.event-hero h1{width:58%;min-height:185px;display:flex;flex-direction:column;justify-content:center;font-size:clamp(2.7rem,7vw,4.3rem)}.mika-frame{position:absolute;top:6px;right:10px;height:220px;width:38%;pointer-events:none}.hero-intro{font-size:1rem;margin-top:20px}.event-facts{font-size:.85rem;gap:8px;margin:20px 0}.event-offer{margin:16px 0}.hero-actions{margin-top:20px;gap:18px}.hero-reassurance{font-size:.69rem}.signup-progress{gap:8px}.signup-progress li{font-size:.69rem;gap:6px}.signup-progress li>span{width:22px;height:22px}.hold-note{flex-wrap:wrap}.event-status-bar small{font-size:.65rem}.registration-panel{gap:20px;padding:22px}.availability{grid-template-columns:auto 1fr;align-items:center;gap:1px 14px;padding:14px}.availability>strong{grid-row:span 2;font-size:2rem}.availability .capacity-track{grid-column:1/-1;width:100%;margin:8px 0 3px}.availability small{grid-column:1/-1}.payment-step .event-button{width:100%;justify-content:center}.registrant-list li{gap:8px;padding:12px;font-size:.83rem}}
 @media(max-width:440px){.event-hero h1{font-size:2.7rem;min-height:175px;width:57%}.mika-frame{width:44%;height:210px;right:2px}.hero-actions{gap:12px}.hero-actions .event-button{width:100%;justify-content:space-between}.hero-guide{font-size:.8rem}.event-offer{gap:8px}.event-offer>span{font-size:.74rem}.event-offer i{margin:0 3px}.event-status-bar small{display:none}.registration-panel{padding:18px}.signup-progress li{font-size:.61rem;gap:5px}.signup-progress li>span{width:20px;height:20px}.registrant-list li{align-items:flex-start}.registrant-list .pending-badge{white-space:normal;text-align:center;max-width:110px}}
 @media(prefers-reduced-motion:reduce){.event-page *{scroll-behavior:auto!important}}
+.event-status-bar.unavailable { color: #8b343f; }
+.event-status-bar.unavailable i { background: #b34450; }
+.event-status-bar .status-retry { min-height: 36px; margin-left: auto; }
 .restore-state h3{margin:0 0 8px;color:var(--matcha-leaf);font:1.4rem var(--font-display)}.restore-state>p{line-height:1.6;color:var(--muted)}.restore-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.confirmation-contact{display:inline-block;margin-top:12px;color:var(--matcha-leaf);font-size:.85rem;font-weight:650;text-underline-offset:3px}
 </style>
 
