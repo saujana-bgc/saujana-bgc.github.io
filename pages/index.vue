@@ -46,11 +46,12 @@
     </section>
 
     <section class="home-section" aria-labelledby="name-story-title">
-      <h2 id="name-story-title" class="hero-title story-title">Why Saujana?</h2>
-      <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
-      <div class="table-scenes">
-        <img src="/images/site/table_scene_1.avif" alt="A group of Saujana players holding their board games." loading="lazy" decoding="async" width="640" height="480">
-        <img src="/images/site/table_scene_2.avif" alt="Saujana players posing with games at a café." loading="lazy" decoding="async" width="640" height="480">
+      <div class="story-layout">
+        <div class="story-copy">
+          <h2 id="name-story-title" class="hero-title story-title">Why Saujana?</h2>
+          <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
+        </div>
+        <img class="story-photo" src="/images/site/table_scene_2.avif" alt="Saujana players posing with games at a café." loading="lazy" decoding="async" width="640" height="480">
       </div>
     </section>
 
@@ -65,58 +66,15 @@
       <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, message an admin privately.</p>
     </section>
 
-    <section v-if="posts.length" class="home-section" aria-labelledby="instagram-title">
-      <div class="ig-header">
-        <h2 id="instagram-title" class="hero-title story-title">Saujana on Instagram</h2>
-        <a href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer" class="text-link">Visit our profile <span aria-hidden="true">↗</span></a>
-      </div>
-
-      <div class="ig-grid">
-        <a
-          v-for="post in posts"
-          :key="post.shortcode"
-          :href="post.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="ig-cell"
-        >
-          <img
-            :src="getInstagramThumb(post.img)"
-            :alt="getInstagramAlt(post.caption)"
-            width="360"
-            height="360"
-            loading="lazy"
-            decoding="async"
-          />
-          <span class="ig-open" aria-hidden="true">↗</span>
-          <div class="ig-overlay" aria-hidden="true">
-            <span v-if="post.is_sidecar" class="ig-badge">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M3 4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2H3a1 1 0 0 1-1-1V4zm2 9v1h10V6h-1v7a1 1 0 0 1-1 1H5zm-1-2h9V4H4v7z"/></svg>
-            </span>
-            <span v-if="post.is_video" class="ig-badge">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84z"/></svg>
-            </span>
-            <p class="ig-caption">{{ post.caption }}</p>
-          </div>
-        </a>
-      </div>
+    <section class="social-note" aria-label="Follow Saujana on Instagram">
+      <p>Photos and recaps from the community</p>
+      <a class="text-link" href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer">See Saujana on Instagram <span aria-hidden="true">↗</span></a>
     </section>
 
   </main>
 </template>
 
 <script setup>
-import { instagramData } from '~/assets/data/instagram_data.js'
-
-
-const posts = computed(() => (instagramData?.posts ?? []).slice(0, 4))
-const getInstagramThumb = (src) => `/${src.replace('images/instagram/', 'images/instagram/thumbs/')}`
-const getInstagramAlt = (caption) => {
-  const summary = caption?.replace(/\s+/g, ' ').trim()
-  if (!summary) return 'Saujana community gathering, shared on Instagram.'
-  return `Saujana on Instagram: ${summary.slice(0, 100)}${summary.length > 100 ? '…' : ''}`
-}
-
 const pillars = [
   {
     title: 'Make the first hello',
@@ -135,15 +93,15 @@ const pillars = [
 const expectations = [
   {
     title: 'Say hello',
-    copy: 'Find the host when you arrive. Let us know it’s your first visit, and take a moment to settle in.'
+    copy: 'Find the host, mention it’s your first visit, and take a moment to settle in.'
   },
   {
     title: 'Find your game',
-    copy: 'Fancy something quick, clever, or a little chaotic? Ask for a suggestion. We’ll walk you through the rules.'
+    copy: 'Tell us what you enjoy. We’ll suggest a game and walk you through the rules.'
   },
   {
     title: 'See where it goes',
-    copy: 'Watch a round, start with something light, or settle into a longer game. You can find your pace as you go.'
+    copy: 'Watch a round or join in. Take your time finding your pace.'
   }
 ]
 </script>
@@ -224,11 +182,12 @@ const expectations = [
   border-radius: var(--radius-card);
 }
 
-.table-scenes img {
+.story-photo {
   display: block;
   width: 100%;
   height: auto;
   border-radius: var(--radius-card);
+  object-fit: cover;
 }
 
 .home-section,
@@ -263,15 +222,16 @@ const expectations = [
 .care-guide {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
   margin-top: 20px;
 }
 
 .expect-card {
-  padding: clamp(16px, 2.2vw, 26px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--white-pure);
+  padding: 4px clamp(14px, 2.2vw, 26px) 4px 0;
+}
+
+.expect-card + .expect-card {
+  padding-left: clamp(14px, 2.2vw, 26px);
+  border-left: 1px solid var(--line);
 }
 
 .expect-card h3,
@@ -313,11 +273,32 @@ const expectations = [
 
 .riichi-discovery a:last-child { border-bottom: 0; }
 
-.table-scenes {
+.story-layout {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .82fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 64px);
+}
+
+.story-copy .section-intro {
+  max-width: 48ch;
+}
+
+.social-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-top: clamp(28px, 4vw, 48px);
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--line);
+}
+
+.social-note p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .care-guide { gap: 20px 28px; }
@@ -327,93 +308,12 @@ const expectations = [
   margin-top: 22px;
 }
 
-.ig-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0 16px;
-  margin-bottom: 14px;
-}
-
-.ig-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.ig-cell {
-  position: relative;
-  display: block;
-  aspect-ratio: 1;
-  overflow: hidden;
-  border-radius: var(--radius-control);
-  background: var(--surface-soft);
-}
-
-.ig-cell img { display: block; width: 100%; height: 100%; object-fit: cover; }
-
-.ig-open {
-  position: absolute;
-  z-index: 1;
-  top: 8px;
-  right: 8px;
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--white-pure);
-  color: var(--matcha-leaf);
-}
-
-.ig-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  padding: 12px;
-  background: linear-gradient(to top, rgba(25, 39, 28, .9), transparent 85%);
-  opacity: 0;
-  transition: opacity .2s;
-}
-
-.ig-cell:hover .ig-overlay,
-.ig-cell:focus-visible .ig-overlay { opacity: 1; }
-
-.ig-caption {
-  display: -webkit-box;
-  margin: 0;
-  overflow: hidden;
-  color: white;
-  font-size: .8rem;
-  line-height: 1.4;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.ig-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(25, 39, 28, .78);
-  color: white;
-}
-
-@media (hover: none) {
-  .ig-overlay { opacity: 1; }
-}
-
 @media (max-width: 900px) {
   .hero-section,
-  .riichi-panel { grid-template-columns: minmax(0, 1fr); }
+  .riichi-panel,
+  .story-layout { grid-template-columns: minmax(0, 1fr); }
   .hero-section { gap: 16px; }
-  .hero-artwork { max-width: 640px; }
+  .hero-artwork { max-width: none; }
 }
 
 @media (max-width: 600px) {
@@ -422,8 +322,13 @@ const expectations = [
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .expect-guide,
   .care-guide { grid-template-columns: minmax(0, 1fr); }
-  .table-scenes,
-  .ig-grid { gap: 10px; }
-  .ig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .expect-card,
+  .expect-card + .expect-card {
+    padding: 14px 0;
+    border-left: 0;
+  }
+  .expect-card + .expect-card { border-top: 1px solid var(--line); }
+  .story-layout { gap: 18px; }
+  .story-photo { max-width: none; }
 }
 </style>
