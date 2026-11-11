@@ -46,7 +46,7 @@
       <header class="archive-heading">
         <p class="eyebrow">Gathering recaps</p>
         <h2 id="archive-title">The story so far</h2>
-        <p v-if="recapSessions.length" class="metadata">Game results and retellings stay tucked away until you reveal them.</p>
+        <p v-if="recapSessions.length" class="metadata">Game results and retellings from our gatherings.</p>
       </header>
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
         <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" v-model="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" /></label>
@@ -72,44 +72,31 @@
             <h3 tabindex="-1">{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
             <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
-          <UButton class="share-button" type="button" @click="shareSession(session)">Share</UButton>
         </div>
-        <div v-if="shareNotices[session.id]" class="share-feedback" role="status">
-          {{ shareNotices[session.id] }}
-          <UButton v-if="shareLinks[session.id]" class="share-copy-link" type="button" @click="copyShareLink(session.id)">Copy link</UButton>
-        </div>
-
-        <details v-if="session.recap" class="recap-reveal">
-          <summary>Reveal retelling</summary>
+        <section v-if="session.recap" class="recap-story" aria-label="Retelling">
+          <p class="eyebrow">Retelling</p>
           <p>{{ session.recap }}</p>
-        </details>
+        </section>
 
         <div v-if="session.games?.length" class="game-grid">
-          <details v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number">
-            <summary>
+          <article v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number" class="game-recap">
+            <header class="game-recap-heading">
               <span class="game-label">Game {{ number }}</span>
-              <span class="game-script">{{ game.script || 'Script not recorded' }}</span>
-              <span class="game-reveal-label"><span class="when-closed">Reveal spoilers</span><span class="when-open">Hide spoilers</span></span>
-            </summary>
+              <h4 class="game-script">{{ game.script || 'Script not recorded' }}</h4>
+            </header>
             <p v-if="game.outcome" class="outcome">{{ game.outcome }}</p>
             <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
               <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
-                <span class="seat-number" aria-hidden="true">{{ String(pIndex + 1).padStart(2, '0') }}</span>
                 <img class="character-art" :src="characterIcon(player.character)" alt="" loading="lazy" decoding="async">
                 <div class="seat-copy">
+                  <span class="seat-name">{{ player.public_name || player.name || 'Anonymous player' }}</span>
                   <span class="seat-character">{{ player.character || 'Character not recorded' }}</span>
-                  <span class="seat-name">{{ player.public_name || player.name || 'Seat ' + (pIndex + 1) }}</span>
                 </div>
                 <span v-if="player.died" class="death-mark">Died</span>
               </li>
             </ol>
             <p v-if="game.notes" class="story-text">{{ game.notes }}</p>
-            <UButton v-if="game.id" class="share-button" type="button" @click="shareGame(session, game)">Share game link</UButton>
-            <div v-if="shareNotices[game.id]" class="share-feedback" role="status">
-              {{ shareNotices[game.id] }}
-              <UButton v-if="shareLinks[game.id]" class="share-copy-link" type="button" @click="copyShareLink(game.id)">Copy link</UButton>
-            </div>
-          </details>
+          </article>
         </div>
 
         <details v-if="sessionPhotos(session).length" class="photo-reveal">
@@ -141,8 +128,6 @@ const config = useRuntimeConfig()
 const route = useRoute()
 const sessions = ref([])
 const photoUrls = ref({})
-const shareNotices = ref({})
-const shareLinks = ref({})
 const selectedYear = ref('all')
 const selectedScript = ref('all')
 const loading = ref(true)
@@ -325,50 +310,6 @@ async function loadCommunityEvents() {
     eventError.value = true
   } finally {
     eventLoading.value = false
-  }
-}
-
-async function shareSession(session) {
-  const link = new URL('/only-blood-in-the-clocktower/', window.location.origin)
-  link.searchParams.set('session', session.id)
-  const nativeShare = Boolean(navigator.share)
-  try {
-    if (nativeShare) await navigator.share({ title: 'Only Blood in the Clocktower', url: link.toString() })
-    else await navigator.clipboard.writeText(link.toString())
-    shareNotices.value = { ...shareNotices.value, [session.id]: nativeShare ? 'Recap shared.' : 'Recap link copied.' }
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') return
-    showShareFallback(session.id, link)
-  }
-}
-
-async function shareGame(session, game) {
-  const link = new URL('/only-blood-in-the-clocktower/', window.location.origin)
-  link.searchParams.set('session', session.id)
-  link.searchParams.set('game', game.id)
-  const nativeShare = Boolean(navigator.share)
-  try {
-    if (nativeShare) await navigator.share({ title: 'Blood on the Clocktower · ' + game.script, url: link.toString() })
-    else await navigator.clipboard.writeText(link.toString())
-    shareNotices.value = { ...shareNotices.value, [game.id]: nativeShare ? 'Game link shared.' : 'Game link copied.' }
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') return
-    showShareFallback(game.id, link)
-  }
-}
-
-function showShareFallback(id, link) {
-  shareLinks.value = { ...shareLinks.value, [id]: link.toString() }
-  shareNotices.value = { ...shareNotices.value, [id]: 'Sharing didn’t work. Copy the link instead.' }
-}
-
-async function copyShareLink(id) {
-  try {
-    await navigator.clipboard.writeText(shareLinks.value[id])
-    shareLinks.value = { ...shareLinks.value, [id]: '' }
-    shareNotices.value = { ...shareNotices.value, [id]: 'Link copied.' }
-  } catch {
-    shareNotices.value = { ...shareNotices.value, [id]: 'Couldn’t copy the link. Check your browser’s clipboard permissions.' }
   }
 }
 
@@ -564,10 +505,9 @@ onMounted(() => {
 .session-card h3 { overflow-wrap: anywhere; }
 .script-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
 .script-tags li { padding: 4px 9px; border: 1px solid var(--rule); border-radius: 5px; color: var(--wine); font-size: .75rem; overflow-wrap: anywhere; }
-.recap-reveal { margin-top: 14px; padding-inline: 12px; border: 1px solid var(--rule); border-radius: 7px; background: #f5ece5; }
-.recap-reveal summary { color: var(--wine); font-size: .9rem; }
-.recap-reveal p, .story-text { max-width: 68ch; white-space: pre-wrap; overflow-wrap: anywhere; }
-.recap-reveal p { margin: 6px 0 12px; }
+.recap-story { margin-top: 14px; padding: 12px 14px; border-inline-start: 2px solid #9b6670; border-radius: 0 7px 7px 0; background: #f5ece5; }
+.recap-story > p:last-child, .story-text { max-width: 68ch; white-space: pre-wrap; overflow-wrap: anywhere; }
+.recap-story > p:last-child { margin: 4px 0 0; }
 
 .stats {
   display: grid;
@@ -608,36 +548,25 @@ onMounted(() => {
 .session-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; }
 .session-heading > div { flex: 1 1 110px; min-width: 0; }
 .is-latest-session > .session-heading { grid-column: 1; align-items: flex-start; }
-.is-latest-session > .share-feedback,
-.is-latest-session > .recap-reveal,
+.is-latest-session > .recap-story,
 .is-latest-session > .game-grid,
 .is-latest-session > .photo-reveal { grid-column: 1 / -1; }
 .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; margin-top: 14px; align-items: start; }
-.game-grid details { min-width: 0; padding: 2px 14px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
-.game-grid details[open] { grid-column: 1 / -1; padding-bottom: 10px; border-color: #cdb3a4; }
-.clocktower-page summary { min-height: 44px; padding: 9px 25px 7px 0; cursor: pointer; font-weight: 700; overflow-wrap: anywhere; }
-.game-grid summary { display: grid; gap: 2px; padding-block: 11px; }
-.game-grid summary, .recap-reveal summary { position: relative; list-style: none; }
-.clocktower-page summary::-webkit-details-marker { display: none; }
-.game-grid summary::after, .recap-reveal summary::after { content: ''; position: absolute; right: 3px; top: 50%; width: 8px; height: 8px; border: solid var(--wine); border-width: 0 1.5px 1.5px 0; transform: translateY(-70%) rotate(45deg); }
-.recap-reveal summary { display: flex; align-items: center; }
-.clocktower-page details[open] > summary::after { transform: translateY(-25%) rotate(225deg); }
+.game-recap { min-width: 0; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
+.game-grid .game-recap { grid-column: 1 / -1; }
+.game-recap-heading { display: grid; gap: 2px; margin-bottom: 8px; }
 .game-label { color: var(--wine); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
 .game-script { font: 400 1.12rem/1.3 var(--font-display); }
-.game-reveal-label { color: var(--soft-ink); font-size: .73rem; font-weight: 600; }
-.when-open, details[open] > summary .when-closed { display: none; }
-details[open] > summary .when-open { display: inline; }
 .outcome { display: inline-block; margin: 7px 0 0; padding: 4px 9px; border-radius: 5px; background: #eee0d5; color: #63323d; font-weight: 700; }
 .grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; margin: 14px 0; padding: 0; list-style: none; }
-.grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 30px 70px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 112px; overflow: hidden; padding: 12px; border: 1px solid #806274; border-radius: 9px; background: radial-gradient(ellipse at 42% 50%, #493141 0%, #291d29 68%); color: #fff5e9; box-shadow: inset 0 0 0 3px #e6be8512, 0 5px 16px #21171d20; }
+.grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 112px; overflow: hidden; padding: 12px; border: 1px solid #806274; border-radius: 9px; background: radial-gradient(ellipse at 42% 50%, #493141 0%, #291d29 68%); color: #fff5e9; box-shadow: inset 0 0 0 3px #e6be8512, 0 5px 16px #21171d20; }
 .grimoire-seat::after { position: absolute; z-index: -1; inset: 5px; border: 1px solid #e6be8524; border-radius: 5px; content: ''; pointer-events: none; }
 .grimoire-seat.is-dead { background: radial-gradient(ellipse at 42% 50%, #553039 0%, #301c25 70%); }
 .character-art { display: block; width: 70px; height: 70px; object-fit: contain; filter: drop-shadow(0 3px 8px #120b1690); }
 .seat-copy { display: grid; gap: 4px; min-width: 0; }
-.seat-number { grid-row: auto; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #e6be8555; border-radius: 50%; color: #f0d0a4; font-size: .68rem; font-weight: 750; }
 .seat-name { min-width: 0; overflow-wrap: anywhere; color: #e9d7ca; font-size: .82rem; }
 .seat-character { min-width: 0; color: #fff5e9; font: 400 1.05rem/1.2 var(--font-display); overflow-wrap: anywhere; }
-.death-mark { grid-column: 4; grid-row: 1; align-self: start; padding: 4px 7px; border: 1px solid #efa6a455; border-radius: 4px; background: #873e4b40; color: #ffd9c7; font-size: .65rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.death-mark { grid-column: 3; grid-row: 1; align-self: start; padding: 4px 7px; border: 1px solid #efa6a455; border-radius: 4px; background: #873e4b40; color: #ffd9c7; font-size: .65rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
 .art-credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--soft-ink); font-size: .72rem; }
 .art-credit a { color: var(--wine); text-underline-offset: 3px; }
 .art-credit a:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
@@ -650,9 +579,6 @@ details[open] > summary .when-open { display: inline; }
 .photo-gallery img { display: block; width: 100%; max-height: 300px; object-fit: cover; background: var(--parchment); transition: transform .2s ease; }
 .photo-link:hover img { transform: scale(1.025); }
 .share-button { min-height: 44px; padding: 7px 11px; border: 1px solid #d3bdb1; border-radius: 6px; background: transparent; color: var(--wine); font: 700 .85rem var(--font-body); cursor: pointer; }
-.share-button:hover { background: #743c460a; border-color: var(--wine); }
-.game-grid .share-button { margin-top: 7px; }
-.share-feedback { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 8px 0 0; color: var(--soft-ink); overflow-wrap: anywhere; font-size: .85rem; }
 .share-copy-link { min-height: 36px; padding: 5px 9px; border: 1px solid #d3bdb1; border-radius: 5px; background: transparent; color: var(--wine); font: 700 .8rem var(--font-body); cursor: pointer; }
 .next-night, .archive, .session-card, .game-grid details { scroll-margin-top: 86px; }
 
@@ -694,10 +620,8 @@ details[open] > summary .when-open { display: inline; }
   .is-latest-session.has-cover > .session-cover { grid-column: 1; grid-row: auto; height: auto; max-height: 260px; margin: 0 0 12px; aspect-ratio: 16 / 9; }
   .is-latest-session > .session-heading { grid-column: 1; grid-row: auto; display: block; }
   .is-latest-session > .latest-label,
-  .is-latest-session > .share-feedback,
-  .is-latest-session > .recap-reveal,
+  .is-latest-session > .recap-story,
   .is-latest-session > .game-grid,
   .is-latest-session > .photo-reveal { grid-column: 1; }
-  .is-latest-session > .session-heading .share-button { margin-top: 8px; }
 }
 </style>
