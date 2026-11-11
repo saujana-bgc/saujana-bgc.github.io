@@ -1,7 +1,11 @@
 <template>
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <section class="hero-section fade-up">
-      <h1 class="visually-hidden">Pull up a chair. Let’s play.</h1>
+      <div class="hero-copy">
+        <h1 class="hero-title">Pull up a chair. Let’s play.</h1>
+        <p>No experience needed. Curiosity is plenty.</p>
+        <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+      </div>
       <figure class="hero-artwork">
         <img
           class="hero-banner"
@@ -13,7 +17,6 @@
           fetchpriority="high"
         >
       </figure>
-      <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
     </section>
 
     <div class="welcome-strip"><span>New faces welcome</span><span>Come on your own</span><span>We’ll teach the rules</span></div>
@@ -170,12 +173,14 @@ const expectations = [
 </script>
 
 <style scoped>
-.hero-section { width: min(1440px, 96%); padding: 0 0 36px; }
-.hero-artwork { width: 100%; margin: 0; }
-.hero-banner { display: block; width: 100%; height: auto; }
-.hero-gatherings-link { display: flex; width: fit-content; min-height: 48px; align-items: center; justify-content: center; gap: 10px; margin: 20px auto 0; padding: 0 24px; border-radius: 6px; background: var(--matcha-leaf); color: var(--white-pure); font-size: .95rem; font-weight: 600; text-decoration: none; }
+.hero-section { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); align-items: center; gap: clamp(28px, 5vw, 72px); width: min(1440px, 96%); padding: 12px 0 36px; }
+.hero-copy { padding-left: clamp(12px, 3vw, 48px); }
+.hero-copy h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); }
+.hero-copy p { max-width: 28ch; margin: 20px 0 0; color: var(--muted); font-family: var(--font-display); font-size: clamp(1.15rem, 2vw, 1.65rem); font-style: italic; line-height: 1.45; }
+.hero-artwork { width: 100%; aspect-ratio: 1.36; margin: 0; overflow: hidden; border-radius: 12px; }
+.hero-banner { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 88% center; transform: scale(2.6) translateX(4%); transform-origin: right center; }
+.hero-gatherings-link { display: flex; width: fit-content; min-height: 48px; align-items: center; justify-content: center; gap: 10px; margin: 28px 0 0; padding: 0 24px; border-radius: 6px; background: var(--matcha-leaf); color: var(--white-pure); font-size: .95rem; font-weight: 600; text-decoration: none; }
 .hero-gatherings-link:hover { background: #293d31; }
-.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .welcome-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 64px; width: min(1200px,92%); padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); font-size: .67rem; letter-spacing: .1em; text-transform: uppercase; }
 .welcome-strip span { display: flex; align-items: center; gap: 14px; }
 .welcome-strip span::before { content: '✧'; color: var(--gold-leaf); }
@@ -220,7 +225,12 @@ const expectations = [
 .ig-caption { color: white; font-size: .75rem; line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .ig-badge { position: absolute; top: 10px; right: 10px; color: white; }
 @media (max-width: 899px) {
- .hero-section { width: 100%; padding-bottom: 28px; }
+ .hero-section { grid-template-columns: minmax(0, 1fr); gap: 22px; width: 100%; padding: 8px 0 28px; }
+ .hero-copy { padding: 12px 22px 0; text-align: center; }
+ .hero-copy h1 { max-width: 15ch; margin-inline: auto; font-size: clamp(2.35rem, 8vw, 3.5rem); }
+ .hero-copy p { margin: 12px auto 0; }
+ .hero-gatherings-link { margin: 18px auto 0; }
+ .hero-artwork { width: min(100% - 32px, 680px); aspect-ratio: 1.6; margin-inline: auto; }
  .welcome-strip { gap: 12px 24px; font-size: .6rem; }
  .announcement-box { margin-top: 44px; }
 }
