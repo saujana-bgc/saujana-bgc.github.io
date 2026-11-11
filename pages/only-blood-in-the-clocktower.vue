@@ -95,8 +95,11 @@
             <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
               <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
                 <span class="seat-number" aria-hidden="true">{{ String(pIndex + 1).padStart(2, '0') }}</span>
-                <span class="seat-name">{{ player.public_name || player.name || 'Seat ' + (pIndex + 1) }}</span>
-                <span v-if="player.character" class="seat-character">{{ player.character }}</span>
+                <img class="character-art" :src="characterIcon(player.character)" alt="" loading="lazy" decoding="async">
+                <div class="seat-copy">
+                  <span class="seat-character">{{ player.character || 'Character not recorded' }}</span>
+                  <span class="seat-name">{{ player.public_name || player.name || 'Seat ' + (pIndex + 1) }}</span>
+                </div>
                 <span v-if="player.died" class="death-mark">Died</span>
               </li>
             </ol>
@@ -129,6 +132,7 @@
         <div><strong>{{ statistics.scripts }}</strong><span>scripts explored</span></div>
       </div>
     </section>
+    <footer class="art-credit">Character icons by the Blood on the Clocktower community <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">View icon credits <span aria-hidden="true">↗</span></a></footer>
   </main>
 </template>
 
@@ -240,6 +244,11 @@ function visibleGames(session) {
   return (session.games || [])
     .map((game, index) => ({ game, number: index + 1 }))
     .filter(({ game }) => selectedScript.value === 'all' || game.script === selectedScript.value)
+}
+
+function characterIcon(character) {
+  const file = (character || 'custom').toLowerCase().replace(/[^a-z0-9]/g, '')
+  return `/images/clocktower/characters/${file}.webp`
 }
 
 function clearArchiveFilters() {
@@ -619,13 +628,19 @@ onMounted(() => {
 .when-open, details[open] > summary .when-closed { display: none; }
 details[open] > summary .when-open { display: inline; }
 .outcome { display: inline-block; margin: 7px 0 0; padding: 4px 9px; border-radius: 5px; background: #eee0d5; color: #63323d; font-weight: 700; }
-.grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 7px; margin: 12px 0; padding: 0; list-style: none; }
-.grimoire-seat { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 3px 8px; align-items: center; min-height: 56px; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 7px; background: var(--paper); }
-.seat-number { grid-row: span 2; display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--wine); font-size: .66rem; font-weight: 750; }
-.seat-name { min-width: 0; overflow-wrap: anywhere; font-weight: 700; }
-.seat-character { grid-column: 2; color: var(--soft-ink); font-size: .8rem; overflow-wrap: anywhere; }
-.death-mark { grid-column: 3; grid-row: 1 / 3; padding: 3px 6px; border: 1px solid #743c4640; border-radius: 4px; color: var(--wine); font-size: .68rem; font-weight: 750; text-transform: uppercase; }
-.grimoire-seat.is-dead { background: #f1e7e2; }
+.grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px; margin: 14px 0; padding: 0; list-style: none; }
+.grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 30px 70px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 112px; overflow: hidden; padding: 12px; border: 1px solid #806274; border-radius: 9px; background: radial-gradient(ellipse at 42% 50%, #493141 0%, #291d29 68%); color: #fff5e9; box-shadow: inset 0 0 0 3px #e6be8512, 0 5px 16px #21171d20; }
+.grimoire-seat::after { position: absolute; z-index: -1; inset: 5px; border: 1px solid #e6be8524; border-radius: 5px; content: ''; pointer-events: none; }
+.grimoire-seat.is-dead { background: radial-gradient(ellipse at 42% 50%, #553039 0%, #301c25 70%); }
+.character-art { display: block; width: 70px; height: 70px; object-fit: contain; filter: drop-shadow(0 3px 8px #120b1690); }
+.seat-copy { display: grid; gap: 4px; min-width: 0; }
+.seat-number { grid-row: auto; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #e6be8555; border-radius: 50%; color: #f0d0a4; font-size: .68rem; font-weight: 750; }
+.seat-name { min-width: 0; overflow-wrap: anywhere; color: #e9d7ca; font-size: .82rem; }
+.seat-character { min-width: 0; color: #fff5e9; font: 400 1.05rem/1.2 var(--font-display); overflow-wrap: anywhere; }
+.death-mark { grid-column: 4; grid-row: 1; align-self: start; padding: 4px 7px; border: 1px solid #efa6a455; border-radius: 4px; background: #873e4b40; color: #ffd9c7; font-size: .65rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.art-credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--soft-ink); font-size: .72rem; }
+.art-credit a { color: var(--wine); text-underline-offset: 3px; }
+.art-credit a:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; margin: 16px 0 0; }
 .photo-reveal { margin-top: 12px; padding: 2px 12px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
 .photo-reveal summary { position: relative; list-style: none; }
