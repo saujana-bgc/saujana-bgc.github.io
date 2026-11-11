@@ -51,15 +51,15 @@ const riichiChildren = [
 const navigation = [
   { label: 'Home', to: '/', prefetch: false },
   { label: 'Gatherings', to: '/gatherings', prefetch: false },
-  { label: 'Birthday Club', to: '/birthday-club', prefetch: false },
+  { label: 'Collection', to: '/collection', prefetch: false },
   { label: 'Play History', to: '/playlog', prefetch: false },
   { label: 'Only Blood in the Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
-  { label: 'Collection', to: '/collection', prefetch: false },
   {
     label: 'Riichi Mahjong',
     type: 'trigger',
     children: riichiChildren,
   },
+  { label: 'Birthday Club', to: '/birthday-club', prefetch: false },
 ]
 const mobileNavigation = navigation
   .map(item => ({
