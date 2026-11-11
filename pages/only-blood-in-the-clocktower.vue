@@ -10,7 +10,7 @@
             {{ heroSecondaryLabel }} <span aria-hidden="true">↓</span>
           </a>
         </div>
-        <a v-if="nextGathering && pastSessions.length" class="hero-tertiary" href="#clocktower-archive">Browse past games <span aria-hidden="true">↓</span></a>
+        <a v-if="recapSessions.length" class="hero-tertiary" href="#clocktower-archive">Browse game recaps <span aria-hidden="true">↓</span></a>
       </div>
       <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
         <div class="calendar-mark" aria-hidden="true">
@@ -46,27 +46,27 @@
 
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header class="archive-heading">
-        <p class="eyebrow">Past gatherings</p>
+        <p class="eyebrow">Gathering recaps</p>
         <h2 id="archive-title">The story so far</h2>
-        <p v-if="pastSessions.length" class="metadata">Game results and retellings stay tucked away until you reveal them.</p>
+        <p v-if="recapSessions.length" class="metadata">Game results and retellings stay tucked away until you reveal them.</p>
       </header>
-      <div v-if="!loading && !error && pastSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter past gatherings">
+      <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
         <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" v-model="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" /></label>
         <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" v-model="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" /></label>
         <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
       </div>
-      <p v-if="!loading && !error && pastSessions.length" class="filter-count" role="status">Showing {{ filteredSessions.length }} of {{ pastSessions.length }} gatherings</p>
+      <p v-if="!loading && !error && recapSessions.length" class="filter-count" role="status">Showing {{ filteredSessions.length }} of {{ recapSessions.length }} gatherings</p>
       <p v-if="error" class="archive-state" role="alert">{{ error }} <UButton class="share-button" type="button" @click="loadArchive">Try again</UButton></p>
       <p v-else-if="loading" class="archive-state" role="status">Opening the grimoire…</p>
-      <div v-else-if="!pastSessions.length" class="archive-state empty-archive">
+      <div v-else-if="!recapSessions.length" class="archive-state empty-archive">
         <span class="empty-mark" aria-hidden="true">✧</span>
         <h3>No recaps yet</h3>
         <p>Retellings, game results and approved photos will appear here after a gathering.</p>
       </div>
 
-      <p v-if="!loading && !error && pastSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
+      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="share-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
       <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id }">
-        <p v-if="session.id === featured?.id" class="eyebrow latest-label">Latest gathering</p>
+        <p v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</p>
         <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="'Approved table photo from ' + formatDate(session.session_date)" loading="lazy">
         <div class="session-heading">
           <div>
@@ -122,7 +122,7 @@
       </article>
     </section>
 
-    <section v-if="!loading && !error && pastSessions.length" class="stats" aria-labelledby="stats-title">
+    <section v-if="!loading && !error && recapSessions.length" class="stats" aria-labelledby="stats-title">
       <p class="eyebrow">The tally</p>
       <h2 id="stats-title">Clocktower in numbers</h2>
       <div class="stat-row">
@@ -155,12 +155,13 @@ const headers = {
 const localDate = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit',
 }).format(new Date())
-const pastSessions = computed(() => sessions.value.filter(session =>
-  (session.session_date < localDate || (session.session_date === localDate && hasResults(session))) && (session.recap || session.games?.length),
-))
+// The archive endpoint already filters to published sessions.
+const recapSessions = computed(() => sessions.value.filter(hasResults))
 const nextNight = computed(() => communityEvents.value
-  .filter(event => /clocktower/i.test(event.name) && event.date >= localDate && !sessions.value.some(session =>
-    session.session_date === event.date && session.games?.length && (!session.venue || !event.venue || session.venue.trim().toLowerCase() === event.venue.trim().toLowerCase()),
+  .filter(event => /clocktower/i.test(event.name) && (
+    event.date > localDate || (event.date === localDate && !recapSessions.value.some(session =>
+      session.session_date === event.date && (!session.venue || !event.venue || session.venue.trim().toLowerCase() === event.venue.trim().toLowerCase()),
+    ))
   ))
   .sort((a, b) => a.date.localeCompare(b.date))[0])
 const nextSession = computed(() => sessions.value
@@ -197,7 +198,7 @@ const nextGathering = computed(() => {
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
 const heroSecondaryHref = '#what-to-expect'
 const heroSecondaryLabel = 'First time? Start here'
-const featured = computed(() => [...pastSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
+const featured = computed(() => [...recapSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
 const nextDateStamp = computed(() => {
   if (!nextGathering.value) return null
   const date = new Date(nextGathering.value.date + 'T12:00:00')
@@ -206,16 +207,16 @@ const nextDateStamp = computed(() => {
     month: date.toLocaleDateString('en-MY', { month: 'short' }),
   }
 })
-const archiveYears = computed(() => [...new Set(pastSessions.value.map(session => session.session_date?.slice(0, 4)).filter(Boolean))].sort((a, b) => b.localeCompare(a)))
-const archiveScripts = computed(() => [...new Set(pastSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean))].sort((a, b) => a.localeCompare(b)))
-const filteredSessions = computed(() => pastSessions.value.filter(session =>
+const archiveYears = computed(() => [...new Set(recapSessions.value.map(session => session.session_date?.slice(0, 4)).filter(Boolean))].sort((a, b) => b.localeCompare(a)))
+const archiveScripts = computed(() => [...new Set(recapSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean))].sort((a, b) => a.localeCompare(b)))
+const filteredSessions = computed(() => recapSessions.value.filter(session =>
   (selectedYear.value === 'all' || session.session_date?.startsWith(selectedYear.value)) &&
   (selectedScript.value === 'all' || session.games?.some(game => game.script === selectedScript.value)),
 ))
 const statistics = computed(() => ({
-  sessions: pastSessions.value.length,
-  games: pastSessions.value.reduce((total, session) => total + (session.games?.length || 0), 0),
-  scripts: new Set(pastSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean)).size,
+  sessions: recapSessions.value.length,
+  games: recapSessions.value.reduce((total, session) => total + (session.games?.length || 0), 0),
+  scripts: new Set(recapSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean)).size,
 }))
 
 function formatDate(value) {
