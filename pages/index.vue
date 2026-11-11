@@ -1,28 +1,18 @@
 <template>
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <section class="hero-section fade-up">
-      <div class="hero-copy">
-        <h1>Pull up a chair.<br><em>Let’s play.</em></h1>
-        <p class="hero-description">We’re Saujana Board Game Community. Join us for board games and riichi mahjong, whether you’re learning your first game or returning to a favourite. Come on your own or bring a friend.</p>
-        <div class="hero-actions">
-          <NuxtLink to="/gatherings" class="primary-link" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
-          <NuxtLink to="/collection" class="text-link" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
-        </div>
-        <p class="hero-footnote"><span aria-hidden="true"></span> No experience needed. Curiosity is plenty.</p>
-      </div>
-      <div class="banner-container">
+      <h1 class="visually-hidden">Pull up a chair. Let’s play.</h1>
+      <figure class="hero-artwork">
         <img
           class="hero-banner"
-          src="/images/site/saujana_bgc_banner_640.avif?v=20260806-hero-v6"
-          :srcset="heroImageSrcset"
-          :sizes="heroImageSizes"
-          alt="Saujana BG Community banner"
-          width="1920"
-          height="1080"
+          src="/images/site/saujana-home-hero.webp"
+          alt="Saujana Board Game Community: Pull up a chair. Let’s play. No experience needed; curiosity is plenty. A collage of players enjoying board games and riichi mahjong."
+          width="1671"
+          height="941"
           loading="eager"
           fetchpriority="high"
         >
-      </div>
+      </figure>
     </section>
 
     <div class="welcome-strip"><span>New faces welcome</span><span>Come on your own</span><span>We’ll teach the rules</span></div>
@@ -140,8 +130,6 @@ import { instagramData } from '~/assets/data/instagram_data.js'
 
 
 const posts = computed(() => (instagramData?.posts ?? []).slice(0, 4))
-const heroImageSrcset = '/images/site/saujana_bgc_banner_640.avif?v=20260806-hero-v6 640w, /images/site/saujana_bgc_banner_800.avif?v=20260806-hero-v6 800w, /images/site/saujana_bgc_banner_900.avif?v=20260806-hero-v6 900w, /images/site/saujana_bgc_banner_1000.avif?v=20260806-hero-v6 1000w, /images/site/saujana_bgc_banner_1200.avif?v=20260806-hero-v6 1200w, /images/site/saujana_bgc_banner.avif?v=20260806-hero-v6 1920w'
-const heroImageSizes = '(min-width: 1200px) 580px, (min-width: 900px) 48vw, 92vw'
 const getInstagramThumb = (src) => `/${src.replace('images/instagram/', 'images/instagram/thumbs/')}`
 
 const igSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" width="28" height="28"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>`
@@ -181,20 +169,10 @@ const expectations = [
 </script>
 
 <style scoped>
-.hero-section { width: min(1200px, 92%); display: grid; grid-template-columns: 1fr 1.05fr; align-items: center; gap: clamp(28px, 5vw, 72px); padding: 0 0 52px; }
-.hero-copy .page-eyebrow { justify-content: flex-start; font-size: .6rem; }
-.hero-copy .page-eyebrow::before, .hero-copy .page-eyebrow::after { display: none; }
-.hero-copy h1 { font-family: var(--font-display); font-size: clamp(2.8rem, 4.7vw, 4.4rem); color: var(--matcha-leaf); font-weight: 400; letter-spacing: -.055em; line-height: 1.12; margin: 0; text-wrap: balance; }
-.hero-copy h1 em { color: #798064; font-weight: 400; }
-.hero-description { max-width: 400px; margin: 24px 0 28px; font-size: 1rem; color: var(--muted); line-height: 1.85; }
-.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; }
-.primary-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 26px; min-height: 48px; padding: 13px 22px; border-radius: 6px; background: var(--matcha-leaf); color: white; font-size: .82rem; text-decoration: none; transition: background .2s; }
-.primary-link:hover { background: #243a2d; }
-.text-link { display: inline-flex; gap: 14px; padding: 12px 0; color: var(--matcha-leaf); font-size: .8rem; text-decoration: none; border-bottom: 1px solid var(--line); }
-.hero-footnote { display: flex; align-items: center; gap: 8px; margin: 25px 0 0; color: var(--muted); font-size: .73rem; }
-.hero-footnote span { width: 5px; height: 5px; border-radius: 50%; background: #798064; }
-.banner-container { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 60px 60px 12px 12px; background: #ece8dd; overflow: hidden; }
-.hero-banner { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 52px 52px 6px 6px; }
+.hero-section { width: min(1440px, 96%); padding: 0 0 36px; }
+.hero-artwork { width: 100%; margin: 0; }
+.hero-banner { display: block; width: 100%; height: auto; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .welcome-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 64px; width: min(1200px,92%); padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted); font-size: .67rem; letter-spacing: .1em; text-transform: uppercase; }
 .welcome-strip span { display: flex; align-items: center; gap: 14px; }
 .welcome-strip span::before { content: '✧'; color: var(--gold-leaf); }
@@ -239,16 +217,12 @@ const expectations = [
 .ig-caption { color: white; font-size: .75rem; line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .ig-badge { position: absolute; top: 10px; right: 10px; color: white; }
 @media (max-width: 899px) {
- .hero-section { grid-template-columns: 1fr; gap: 32px; padding: 0 0 32px; }
- .hero-copy { max-width: 640px; }
- .hero-copy h1 { font-size: clamp(2.65rem,7vw,4rem); }
- .hero-description { max-width: 540px; }
- .banner-container { border-radius: 80px 80px 10px 10px; }
- .hero-banner { aspect-ratio: 16 / 9; border-radius: 72px 72px 5px 5px; }
+ .hero-section { width: 100%; padding-bottom: 28px; }
  .welcome-strip { gap: 12px 24px; font-size: .6rem; }
  .announcement-box { margin-top: 44px; }
 }
 @media (max-width: 600px) {
+ .hero-section { padding-bottom: 24px; }
  .expect-guide, .care-guide { grid-template-columns: 1fr; gap: 22px; }
  .care-guide { margin-top: 28px; }
  .pillar { padding-bottom: 10px; }
