@@ -22,6 +22,18 @@
       </figure>
     </section>
 
+    <section class="next-gathering" aria-labelledby="next-gathering-title" aria-live="polite">
+      <div>
+        <p class="next-gathering-label">Something to look forward to</p>
+        <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering ? nextGathering.name : 'Find your next gathering' }}</h2>
+        <p v-if="nextGathering" class="next-gathering-details">{{ formatGatheringDate(nextGathering.date) }} · {{ nextGathering.time }} · {{ nextGathering.venue }}</p>
+        <p v-else class="next-gathering-details">See upcoming dates, venues and sign-up details.</p>
+      </div>
+      <NuxtLink class="next-gathering-link" :to="nextGathering ? `/gatherings#gathering-${nextGathering.id}` : '/gatherings'" no-prefetch>
+        {{ nextGathering ? 'See gathering details' : 'See upcoming gatherings' }} <span aria-hidden="true">→</span>
+      </NuxtLink>
+    </section>
+
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
       <div class="first-visit-layout">
         <div class="first-visit-copy">
@@ -38,18 +50,6 @@
       </div>
     </section>
 
-    <section class="riichi-panel" aria-labelledby="riichi-title">
-      <div>
-        <h2 id="riichi-title" class="hero-title story-title">Explore riichi mahjong</h2>
-        <p class="section-intro">Curious about Japanese mahjong? Explore our tools, league standings and tournament.</p>
-      </div>
-      <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
-        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch>Scoring calculator <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-league" no-prefetch>League and standings <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-open" no-prefetch>Riichi Open I tournament <span aria-hidden="true">→</span></NuxtLink>
-      </nav>
-    </section>
-
     <section class="home-section" aria-labelledby="community-values-title">
       <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
       <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse stretching as far as the eye can see. We like that sense of possibility: another game to try, another story to hear, someone new to meet.</p>
@@ -62,6 +62,18 @@
       <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
     </section>
 
+    <section class="riichi-panel" aria-labelledby="riichi-title">
+      <div>
+        <h2 id="riichi-title" class="hero-title story-title">Explore riichi mahjong</h2>
+        <p class="section-intro">Curious about Japanese mahjong? Explore our tools, league standings and tournament.</p>
+      </div>
+      <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
+        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch>Scoring calculator <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-league" no-prefetch>League and standings <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/riichi-open" no-prefetch>Riichi Open I tournament <span aria-hidden="true">→</span></NuxtLink>
+      </nav>
+    </section>
+
     <section class="social-note" aria-label="Follow Saujana on Instagram">
       <p>Photos and recaps from the community</p>
       <a class="text-link" href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer">See Saujana on Instagram <span aria-hidden="true">↗</span></a>
@@ -71,6 +83,33 @@
 </template>
 
 <script setup>
+const nextGathering = ref(null)
+
+onMounted(async () => {
+  const { data, error } = await useSupabase()
+    .from('events')
+    .select('id,name,date,time,venue')
+    .gte('date', new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kuala_Lumpur',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date()))
+    .order('date', { ascending: true })
+    .limit(1)
+
+  if (!error) nextGathering.value = data?.[0] ?? null
+})
+
+function formatGatheringDate(dateValue) {
+  const [year, month, day] = dateValue.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
+}
+
 const pillars = [
   {
     title: 'Make the first hello',
@@ -96,8 +135,8 @@ const expectations = [
     copy: 'Tell us what you enjoy. We’ll suggest a game and walk you through the rules.'
   },
   {
-    title: 'See where it goes',
-    copy: 'Watch a round or join in. Take your time finding your pace.'
+    title: 'Watch or join in',
+    copy: 'Watch a round or play at your own pace.'
   }
 ]
 </script>
@@ -113,6 +152,10 @@ const expectations = [
 .home > * { min-width: 0; }
 
 .hero-section {
+  padding: clamp(20px, 4vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface-soft);
   display: grid;
   grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
   align-items: center;
@@ -176,6 +219,51 @@ const expectations = [
   width: 100%;
   height: auto;
   border-radius: var(--radius-card);
+}
+
+.next-gathering {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: clamp(20px, 3vw, 36px);
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--lavender-mist);
+}
+
+.next-gathering-label {
+  margin: 0 0 4px;
+  color: var(--matcha-leaf);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.next-gathering-title {
+  margin: 0;
+  color: var(--matcha-leaf);
+  font: 400 clamp(1.25rem, 2.4vw, 1.65rem)/1.25 var(--font-display);
+}
+
+.next-gathering-details {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.5;
+}
+
+.next-gathering-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  color: var(--matcha-leaf);
+  font-weight: 700;
+  text-underline-offset: .2em;
 }
 
 .first-visit-photo {
@@ -309,7 +397,7 @@ const expectations = [
 
 @media (max-width: 900px) {
   .hero-section,
-  .riichi-panel,
+  .riichi-panel { grid-template-columns: minmax(0, 1fr); }
   .first-visit-layout { grid-template-columns: minmax(0, 1fr); }
   .hero-section { gap: 16px; }
   .hero-artwork { max-width: none; }
@@ -328,5 +416,7 @@ const expectations = [
   }
   .expect-card + .expect-card { border-top: 1px solid var(--line); }
   .first-visit-layout { gap: 18px; }
+  .next-gathering { align-items: flex-start; padding: 18px; }
+  .next-gathering-link { width: 100%; }
 }
 </style>
