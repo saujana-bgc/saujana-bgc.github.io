@@ -46,7 +46,7 @@
             </article>
           </div>
         </div>
-        <img class="first-visit-photo" src="/images/site/table_scene_2.avif" alt="Saujana players sharing a game at a café." loading="lazy" decoding="async" width="640" height="480">
+        <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
       </div>
     </section>
 
