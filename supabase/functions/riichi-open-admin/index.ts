@@ -60,18 +60,27 @@ Deno.serve(async (request) => {
     }
 
     if(body.action==='registration_note'){
-      if(event.stage!=='registration') return reply(request,409,{error:'Private notes are locked after the playing roster starts.'})
       const id=String(body.registration_id??''),note=String(body.private_note??'').trim().slice(0,2000)
       if(typeof body.expected_private_note!=='string') return reply(request,400,{error:'Reload this registration before saving its note.'})
       const expectedNote=String(body.expected_private_note).trim().slice(0,2000)
-      const {data:registration,error:findError}=await client.from('riichi_open_registrations').select('id').eq('id',id).eq('event_id',event.id).maybeSingle()
+      const {data:registration,error:findError}=await client.from('riichi_open_registrations').select('id,status').eq('id',id).eq('event_id',event.id).maybeSingle()
       if(findError||!registration) return reply(request,404,{error:'Registration not found.'})
+      if(event.stage!=='registration'&&registration.status!=='payment_exception') return reply(request,409,{error:'Only late payment review notes can be changed after the playing roster starts.'})
       let update=client.from('riichi_open_registrations').update({private_note:note||null,updated_at:new Date().toISOString()}).eq('id',id).eq('event_id',event.id)
       update=expectedNote?update.eq('private_note',expectedNote):update.is('private_note',null)
       const {data:updated,error}=await update.select('id').maybeSingle()
       if(error) throw error
       if(!updated) return reply(request,409,{error:'Private note changed in another session; choose which version to keep.'})
       await client.from('riichi_open_audit_log').insert({event_id:event.id,actor_id:user.id,action:'update_registration_note',entity_type:'registration',entity_id:id,details:{note_updated:true}})
+      return reply(request,200,{ok:true})
+    }
+
+    if(body.action==='review_payment_exception'){
+      const id=String(body.registration_id??''),note=String(body.private_note??'').trim().slice(0,2000),expectedNote=String(body.expected_private_note??'').trim().slice(0,2000)
+      if(typeof body.expected_private_note!=='string') return reply(request,400,{error:'Reload this registration before completing its review.'})
+      const {error}=await client.rpc('admin_review_riichi_open_payment_exception',{p_registration_id:id,p_expected_note:expectedNote,p_note:note,p_actor:user.id})
+      if(error?.message?.includes('Private note changed')) return reply(request,409,{error:error.message})
+      if(error) throw error
       return reply(request,200,{ok:true})
     }
 

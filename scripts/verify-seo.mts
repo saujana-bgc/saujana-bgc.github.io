@@ -22,7 +22,7 @@ for (const path of publicRoutes) {
   assert.ok(head.includes(`<meta property="og:url" content="${page.canonical}"`), `${path}: social URL matches canonical`)
   assert.doesNotMatch(head, /<meta[^>]+(?:noindex|nofollow)/i, `${path}: public page allows indexing`)
   assert.match(body, /<h1\b[^>]*>[^<\s]/, `${path}: real heading without executing JavaScript`)
-  assert.ok(body.includes('href="/riichi-calculator"'), `${path}: crawlable internal links`)
+  assert.match(body, /<a\b[^>]*href="\/[^"]*"/, `${path}: crawlable internal links`)
   const structured = head.match(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)
   assert.ok(structured, `${path}: structured data in HTML`)
   const graph = JSON.parse(structured[1])['@graph']

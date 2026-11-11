@@ -27,6 +27,7 @@
         <div class="seating-grid"><article v-for="table in filteredAssignments" :key="table.table_number"><h3>Table <strong>{{ table.table_number }}</strong></h3><ul><li v-for="seat in table.seats" :key="seat.seat_wind" :class="{ 'matched-player': search && matches(seat.display_name) }"><span class="wind-label">{{ seat.seat_wind }}</span><strong>{{ seat.display_name }}</strong></li></ul></article></div>
         <p v-if="!filteredAssignments.length" class="no-matches">No published table matches “{{ search }}”.</p>
       </section>
+      <section v-else-if="seatingPending" class="results-card waiting-scores"><h2>{{ humanize(expectedAssignmentRound) }} seating is being prepared.</h2><p>The organiser has advanced the event. New table assignments will appear here once they are published.</p></section>
 
       <section v-if="snapshot.standings?.length" class="results-card">
         <div class="card-heading"><div><p class="eyebrow">Certified results</p><h2>{{ event?.stage === 'completed' ? 'Final qualification standings' : 'Qualification standings' }}</h2></div><span class="soft-badge">Certified only</span></div>
@@ -51,7 +52,9 @@ const search = ref('')
 const phases = [{ key: 'registration', label: 'Registration' }, { key: 'qualifier_1', label: 'Qualifier 1' }, { key: 'qualifier_2', label: 'Qualifier 2' }, { key: 'final', label: 'Final' }]
 const phaseIndex = computed(() => props.event?.stage === 'completed' ? 4 : Math.max(0, phases.findIndex(phase => phase.key === props.event?.stage)))
 const formattedUpdate = computed(() => props.updatedAt ? new Date(props.updatedAt).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', dateStyle: 'medium', timeStyle: 'short' }) : 'Awaiting publication')
-const assignments = computed(() => { const key = props.snapshot?.assignment_round; return key ? props.snapshot?.assignments?.[key] ?? [] : Object.values(props.snapshot?.assignments ?? {})[0] ?? [] })
+const expectedAssignmentRound = computed(() => props.event?.stage === 'completed' ? 'final' : props.event?.stage)
+const assignments = computed(() => { const key = props.snapshot?.assignment_round; return key && key === expectedAssignmentRound.value ? props.snapshot?.assignments?.[key] ?? [] : [] })
+const seatingPending = computed(() => ['qualifier_1','qualifier_2','final'].includes(expectedAssignmentRound.value) && props.snapshot?.assignment_round !== expectedAssignmentRound.value)
 const matches = name => String(name ?? '').toLocaleLowerCase().includes(search.value.trim().toLocaleLowerCase())
 const filteredAssignments = computed(() => assignments.value.filter(table => table.seats.some(seat => matches(seat.display_name))))
 const filteredStandings = computed(() => (props.snapshot?.standings ?? []).filter(row => matches(row.display_name)))
