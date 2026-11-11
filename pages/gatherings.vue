@@ -1063,12 +1063,12 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 12px 32px rgba(160, 100, 110, 0.08);
     text-align: center;
 }
-.gatherings-main > .first-time-panel { order: 1; }
-.gatherings-main > .tabs { order: 2; }
+.gatherings-main > .tabs { order: 1; }
 .gatherings-main > .event-card,
 .gatherings-main > .loading-copy,
-.gatherings-main > .empty-state { order: 3; }
-.gatherings-main > .pagination { order: 4; }
+.gatherings-main > .empty-state { order: 2; }
+.gatherings-main > .pagination { order: 3; }
+.gatherings-main > .first-time-panel { order: 4; }
 
 .first-time-panel h2 {
     margin: 0 0 8px;

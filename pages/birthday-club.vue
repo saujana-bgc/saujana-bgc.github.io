@@ -450,6 +450,13 @@ function resetForm() {
 .field-group input, .field-group select { border-radius: 8px; border-color: var(--line); }
 .consent-row { border-radius: 8px; background: var(--surface-soft); }
 .consent-row small, .privacy-note { opacity: 1; color: var(--muted); font-size: .8rem; }
+@media (max-width: 767px) {
+  .date-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .field-group { margin-bottom: 17px; }
+  .birthday-control { min-width: 0; }
+  .field-group :deep(.birthday-control input) { border: 0; box-shadow: none; }
+  .field-group :deep(.birthday-control:focus-within) { border-color: var(--matcha-leaf); box-shadow: 0 0 0 3px rgba(101, 119, 99, .11); }
+}
 .submit-button, .secondary-button { border-radius: 6px; box-shadow: none; font-size: .85rem; text-transform: none; letter-spacing: .02em; }
 
 </style>

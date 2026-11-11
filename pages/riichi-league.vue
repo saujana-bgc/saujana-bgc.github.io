@@ -3,7 +3,7 @@
     <header class="league-hero fade-up">
       <p class="page-eyebrow">One more hand?</p>
       <h1 class="hero-title">Riichi mahjong league</h1>
-      <p class="league-intro">A friendly season of riichi mahjong, one gathering at a time. Follow the standings, look back at a table, or add the results of your latest game.</p>
+      <p class="league-intro">Follow the standings, revisit a week, or add your latest result.</p>
       <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings" no-prefetch>Come to a gathering</NuxtLink> and ask the host how to get started.</p>
 
       <div class="season-switcher">
@@ -2404,6 +2404,7 @@ onBeforeUnmount(() => {
   .league-hero { padding-bottom: 22px; }
   .league-hero .hero-title { max-width: 12ch; margin-inline: auto; line-height: 1.08; }
   .league-intro { max-width: 34rem; margin-inline: auto; }
+  .league-hero .league-welcome { margin-block: 10px; }
   .standings-card { order: 1; }
   .season-card { order: 2; }
   .weeks-card { order: 3; }
@@ -2411,7 +2412,7 @@ onBeforeUnmount(() => {
   .season-switcher { justify-content: center; }
   .season-switcher .league-control { min-width: 150px; }
   .league-shortcuts { gap: 8px; }
-  .league-shortcuts > * { flex: 1 1 auto; }
+  .league-shortcuts > * { flex: 1 1 0; padding-inline: 9px; font-size: .83rem; }
   .season-card { margin-bottom: 18px; }
 }
 

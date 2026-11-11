@@ -6,10 +6,6 @@
         <h1>Only Blood <em>in the Clocktower</em></h1>
         <p class="intro">Blood on the Clocktower is a social game of hidden roles. Talk, share clues and vote to find the Demon. New players are welcome; we’ll explain as you play.</p>
         <div class="hero-links">
-          <a class="hero-primary" :href="nextCtaHref">
-            {{ nextGathering ? (nextGathering.signup_url ? 'Save your place' : 'See gathering details') : 'See all gatherings' }}
-            <span aria-hidden="true">↗</span>
-          </a>
           <a class="hero-secondary" :href="heroSecondaryHref">
             {{ heroSecondaryLabel }} <span aria-hidden="true">↓</span>
           </a>

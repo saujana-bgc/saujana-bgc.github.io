@@ -1078,8 +1078,8 @@ onBeforeUnmount(() => {
 .calculator-heading .page-eyebrow { margin-bottom: 14px; }
 .calculator-heading .hero-title { font-size: clamp(2.25rem, 5.3vw, 3.7rem); }
 .calculator-heading > .calculator-description { max-width: 580px; margin: 14px auto 0; color: var(--muted); font-size: .95rem; line-height: 1.7; }
-.tutorial-trigger { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; margin-top: 14px; padding: 9px 15px; border: 1px solid var(--matcha-leaf); border-radius: 7px; background: var(--matcha-leaf); color: var(--white-pure); font: 650 .82rem var(--font-body); cursor: pointer; transition: background-color .18s, border-color .18s; }
-.tutorial-trigger:hover { border-color: #293e32; background: #293e32; }
+.tutorial-trigger { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; margin-top: 14px; padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--matcha-leaf); font: 650 .82rem var(--font-body); cursor: pointer; transition: background-color .18s, border-color .18s; }
+.tutorial-trigger:hover { border-color: var(--matcha-leaf); background: var(--surface-soft); }
 .tutorial-trigger > span { font-size: .68rem; }
 .tutorial-trigger:focus-visible { outline: 3px solid var(--gold-leaf); outline-offset: 3px; }
 .calculator-layout { display: grid; grid-template-areas: "form result"; grid-template-columns: minmax(0, 1fr) minmax(290px, 345px); align-items: start; gap: 22px; }

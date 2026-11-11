@@ -39,14 +39,14 @@
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
           <p class="section-intro">New to Saujana? Here’s how a first visit can go. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
-          <div class="expect-guide">
-            <article v-for="item in expectations" :key="item.title" class="expect-card">
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.copy }}</p>
-            </article>
-          </div>
         </div>
         <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
+        <div class="expect-guide">
+          <article v-for="item in expectations" :key="item.title" class="expect-card">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.copy }}</p>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -293,10 +293,14 @@ const expectations = [
 
 .first-visit-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+  grid-template-areas: "copy photo" "steps steps";
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .95fr);
   align-items: center;
   gap: clamp(24px, 4vw, 48px);
 }
+.first-visit-copy { grid-area: copy; }
+.first-visit-photo { grid-area: photo; }
+.first-visit-layout > .expect-guide { grid-area: steps; width: 100%; }
 
 .story-title { font-size: clamp(1.7rem, 4vw, 2.55rem); }
 
@@ -398,7 +402,7 @@ const expectations = [
 @media (max-width: 900px) {
   .hero-section,
   .riichi-panel { grid-template-columns: minmax(0, 1fr); }
-  .first-visit-layout { grid-template-columns: minmax(0, 1fr); }
+  .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .hero-section { gap: 16px; }
   .hero-artwork { max-width: none; }
 }

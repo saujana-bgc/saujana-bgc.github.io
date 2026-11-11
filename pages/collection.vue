@@ -4,9 +4,8 @@
       <p class="page-eyebrow">What shall we play next?</p>
       <h1 class="hero-title">Board game collection</h1>
       <div class="stats-container collection-summary">
-        <span><strong>{{ totalGames }}</strong> games on the shelf</span>
         <span v-if="isPending">Loading play history…</span>
-        <span v-else><strong>{{ isError ? '—' : unplayedCount }}</strong> {{ isError ? 'play history unavailable' : 'with no plays logged' }}</span>
+        <span v-else><strong>{{ isError ? '—' : unplayedCount }}</strong> {{ isError ? 'play history unavailable' : 'games with no plays logged' }}</span>
       </div>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>
     </header>
@@ -34,7 +33,7 @@
         <div class="collection-sort-options" aria-label="Sort games">
           <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="currentSort = 'name'">A to Z</UButton>
           <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="currentSort = 'played'">Recently played</UButton>
-          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="generateSurprise">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'No plays logged' }}</UButton>
+          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="generateSurprise">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'Pick an unplayed game' }}</UButton>
         </div>
         <div class="collection-category-options" aria-label="Filter by category">
           <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
@@ -603,7 +602,7 @@ watch([search, currentSort, selectedCategories], () => {
 .collection-result-count { flex: 0 0 auto; white-space: nowrap; }
 .sort-controls { display: flex; flex-direction: column; max-width: 720px; gap: 10px; margin-bottom: 8px; }
 .collection-sort-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.collection-category-options { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: thin; }
+.collection-category-options { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 0 8px; }
 .sort-btn { padding: 10px 12px; min-height: 44px; border-radius: 6px; text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
 .category-btn { flex: 0 0 auto; }
 .sort-btn:hover { transform: none; box-shadow: none; }
@@ -640,7 +639,7 @@ main:has(.collection-search) > .collection-invite { order: 5; width: 90%; max-wi
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-sort-options .surprise { grid-column: 1 / -1; }
-  .collection-category-options { gap: 6px; }
+  .collection-category-options { gap: 6px; overflow: visible; }
   .collection-invite { text-align: left; }
 }
 
