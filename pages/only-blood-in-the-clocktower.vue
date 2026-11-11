@@ -31,15 +31,15 @@
     </header>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
-      <div class="welcome-body">
+      <div class="welcome-heading">
         <p class="eyebrow">New to the game?</p>
         <h2 id="welcome-title">Your first game</h2>
-        <ul class="welcome-steps">
-          <li><strong>Before you arrive</strong><span>Check the gathering’s date, time, venue and costs. Follow its sign-up details and mark yourself tentative if you’re still deciding.</span></li>
-          <li><strong>When you arrive</strong><span>Come solo or bring a friend. The host will help you find a seat and explain what you need as you play.</span></li>
-        </ul>
-        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Optional: read the official guide <span aria-hidden="true">↗</span></a>
       </div>
+      <ul class="welcome-steps">
+        <li><strong>Before you arrive</strong><span>Check the gathering’s date, time, venue and costs. Follow its sign-up details and mark yourself tentative if you’re still deciding.</span></li>
+        <li><strong>When you arrive</strong><span>Come solo or bring a friend. The host will help you find a seat and explain what you need as you play.</span></li>
+      </ul>
+      <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
     </section>
 
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
@@ -64,35 +64,40 @@
 
       <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
       <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id, 'has-cover': session.id === featured?.id && Boolean(coverPhoto(session)) }">
-        <p v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</p>
-        <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="'Approved table photo from ' + formatDate(session.session_date)" loading="lazy">
-        <div class="session-heading">
-          <div>
-            <p class="eyebrow"><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
+        <div class="session-masthead">
+          <div class="session-heading">
+            <p class="session-kicker"><span v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</span><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
             <h3 tabindex="-1">{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
             <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
+          <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="coverPhoto(session).alt || 'Table photo from ' + formatDate(session.session_date)" loading="lazy">
         </div>
         <section v-if="session.recap" class="recap-story" aria-label="Retelling">
-          <p class="eyebrow">Retelling</p>
-          <p>{{ session.recap }}</p>
+          <h4>Retelling</h4>
+          <div class="recap-prose">
+            <p v-for="(paragraph, index) in retellingParagraphs(session.recap)" :key="index">{{ paragraph }}</p>
+          </div>
         </section>
 
         <div v-if="session.games?.length" class="game-grid">
           <article v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number" class="game-recap">
             <header class="game-recap-heading">
-              <span class="game-label">Game {{ number }}</span>
-              <h4 class="game-script" tabindex="-1">{{ game.script || 'Script not recorded' }}</h4>
+              <div class="game-title">
+                <span class="game-label">Game {{ number }}</span>
+                <h4 class="game-script" tabindex="-1">{{ game.script || 'Script not recorded' }}</h4>
+              </div>
+              <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
             </header>
-            <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
             <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
               <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
                 <img class="character-art" :src="characterIcon(player.character)" alt="" loading="lazy" decoding="async">
                 <div class="seat-copy">
                   <span class="seat-name">{{ publicPlayerName(player, pIndex) }}</span>
-                  <span class="seat-character">{{ player.character || 'Character not recorded' }}</span>
+                  <div class="seat-meta">
+                    <span class="seat-character">{{ player.character || 'Character not recorded' }}</span>
+                    <span v-if="player.died" class="death-mark">Died</span>
+                  </div>
                 </div>
-                <span v-if="player.died" class="death-mark">Died</span>
               </li>
             </ol>
             <p v-if="game.notes" class="story-text">{{ game.notes }}</p>
@@ -234,6 +239,10 @@ function coverPhoto(session) {
   return sessionPhotos(session).find(photo => photo.cover)
 }
 
+function retellingParagraphs(recap) {
+  return recap.trim().split(/\r?\n(?:[^\S\r\n]*\r?\n)+/)
+}
+
 function visibleGames(session) {
   return (session.games || [])
     .map((game, index) => ({ game, number: index + 1 }))
@@ -338,8 +347,8 @@ onMounted(() => {
   --gold: #e6be85;
   --soft-ink: #6b5755;
   --rule: #e3d6c6;
-  --panel-pad: clamp(20px, 4vw, 38px);
-  width: min(1200px, 94%);
+  --panel-pad: clamp(15px, 2.6vw, 34px);
+  width: min(1320px, calc(100% - clamp(28px, 6vw, 88px)));
   margin: auto;
   padding: clamp(18px, 3vw, 34px) 0 64px;
   color: var(--ink);
@@ -352,8 +361,9 @@ onMounted(() => {
   grid-template-areas: "copy date" "actions date";
   align-items: center;
   overflow: hidden;
-  min-height: 430px;
-  gap: clamp(20px, 3vw, 44px);
+  min-height: 350px;
+  align-content: center;
+  gap: 12px clamp(24px, 3.2vw, 48px);
   padding: clamp(34px, 4.5vw, 56px);
   text-align: left;
   border-radius: 16px;
@@ -492,21 +502,20 @@ onMounted(() => {
 .retry-button { justify-self: start; min-height: 40px; margin-top: 8px; padding: 7px 11px; border: 1px solid #b99577; border-radius: 6px; background: transparent; color: var(--wine); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
 .retry-button:focus-visible { outline: 2px solid var(--wine); outline-offset: 2px; }
 .welcome-note {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px 32px;
-  margin: 0 0 clamp(30px, 4.7vw, 54px);
+  display: grid;
+  grid-template-columns: minmax(155px, .75fr) minmax(0, 2.8fr) auto;
+  align-items: start;
+  gap: 14px clamp(16px, 2.6vw, 36px);
+  margin: 0 0 clamp(26px, 4vw, 48px);
   padding: clamp(19px, 3vw, 28px) 0;
   border-block: 1px solid #dfd0be;
   background: transparent;
 }
-.welcome-note > div { max-width: 82ch; }
 .welcome-note h2 { margin: 4px 0 6px; color: var(--ink); font: 400 clamp(1.45rem, 3vw, 2rem)/1.15 var(--font-display); letter-spacing: -.025em; }
-.welcome-steps { display: grid; gap: 11px; margin: 12px 0 14px; padding: 0; list-style: none; }
+.welcome-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; margin: 0; padding: 0; list-style: none; }
 .welcome-steps li { display: grid; gap: 2px; color: var(--soft-ink); font-size: .9rem; line-height: 1.5; }
 .welcome-steps strong { color: var(--ink); }
-.welcome-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 0 0 auto; min-height: 44px; padding: 9px 13px; border: 1px solid #b99577; border-radius: 6px; color: var(--wine); font-size: .86rem; font-weight: 700; text-decoration: none; }
+.welcome-link { display: inline-flex; align-items: center; justify-self: start; align-self: center; gap: 8px; min-height: 44px; padding: 9px 13px; border: 1px solid #b99577; border-radius: 6px; color: var(--wine); font-size: .86rem; font-weight: 700; text-decoration: none; }
 .welcome-link:hover { background: #fffaf2; }
 
 .metadata { margin: 4px 0 0; color: var(--soft-ink); font-size: .92rem; overflow-wrap: anywhere; }
@@ -514,9 +523,13 @@ onMounted(() => {
 .session-card h3 { overflow-wrap: break-word; }
 .script-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
 .script-tags li { padding: 4px 9px; border: 1px solid var(--rule); border-radius: 5px; color: var(--wine); font-size: .75rem; overflow-wrap: anywhere; }
-.recap-story { margin-top: 14px; padding: 12px 14px; border-inline-start: 2px solid #9b6670; border-radius: 0 7px 7px 0; background: #f5ece5; }
-.recap-story > p:last-child, .story-text { max-width: 82ch; white-space: pre-wrap; overflow-wrap: break-word; }
-.recap-story > p:last-child { margin: 4px 0 0; }
+.recap-story { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 18px; padding: 16px 0; border-block: 1px solid var(--rule); }
+.recap-story h4 { margin: 0; color: var(--wine); font: 400 1.2rem/1.4 var(--font-display); }
+.recap-prose, .story-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.recap-prose { max-width: 106ch; font-size: 1.02rem; line-height: 1.65; }
+.recap-prose p { margin: 0; }
+.recap-prose p + p { margin-top: .75em; }
+.story-text { margin: 12px 0 0; }
 
 .stats {
   display: grid;
@@ -548,34 +561,28 @@ onMounted(() => {
 .empty-archive p { max-width: 60ch; margin: 8px auto 0; }
 .session-card { margin: 0 0 14px; border-inline-start: 3px solid #b28869; box-shadow: 0 6px 20px #35282b08; }
 .session-card.is-latest-session { border-inline-start-color: var(--wine); background: linear-gradient(110deg, #f8eee6, var(--paper) 70%); box-shadow: 0 9px 26px #34212512; }
-.session-card.is-latest-session.has-cover { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); column-gap: clamp(18px, 3vw, 34px); }
-.latest-label { margin-bottom: 5px; }
-.is-latest-session > .latest-label { grid-column: 1 / -1; }
-.session-cover { display: block; width: 100%; max-height: 320px; margin: 0 0 14px; aspect-ratio: 16 / 7; border-radius: 7px; background: var(--parchment); object-fit: cover; }
-.is-latest-session.has-cover > .session-cover { grid-column: 2; grid-row: 2 / span 4; height: 100%; max-height: 360px; margin: 0; aspect-ratio: 4 / 3; }
-.session-card h3 { margin-top: 3px; }
-.session-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; }
-.session-heading > div { flex: 1 1 110px; min-width: 0; }
-.is-latest-session > .session-heading { grid-column: 1; align-items: flex-start; }
-.is-latest-session > .recap-story,
-.is-latest-session > .game-grid,
-.is-latest-session > .photo-reveal { grid-column: 1 / -1; }
-.game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; margin-top: 14px; align-items: start; }
+.session-masthead { display: grid; gap: 16px 28px; align-items: center; }
+.has-cover .session-masthead { grid-template-columns: minmax(0, 1fr) minmax(240px, 34%); }
+.session-kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 0 0 6px; color: var(--soft-ink); font-size: .82rem; }
+.latest-label { padding: 3px 8px; border-radius: 4px; background: #efe0d6; letter-spacing: .09em; }
+.session-cover { display: block; width: 100%; max-height: 200px; aspect-ratio: 16 / 9; border-radius: 8px; background: var(--parchment); object-fit: cover; }
+.game-grid { display: grid; gap: 12px; margin-top: 18px; }
 .game-recap { min-width: 0; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
-.game-grid .game-recap { grid-column: 1 / -1; }
-.game-recap-heading { display: grid; gap: 2px; margin-bottom: 8px; }
+.game-recap .game-recap-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; padding: 0; text-align: left; }
+.game-title { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .game-label { color: var(--wine); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
-.game-script { font: 400 1.12rem/1.3 var(--font-display); }
-.outcome { display: inline-block; margin: 7px 0 0; padding: 4px 9px; border-radius: 5px; background: #eee0d5; color: #63323d; font-weight: 700; }
-.grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; margin: 14px 0; padding: 0; list-style: none; }
-.grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 112px; overflow: hidden; padding: 12px; border: 1px solid #806274; border-radius: 9px; background: radial-gradient(ellipse at 42% 50%, #493141 0%, #291d29 68%); color: #fff5e9; box-shadow: inset 0 0 0 3px #e6be8512, 0 5px 16px #21171d20; }
+.game-script { margin: 0; font: 400 1.12rem/1.3 var(--font-display); }
+.outcome { margin: 0; padding: 4px 9px; border-radius: 5px; background: #eee0d5; color: #63323d; font-size: .84rem; font-weight: 700; }
+.grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; align-items: center; min-height: 88px; overflow: hidden; padding: 10px; border: 1px solid #806274; border-radius: 9px; background: radial-gradient(ellipse at 42% 50%, #493141 0%, #291d29 68%); color: #fff5e9; box-shadow: inset 0 0 0 3px #e6be8512, 0 5px 16px #21171d20; }
 .grimoire-seat::after { position: absolute; z-index: -1; inset: 5px; border: 1px solid #e6be8524; border-radius: 5px; content: ''; pointer-events: none; }
 .grimoire-seat.is-dead { background: radial-gradient(ellipse at 42% 50%, #553039 0%, #301c25 70%); }
-.character-art { display: block; width: 70px; height: 70px; object-fit: contain; filter: drop-shadow(0 3px 8px #120b1690); }
+.character-art { display: block; width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 3px 8px #120b1690); }
 .seat-copy { display: grid; gap: 4px; min-width: 0; }
+.seat-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .seat-name { min-width: 0; color: #fff5e9; font: 400 1.05rem/1.2 var(--font-display); overflow-wrap: anywhere; }
 .seat-character { min-width: 0; overflow-wrap: anywhere; color: #e9d7ca; font-size: .82rem; }
-.death-mark { grid-column: 3; grid-row: 1; align-self: start; padding: 4px 7px; border: 1px solid #efa6a455; border-radius: 4px; background: #873e4b40; color: #ffd9c7; font-size: .65rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.death-mark { padding: 2px 5px; border: 1px solid #efa6a455; border-radius: 4px; background: #873e4b40; color: #ffd9c7; font-size: .65rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
 .art-credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--soft-ink); font-size: .72rem; }
 .art-credit a { color: var(--wine); text-underline-offset: 3px; }
 .art-credit a:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
@@ -590,6 +597,13 @@ onMounted(() => {
 .archive-button { min-height: 44px; padding: 7px 11px; border: 1px solid #d3bdb1; border-radius: 6px; background: transparent; color: var(--wine); font: 700 .85rem var(--font-body); cursor: pointer; }
 .next-night, .archive, .session-card, .game-recap { scroll-margin-top: 86px; }
 
+@media (min-width: 861px) {
+  .recap-story { grid-template-columns: 105px minmax(0, 1fr); gap: 20px; }
+}
+@media (max-width: 950px) {
+  .welcome-note { grid-template-columns: minmax(145px, .8fr) minmax(0, 2fr); }
+  .welcome-link { grid-column: 2; }
+}
 @media (max-width: 760px) {
   .clocktower-page > .page-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "date" "actions"; gap: 18px; min-height: 0; padding: 28px 22px 26px; }
   .page-header::after { background: linear-gradient(180deg, var(--night) 14%, #21171def 42%, #21171db8 75%, #21171d30 100%); }
@@ -603,11 +617,12 @@ onMounted(() => {
   .stats { grid-template-columns: 1fr; text-align: center; gap: 2px; }
   .stat-row { grid-column: 1; grid-row: auto; margin-top: 10px; }
   .stat-row div:first-child { border: 0; }
+  .has-cover .session-masthead { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
   .clocktower-page > .page-header { padding: 22px 18px; gap: 18px; }
   .page-header h1 { font-size: clamp(2rem, 8.2vw, 3rem); }
-  .intro { max-width: 31ch; font-size: .91rem; line-height: 1.5; }
+  .intro { font-size: .91rem; line-height: 1.5; }
   .hero-secondary { font-size: .76rem; }
   .next-night { grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: start; }
   .next-copy { min-width: 0; }
@@ -615,20 +630,11 @@ onMounted(() => {
   .calendar-mark { width: 50px; height: 58px; }
   .calendar-mark strong { font-size: 1.5rem; }
   .archive-filters label { flex: 1 1 112px; min-width: 0; }
-  .welcome-note { align-items: flex-start; flex-direction: column; gap: 13px; }
+  .welcome-note, .welcome-steps { grid-template-columns: minmax(0, 1fr); }
+  .welcome-link { grid-column: 1; }
   .next-night .calendar-link { grid-column: 2; }
-  .session-heading { align-items: flex-start; }
-  .session-heading > div { flex-basis: 180px; }
+  .recap-prose { font-size: .96rem; }
   .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-gallery img { max-height: 180px; }
-}
-@media (max-width: 760px) {
-  .session-card.is-latest-session.has-cover { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
-  .is-latest-session.has-cover > .session-cover { grid-column: 1; grid-row: auto; height: auto; max-height: 260px; margin: 0 0 12px; aspect-ratio: 16 / 9; }
-  .is-latest-session > .session-heading { grid-column: 1; grid-row: auto; display: block; }
-  .is-latest-session > .latest-label,
-  .is-latest-session > .recap-story,
-  .is-latest-session > .game-grid,
-  .is-latest-session > .photo-reveal { grid-column: 1; }
 }
 </style>
