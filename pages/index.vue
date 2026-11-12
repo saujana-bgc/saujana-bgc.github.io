@@ -484,6 +484,5 @@ const expectations = [
   .next-gathering { align-items: flex-start; padding: 18px; }
   .next-gathering-link { width: 100%; }
   .hero-artwork { max-width: 420px; margin-inline: auto; }
-  .hero-banner { aspect-ratio: 1.45; object-fit: cover; object-position: center; }
 }
 </style>
