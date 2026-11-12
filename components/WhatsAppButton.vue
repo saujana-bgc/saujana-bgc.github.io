@@ -1,6 +1,7 @@
 <template>
   <a
     class="whatsapp-button"
+    :class="{ 'whatsapp-button-in-content': inContent }"
     href="https://wa.me/saujanabgc"
     target="_blank"
     rel="noopener noreferrer"
@@ -17,6 +18,10 @@
     <span class="sr-only">@saujanabgc</span>
   </a>
 </template>
+
+<script setup>
+defineProps({ inContent: { type: Boolean, default: false } })
+</script>
 
 <style scoped>
 .whatsapp-button {
@@ -42,6 +47,12 @@
   letter-spacing: 0.02em;
   text-decoration: none;
   transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.whatsapp-button-in-content {
+  position: static;
+  align-self: flex-end;
+  margin: 16px max(5vw, env(safe-area-inset-right)) 18px;
 }
 
 .whatsapp-button:hover {

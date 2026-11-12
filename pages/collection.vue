@@ -22,12 +22,8 @@
         />
         <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
         <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
+        <NuxtLink class="collection-gathering-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       </div>
-
-      <section class="collection-invite fade-up">
-        <p>Found a game you’d like to try?</p>
-        <NuxtLink class="context-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
-      </section>
 
       <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
         <div class="collection-sort-options" aria-label="Sort games">
@@ -624,13 +620,15 @@ watch([search, currentSort, selectedCategories], () => {
 /* Keep keyboard and visual order aligned on the collection page. */
 main:has(.collection-search) { gap: 10px; }
 main:has(.collection-search) > .collection-search { margin-bottom: 0; }
-main:has(.collection-search) > .collection-invite { width: 90%; max-width: 720px; margin: 0 auto 4px; }
 main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; }
+.collection-gathering-link { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; gap: 6px; color: var(--matcha-leaf); font-size: .82rem; font-weight: 650; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; white-space: nowrap; }
+.collection-gathering-link:hover { text-decoration-color: var(--matcha-leaf); }
 .collection-updated { margin-top: 6px; }
 .collection-sort-options .surprise { line-height: 1.25; }
 @media (max-width: 480px) {
   .collection-summary { gap: 4px 14px; font-size: .78rem; }
   .collection-search { align-items: center; }
+  .collection-gathering-link { margin-left: auto; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-sort-options .surprise { grid-column: 1 / -1; }

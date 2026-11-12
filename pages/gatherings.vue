@@ -1441,6 +1441,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
         padding: 18px;
         box-sizing: border-box;
         gap: 8px;
+        background: linear-gradient(180deg, rgba(20, 30, 22, 0.24), rgba(20, 30, 22, 0.84) 42%, rgba(20, 30, 22, 0.9));
     }
 
     .event-card .event-image-title {
@@ -2213,8 +2214,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .gatherings-main > .tabs { margin-top: 2px; }
 .first-time-panel { width: min(100%, 960px); }
 @media (max-width: 600px) {
-  .first-time-panel { padding: 15px 17px; margin-bottom: 12px; }
-  .first-time-panel summary { gap: 3px 8px; }
+  .first-time-panel { width: min(100%, 960px); box-sizing: border-box; padding: 15px 17px; margin-bottom: 12px; }
+  .first-time-panel summary { display: grid; grid-template-columns: minmax(0, 1fr) 1.4rem; align-items: center; gap: 3px 8px; }
+  .first-time-panel summary::after { grid-column: 2; grid-row: 1 / span 2; justify-self: center; }
   .first-time-summary-hint { font-size: .78rem; line-height: 1.45; }
 }
 

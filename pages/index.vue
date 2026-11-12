@@ -485,8 +485,12 @@ const expectations = [
 }
 
 @media (max-width: 900px) {
-  .hero-section { grid-template-columns: minmax(0, 1fr); }
-  .hero-section { gap: 16px; }
+  .hero-section { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 20px; }
+  .hero-artwork { max-width: 100%; }
+}
+
+@media (max-width: 700px) {
+  .hero-section { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .hero-artwork { max-width: none; }
 }
 

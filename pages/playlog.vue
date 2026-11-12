@@ -30,6 +30,44 @@
           <p v-if="matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
         </div>
 
+        <section
+          v-for="(session, i) in pagedSessions"
+          :key="session.date"
+          class="session-card fade-up"
+          :style="{ transitionDelay: Math.min(i * 0.07, 0.5) + 's' }"
+        >
+          <div class="session-date">{{ session.displayDate }}</div>
+
+          <div class="game-grid">
+            <UButton
+              v-for="game in session.games"
+              :key="game.key"
+              class="game-pill"
+              type="button"
+              :aria-pressed="hoverImage.key === game.key && hoverImage.visible"
+              :class="{ 'game-pill-match': matchingGames && game.name.toLocaleLowerCase().includes(matchingGames) }"
+              @click="toggleGameImage($event, game)"
+            >{{ game.name }}</UButton>
+          </div>
+        </section>
+
+        <div v-if="filteredSessions.length === 0" class="loading-state">
+          <p>{{ search.trim() ? `No gatherings include “${search.trim()}”. Try another game title.` : 'Our play history is waiting for its first entry.' }}</p>
+          <NuxtLink class="context-link" to="/collection" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
+        </div>
+
+        <div v-if="totalPages > 1" class="pagination">
+          <UButton class="page-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">Previous</UButton>
+          <UButton
+            v-for="p in totalPages"
+            :key="p"
+            class="page-btn"
+            :class="{ active: p === currentPage }"
+            @click="goToPage(p)"
+          >{{ p }}</UButton>
+          <UButton class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">Next</UButton>
+        </div>
+
         <section class="session-card stats-panel fade-up">
           <div class="session-date">Our time in games</div>
           <div class="stats-layout">
@@ -89,44 +127,6 @@
             </div>
           </div>
         </section>
-
-        <section
-          v-for="(session, i) in pagedSessions"
-          :key="session.date"
-          class="session-card fade-up"
-          :style="{ transitionDelay: Math.min(i * 0.07, 0.5) + 's' }"
-        >
-          <div class="session-date">{{ session.displayDate }}</div>
-
-          <div class="game-grid">
-            <UButton
-              v-for="game in session.games"
-              :key="game.key"
-              class="game-pill"
-              type="button"
-              :aria-pressed="hoverImage.key === game.key && hoverImage.visible"
-              :class="{ 'game-pill-match': matchingGames && game.name.toLocaleLowerCase().includes(matchingGames) }"
-              @click="toggleGameImage($event, game)"
-            >{{ game.name }}</UButton>
-          </div>
-        </section>
-
-        <div v-if="filteredSessions.length === 0" class="loading-state">
-          <p>{{ search.trim() ? `No gatherings include “${search.trim()}”. Try another game title.` : 'Our play history is waiting for its first entry.' }}</p>
-          <NuxtLink class="context-link" to="/collection" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
-        </div>
-
-        <div v-if="totalPages > 1" class="pagination">
-          <UButton class="page-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">Previous</UButton>
-          <UButton
-            v-for="p in totalPages"
-            :key="p"
-            class="page-btn"
-            :class="{ active: p === currentPage }"
-            @click="goToPage(p)"
-          >{{ p }}</UButton>
-          <UButton class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">Next</UButton>
-        </div>
       </template>
     </main>
 
@@ -748,10 +748,10 @@ onUnmounted(() => {
 
 /* Keep visual section order aligned with keyboard reading order. */
 .search-wrap { order: 1; margin-bottom: 12px; }
-main > .stats-panel { order: 2; margin-top: 12px; }
-main > .session-card:not(.stats-panel) { order: 3; }
-main > .loading-state { order: 3; }
-main > .pagination { order: 4; }
+main > .stats-panel { order: 4; margin-top: 24px; }
+main > .session-card:not(.stats-panel) { order: 2; }
+main > .loading-state { order: 2; }
+main > .pagination { order: 3; }
 .clocktower-link { margin: 14px auto 0; width: fit-content; max-width: 100%; }
 .clocktower-link a { display: inline-flex; align-items: center; min-height: 42px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .82rem; line-height: 1.4; text-decoration: none; }
 .clocktower-link a:hover { background: var(--white-pure); border-color: var(--matcha-leaf); }

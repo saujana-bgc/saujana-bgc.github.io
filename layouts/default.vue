@@ -29,7 +29,7 @@
       <slot />
     </div>
 
-    <WhatsAppButton v-if="!isAdminRoute && !isRiichiCalculatorRoute" />
+    <WhatsAppButton v-if="!isAdminRoute && !isRiichiCalculatorRoute" :in-content="isBrowseRoute" />
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Good games. Good company. See you soon.</p>
@@ -89,6 +89,7 @@ const mobileNavigationUi = {
 const { lastUpdated, versionUpdateAvailable, refreshToLatest } = useVersion()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const isRiichiCalculatorRoute = computed(() => route.path.replace(/\/+$/, '') === '/riichi-calculator')
+const isBrowseRoute = computed(() => ['/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')))
 const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
 const showVisitorCounter = ref(false)
