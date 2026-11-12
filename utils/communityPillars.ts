@@ -24,7 +24,7 @@ export const communityPillars = [
     },
     description: 'Riichi is Japanese mahjong played with tiles. At a Riichi gathering, watch a hand and ask someone to walk you through it.',
     links: [
-      { label: 'Try Riichi at a gathering', to: '/gatherings' },
+      { label: 'Find a Riichi gathering', to: '/gatherings' },
       { label: 'Riichi League', to: '/riichi-league' },
       { label: 'Riichi Calculator', to: '/riichi-calculator' },
       { label: 'Riichi Open I', to: '/riichi-open' },

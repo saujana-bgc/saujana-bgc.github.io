@@ -23,7 +23,7 @@
               <UButton type="button" aria-label="Next year" @click="calendarYear++">&rarr;</UButton>
             </div>
 
-            <div class="summary-stats" aria-live="polite">
+            <div v-if="!isLoading" class="summary-stats" aria-live="polite">
               <span><strong>{{ birthdays.length }}</strong> birthdays</span>
               <span><strong>{{ publicGreetingCount }}</strong> public greetings allowed</span>
             </div>
@@ -118,7 +118,7 @@ const currentYear = now.getFullYear()
 const calendarYear = ref(currentYear)
 const loadError = ref('')
 const birthdays = ref([])
-const isLoading = ref(false)
+const isLoading = ref(true)
 
 const monthNames = [
   'January', 'February', 'March', 'April', 'May', 'June',

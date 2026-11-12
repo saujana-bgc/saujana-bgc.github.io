@@ -8,7 +8,7 @@
         <label class="league-field-label" for="season-select">Season</label>
         <USelect class="league-control w-full" id="season-select" v-model="selectedSeasonId" :items="seasons.map(item => ({ label: `Season ${item.number}`, value: item.id }))" :disabled="isLoadingLeague || !seasons.length || isSubmittingScore" />
       </div>
-      <nav class="league-shortcuts" aria-label="League sections">
+      <nav v-if="selectedSeason" class="league-shortcuts" aria-label="League sections">
         <a class="league-button" href="#standings-heading">Standings</a>
         <a class="league-button" href="#weeks-heading">Weekly results</a>
         <UButton class="league-button league-button-primary" v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add results</UButton>

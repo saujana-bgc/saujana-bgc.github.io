@@ -41,7 +41,7 @@ const route = useRoute()
 const router = useRouter()
 const username = ref('admin')
 const password = ref('')
-const remember = ref(true)
+const remember = ref(false)
 const error = ref('')
 const busy = ref(false)
 let restoreWatchdog

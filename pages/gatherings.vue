@@ -216,19 +216,34 @@
                 <tbody>
                   <tr v-for="attendee in attendeesByEvent[event.id] ?? []" :key="attendee.id">
                     <td>
+                      <template v-if="canEditEvent(event)">
                       <input v-model="attendee.name" class="cell-input" autocomplete="off" :aria-label="`Name for ${attendee.name || 'attendee'}`" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === attendee && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === attendee && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" :readonly="!canEditEvent(event)" @focus="showNameAutocomplete($event, attendee)" @input="showNameAutocomplete($event, attendee)" @keydown="onNameAutocompleteKeydown($event, attendee)" @blur="onExistingNameBlur(attendee, event)" />
+                      </template>
+                      <span v-else class="attendee-readonly">{{ attendee.name || '—' }}</span>
                     </td>
                     <td>
+                      <template v-if="canEditEvent(event)">
                       <input v-model="attendee.eta" type="time" class="cell-input" :aria-label="`Arrival time for ${attendee.name || 'attendee'}`" :min="eventStartTime(event) || undefined" :readonly="!canEditEvent(event)" @change="validateEtaForEvent(event, attendee)" @blur="saveAttendee(attendee, event)" />
+                      </template>
+                      <span v-else class="attendee-readonly">{{ attendee.eta || '—' }}</span>
                     </td>
                     <td>
+                      <template v-if="canEditEvent(event)">
                       <input v-model="attendee.amount_spent" type="number" step="0.01" min="10" class="cell-input cell-number" :aria-label="`Amount spent by ${attendee.name || 'attendee'} in RM`" :readonly="!canEditEvent(event)" @blur="saveAttendee(attendee, event)" />
+                      </template>
+                      <span v-else class="attendee-readonly">{{ attendee.amount_spent ? `RM ${Number(attendee.amount_spent).toFixed(2)}` : '—' }}</span>
                     </td>
                     <td>
+                      <template v-if="canEditEvent(event)">
                       <textarea v-model="attendee.bringing_games" class="cell-input cell-area" placeholder="—" rows="1" :aria-label="`Games brought by ${attendee.name || 'attendee'}`" :readonly="!canEditEvent(event)" @input="autoResize" @blur="saveAttendee(attendee, event)" />
+                      </template>
+                      <span v-else class="attendee-readonly">{{ attendee.bringing_games || '—' }}</span>
                     </td>
                     <td>
+                      <template v-if="canEditEvent(event)">
                       <textarea v-model="attendee.notes" class="cell-input cell-area" placeholder="—" rows="1" :aria-label="`Notes for ${attendee.name || 'attendee'}`" :readonly="!canEditEvent(event)" @input="autoResize" @blur="saveAttendee(attendee, event)" />
+                      </template>
+                      <span v-else class="attendee-readonly">{{ attendee.notes || '—' }}</span>
                     </td>
                     <td class="td-delete">
                       <UButton v-if="canEditEvent(event)" class="btn-delete" :aria-label="`Remove ${attendee.name || 'attendee'} from the list`" @click="confirmDelete(attendee, event.id, event)" title="Remove this name from the list">
@@ -244,24 +259,25 @@
             <div class="attendees-cards">
               <div v-for="attendee in attendeesByEvent[event.id] ?? []" :key="attendee.id" class="attendee-card">
                 <div class="card-header">
-                  <input v-model="attendee.name" class="card-name-input" autocomplete="off" :aria-label="`Name for ${attendee.name || 'attendee'}`" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === attendee && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === attendee && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" :readonly="!canEditEvent(event)" @focus="showNameAutocomplete($event, attendee)" @input="showNameAutocomplete($event, attendee)" @keydown="onNameAutocompleteKeydown($event, attendee)" @blur="onExistingNameBlur(attendee, event)" />
+                  <input v-if="canEditEvent(event)" v-model="attendee.name" class="card-name-input" autocomplete="off" :aria-label="`Name for ${attendee.name || 'attendee'}`" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === attendee && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === attendee && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" @focus="showNameAutocomplete($event, attendee)" @input="showNameAutocomplete($event, attendee)" @keydown="onNameAutocompleteKeydown($event, attendee)" @blur="onExistingNameBlur(attendee, event)" />
+                  <strong v-else class="card-name-readonly">{{ attendee.name || '—' }}</strong>
                   <UButton v-if="canEditEvent(event)" class="btn-delete" :aria-label="`Remove ${attendee.name || 'attendee'} from the list`" @click="confirmDelete(attendee, event.id, event)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" style="width:0.85em;height:0.85em"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></UButton>
                 </div>
                 <div class="card-field">
-                  <label class="card-label" :for="`attendee-${attendee.id}-eta`">Arrival time</label>
-                  <input :id="`attendee-${attendee.id}-eta`" v-model="attendee.eta" type="time" class="card-value-input" :aria-label="`Arrival time for ${attendee.name || 'attendee'}`" :min="eventStartTime(event) || undefined" :readonly="!canEditEvent(event)" @change="validateEtaForEvent(event, attendee)" @blur="saveAttendee(attendee, event)" />
+                  <label v-if="canEditEvent(event)" class="card-label" :for="`attendee-${attendee.id}-eta`">Arrival time</label><span v-else class="card-label">Arrival time</span>
+                  <input v-if="canEditEvent(event)" :id="`attendee-${attendee.id}-eta`" v-model="attendee.eta" type="time" class="card-value-input" :aria-label="`Arrival time for ${attendee.name || 'attendee'}`" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, attendee)" @blur="saveAttendee(attendee, event)" /><span v-else class="attendee-readonly">{{ attendee.eta || '—' }}</span>
                 </div>
                 <div class="card-field">
-                  <label class="card-label" :for="`attendee-${attendee.id}-spent`">Spent (RM)</label>
-                  <input :id="`attendee-${attendee.id}-spent`" v-model="attendee.amount_spent" type="number" step="0.01" min="10" class="card-value-input" :aria-label="`Amount spent by ${attendee.name || 'attendee'} in RM`" :readonly="!canEditEvent(event)" @blur="saveAttendee(attendee, event)" />
+                  <label v-if="canEditEvent(event)" class="card-label" :for="`attendee-${attendee.id}-spent`">Spent (RM)</label><span v-else class="card-label">Spent (RM)</span>
+                  <input v-if="canEditEvent(event)" :id="`attendee-${attendee.id}-spent`" v-model="attendee.amount_spent" type="number" step="0.01" min="10" class="card-value-input" :aria-label="`Amount spent by ${attendee.name || 'attendee'} in RM`" @blur="saveAttendee(attendee, event)" /><span v-else class="attendee-readonly">{{ attendee.amount_spent ? `RM ${Number(attendee.amount_spent).toFixed(2)}` : '—' }}</span>
                 </div>
                 <div class="card-field">
-                  <label class="card-label" :for="`attendee-${attendee.id}-games`">Bringing</label>
-                  <textarea :id="`attendee-${attendee.id}-games`" v-model="attendee.bringing_games" class="card-value-input card-area" placeholder="—" rows="1" :aria-label="`Games brought by ${attendee.name || 'attendee'}`" :readonly="!canEditEvent(event)" @input="autoResize" @blur="saveAttendee(attendee, event)" />
+                  <label v-if="canEditEvent(event)" class="card-label" :for="`attendee-${attendee.id}-games`">Bringing</label><span v-else class="card-label">Bringing</span>
+                  <textarea v-if="canEditEvent(event)" :id="`attendee-${attendee.id}-games`" v-model="attendee.bringing_games" class="card-value-input card-area" placeholder="—" rows="1" :aria-label="`Games brought by ${attendee.name || 'attendee'}`" @input="autoResize" @blur="saveAttendee(attendee, event)" /><span v-else class="attendee-readonly">{{ attendee.bringing_games || '—' }}</span>
                 </div>
                 <div class="card-field">
-                  <label class="card-label" :for="`attendee-${attendee.id}-notes`">Notes</label>
-                  <textarea :id="`attendee-${attendee.id}-notes`" v-model="attendee.notes" class="card-value-input card-area" placeholder="—" rows="1" :aria-label="`Notes for ${attendee.name || 'attendee'}`" :readonly="!canEditEvent(event)" @input="autoResize" @blur="saveAttendee(attendee, event)" />
+                  <label v-if="canEditEvent(event)" class="card-label" :for="`attendee-${attendee.id}-notes`">Notes</label><span v-else class="card-label">Notes</span>
+                  <textarea v-if="canEditEvent(event)" :id="`attendee-${attendee.id}-notes`" v-model="attendee.notes" class="card-value-input card-area" placeholder="—" rows="1" :aria-label="`Notes for ${attendee.name || 'attendee'}`" @input="autoResize" @blur="saveAttendee(attendee, event)" /><span v-else class="attendee-readonly">{{ attendee.notes || '—' }}</span>
                 </div>
               </div>
             </div>
@@ -1819,6 +1835,15 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     background: rgba(201, 190, 239, 0.2);
 }
 
+.attendee-readonly {
+    display: block;
+    padding: 6px;
+    font-size: .88rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    color: var(--clay-text);
+}
+
 .cell-input[readonly],
 .card-name-input[readonly],
 .card-value-input[readonly] {
@@ -1961,6 +1986,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     border-radius: 6px;
     transition: background 0.2s;
 }
+
+.card-name-readonly { flex: 1; padding: 2px 4px; overflow-wrap: anywhere; }
 
 .card-name-input:focus { background: rgba(255,255,255,0.5); }
 .card-name-input::placeholder { opacity: 0.4; font-weight: 400; }

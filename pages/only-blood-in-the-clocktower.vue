@@ -28,7 +28,7 @@
       </section>
       <nav class="hero-actions" aria-label="Clocktower page links">
         <a class="hero-secondary" href="#what-to-expect">First time? Start here <span aria-hidden="true">↓</span></a>
-        <a v-if="recapSessions.length" class="hero-tertiary" href="#clocktower-archive">Browse gathering recaps <span aria-hidden="true">↓</span></a>
+        <a class="hero-tertiary" href="#clocktower-archive">Browse gathering recaps <span aria-hidden="true">↓</span></a>
       </nav>
     </div>
 
