@@ -2,7 +2,7 @@
   <section aria-labelledby="admin-dashboard-title">
     <header>
       <p class="eyebrow">Organiser workspace</p>
-      <h1 id="admin-dashboard-title">Master Admin</h1>
+      <h1 id="admin-dashboard-title">Organiser dashboard</h1>
       <p class="dashboard-lede">Manage birthdays, Clocktower recaps and the Riichi Open I tournament.</p>
     </header>
 
@@ -38,7 +38,7 @@
 import { adminDashboardGroups } from '~/utils/adminNavigation.js'
 
 definePageMeta({ layout: 'admin' })
-useHead({ title: 'Master Admin | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
+useHead({ title: 'Organiser Dashboard | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
 </script>
 
 <style scoped>

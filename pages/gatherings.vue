@@ -3,22 +3,23 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Something to look forward to</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Find upcoming board game, riichi mahjong, and Blood on the Clocktower gatherings. New to Saujana? Ask the host to help you get started.</div>
+      <div class="stats-container">See dates, venues and sign-up details for board games, riichi mahjong and Blood on the Clocktower.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
-      <details class="first-time-panel fade-up">
+      <details class="first-time-panel fade-up" open>
         <summary>
           <span class="first-time-summary-title">Your first visit, made easy</span>
-          <span class="first-time-summary-hint">Come solo or bring a friend. No game experience needed.</span>
+          <span class="first-time-summary-hint">No game experience needed. You can watch a round or join in.</span>
         </summary>
         <div class="first-time-details-content">
-          <p>The host can help you find a seat and choose a game. You can watch a round, join in, or bring a game to share.</p>
+          <p>Use Directions on the gathering card to reach the venue. Once there, ask for the Saujana host; they can help you choose a game and explain as you play. If you can’t find the group or need an expected finish time to plan your journey home, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">ask the admin a question on WhatsApp</a>.</p>
           <ul class="first-time-details">
-            <li><strong>Before you come:</strong> Check the date, time, and venue, then follow that gathering’s sign-up details. Still deciding? Mark yourself tentative when there’s a sign-up list.</li>
+            <li><strong>Before you come:</strong> Check the date, time and venue. Still deciding? Add “tentative” to your notes when you sign up.</li>
             <li><strong>At regular gatherings:</strong> Order at least RM10 per person to support our hosts. Add your spend to the list after ordering, and pay at the counter.</li>
           </ul>
+          <p class="first-time-care">Everyone should feel welcome and respected. Read <a href="/#respect-at-table">Respect at the table</a>, or <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">raise a concern privately with an admin on WhatsApp</a>.</p>
         </div>
       </details>
 
@@ -92,11 +93,6 @@
         </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
-          <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-quick-details">
-            <span>{{ formatDate(event.date) }} · {{ event.time }}</span>
-            <span>{{ event.venue }}</span>
-            <UButton v-if="canEditEvent(event) && !newRows[event.id]" type="button" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }} <span aria-hidden="true">↓</span></UButton>
-          </div>
           <div class="event-description">
             <template v-if="isSpookyGameDay(event)">
               Celebrate Halloween with Pair of Dice × Saujana at Richeese Factory, the Curve. Join us for Blood on the Clocktower, 20+ board games, Riichi Mahjong and Halloween Bingo, plus a lucky draw and a costume contest with prizes. Come dressed in your Halloween best for an afternoon and evening of games and good company. Entry is free with a minimum RM20 food purchase at Richeese Factory.
@@ -116,7 +112,8 @@
           <div v-else-if="!isSpookyGameDay(event)" class="attendees-section">
             <div v-if="activeTab === 'present'" class="signup-intro">
               <h3>Sign up</h3>
-              <p>Use the name you’d like us to know you by. Still deciding? Add “tentative” in the notes.</p>
+              <p>Choose the name you’d like us to know you by. Your name and any arrival time, games, notes or spend you enter appear in the public list. Keep private requests for <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">WhatsApp</a>.</p>
+              <p class="signup-care">Need to raise a concern? Read <a href="/#respect-at-table">Respect at the table</a> or <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin privately on WhatsApp</a>.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
@@ -134,7 +131,7 @@
               >
                 <div class="signup-form-heading">
                   <h4 :id="`signup-title-${event.id}`">Your sign-up</h4>
-                  <p>Only your name is required. Regular gatherings have a RM10 minimum spend per person.</p>
+                  <p>Your name is the only required detail.</p>
                 </div>
                 <fieldset class="signup-fields" :disabled="savingRows[event.id]">
                   <legend class="signup-sr-only">Your details</legend>
@@ -156,7 +153,7 @@
                       </div>
                       <div class="signup-field signup-field-notes">
                         <label :for="`signup-notes-${event.id}`">Notes</label>
-                        <textarea :id="`signup-notes-${event.id}`" v-model="newRows[event.id].notes" name="notes" class="signup-input signup-area" placeholder="First visit, tentative, bringing a friend…" rows="2" />
+                        <textarea :id="`signup-notes-${event.id}`" v-model="newRows[event.id].notes" name="notes" class="signup-input signup-area" placeholder="Anything you’d like the host to know" rows="2" />
                       </div>
                     </div>
                   </details>
@@ -1071,7 +1068,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .gatherings-main > .loading-copy,
 .gatherings-main > .empty-state { order: 2; }
 .gatherings-main > .pagination { order: 3; }
-.gatherings-main > .first-time-panel { order: 4; }
+.gatherings-main > .first-time-panel { order: 0; }
 
 .first-time-panel h2 {
     margin: 0 0 8px;
@@ -1587,11 +1584,12 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .signup-intro p {
     margin: 0;
-    max-width: 620px;
+    max-width: none;
     font-size: 0.9rem;
     line-height: 1.75;
     opacity: 0.82;
 }
+.signup-intro .signup-care { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 
 .attendees-header {
     display: flex;
@@ -2098,6 +2096,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .first-time-details { margin: 18px 0 0; padding-left: 20px; color: var(--muted); font-size: .9rem; line-height: 1.8; }
 .first-time-details li + li { margin-top: 10px; }
 .first-time-details strong { color: var(--matcha-leaf); }
+.first-time-details-content a,
+.signup-intro a { color: var(--matcha-leaf); text-underline-offset: .18em; }
+.first-time-care { margin-top: 16px !important; padding-top: 14px; border-top: 1px solid var(--line); }
 .tabs { margin: 8px auto 28px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; box-shadow: none; background: var(--surface-soft); }
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
@@ -2211,6 +2212,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .first-time-panel .first-time-summary-title { font-style: normal; font-weight: 650; }
 .first-time-panel .first-time-summary-hint { color: var(--muted); }
 .gatherings-main > .tabs { margin-top: 2px; }
+.first-time-panel { width: min(100%, 960px); }
 @media (max-width: 600px) {
   .first-time-panel { padding: 15px 17px; margin-bottom: 12px; }
   .first-time-panel summary { gap: 3px 8px; }

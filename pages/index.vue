@@ -3,11 +3,11 @@
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
         <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
-        <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Come solo or bring a friend. We’ll help you learn as you play.</p>
+        <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Come solo or with a friend. New to a game? We’ll help you get started.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
-          <a class="text-link" href="#community-pillars">Explore what we play <span aria-hidden="true">↓</span></a>
-          <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="#first-visit">Plan your first visit <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="#community-pillars">See what we play <span aria-hidden="true">↓</span></a>
         </div>
       </div>
       <figure class="hero-artwork">
@@ -69,7 +69,7 @@
       <div class="first-visit-layout">
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">New to Saujana? Here’s how a first visit can go. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
+          <p class="section-intro">At your first gathering, find the host and say hello. <NuxtLink to="/gatherings" no-prefetch>Check dates, venues and sign-up details</NuxtLink>. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
         </div>
         <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
         <div class="expect-guide">
@@ -94,7 +94,7 @@
           <p>{{ value.content }}</p>
         </div>
       </div>
-      <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
+      <p id="respect-at-table" class="respect-note"><strong>Respect at the table.</strong> Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
     </section>
 
     <section class="social-note" aria-label="Follow Saujana on Instagram">

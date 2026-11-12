@@ -8,7 +8,7 @@
   >
     <div class="tutorial-shell">
       <header class="tutorial-header">
-        <h2 id="tutorial-title">Riichi mahjong calculator guide</h2>
+        <h2 id="tutorial-title">Calculator guide</h2>
         <UButton
           type="button"
           class="tutorial-close"

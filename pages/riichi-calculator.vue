@@ -1,7 +1,7 @@
 <template>
   <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1) }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
     <header class="page-intro calculator-heading">
-      <p class="page-eyebrow">A quick table-side guide</p>
+      <p class="page-eyebrow">Japanese mahjong scoring</p>
       <h1 class="hero-title">Riichi Calculator</h1>
       <p class="calculator-description">Check a Japanese mahjong hand or enter han and fu to calculate ron and tsumo payments.</p>
       <UButton ref="tutorialTrigger" type="button" class="tutorial-trigger" aria-haspopup="dialog" @click="openTutorial">

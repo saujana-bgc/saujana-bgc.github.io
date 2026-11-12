@@ -37,17 +37,17 @@
         <h2 id="welcome-title">Your first game</h2>
       </div>
       <ul class="welcome-steps">
-        <li><strong>Before you arrive</strong><span>Check the gathering’s date, time, venue and costs. Follow its sign-up details and mark yourself tentative if you’re still deciding.</span></li>
-        <li><strong>When you arrive</strong><span>Come solo or bring a friend. The host will help you find a seat and explain what you need as you play.</span></li>
+        <li><strong>Meet the Storyteller</strong><span>They guide the game, explain your role and answer questions as you play.</span></li>
+        <li><strong>Choose how to join</strong><span>Come solo or with a friend. You can watch a round before taking part.</span></li>
       </ul>
       <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
     </section>
 
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header class="archive-heading">
-        <p class="eyebrow">Gathering recaps</p>
-        <h2 id="archive-title">The story so far</h2>
-        <p v-if="recapSessions.length" class="metadata">Game results and retellings from our gatherings.</p>
+        <p class="eyebrow">Past games</p>
+        <h2 id="archive-title">Gathering recaps</h2>
+        <p v-if="recapSessions.length" class="metadata">Read what happened and see each game’s results.</p>
       </header>
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
         <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" v-model="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" /></label>

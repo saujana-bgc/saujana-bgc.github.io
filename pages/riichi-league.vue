@@ -315,7 +315,7 @@
         <header class="rules-dialog-header">
           <div>
             <p class="section-kicker">Saujana Riichi League</p>
-            <h2 id="rules-dialog-title">Table rules</h2>
+            <h2 id="rules-dialog-title">League rules</h2>
             <p>
               We want everyone to feel comfortable playing and learning. These are the Japanese riichi
               mahjong rules and table settings used in our league.
