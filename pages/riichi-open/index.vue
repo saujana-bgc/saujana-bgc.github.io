@@ -1,6 +1,6 @@
 <template>
   <main class="event-page">
-    <header class="page-intro">
+    <header class="page-intro event-page-intro">
       <p class="page-eyebrow">14 November · Ara Damansara</p>
       <h1 class="hero-title">Riichi Open I</h1>
     </header>
@@ -13,7 +13,7 @@
         <p class="hero-intro">Two East–South qualifying rounds, then a final for the top four eligible players. A friendly day of serious mahjong.</p>
         <div class="event-facts"><span>Saturday, 14 November 2026</span><span>Starts at 2:30 pm</span><span>Boardroom Bandit, Ara Damansara</span></div>
         <div class="event-offer"><strong>RM10</strong><span>entry fee</span><i aria-hidden="true"></i><span>A prize for the winner</span></div>
-        <div class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton><UButton class="hero-guide" color="neutral" variant="outline" @click="openGuide">Tournament rules</UButton></div>
+        <div class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue my registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton><UButton class="hero-guide" type="button" @click="openGuide">Tournament rules</UButton></div>
         <p class="hero-reassurance">16 places · No account needed · Receipt verified by the organiser</p>
       </div>
       <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster.png" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="1122" height="1402"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
@@ -65,7 +65,7 @@
       <ul v-else class="registrant-list"><li v-for="player in registrations" :key="player.id"><strong>{{ player.display_name }}</strong><span :class="player.status==='verified'?'verified-badge':'pending-badge'">{{ player.status==='verified'?'Verified':'Awaiting verification' }}</span></li></ul>
     </section>
 
-    <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The top four eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><UButton ref="guideTrigger" type="button" class="guide-trigger" @click="openGuide">Read the tournament rules <span aria-hidden="true">↗</span></UButton></section>
+    <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The top four eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><UButton ref="guideTrigger" type="button" class="guide-trigger hero-guide" @click="openGuide">Tournament rules <span aria-hidden="true">↗</span></UButton></section>
 
     <section class="event-schedule" aria-labelledby="schedule-heading">
       <div class="schedule-intro"><p class="eyebrow">Saturday, 14 November</p><h2 id="schedule-heading">Tournament schedule</h2><p>Each qualifying round has a 75-minute limit to help the tournament finish at a reasonable time.</p></div>
@@ -692,6 +692,43 @@ async function cancelHold() {
 .event-status-bar .status-retry { min-height: 36px; margin-left: auto; }
 .restore-state h3{margin:0 0 8px;color:var(--matcha-leaf);font:1.4rem var(--font-display)}.restore-state>p{line-height:1.6;color:var(--muted)}.restore-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.confirmation-contact{display:inline-block;margin-top:12px;color:var(--matcha-leaf);font-size:.85rem;font-weight:650;text-underline-offset:3px}
 .event-page .page-intro { padding-inline: 0; }
+.event-page-intro { padding-bottom: 16px; }
+.event-page .riichi-tabs { margin-bottom: 12px; }
+.event-page .event-status-bar { margin-bottom: 14px; }
+.event-page .hero-actions .event-button,
+.event-page .hero-guide {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 48px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.event-page .hero-actions .event-button { width: max-content; min-width: 190px; }
+.event-page .hero-guide {
+  width: auto;
+  padding: 11px 16px;
+  border: 1px solid var(--line);
+  background: var(--white-pure);
+  color: var(--matcha-leaf);
+  font: 600 .88rem var(--font-body);
+  cursor: pointer;
+}
+.event-page .hero-guide:hover { background: var(--surface-soft); }
+.event-page .hero-guide:focus-visible { outline: 3px solid var(--gold-leaf); outline-offset: 3px; }
+.event-page .guide-trigger span { color: var(--matcha-leaf); }
+@media (max-width: 760px) {
+  .event-page-intro { padding-bottom: 12px; }
+  .event-page .riichi-tabs { margin-bottom: 10px; }
+  .event-page .hero-actions { gap: 12px; }
+}
+@media (max-width: 440px) {
+  .event-page .hero-actions { align-items: stretch; }
+  .event-page .hero-actions .event-button,
+  .event-page .hero-actions .hero-guide { width: 100%; }
+  .event-page .hero-actions .event-button { min-width: 0; }
+}
 .event-hero h2 {
   margin: 0;
   color: var(--matcha-leaf);
