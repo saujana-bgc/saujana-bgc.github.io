@@ -3,13 +3,13 @@
     <header class="page-intro event-page-intro">
       <p class="page-eyebrow">14 November · Ara Damansara</p>
       <h1 class="hero-title">Riichi Open I</h1>
-      <div class="event-page-shortcuts">
-        <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
-        <UButton ref="guideTrigger" type="button" class="schedule-jump" @click="openGuide">Tournament rules</UButton>
-      </div>
     </header>
     <RiichiOpenTabs v-model="activeTab" />
     <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><UButton v-if="standingsError" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>
+    <div class="event-page-shortcuts">
+      <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
+      <UButton ref="guideTrigger" type="button" class="schedule-jump" @click="openGuide">Tournament rules</UButton>
+    </div>
     <section v-show="activeTab === 'registration'" id="riichi-registration-panel" role="tabpanel" aria-labelledby="riichi-registration-tab">
     <section class="event-hero">
       <div class="hero-copy">
@@ -37,9 +37,8 @@
         <p v-if="restoreFailed && error" class="form-error" role="alert">{{ error }}</p>
         <div class="restore-actions"><UButton v-if="!savedHoldCanDiscard" type="button" class="event-button" :disabled="busy || restorePending" @click="restoreSavedHold">{{ restorePending ? 'Restoring…' : 'Try restoring place' }}</UButton><UButton v-if="restoreFailed && savedHoldCanRelease" type="button" class="inline-button" :disabled="busy" @click="releaseSavedHold">Release saved place</UButton><UButton v-if="restoreFailed && savedHoldCanDiscard" type="button" class="inline-button" :disabled="busy" @click="clearSavedHoldDetails">Clear saved details</UButton></div>
       </div>
-      <div v-else-if="!hold" class="signup-step">
-        <p v-if="!publicLoaded" role="status">{{ refreshing ? 'Checking available places…' : 'Availability could not be loaded.' }} <UButton v-if="!refreshing" class="inline-button" @click="loadPublic">Try again</UButton></p>
-        <div v-else-if="!canRegister" class="registration-closed"><h3>{{ event?.stage !== 'registration' ? 'Registration has ended.' : availablePlaces === 0 ? 'All places are currently reserved.' : 'Registration is closed.' }}</h3><p>{{ event?.stage !== 'registration' ? 'The playing roster is set. Follow table assignments and certified scores in Standings.' : 'Please check back for availability before sending a payment.' }}</p><UButton class="inline-button" @click="activeTab = 'standings'">View standings →</UButton></div>
+      <div v-else-if="!hold && publicLoaded" class="signup-step">
+        <div v-if="!canRegister" class="registration-closed"><h3>{{ event?.stage !== 'registration' ? 'Registration has ended.' : availablePlaces === 0 ? 'All places are currently reserved.' : 'Registration is closed.' }}</h3><p>{{ event?.stage !== 'registration' ? 'The playing roster is set. Follow table assignments and certified scores in Standings.' : 'Please check back for availability before sending a payment.' }}</p><UButton class="inline-button" @click="activeTab = 'standings'">View standings →</UButton></div>
         <p v-else-if="registrationStorageUnavailable" class="form-error" role="alert">This browser can’t access your saved registration details. Enable site storage or use another browser before reserving a place.</p>
         <form v-else @submit.prevent="reservePlace">
           <label for="display-name">Name for the public participant list</label>
@@ -49,7 +48,7 @@
           <p class="small-print">A reservation holds one place for {{ holdDuration }} minutes. No participant account is needed.</p>
         </form>
       </div>
-      <div v-else ref="paymentPanel" class="payment-step" tabindex="-1">
+      <div v-else-if="hold" ref="paymentPanel" class="payment-step" tabindex="-1">
         <div class="hold-note"><div><strong>{{ holdExpired ? 'Your place reservation has expired.' : `${holdCountdown} left to complete registration` }}</strong><small>{{ holdExpired ? 'Already paid? Submit your receipt for organiser review. Your place will need to be checked.' : `Held for ${hold.name} until ${holdExpiry}. Already paid? Upload your receipt before leaving.` }}</small></div><UButton type="button" class="inline-button" :disabled="busy" @click="cancelHold">Release place</UButton></div>
         <div v-if="holdExpired || !event?.registration_open || event?.stage !== 'registration'" class="payment-instructions registration-closed"><h3>Payment window closed</h3><p>This place is no longer held. If you’ve already paid, upload your receipt for organiser review. A place is not confirmed.</p></div>
         <div v-else class="payment-instructions"><h3>{{ hold.restarted_from_registration_id ? 'Submit your receipt' : 'Pay RM10' }}</h3><p v-if="hold.restarted_from_registration_id">If your entry fee was refunded, contact the organiser before paying again. Otherwise, upload your original receipt so the organiser can review the payment.</p><template v-else><p>Send your entry fee by Touch ’n Go or DuitNow to:</p><a href="tel:+60162459482">+60 16-245 9482</a><p>Recipient name: <strong>NICHOLAS</strong></p><UButton type="button" class="copy-button" @click="copyNumber">{{ copied ? 'Number copied' : 'Copy number' }}</UButton></template></div>
@@ -63,9 +62,8 @@
       </div>
     </section>
 
-    <section class="registrant-section"><div><p class="eyebrow">The field</p><h2>Registration list</h2><p>Payment status appears beside each name.</p></div><div class="registrant-counts"><span><strong>{{ verifiedCount }}</strong> verified</span><span><strong>{{ pendingCount }}</strong> awaiting verification</span></div>
-      <p v-if="!publicLoaded" class="empty-list">{{ standingsError ? 'The registration list is temporarily unavailable. Please try refreshing.' : 'Loading registered players…' }}</p>
-      <p v-else-if="!registrations.length" class="empty-list">No registrations yet.</p>
+    <section v-if="publicLoaded" class="registrant-section"><div><p class="eyebrow">The field</p><h2>Registration list</h2><p>Payment status appears beside each name.</p></div><div class="registrant-counts"><span><strong>{{ verifiedCount }}</strong> verified</span><span><strong>{{ pendingCount }}</strong> awaiting verification</span></div>
+      <p v-if="!registrations.length" class="empty-list">No registrations yet.</p>
       <ul v-else class="registrant-list"><li v-for="player in registrations" :key="player.id"><strong>{{ player.display_name }}</strong><span :class="player.status==='verified'?'verified-badge':'pending-badge'">{{ player.status==='verified'?'Verified':'Awaiting verification' }}</span></li></ul>
     </section>
 

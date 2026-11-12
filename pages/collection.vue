@@ -17,9 +17,7 @@
         />
         <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found<span v-if="isPending"> · Loading play history…</span></p>
         <p class="collection-updated">Shelf updated {{ lastTended }}</p>
-        <p class="collection-invitation">Pick an unplayed game and find a gathering to try it with us.</p>
         <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
-        <NuxtLink class="collection-gathering-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
       <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
@@ -583,7 +581,6 @@ watch([search, currentSort, selectedCategories], () => {
 
 /* Boutique surfaces and readable controls. */
 .collection-updated { margin: 10px 0 0; font-size: .72rem; color: var(--muted); }
-.collection-invitation { margin: 5px 0 0; color: var(--clay-text); font-size: .86rem; }
 
 .collection-invite { max-width: 760px; padding: 0; background: none; border: 0; box-shadow: none; margin-bottom: 24px; }
 .collection-invite h2 { font-style: normal; }
@@ -616,13 +613,10 @@ watch([search, currentSort, selectedCategories], () => {
 main:has(.collection-search) { gap: 10px; }
 main:has(.collection-search) > .collection-search { margin-bottom: 0; }
 main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; }
-.collection-gathering-link { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; gap: 6px; color: var(--matcha-leaf); font-size: .82rem; font-weight: 650; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; white-space: nowrap; }
-.collection-gathering-link:hover { text-decoration-color: var(--matcha-leaf); }
 .collection-updated { margin-top: 6px; }
 .collection-sort-options .surprise { line-height: 1.25; }
 @media (max-width: 480px) {
   .collection-search { align-items: center; }
-  .collection-gathering-link { margin-left: auto; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-sort-options .surprise { grid-column: 1 / -1; }

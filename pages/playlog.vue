@@ -751,7 +751,7 @@ main > .stats-panel { order: 4; margin-top: 24px; }
 main > .session-card:not(.stats-panel) { order: 2; }
 main > .loading-state { order: 2; }
 main > .pagination { order: 3; }
-.clocktower-link { margin: 14px auto 0; width: fit-content; max-width: 100%; }
+.clocktower-link { order: 5; margin: 14px auto 0; width: fit-content; max-width: 100%; }
 .clocktower-link a { display: inline-flex; align-items: center; min-height: 42px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .82rem; line-height: 1.4; text-decoration: none; }
 .clocktower-link a:hover { background: var(--white-pure); border-color: var(--matcha-leaf); }
 @media (max-width: 767px) {

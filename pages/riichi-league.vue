@@ -4,8 +4,6 @@
       <p class="page-eyebrow">One more hand?</p>
       <h1 class="hero-title">Riichi League</h1>
       <p class="league-intro">Follow the standings, revisit a week, or add your latest result.</p>
-      <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings" no-prefetch>Come to a gathering</NuxtLink> to watch a hand and meet the players. Ask around for Saujana BGC and let us know you’re new to riichi.</p>
-
       <div class="season-switcher">
         <label class="league-field-label" for="season-select">Season</label>
         <USelect class="league-control w-full" id="season-select" v-model="selectedSeasonId" :items="seasons.map(item => ({ label: `Season ${item.number}`, value: item.id }))" :disabled="isLoadingLeague || !seasons.length || isSubmittingScore" />
@@ -109,6 +107,8 @@
         {{ showAllStandings ? 'Show top 10' : `Show all ${filteredStandings.length} players` }}
       </UButton>
     </section>
+
+    <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings" no-prefetch>Come to a gathering</NuxtLink> to watch a hand and meet the players. Ask around for Saujana BGC and let us know you’re new to riichi.</p>
 
     <section class="content-card weeks-card fade-up" aria-labelledby="weeks-heading">
       <div class="section-heading">

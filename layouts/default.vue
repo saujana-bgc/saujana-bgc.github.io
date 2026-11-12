@@ -30,7 +30,7 @@
           </template>
         </USlideover>
       </div>
-      <UNavigationMenu class="desktop-navigation" :items="navigation" orientation="horizontal" :ui="desktopNavigationUi" />
+      <UNavigationMenu as="div" class="desktop-navigation" :items="navigation" orientation="horizontal" :ui="desktopNavigationUi" />
     </nav>
 
     <div id="page-content" class="page-content" tabindex="-1">
