@@ -65,8 +65,8 @@
 
       <form class="calculator-form" aria-label="Riichi hand details" @input="hasInteracted = true" @click="hasInteracted = true" @submit.prevent>
         <div class="entry-mode" role="group" aria-label="Scoring entry method">
-          <UButton type="button" :class="{ selected: entryMode === 'tiles' }" :aria-pressed="entryMode === 'tiles'" @click="setEntryMode('tiles')"><strong>Enter your tiles</strong><small>Tile entry · finds yaku and fu</small></UButton>
-          <UButton type="button" :class="{ selected: entryMode === 'hanfu' }" :aria-pressed="entryMode === 'hanfu'" @click="setEntryMode('hanfu')"><strong>Enter han and fu</strong><small>Quick · for a known score</small></UButton>
+          <UButton type="button" :class="{ selected: entryMode === 'tiles' }" :aria-pressed="entryMode === 'tiles'" @click="setEntryMode('tiles')"><strong>Tiles</strong><small>Find yaku and fu from your hand</small></UButton>
+          <UButton type="button" :class="{ selected: entryMode === 'hanfu' }" :aria-pressed="entryMode === 'hanfu'" @click="setEntryMode('hanfu')"><strong>Han and fu</strong><small>Enter a known score</small></UButton>
         </div>
         <div class="player-count-row" role="group" aria-label="Players at the table">
           <span class="field-label">Players</span>

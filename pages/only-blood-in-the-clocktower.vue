@@ -34,7 +34,6 @@
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
       <div class="welcome-heading">
-        <p class="eyebrow">New to the game?</p>
         <h2 id="welcome-title">Your first game</h2>
       </div>
       <ul class="welcome-steps">

@@ -2401,10 +2401,6 @@ onBeforeUnmount(() => {
   .league-hero .hero-title { max-width: 12ch; margin-inline: auto; line-height: 1.08; }
   .league-intro { max-width: 34rem; margin-inline: auto; }
   .league-hero .league-welcome { margin-block: 10px; }
-  .season-card { order: 1; }
-  .standings-card { order: 2; }
-  .weeks-card { order: 3; }
-  .rules-card { order: 4; }
   .season-switcher { justify-content: center; }
   .season-switcher .league-control { min-width: 150px; }
   .league-shortcuts { gap: 8px; }

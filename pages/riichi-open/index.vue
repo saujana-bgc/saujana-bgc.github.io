@@ -17,13 +17,13 @@
         <p class="hero-intro">Two East–South qualifying rounds, then a final for the top four eligible players. A friendly day of serious mahjong.</p>
         <div class="event-facts"><span>Saturday, 14 November 2026</span><span>Starts at 2:30 pm</span><span>Boardroom Bandit, Ara Damansara</span></div>
         <div class="event-offer"><strong>RM10</strong><span>entry fee</span><i aria-hidden="true"></i><span>A prize for the winner</span></div>
-        <div class="hero-actions"><UButton class="event-button" :disabled="!publicLoaded && !hold && !complete" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue your registration' : publicLoaded && !canRegister ? 'View standings' : publicLoaded ? 'Save my place' : 'Checking availability…' }} <span aria-hidden="true">→</span></UButton></div>
+        <div v-if="publicLoaded || hold || complete" class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue your registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton></div>
         <p class="hero-reassurance">16 places · No account needed · Receipt verified by the organiser</p>
       </div>
       <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster.png" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="1122" height="1402"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
     </section>
 
-    <section id="registration" ref="registrationPanel" class="registration-panel" aria-labelledby="register-heading" tabindex="-1">
+    <section v-if="publicLoaded || hold || complete || restorePending || restoreFailed" id="registration" ref="registrationPanel" class="registration-panel" aria-labelledby="register-heading" tabindex="-1">
       <div class="register-heading"><p class="eyebrow">16 places · four-player tables</p><h2 id="register-heading">{{ complete ? 'Your registration' : hold ? 'Continue your registration' : publicLoaded && !canRegister ? 'Registration is closed' : publicLoaded ? 'Save your place' : 'Checking availability' }}</h2><p v-if="complete">Review your registration status and reference below.</p><p v-else-if="hold">Upload your RM10 receipt before your reservation expires.</p><p v-else-if="publicLoaded && !canRegister">{{ event?.stage !== 'registration' ? 'Follow table assignments and results in Standings.' : 'Check Standings for event updates.' }}</p><p v-else>Reserve a place, then upload your RM10 receipt. Your name appears in the public list while payment is being checked.</p></div>
       <div class="availability" v-if="event"><strong>{{ availablePlaces }}</strong><span>places left</span><div class="capacity-track"><i :style="{ width: `${usedPercent}%` }"></i></div><small>{{ registrations.length }} registered<span v-if="activeHolds"> · {{ activeHolds }} temporarily held during payment</span><span v-else> · no places currently held during payment</span></small></div>
       <ol v-if="hold || complete || publicLoaded && canRegister" class="signup-progress" aria-label="Registration progress"><li :class="{ current: !hold && !complete, done: hold || complete }" :aria-current="!hold && !complete ? 'step' : undefined"><span>{{ hold || complete ? '✓' : '1' }}</span>Your name</li><li :class="{ current: hold && !complete, done: complete }" :aria-current="hold && !complete ? 'step' : undefined"><span>{{ complete ? '✓' : '2' }}</span>Pay and upload</li><li :class="{ current: complete }" :aria-current="complete ? 'step' : undefined"><span>3</span>Organiser review</li></ol>
@@ -332,7 +332,6 @@ async function loadPublic() {
     if (notice.value.startsWith('Live registration')) notice.value = ''
     await refreshOwnRegistration()
   } catch (cause) {
-    notice.value = 'Live registration details are temporarily unavailable. Please refresh in a moment.'
     standingsError.value = cause.message || 'Please refresh in a moment.'
   } finally { refreshing.value = false }
 }

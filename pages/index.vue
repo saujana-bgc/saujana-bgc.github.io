@@ -22,11 +22,11 @@
       </figure>
     </section>
 
-    <section class="next-gathering" aria-labelledby="next-gathering-title" aria-live="polite">
+    <section v-if="nextGathering" class="next-gathering" aria-labelledby="next-gathering-title" aria-live="polite">
       <div>
         <p class="next-gathering-label">Something to look forward to</p>
-        <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering ? nextGathering.name : 'Find your next gathering' }}</h2>
-        <div v-if="nextGathering" class="next-gathering-details">
+        <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
+        <div class="next-gathering-details">
           <span class="gathering-detail">
             <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg>
             {{ formatGatheringDate(nextGathering.date) }}
@@ -41,10 +41,9 @@
           </span>
           <a v-if="nextGathering.venue_url" class="gathering-detail gathering-directions" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
-        <p v-else class="next-gathering-details">See upcoming dates, venues and sign-up details.</p>
       </div>
-      <NuxtLink class="next-gathering-link" :to="nextGathering ? `/gatherings#gathering-${nextGathering.id}` : '/gatherings'" no-prefetch>
-        {{ nextGathering ? 'See gathering details' : 'See upcoming gatherings' }} <span aria-hidden="true">→</span>
+      <NuxtLink class="next-gathering-link" :to="`/gatherings#gathering-${nextGathering.id}`" no-prefetch>
+        See gathering details <span aria-hidden="true">→</span>
       </NuxtLink>
     </section>
 

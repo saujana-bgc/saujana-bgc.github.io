@@ -38,7 +38,7 @@
     </div>
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
-      <p class="footer-signature">Come Away with Saujana</p>
+      <p class="footer-signature">Come Play with Saujana</p>
       <nav class="footer-pillars" aria-label="Explore Saujana">
         <NuxtLink to="/gatherings" no-prefetch>Gatherings</NuxtLink>
         <NuxtLink to="/collection" no-prefetch>Collection</NuxtLink>

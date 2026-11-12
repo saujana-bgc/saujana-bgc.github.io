@@ -17,7 +17,7 @@
         </UButton>
       </div>
 
-      <details class="first-time-panel fade-up">
+      <details v-if="activeTab === 'present'" class="first-time-panel fade-up">
         <summary>
           <span class="first-time-summary-title">Your first visit, made easy</span>
           <span class="first-time-summary-hint">No game experience needed. You can watch a round or join in.</span>

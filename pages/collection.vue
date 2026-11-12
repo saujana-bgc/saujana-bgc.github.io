@@ -20,15 +20,18 @@
         <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
       </div>
 
-      <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
+      <div class="sort-controls fade-up">
         <div class="collection-sort-options" aria-label="Sort games">
           <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="currentSort = 'name'">A to Z</UButton>
           <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="currentSort = 'played'">Recently played</UButton>
           <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="generateSurprise">Pick a game with no plays logged</UButton>
         </div>
-        <div class="collection-category-options" aria-label="Filter by category">
-          <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
-        </div>
+        <details class="collection-categories">
+          <summary>Categories<span v-if="selectedCategories.length" class="category-selection"> · {{ selectedCategories[0] === 'Card Game' ? 'Card games' : selectedCategories[0] === 'Party Game' ? 'Party games' : selectedCategories[0] }}</span></summary>
+          <div class="collection-category-options" role="group" aria-label="Filter by category">
+            <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
+          </div>
+        </details>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
@@ -590,6 +593,11 @@ watch([search, currentSort, selectedCategories], () => {
 .sort-controls { display: flex; flex-direction: column; max-width: 720px; gap: 10px; margin-bottom: 8px; }
 .collection-sort-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .collection-category-options { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 0 8px; }
+.collection-categories { border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
+.collection-categories summary { display: flex; align-items: center; min-height: 44px; padding: 9px 12px; color: var(--matcha-leaf); font-size: .82rem; font-weight: 600; cursor: pointer; }
+.collection-categories summary::marker { color: var(--gold-leaf); }
+.category-selection { color: var(--muted); font-weight: 400; }
+.collection-categories[open] .collection-category-options { padding: 2px 10px 10px; }
 .sort-btn { padding: 10px 12px; min-height: 44px; border-radius: 6px; text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
 .category-btn { flex: 0 0 auto; }
 .sort-btn:hover { transform: none; box-shadow: none; }
