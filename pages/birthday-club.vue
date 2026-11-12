@@ -79,6 +79,10 @@
             </div>
           </fieldset>
 
+          <p class="privacy-note">
+            Just your chosen name, month, and day. We don’t need your birth year. Organisers keep your birthday and greeting preference in a private calendar.
+          </p>
+
           <label class="consent-row" for="public-greeting">
             <input id="public-greeting" v-model="allowPublicGreeting" type="checkbox" name="public_greeting">
             <span class="check-box" aria-hidden="true"></span>
@@ -87,10 +91,6 @@
               <small>Saujana may greet you on community channels. Leave this unchecked if you’d rather not have a public greeting.</small>
             </span>
           </label>
-
-          <p class="privacy-note">
-            Just your chosen name, month, and day. We don’t need your birth year. Organisers keep your birthday and greeting preference in a private calendar.
-          </p>
 
           <p v-if="submitError" class="submit-error" role="alert">{{ submitError }}</p>
 

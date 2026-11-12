@@ -35,7 +35,7 @@
       <p class="footer-signature">Good games. Good company. See you soon.</p>
       <nav class="footer-pillars" aria-label="Community pillars">
         <NuxtLink v-for="pillar in communityPillars" :key="pillar.id" :to="pillar.links[0].to" no-prefetch>
-          {{ pillar.label }}
+          {{ pillar.id === 'riichi' ? 'Riichi League' : pillar.label }}
         </NuxtLink>
       </nav>
       <span class="footer-copyright">&copy; {{ year }} Saujana Board Game Community</span>

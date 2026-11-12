@@ -40,6 +40,7 @@
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>
             {{ nextGathering.venue }}
           </span>
+          <a v-if="nextGathering.venue_url" class="gathering-detail gathering-directions" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
         <p v-else class="next-gathering-details">See upcoming dates, venues and sign-up details.</p>
       </div>
@@ -113,7 +114,7 @@ const nextGathering = ref(null)
 onMounted(async () => {
   const { data, error } = await useSupabase()
     .from('events')
-    .select('id,name,date,time,venue')
+    .select('id,name,date,time,venue,venue_url')
     .gte('date', new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Kuala_Lumpur',
       year: 'numeric',
@@ -129,9 +130,10 @@ onMounted(async () => {
 function formatGatheringDate(dateValue) {
   const [year, month, day] = dateValue.split('-').map(Number)
   return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
-    weekday: 'short',
+    weekday: 'long',
     day: 'numeric',
-    month: 'short',
+    month: 'long',
+    year: 'numeric',
   })
 }
 

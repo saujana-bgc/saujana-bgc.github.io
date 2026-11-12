@@ -113,7 +113,6 @@
             <div v-if="activeTab === 'present'" class="signup-intro">
               <h3>Sign up</h3>
               <p>Choose the name you’d like us to know you by. Your name and any arrival time, games, notes or spend you enter appear in the public list. Keep private requests for <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">WhatsApp</a>.</p>
-              <p class="signup-care">Need to raise a concern? Read <a href="/#respect-at-table">Respect at the table</a> or <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin privately on WhatsApp</a>.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
@@ -554,7 +553,7 @@ function nextPage() {
 function formatDate(dateStr) {
     const [year, month, day] = dateStr.split('-')
     const date = new Date(year, month - 1, day)
-    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 function getVenueImage(venue) {

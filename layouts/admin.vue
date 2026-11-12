@@ -21,9 +21,9 @@
           :to="item.to"
           :class="{ active: isCurrentPage(item.to) }"
           :aria-current="isCurrentPage(item.to) ? 'page' : undefined"
-          :aria-label="item.id === 'botc-archive' ? item.title : undefined"
+          :aria-label="item.id === 'botc-archive' ? 'Only Blood in the Clocktower organiser' : undefined"
         >
-          {{ item.id === 'botc-archive' ? 'Clocktower' : item.title }}
+          {{ item.id === 'botc-archive' ? 'Clocktower organiser' : item.title }}
         </NuxtLink>
       </nav>
       <div class="admin-page"><slot /></div>

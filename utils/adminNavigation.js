@@ -11,7 +11,7 @@ export const adminDashboardGroups = [
     title: 'Community',
     links: [
       { title: 'Birthday Club calendar', description: 'Check birthdays and greeting preferences.', to: '/admin/birthday-club' },
-      { title: 'Only Blood in the Clocktower', description: 'Log games and publish gathering recaps.', to: '/admin/only-blood-in-the-clocktower' },
+      { title: 'Clocktower organiser', description: 'Log games and publish gathering recaps.', to: '/admin/only-blood-in-the-clocktower' },
     ],
   },
   {

@@ -16,7 +16,8 @@
         <div class="next-copy">
           <p class="eyebrow">The next gathering</p>
           <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
-          <p v-if="nextGathering?.time || nextGathering?.venue"><template v-if="nextGathering?.time">{{ nextGathering.time }}</template><template v-if="nextGathering?.time && nextGathering?.venue"> · </template><template v-if="nextGathering?.venue">{{ nextGathering.venue }}</template></p>
+          <p v-if="nextGathering?.time">{{ nextGathering.time }}</p>
+          <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions ↗</a></p>
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
           <p v-else-if="eventError">We couldn’t load the schedule just now.</p>
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
@@ -177,6 +178,7 @@ const nextGathering = computed(() => {
       date: event.date,
       time: event.time || session.session_time,
       venue: event.venue || session.venue,
+      venue_url: event.venue_url,
       first_timer_note: session.first_timer_note,
       signup_url: session.signup_url,
       href: `/gatherings/#gathering-${event.id}`,
@@ -221,7 +223,7 @@ const statistics = computed(() => ({
 
 function formatDate(value) {
   return value
-    ? new Date(value + 'T12:00:00').toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(value + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     : 'Date to be announced'
 }
 
@@ -318,7 +320,7 @@ async function loadCommunityEvents() {
   try {
     const { data, error: loadError } = await useSupabase()
       .from('events')
-      .select('id,name,date,time,venue')
+      .select('id,name,date,time,venue,venue_url')
       .gte('date', localDate)
       .order('date', { ascending: true })
     if (loadError) throw loadError

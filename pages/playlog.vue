@@ -746,12 +746,12 @@ onUnmounted(() => {
 .pagination { flex-wrap: wrap; justify-content: center; max-width: 92%; }
 @media (max-width: 767px) { .stat-tile:nth-child(3) { grid-column: 1 / -1; } }
 
-/* Let visitors browse the sessions before the deeper community statistics. */
+/* Keep visual section order aligned with keyboard reading order. */
 .search-wrap { order: 1; margin-bottom: 12px; }
-main > .session-card:not(.stats-panel) { order: 2; }
-main > .loading-state { order: 2; }
-main > .pagination { order: 3; }
-main > .stats-panel { order: 4; margin-top: 24px; }
+main > .stats-panel { order: 2; margin-top: 12px; }
+main > .session-card:not(.stats-panel) { order: 3; }
+main > .loading-state { order: 3; }
+main > .pagination { order: 4; }
 .clocktower-link { margin: 14px auto 0; width: fit-content; max-width: 100%; }
 .clocktower-link a { display: inline-flex; align-items: center; min-height: 42px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .82rem; line-height: 1.4; text-decoration: none; }
 .clocktower-link a:hover { background: var(--white-pure); border-color: var(--matcha-leaf); }
