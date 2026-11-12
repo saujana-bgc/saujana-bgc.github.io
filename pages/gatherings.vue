@@ -14,7 +14,7 @@
           <span class="first-time-summary-hint">No game experience needed. You can watch a round or join in.</span>
         </summary>
         <div class="first-time-details-content">
-          <p>Use Directions on the gathering card to reach the venue. Once there, ask for the Saujana host; they can help you choose a game and explain as you play. If you can’t find the group or need an expected finish time to plan your journey home, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">ask the admin a question on WhatsApp</a>.</p>
+          <p>Use Directions on the gathering card to reach the venue. Once there, ask around for Saujana BGC and we’ll help you choose a game and explain as you play. If you can’t find us or need an expected finish time to plan your journey home, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message Saujana on WhatsApp</a>.</p>
           <ul class="first-time-details">
             <li><strong>Before you come:</strong> Check the date, time and venue. Still deciding? Add “tentative” to your notes when you sign up.</li>
             <li><strong>At regular gatherings:</strong> Order at least RM10 per person to support our hosts. Add your spend to the list after ordering, and pay at the counter.</li>
@@ -117,7 +117,10 @@
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
-              <p v-if="signupSuccess[event.id]" class="signup-success" role="status">{{ signupSuccess[event.id] }}</p>
+              <div v-if="signupSuccess[event.id]" class="signup-success" role="status">
+                <p>{{ signupSuccess[event.id] }} When you arrive, ask around for Saujana BGC.</p>
+                <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
+              </div>
               <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
                 <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
               </div>
@@ -950,7 +953,7 @@ async function saveNewRow(eventId) {
         // Remembering a name is optional; blocked storage must not hide a successful signup.
         try { localStorage.setItem('saujana_name', data.name) } catch {}
         mergeAttendeeNameOptions([data.name])
-        signupSuccess[eventId] = `You’re on the sign-up list, ${data.name}. On the day, say hello to the Saujana host and we’ll help you find a table.`
+        signupSuccess[eventId] = `You’re on the sign-up list, ${data.name}.`
         delete newRows[eventId]
         focusSignupTrigger(eventId)
     } catch {

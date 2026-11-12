@@ -70,7 +70,7 @@
       <div class="first-visit-layout">
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">At your first gathering, find the host and say hello. <NuxtLink to="/gatherings" no-prefetch>Check dates, venues and sign-up details</NuxtLink>. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
+          <p class="section-intro">When you arrive, ask around for Saujana BGC. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>Check dates, venues and sign-up details</NuxtLink>.</p>
         </div>
         <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
         <div class="expect-guide">
@@ -159,7 +159,7 @@ const expectations = [
   {
     title: 'Say hello',
     icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
-    copy: 'Find the host, mention it’s your first visit, and take a moment to settle in.'
+    copy: 'Ask around for Saujana BGC and let us know it’s your first visit. Take a moment to settle in.'
   },
   {
     title: 'Find your game',
