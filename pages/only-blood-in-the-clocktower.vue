@@ -23,7 +23,7 @@
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
           <UButton v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</UButton>
         </div>
-        <a v-if="nextGathering" class="calendar-link" :href="nextCtaHref">{{ nextGathering.signup_url ? 'See details and sign up' : 'See gathering details' }} <span aria-hidden="true">↗</span></a>
+        <a v-if="nextGathering" class="calendar-link" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
         <a v-else-if="!eventLoading" class="calendar-link" href="/gatherings/">See all gatherings <span aria-hidden="true">↗</span></a>
       </section>
       <nav class="hero-actions" aria-label="Clocktower page links">
@@ -200,6 +200,10 @@ const nextGathering = computed(() => {
   return null
 })
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
+const nextCtaLabel = computed(() => {
+  if (nextGathering.value?.signup_url) return 'See details and sign up'
+  return nextGathering.value?.href?.endsWith('/') ? 'See all gatherings' : 'See gathering details'
+})
 const featured = computed(() => [...recapSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
 const nextDateStamp = computed(() => {
   if (!nextGathering.value) return null

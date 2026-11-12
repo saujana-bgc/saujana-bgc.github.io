@@ -151,8 +151,8 @@
                         <textarea :id="`signup-games-${event.id}`" v-model="newRows[event.id].bringing_games" name="bringing_games" class="signup-input signup-area" placeholder="Any games you’d like to share" rows="2" />
                       </div>
                       <div class="signup-field signup-field-notes">
-                        <label :for="`signup-notes-${event.id}`">Notes</label>
-                        <textarea :id="`signup-notes-${event.id}`" v-model="newRows[event.id].notes" name="notes" class="signup-input signup-area" placeholder="Anything you’d like the host to know" rows="2" />
+                        <label :for="`signup-notes-${event.id}`">Public notes</label>
+                        <textarea :id="`signup-notes-${event.id}`" v-model="newRows[event.id].notes" name="notes" class="signup-input signup-area" placeholder="Anything attendees should know" rows="2" />
                       </div>
                     </div>
                   </details>
