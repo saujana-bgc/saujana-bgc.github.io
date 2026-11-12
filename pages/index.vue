@@ -64,6 +64,7 @@
           </ul>
         </article>
       </div>
+      <p class="first-gathering-reassurance">Coming on your own? Ask around for Saujana BGC and tell us it’s your first time. We’ll help you find a table. <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Can’t find us? Message Saujana on WhatsApp</a>.</p>
     </section>
 
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
@@ -437,6 +438,15 @@ const expectations = [
 }
 
 .community-card .text-link span { flex-shrink: 0; }
+.first-gathering-reassurance {
+  max-width: 72ch;
+  margin: 18px auto 0;
+  color: var(--clay-text);
+  font-size: .96rem;
+  line-height: 1.65;
+  text-align: center;
+}
+.first-gathering-reassurance a { color: var(--matcha-leaf); font-weight: 650; text-underline-offset: 3px; }
 
 .first-visit-photo {
   aspect-ratio: 4 / 3;
