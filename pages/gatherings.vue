@@ -112,8 +112,8 @@
           <div v-else-if="!isSpookyGameDay(event)" class="attendees-section">
             <div v-if="activeTab === 'present'" class="signup-intro">
               <h3>Sign up</h3>
-              <p>Choose the name you’d like us to know you by. Your name and any arrival time, games, notes or spend you enter appear in the public list. Keep private requests for <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">WhatsApp</a>.</p>
-              <p v-if="canEditEvent(event)" class="signup-minimum-spend">Regular gatherings have a minimum spend of RM10 per person. Pay at the counter.</p>
+              <p>Add the name you’d like us to know you by. Names and optional details appear in the public list.</p>
+              <p v-if="canEditEvent(event)" class="signup-minimum-spend">RM10 minimum spend per person. Pay at the counter.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
@@ -158,6 +158,7 @@
                     </div>
                   </details>
                 </fieldset>
+                <p class="signup-privacy-note">Names, arrival times, games and public notes appear in the attendee list. For private requests, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin on WhatsApp</a>.</p>
                 <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
                 <div class="signup-form-footer">
                   <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your sign-up…' : '' }}</p>
@@ -1597,6 +1598,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 .signup-intro .signup-minimum-spend { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--clay-text); font-weight: 650; opacity: 1; }
 .signup-intro .signup-care { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.signup-privacy-note { margin: 0 0 16px; color: var(--muted); font-size: .82rem; line-height: 1.6; }
+.signup-privacy-note a { color: var(--matcha-leaf); text-underline-offset: .18em; }
 
 .attendee-list-details { margin-top: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
 .attendee-list-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 14px; color: var(--matcha-leaf); font-size: .9rem; font-weight: 700; cursor: pointer; list-style: none; }
@@ -2232,9 +2235,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .first-time-panel .first-time-summary-title { font-style: normal; font-weight: 650; }
 .first-time-panel .first-time-summary-hint { color: var(--muted); }
 .gatherings-main > .tabs { margin-top: 2px; }
-.first-time-panel { width: min(100%, 960px); }
+.first-time-panel { width: min(calc(100% - 40px), 960px); box-sizing: border-box; }
 @media (max-width: 600px) {
-  .first-time-panel { width: min(100%, 960px); box-sizing: border-box; padding: 15px 17px; margin-bottom: 12px; }
+  .first-time-panel { padding: 15px 17px; margin-bottom: 12px; }
   .first-time-panel summary { display: grid; grid-template-columns: minmax(0, 1fr) 1.4rem; align-items: center; gap: 3px 8px; }
   .first-time-panel summary::after { grid-column: 2; grid-row: 1 / span 2; justify-self: center; }
   .first-time-summary-hint { font-size: .78rem; line-height: 1.45; }
