@@ -3,7 +3,7 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Something to look forward to</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Find your next gathering and check the details. New to Saujana? Ask the host to help you get started.</div>
+      <div class="stats-container">Find upcoming board game, riichi mahjong, and Blood on the Clocktower gatherings. New to Saujana? Ask the host to help you get started.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">

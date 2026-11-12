@@ -11,7 +11,7 @@
           <img class="mobile-brand-logo" src="/images/saujana-brand.webp" alt="" width="114" height="114" />
           <span class="brand-wordmark">Saujana<span class="brand-caption">Board Game Community</span></span>
         </NuxtLink>
-        <USlideover v-model:open="menuOpen" title="Explore Saujana" description="Browse the Saujana Board Game Community website." side="right" :ui="{ content: 'bg-[var(--bg-silk)]', body: 'p-5' }">
+        <USlideover v-model:open="menuOpen" title="Explore Saujana" description="Find gatherings, games, and community resources." side="right" :ui="{ content: 'bg-[var(--bg-silk)]', body: 'p-5' }">
           <template #default="{ open }">
             <UButton variant="outline" color="neutral" type="button" class="menu-toggle" :class="{ open }" aria-controls="primary-nav-links" :aria-expanded="open" :aria-label="open ? 'Close navigation menu' : 'Open navigation menu'">
               <span></span><span></span><span></span>
@@ -33,6 +33,11 @@
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Good games. Good company. See you soon.</p>
+      <nav class="footer-pillars" aria-label="Community pillars">
+        <NuxtLink v-for="pillar in communityPillars" :key="pillar.id" :to="pillar.links[0].to" no-prefetch>
+          {{ pillar.label }}
+        </NuxtLink>
+      </nav>
       <span class="footer-copyright">&copy; {{ year }} Saujana Board Game Community</span>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
@@ -43,32 +48,28 @@
 </template>
 
 <script setup>
-const riichiChildren = [
-  { label: 'Riichi Calculator', to: '/riichi-calculator', prefetch: false },
-  { label: 'Riichi League', to: '/riichi-league', prefetch: false },
-  { label: 'Riichi Open I', to: '/riichi-open', prefetch: false },
-]
-const navigation = [
+import { communityPillars } from '~/utils/communityPillars'
+
+const route = useRoute()
+const navigation = computed(() => [
   { label: 'Home', to: '/', prefetch: false },
   { label: 'Gatherings', to: '/gatherings', prefetch: false },
-  { label: 'Collection', to: '/collection', prefetch: false },
-  { label: 'Play History', to: '/playlog', prefetch: false },
-  { label: 'Only Blood in the Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
-  {
-    label: 'Riichi Mahjong',
-    type: 'trigger',
-    children: riichiChildren,
-  },
+  ...communityPillars.map(({ label, links }) => {
+    if (links.length === 1) return { label, to: links[0].to, prefetch: false }
+    return {
+      label,
+      type: 'trigger',
+      active: links.some(link => link.to === route.path.replace(/\/+$/, '')),
+      children: links.map(link => ({ ...link, prefetch: false })),
+    }
+  }),
   { label: 'Birthday Club', to: '/birthday-club', prefetch: false },
-]
-const mobileNavigation = navigation
-  .map(item => ({
-    ...item,
-    onSelect: closeMenu,
-    children: item.label === 'Riichi mahjong'
-      ? riichiChildren.map(child => ({ ...child, onSelect: closeMenu }))
-      : item.children?.map(child => ({ ...child, onSelect: closeMenu })),
-  }))
+])
+const mobileNavigation = computed(() => navigation.value.map(item => ({
+  ...item,
+  onSelect: item.to ? closeMenu : undefined,
+  children: item.children?.map(child => ({ ...child, onSelect: closeMenu })),
+})))
 const desktopNavigationUi = {
   root: 'ml-auto',
   list: 'm-0 list-none items-center gap-1 p-0',
@@ -86,7 +87,6 @@ const mobileNavigationUi = {
 }
 
 const { lastUpdated, versionUpdateAvailable, refreshToLatest } = useVersion()
-const route = useRoute()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const isRiichiCalculatorRoute = computed(() => route.path.replace(/\/+$/, '') === '/riichi-calculator')
 const year = computed(() => new Date().getFullYear())
@@ -140,6 +140,22 @@ onMounted(() => {
   color: var(--matcha-leaf);
   font-family: var(--font-display);
   font-size: 1.15rem;
+}
+
+.footer-pillars {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 20px;
+  margin-bottom: 8px;
+  font-size: .85rem;
+}
+
+.footer-pillars a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--matcha-leaf);
 }
 
 .footer-copyright {

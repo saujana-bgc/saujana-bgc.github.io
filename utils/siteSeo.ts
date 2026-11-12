@@ -5,11 +5,11 @@ export const siteName = 'Saujana Board Game Community'
 export const publicPages = {
   '/': {
     title: 'Come Play with Saujana | Saujana BGC',
-    description: 'Join Saujana for board games and riichi mahjong. Find a welcoming gathering, browse our board game collection, or try our riichi scoring calculator.',
+    description: 'Join Saujana for board games, riichi mahjong, and Blood on the Clocktower. Explore what we play and find your next gathering.',
   },
   '/gatherings': {
     title: 'Gatherings | Saujana BGC',
-    description: 'Find your next Saujana board game gathering. Check dates, venues and sign-up details. New to board games or riichi mahjong? Start here.',
+    description: 'Find your next Saujana gathering for board games, riichi mahjong, or Blood on the Clocktower. Check dates, venues, and sign-up details.',
   },
   '/collection': {
     title: 'Collection | Saujana BGC',

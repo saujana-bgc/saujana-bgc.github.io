@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
-      <p class="page-eyebrow">What shall we play next?</p>
+      <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Collection</h1>
       <div class="stats-container collection-summary">
         <span v-if="isPending">Loading play history…</span>

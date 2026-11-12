@@ -3,7 +3,7 @@
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
         <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
-        <p>Board games and riichi mahjong, with help learning the rules. Come solo or bring a friend.</p>
+        <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Come solo or bring a friend. We’ll help you learn as you play.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
@@ -47,6 +47,23 @@
       </NuxtLink>
     </section>
 
+    <section class="home-section" aria-labelledby="community-pillars-title">
+      <h2 id="community-pillars-title" class="hero-title story-title">What We Play</h2>
+      <div class="community-pillars">
+        <article v-for="pillar in communityPillars" :key="pillar.id" class="community-card">
+          <h3>{{ pillar.label }}</h3>
+          <p>{{ pillar.description }}</p>
+          <ul>
+            <li v-for="link in pillar.links" :key="link.to">
+              <NuxtLink class="text-link" :to="link.to" no-prefetch>
+                {{ link.label }} <span aria-hidden="true">→</span>
+              </NuxtLink>
+            </li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
       <div class="first-visit-layout">
         <div class="first-visit-copy">
@@ -70,25 +87,13 @@
       <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
       <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse as far as the eye can see. To us, it’s another game to try, another story to hear, someone new to meet.</p>
       <div class="care-guide">
-        <div v-for="pillar in pillars" :key="pillar.title" class="pillar">
-          <svg class="pillar-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="pillar.icon"/></svg>
-          <h3>{{ pillar.title }}</h3>
-          <p>{{ pillar.content }}</p>
+        <div v-for="value in communityValues" :key="value.title" class="pillar">
+          <svg class="pillar-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="value.icon"/></svg>
+          <h3>{{ value.title }}</h3>
+          <p>{{ value.content }}</p>
         </div>
       </div>
       <p class="respect-note">Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
-    </section>
-
-    <section class="riichi-panel" aria-labelledby="riichi-title">
-      <div>
-        <h2 id="riichi-title" class="hero-title story-title">Explore riichi mahjong</h2>
-        <p class="section-intro">Curious about Japanese mahjong? Explore our tools, league standings and tournament.</p>
-      </div>
-      <nav class="riichi-discovery" aria-label="Explore riichi mahjong">
-        <NuxtLink class="text-link" to="/riichi-calculator" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2m-8 4h2m4 0h2"/></svg>Riichi mahjong calculator <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-league" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20V11m8 9V4m8 16v-6M2 20h20"/><path d="m4 8 6-4 6 5 5-5"/></svg>Riichi mahjong league <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink class="text-link" to="/riichi-open" no-prefetch><svg class="link-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/></svg>Riichi Open I <span aria-hidden="true">→</span></NuxtLink>
-      </nav>
     </section>
 
     <section class="social-note" aria-label="Follow Saujana on Instagram">
@@ -100,6 +105,8 @@
 </template>
 
 <script setup>
+import { communityPillars } from '~/utils/communityPillars'
+
 const nextGathering = ref(null)
 
 onMounted(async () => {
@@ -127,7 +134,7 @@ function formatGatheringDate(dateValue) {
   })
 }
 
-const pillars = [
+const communityValues = [
   {
     title: 'Make the first hello',
     icon: 'M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6a7.5 7.5 0 1 1 17-3.5Z',
@@ -285,7 +292,7 @@ const expectations = [
 
 .gathering-detail { display: inline-flex; min-width: 0; align-items: center; gap: 7px; }
 .gathering-detail:last-child { overflow-wrap: anywhere; }
-.gathering-detail svg, .guide-icon, .pillar-icon, .link-icon {
+.gathering-detail svg, .guide-icon, .pillar-icon {
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
@@ -315,12 +322,8 @@ const expectations = [
   object-fit: cover;
 }
 
-.home-section,
-.riichi-panel {
-  margin-top: clamp(32px, 5.5vw, 68px);
-}
-
 .home-section {
+  margin-top: clamp(32px, 5.5vw, 68px);
   padding-top: clamp(24px, 3.5vw, 40px);
   border-top: 1px solid var(--line);
 }
@@ -389,35 +392,48 @@ const expectations = [
   line-height: 1.65;
 }
 
-.riichi-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: center;
-  gap: 12px 28px;
-  padding: clamp(20px, 4vw, 40px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--lavender-mist);
-}
-
-.riichi-discovery {
+.community-pillars {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: clamp(12px, 2vw, 24px);
+  margin-top: 20px;
 }
 
-.riichi-discovery a {
-  min-height: 56px;
-  justify-content: flex-start;
-  padding: 10px 12px;
+.community-card {
+  min-width: 0;
+  padding: clamp(16px, 2.5vw, 28px);
   border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  text-decoration: none;
+  border-radius: var(--radius-card);
+  background: var(--white-pure);
 }
 
-.riichi-discovery a:hover { background: rgba(255, 254, 250, .65); }
-.riichi-discovery a span { margin-left: auto; }
-.link-icon { color: var(--gold-leaf); }
+.community-card h3 {
+  margin: 0;
+  color: var(--matcha-leaf);
+  font: 400 1.4rem/1.3 var(--font-display);
+}
+
+.community-card p {
+  margin: 8px 0 12px;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+.community-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.community-card li { border-top: 1px solid var(--line); }
+
+.community-card .text-link {
+  display: flex;
+  justify-content: space-between;
+  min-height: 44px;
+}
+
+.community-card .text-link span { flex-shrink: 0; }
 
 .first-visit-photo {
   aspect-ratio: 4 / 3;
@@ -466,10 +482,13 @@ const expectations = [
 }
 
 @media (max-width: 900px) {
-  .hero-section,
-  .riichi-panel { grid-template-columns: minmax(0, 1fr); }
+  .hero-section { grid-template-columns: minmax(0, 1fr); }
   .hero-section { gap: 16px; }
   .hero-artwork { max-width: none; }
+}
+
+@media (max-width: 700px) {
+  .community-pillars { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 600px) {
@@ -477,10 +496,7 @@ const expectations = [
   .hero-copy,
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .care-guide, .riichi-discovery { grid-template-columns: minmax(0, 1fr); }
-  .riichi-discovery { gap: 0; }
-  .riichi-discovery a { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding-inline: 0; }
-  .riichi-discovery a:last-child { border-bottom: 0; }
+  .care-guide { grid-template-columns: minmax(0, 1fr); }
   .next-gathering { align-items: flex-start; padding: 18px; }
   .next-gathering-link { width: 100%; }
   .hero-artwork { max-width: 420px; margin-inline: auto; }
