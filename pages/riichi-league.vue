@@ -42,10 +42,6 @@
           <span>of {{ selectedSeason.totalWeeks }} weeks played</span>
         </div>
         <div>
-          <strong>{{ selectedSeason.bestResultsCount }}</strong>
-          <span>highest-scoring league days included</span>
-        </div>
-        <div>
           <strong>{{ selectedSeason.supportedTableSizes.join(' or ') }}</strong>
           <span>players per table</span>
         </div>
@@ -1262,7 +1258,7 @@ onBeforeUnmount(() => {
 
 .season-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 34px;
 }
@@ -2275,7 +2271,7 @@ onBeforeUnmount(() => {
 .table-metadata span { font-size: .75rem; opacity: .85; }
 @media (max-width: 760px) {
   .season-card, .content-card, .rules-card { padding: 20px 16px; }
-  .season-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .season-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .season-stats > div { padding: 12px 8px; }
   .season-stats span { font-size: .75rem; line-height: 1.45; opacity: .85; }
   .league-hero { padding: 0 8px 24px; }

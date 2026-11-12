@@ -156,9 +156,9 @@ const communityValues = [
 
 const expectations = [
   {
-    title: 'Say hello',
+    title: 'Settle in',
     icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
-    copy: 'Ask around for Saujana BGC and let us know it’s your first visit. Take a moment to settle in.'
+    copy: 'Take a moment to settle in. You can start by watching a game or joining a table.'
   },
   {
     title: 'Find your game',

@@ -1,5 +1,5 @@
 <template>
-  <main class="clocktower-admin">
+  <div class="clocktower-admin">
     <header class="admin-masthead">
       <div><p class="eyebrow">The Storyteller’s Desk</p><h1>Clocktower organiser</h1><p>Log games, write the recap and prepare the next gathering.</p></div>
       <UButton class="admin-primary" type="button" :disabled="busy" @click="startNew">New gathering</UButton>
@@ -176,7 +176,7 @@
       </div>
     </form>
 
-  </main>
+  </div>
 </template>
 
 <script setup>

@@ -19,20 +19,13 @@
           </template>
           <template #body>
             <nav id="primary-nav-links" class="mobile-navigation" aria-label="Explore Saujana" @click.capture="closeMenuOnNavigationLink">
-              <NuxtLink class="mobile-navigation-link" to="/gatherings" no-prefetch>Gatherings</NuxtLink>
-              <section class="mobile-navigation-group" aria-labelledby="mobile-board-games-heading">
-                <h2 id="mobile-board-games-heading">Board games</h2>
-                <NuxtLink class="mobile-navigation-child" to="/collection" no-prefetch>Collection</NuxtLink>
-                <NuxtLink class="mobile-navigation-child" to="/playlog" no-prefetch>Play History</NuxtLink>
-              </section>
-              <section class="mobile-navigation-group" aria-labelledby="mobile-riichi-heading">
-                <h2 id="mobile-riichi-heading">Riichi mahjong</h2>
-                <NuxtLink class="mobile-navigation-child" to="/riichi-league" no-prefetch>Riichi League</NuxtLink>
-                <NuxtLink class="mobile-navigation-child" to="/riichi-calculator" no-prefetch>Riichi Calculator</NuxtLink>
-                <NuxtLink class="mobile-navigation-child" to="/riichi-open" no-prefetch>Riichi Open I</NuxtLink>
-              </section>
-              <NuxtLink class="mobile-navigation-link" to="/only-blood-in-the-clocktower" no-prefetch>Clocktower</NuxtLink>
-              <NuxtLink class="mobile-navigation-link" to="/birthday-club" no-prefetch>Birthday Club</NuxtLink>
+              <template v-for="item in navigation" :key="item.id">
+                <section v-if="item.children" class="mobile-navigation-group" :aria-labelledby="`mobile-navigation-heading-${item.id}`">
+                  <h2 :id="`mobile-navigation-heading-${item.id}`">{{ item.label }}</h2>
+                  <NuxtLink v-for="child in item.children" :key="child.to" class="mobile-navigation-child" :class="{ 'is-current': isCurrentDestination(child.to) }" :to="child.to" :aria-current="isCurrentDestination(child.to) ? 'page' : undefined" no-prefetch>{{ child.label }}</NuxtLink>
+                </section>
+                <NuxtLink v-else class="mobile-navigation-link" :class="{ 'is-current': isCurrentDestination(item.to) }" :to="item.to" :aria-current="isCurrentDestination(item.to) ? 'page' : undefined" no-prefetch>{{ item.label }}</NuxtLink>
+              </template>
             </nav>
           </template>
         </USlideover>
@@ -44,15 +37,14 @@
       <slot />
     </div>
 
-    <WhatsAppButton v-if="!isAdminRoute && !isRiichiCalculatorRoute" :in-content="isBrowseRoute" />
-
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Come Away with Saujana</p>
-      <nav class="footer-pillars" aria-label="Community pillars">
+      <nav class="footer-pillars" aria-label="Explore Saujana">
         <NuxtLink to="/gatherings" no-prefetch>Gatherings</NuxtLink>
         <NuxtLink to="/collection" no-prefetch>Collection</NuxtLink>
         <NuxtLink to="/riichi-league" no-prefetch>Riichi League</NuxtLink>
         <NuxtLink to="/only-blood-in-the-clocktower" no-prefetch>Clocktower</NuxtLink>
+        <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Say hello on WhatsApp <span aria-hidden="true">↗</span></a>
       </nav>
       <span class="footer-copyright">&copy; {{ year }} Saujana Board Game Community</span>
       <ClientOnly v-if="showVisitorCounter">
@@ -66,8 +58,9 @@
 <script setup>
 const route = useRoute()
 const navigation = computed(() => [
-  { label: 'Gatherings', to: '/gatherings', prefetch: false },
+  { id: 'gatherings', label: 'Gatherings', to: '/gatherings', prefetch: false },
   {
+    id: 'board-games',
     label: 'Board Games',
     type: 'trigger',
     active: ['/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
@@ -77,6 +70,7 @@ const navigation = computed(() => [
     ],
   },
   {
+    id: 'riichi',
     label: 'Riichi Mahjong',
     type: 'trigger',
     active: ['/riichi-league', '/riichi-calculator', '/riichi-open'].includes(route.path.replace(/\/+$/, '')),
@@ -86,8 +80,8 @@ const navigation = computed(() => [
       { label: 'Riichi Open I', to: '/riichi-open', prefetch: false },
     ],
   },
-  { label: 'Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
-  { label: 'Birthday Club', to: '/birthday-club', prefetch: false },
+  { id: 'clocktower', label: 'Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
+  { id: 'birthday-club', label: 'Birthday Club', to: '/birthday-club', prefetch: false },
 ])
 const desktopNavigationUi = {
   root: 'ml-auto',
@@ -99,8 +93,6 @@ const desktopNavigationUi = {
 
 const { lastUpdated, versionUpdateAvailable, refreshToLatest } = useVersion()
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
-const isRiichiCalculatorRoute = computed(() => route.path.replace(/\/+$/, '') === '/riichi-calculator')
-const isBrowseRoute = computed(() => ['/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')))
 const year = computed(() => new Date().getFullYear())
 const footerRef = ref(null)
 const showVisitorCounter = ref(false)
@@ -108,6 +100,10 @@ const menuOpen = ref(false)
 
 function closeMenu() {
   menuOpen.value = false
+}
+
+function isCurrentDestination(destination) {
+  return route.path.replace(/\/+$/, '') === destination
 }
 
 function closeMenuOnNavigationLink(event) {
@@ -190,6 +186,8 @@ onMounted(() => {
 .mobile-navigation-child { padding: 0 12px; color: var(--muted); font-size: .92rem; }
 .mobile-navigation-link:hover,
 .mobile-navigation-child:hover { background: var(--surface-soft); color: var(--matcha-leaf); }
+.mobile-navigation-link.is-current,
+.mobile-navigation-child.is-current { background: var(--surface-soft); color: var(--matcha-leaf); font-weight: 700; }
 .mobile-navigation-group { padding: 8px 0; border-top: 1px solid var(--line); }
 .mobile-navigation-group h2 { margin: 0; padding: 4px 12px; color: var(--matcha-leaf); font-size: .76rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .mobile-navigation :focus-visible { outline: 3px solid var(--matcha-leaf); outline-offset: 2px; }

@@ -8,6 +8,15 @@
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
+      <div class="tabs fade-up">
+        <UButton :class="['tab', activeTab === 'present' ? 'tab-active' : '']" :aria-pressed="activeTab === 'present'" @click="switchTab('present')">
+          Upcoming
+        </UButton>
+        <UButton :class="['tab', activeTab === 'past' ? 'tab-active' : '']" :aria-pressed="activeTab === 'past'" @click="switchTab('past')">
+          Past
+        </UButton>
+      </div>
+
       <details class="first-time-panel fade-up">
         <summary>
           <span class="first-time-summary-title">Your first visit, made easy</span>
@@ -22,15 +31,6 @@
           <p class="first-time-care">Everyone should feel welcome and respected. Read <a href="/#respect-at-table">Respect at the table</a>, or <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">raise a concern privately with an admin on WhatsApp</a>.</p>
         </div>
       </details>
-
-      <div class="tabs fade-up">
-        <UButton :class="['tab', activeTab === 'present' ? 'tab-active' : '']" :aria-pressed="activeTab === 'present'" @click="switchTab('present')">
-          Upcoming
-        </UButton>
-        <UButton :class="['tab', activeTab === 'past' ? 'tab-active' : '']" :aria-pressed="activeTab === 'past'" @click="switchTab('past')">
-          Past
-        </UButton>
-      </div>
 
       <div
         v-for="(event, index) in currentEvents"
@@ -118,7 +118,7 @@
 
             <div v-if="canEditEvent(event)" class="signup-section">
               <div v-if="signupSuccess[event.id]" class="signup-success" role="status">
-                <p>{{ signupSuccess[event.id] }} When you arrive, ask around for Saujana BGC.</p>
+                <p>{{ signupSuccess[event.id] }}</p>
                 <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
               </div>
               <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
@@ -1063,13 +1063,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     box-shadow: inset 0 3px 0 var(--gold-leaf), 0 12px 32px rgba(160, 100, 110, 0.08);
     text-align: center;
 }
-.gatherings-main > .tabs { order: 1; }
-.gatherings-main > .event-card,
-.gatherings-main > .loading-copy,
-.gatherings-main > .empty-state { order: 2; }
-.gatherings-main > .pagination { order: 3; }
-.gatherings-main > .first-time-panel { order: 0; }
-
 .first-time-panel h2 {
     margin: 0 0 8px;
     color: var(--matcha-leaf);

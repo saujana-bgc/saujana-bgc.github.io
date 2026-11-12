@@ -4,7 +4,7 @@
       <p class="page-eyebrow">A little more to celebrate</p>
       <h1 class="hero-title">Birthday Club</h1>
       <div class="stats-container">
-        The games bring us together. The people make it special. Share your birthday so we can remember your day, too.
+        Share your birthday so we can celebrate you with the community.
       </div>
     </header>
 
@@ -12,9 +12,9 @@
       <section class="birthday-card fade-up" aria-label="Birthday submission form">
         <div v-if="isSubmitted" class="birthday-success" role="status">
           <div class="success-mark" aria-hidden="true">&#10022;</div>
-          <p class="success-kicker">Birthday saved, {{ submittedName }}.</p>
-          <h2>A date worth remembering.</h2>
-          <p>Your birthday and greeting preference are on our calendar. Thanks for giving us another reason to celebrate.</p>
+          <p class="success-kicker">Birthday saved</p>
+          <h2>Thanks, {{ submittedName }}.</h2>
+          <p>Your birthday and greeting preference are on our calendar.</p>
           <UButton class="secondary-button" color="neutral" variant="outline" type="button" @click="resetForm">
             Add another birthday
           </UButton>

@@ -48,7 +48,6 @@
       <header class="archive-heading">
         <p class="eyebrow">Past games</p>
         <h2 id="archive-title" tabindex="-1">Gathering recaps</h2>
-        <p v-if="recapSessions.length" class="metadata">Read what happened and see each game’s results.</p>
       </header>
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
         <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" :model-value="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" @update:model-value="setSelectedYear" /></label>

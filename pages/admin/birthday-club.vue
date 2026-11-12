@@ -1,6 +1,6 @@
 <template>
   <div class="calendar-shell">
-    <main class="calendar-page">
+    <div class="calendar-page">
         <header class="calendar-header fade-up">
           <div>
             <p class="eyebrow">For community organisers</p>
@@ -97,7 +97,7 @@
             <span><i class="legend-dot private-dot"></i> No public greeting</span>
           </div>
         </section>
-    </main>
+    </div>
   </div>
 </template>
 

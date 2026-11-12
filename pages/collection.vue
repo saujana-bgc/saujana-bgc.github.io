@@ -3,12 +3,6 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Collection</h1>
-      <div class="stats-container collection-summary">
-        <span v-if="isPending">Loading play history…</span>
-        <span v-else><strong>{{ isError ? '—' : unplayedCount }}</strong> {{ isError ? 'play history unavailable' : 'games with no plays logged' }}</span>
-      </div>
-      <p class="collection-updated">Shelf updated {{ lastTended }}</p>
-      <p class="collection-invitation">Pick an unplayed game and find a gathering to try it with us.</p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -21,7 +15,9 @@
           placeholder="Find your next game"
           aria-label="Search the collection by title, category, player count, or designer"
         />
-        <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
+        <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found<span v-if="isPending"> · Loading play history…</span></p>
+        <p class="collection-updated">Shelf updated {{ lastTended }}</p>
+        <p class="collection-invitation">Pick an unplayed game and find a gathering to try it with us.</p>
         <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
         <NuxtLink class="collection-gathering-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       </div>
@@ -30,7 +26,7 @@
         <div class="collection-sort-options" aria-label="Sort games">
           <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" @click="currentSort = 'name'">A to Z</UButton>
           <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" @click="currentSort = 'played'">Recently played</UButton>
-          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="generateSurprise">{{ isPending ? 'Loading play history…' : isError ? 'Play history unavailable' : 'Pick a game with no plays logged' }}</UButton>
+          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :disabled="isPending || isError" @click="generateSurprise">Pick a game with no plays logged</UButton>
         </div>
         <div class="collection-category-options" aria-label="Filter by category">
           <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
@@ -67,10 +63,9 @@
 
           <div class="last-played">
             <div>
-              <span v-if="isPending">Loading play history…</span>
-              <span v-else-if="isError">Play history unavailable</span>
-              <span v-else-if="game.stats.date">Last played {{ formatDate(game.stats.date) }}</span>
-              <span v-else style="opacity: 0.65; font-style: italic;">No plays logged yet</span>
+              <span v-if="game.stats.date">Last played {{ formatDate(game.stats.date) }}</span>
+              <span v-else-if="!isPending && !isError" style="opacity: 0.65; font-style: italic;">No plays logged yet</span>
+              <span v-else aria-hidden="true">—</span>
             </div>
             <div style="margin-top: 6px; opacity: 0.65;">
               Plays logged: {{ isPending || isError ? '—' : game.stats.count }}
@@ -587,8 +582,6 @@ watch([search, currentSort, selectedCategories], () => {
 }
 
 /* Boutique surfaces and readable controls. */
-.collection-summary { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 24px; }
-.collection-summary strong { color: var(--matcha-leaf); }
 .collection-updated { margin: 10px 0 0; font-size: .72rem; color: var(--muted); }
 .collection-invitation { margin: 5px 0 0; color: var(--clay-text); font-size: .86rem; }
 
@@ -628,7 +621,6 @@ main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; 
 .collection-updated { margin-top: 6px; }
 .collection-sort-options .surprise { line-height: 1.25; }
 @media (max-width: 480px) {
-  .collection-summary { gap: 4px 14px; font-size: .78rem; }
   .collection-search { align-items: center; }
   .collection-gathering-link { margin-left: auto; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }

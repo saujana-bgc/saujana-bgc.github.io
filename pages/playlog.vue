@@ -4,10 +4,14 @@
       <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Play History</h1>
       <div class="stats-container">A record of what we’ve played and who joined in. Look back at a gathering, or see which favourites keep making it to the table.</div>
-      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower">See Clocktower recaps and the next gathering →</NuxtLink></p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+      <div class="search-wrap fade-up">
+        <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
+        <p class="page-hint">Select a game to see its cover and players.</p>
+        <p v-if="!isPending && !isError && matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
+      </div>
       <template v-if="isPending">
         <div class="loading-state loading-copy">Loading play history…</div>
         <section class="session-card" v-for="n in 3" :key="'skel-'+n">
@@ -24,12 +28,6 @@
       </div>
 
       <template v-else>
-        <div class="search-wrap fade-up">
-          <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
-          <p class="page-hint">Select a game to see its cover and players.</p>
-          <p v-if="matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
-        </div>
-
         <section
           v-for="(session, i) in pagedSessions"
           :key="session.date"
@@ -128,6 +126,7 @@
           </div>
         </section>
       </template>
+      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower" no-prefetch>See Clocktower recaps and the next gathering →</NuxtLink></p>
     </main>
 
     <Teleport to="body">
