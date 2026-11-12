@@ -361,7 +361,10 @@ const route = useRoute()
 const PAGE_SIZE = 10
 const MINIMUM_SPEND = 10
 const loadingTab = ref(null)
-const loading = computed(() => loadingTab.value === activeTab.value)
+const loading = computed(() => {
+    if (loadingTab.value === activeTab.value) return true
+    return activeTab.value === 'present' ? !presentLoaded.value && !eventsError.present : !pastLoaded.value && !eventsError.past
+})
 const presentEventsList = ref([])
 const pastEventsList = ref([])
 const presentLoaded = ref(false)

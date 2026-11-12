@@ -636,8 +636,8 @@ main:has(.collection-search) > .collection-invite { order: 5; width: 90%; max-wi
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-sort-options .surprise { grid-column: 1 / -1; }
-  .collection-category-options { gap: 6px; overflow-x: auto; flex-wrap: nowrap; margin-inline: -4vw; padding: 2px 4vw 10px; scrollbar-width: thin; }
-  .collection-category-options .category-btn { flex: 0 0 auto; }
+  .collection-category-options { gap: 6px; flex-wrap: wrap; padding: 2px 0 8px; }
+  .collection-category-options .category-btn { flex: 0 1 auto; }
   .collection-updated { font-size: .68rem; }
   .collection-invite { text-align: left; }
 }

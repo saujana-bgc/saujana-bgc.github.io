@@ -6,6 +6,7 @@
         <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Come solo or bring a friend. We’ll help you learn as you play.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+          <a class="text-link" href="#community-pillars">Explore what we play <span aria-hidden="true">↓</span></a>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -47,7 +48,7 @@
       </NuxtLink>
     </section>
 
-    <section class="home-section" aria-labelledby="community-pillars-title">
+    <section id="community-pillars" class="home-section" aria-labelledby="community-pillars-title" tabindex="-1">
       <h2 id="community-pillars-title" class="hero-title story-title">What We Play</h2>
       <div class="community-pillars">
         <article v-for="pillar in communityPillars" :key="pillar.id" class="community-card">
