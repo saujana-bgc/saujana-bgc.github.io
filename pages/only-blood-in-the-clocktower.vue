@@ -51,8 +51,8 @@
         <p v-if="recapSessions.length" class="metadata">Read what happened and see each game’s results.</p>
       </header>
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
-        <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" v-model="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" /></label>
-        <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" v-model="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" /></label>
+        <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" :model-value="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" @update:model-value="setSelectedYear" /></label>
+        <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" :model-value="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" @update:model-value="setSelectedScript" /></label>
         <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
       </div>
       <p v-if="shareNotice" class="archive-state share-notice" role="status">{{ shareNotice }}</p>
@@ -278,7 +278,15 @@ function clearArchiveFilters() {
   selectedScript.value = 'all'
 }
 
-watch([selectedYear, selectedScript], () => { currentPage.value = 1 })
+function setSelectedYear(year) {
+  selectedYear.value = year
+  currentPage.value = 1
+}
+
+function setSelectedScript(script) {
+  selectedScript.value = script
+  currentPage.value = 1
+}
 
 async function changePage(page) {
   currentPage.value = Math.min(Math.max(1, page), pageCount.value)
