@@ -2,7 +2,7 @@
   <main class="league-page">
     <header class="page-intro league-hero fade-up">
       <p class="page-eyebrow">One more hand?</p>
-      <h1 class="hero-title">Riichi mahjong league</h1>
+      <h1 class="hero-title">Riichi League</h1>
       <p class="league-intro">Follow the standings, revisit a week, or add your latest result.</p>
       <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings" no-prefetch>Come to a gathering</NuxtLink> and ask the host how to get started.</p>
 

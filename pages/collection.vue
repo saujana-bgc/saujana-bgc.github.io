@@ -2,7 +2,7 @@
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
       <p class="page-eyebrow">What shall we play next?</p>
-      <h1 class="hero-title">Board game collection</h1>
+      <h1 class="hero-title">Collection</h1>
       <div class="stats-container collection-summary">
         <span v-if="isPending">Loading play history…</span>
         <span v-else><strong>{{ isError ? '—' : unplayedCount }}</strong> {{ isError ? 'play history unavailable' : 'games with no plays logged' }}</span>

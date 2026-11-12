@@ -2,7 +2,7 @@
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Something to look forward to</p>
-      <h1 class="hero-title">Board game gatherings</h1>
+      <h1 class="hero-title">Gatherings</h1>
       <div class="stats-container">Find your next gathering and check the details. New to Saujana? Ask the host to help you get started.</div>
     </header>
 

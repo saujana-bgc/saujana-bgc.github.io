@@ -44,18 +44,18 @@
 
 <script setup>
 const riichiChildren = [
-  { label: 'Riichi mahjong calculator', to: '/riichi-calculator', prefetch: false },
-  { label: 'Riichi mahjong league', to: '/riichi-league', prefetch: false },
+  { label: 'Riichi Calculator', to: '/riichi-calculator', prefetch: false },
+  { label: 'Riichi League', to: '/riichi-league', prefetch: false },
   { label: 'Riichi Open I', to: '/riichi-open', prefetch: false },
 ]
 const navigation = [
   { label: 'Home', to: '/', prefetch: false },
   { label: 'Gatherings', to: '/gatherings', prefetch: false },
   { label: 'Collection', to: '/collection', prefetch: false },
-  { label: 'Play history', to: '/playlog', prefetch: false },
+  { label: 'Play History', to: '/playlog', prefetch: false },
   { label: 'Only Blood in the Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
   {
-    label: 'Riichi mahjong',
+    label: 'Riichi Mahjong',
     type: 'trigger',
     children: riichiChildren,
   },
