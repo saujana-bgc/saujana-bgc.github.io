@@ -18,7 +18,22 @@
             </UButton>
           </template>
           <template #body>
-            <UNavigationMenu id="primary-nav-links" class="mobile-navigation" :items="mobileNavigation" orientation="vertical" :ui="mobileNavigationUi" @click.capture="closeMenuOnNavigationLink" />
+            <nav id="primary-nav-links" class="mobile-navigation" aria-label="Explore Saujana" @click.capture="closeMenuOnNavigationLink">
+              <NuxtLink class="mobile-navigation-link" to="/gatherings" no-prefetch>Gatherings</NuxtLink>
+              <section class="mobile-navigation-group" aria-labelledby="mobile-board-games-heading">
+                <h2 id="mobile-board-games-heading">Board games</h2>
+                <NuxtLink class="mobile-navigation-child" to="/collection" no-prefetch>Collection</NuxtLink>
+                <NuxtLink class="mobile-navigation-child" to="/playlog" no-prefetch>Play History</NuxtLink>
+              </section>
+              <section class="mobile-navigation-group" aria-labelledby="mobile-riichi-heading">
+                <h2 id="mobile-riichi-heading">Riichi mahjong</h2>
+                <NuxtLink class="mobile-navigation-child" to="/riichi-league" no-prefetch>Riichi League</NuxtLink>
+                <NuxtLink class="mobile-navigation-child" to="/riichi-calculator" no-prefetch>Riichi Calculator</NuxtLink>
+                <NuxtLink class="mobile-navigation-child" to="/riichi-open" no-prefetch>Riichi Open I</NuxtLink>
+              </section>
+              <NuxtLink class="mobile-navigation-link" to="/only-blood-in-the-clocktower" no-prefetch>Clocktower</NuxtLink>
+              <NuxtLink class="mobile-navigation-link" to="/birthday-club" no-prefetch>Birthday Club</NuxtLink>
+            </nav>
           </template>
         </USlideover>
       </div>
@@ -34,9 +49,10 @@
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Come Away with Saujana</p>
       <nav class="footer-pillars" aria-label="Community pillars">
-        <NuxtLink v-for="pillar in communityPillars" :key="pillar.id" :to="pillar.links[0].to" no-prefetch>
-          {{ pillar.id === 'riichi' ? 'Riichi League' : pillar.label }}
-        </NuxtLink>
+        <NuxtLink to="/gatherings" no-prefetch>Gatherings</NuxtLink>
+        <NuxtLink to="/collection" no-prefetch>Collection</NuxtLink>
+        <NuxtLink to="/riichi-league" no-prefetch>Riichi League</NuxtLink>
+        <NuxtLink to="/only-blood-in-the-clocktower" no-prefetch>Clocktower</NuxtLink>
       </nav>
       <span class="footer-copyright">&copy; {{ year }} Saujana Board Game Community</span>
       <ClientOnly v-if="showVisitorCounter">
@@ -48,42 +64,37 @@
 </template>
 
 <script setup>
-import { communityPillars } from '~/utils/communityPillars'
-
 const route = useRoute()
 const navigation = computed(() => [
-  { label: 'Home', to: '/', prefetch: false },
   { label: 'Gatherings', to: '/gatherings', prefetch: false },
-  ...communityPillars.map(({ label, links }) => {
-    if (links.length === 1) return { label, to: links[0].to, prefetch: false }
-    return {
-      label,
-      type: 'trigger',
-      active: links.some(link => link.to === route.path.replace(/\/+$/, '')),
-      children: links.map(link => ({ ...link, prefetch: false })),
-    }
-  }),
+  {
+    label: 'Board Games',
+    type: 'trigger',
+    active: ['/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
+    children: [
+      { label: 'Collection', to: '/collection', prefetch: false },
+      { label: 'Play History', to: '/playlog', prefetch: false },
+    ],
+  },
+  {
+    label: 'Riichi Mahjong',
+    type: 'trigger',
+    active: ['/riichi-league', '/riichi-calculator', '/riichi-open'].includes(route.path.replace(/\/+$/, '')),
+    children: [
+      { label: 'Riichi League', to: '/riichi-league', prefetch: false },
+      { label: 'Riichi Calculator', to: '/riichi-calculator', prefetch: false },
+      { label: 'Riichi Open I', to: '/riichi-open', prefetch: false },
+    ],
+  },
+  { label: 'Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
   { label: 'Birthday Club', to: '/birthday-club', prefetch: false },
 ])
-const mobileNavigation = computed(() => navigation.value.map(item => ({
-  ...item,
-  onSelect: item.to ? closeMenu : undefined,
-  children: item.children?.map(child => ({ ...child, onSelect: closeMenu })),
-})))
 const desktopNavigationUi = {
   root: 'ml-auto',
   list: 'm-0 list-none items-center gap-1 p-0',
   link: 'no-underline rounded-lg px-3 py-2 text-sm text-[var(--muted)] hover:text-[var(--matcha-leaf)] data-[active]:text-[var(--matcha-leaf)]',
   childList: 'm-0 min-w-56 list-none rounded-xl border border-[var(--line)] bg-[var(--bg-silk)] p-2 shadow-lg',
   childLink: 'no-underline min-h-11 rounded-lg px-3 py-2 text-sm text-[var(--clay-text)] hover:bg-[var(--surface-soft)] hover:text-[var(--matcha-leaf)]',
-}
-const mobileNavigationUi = {
-  root: 'w-full flex-col',
-  list: 'm-0 w-full list-none flex-col gap-1 p-0',
-  item: 'w-full',
-  link: 'no-underline min-h-12 rounded-lg px-3 py-3 text-base text-[var(--clay-text)] hover:bg-[var(--surface-soft)] data-[active]:text-[var(--matcha-leaf)]',
-  childList: 'm-0 ml-3 list-none border-l border-[var(--line)] p-0 pl-3',
-  childLink: 'no-underline min-h-11 rounded-lg px-3 py-2 text-sm text-[var(--muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--matcha-leaf)]',
 }
 
 const { lastUpdated, versionUpdateAvailable, refreshToLatest } = useVersion()
@@ -171,5 +182,16 @@ onMounted(() => {
   font-size: 0.68rem;
   letter-spacing: 0.02em;
 }
+
+.mobile-navigation { display: grid; gap: 8px; }
+.mobile-navigation-link,
+.mobile-navigation-child { display: flex; min-height: 44px; align-items: center; border-radius: var(--radius-control); color: var(--clay-text); text-decoration: none; }
+.mobile-navigation-link { padding: 0 12px; font-size: 1rem; font-weight: 600; }
+.mobile-navigation-child { padding: 0 12px; color: var(--muted); font-size: .92rem; }
+.mobile-navigation-link:hover,
+.mobile-navigation-child:hover { background: var(--surface-soft); color: var(--matcha-leaf); }
+.mobile-navigation-group { padding: 8px 0; border-top: 1px solid var(--line); }
+.mobile-navigation-group h2 { margin: 0; padding: 4px 12px; color: var(--matcha-leaf); font-size: .76rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.mobile-navigation :focus-visible { outline: 3px solid var(--matcha-leaf); outline-offset: 2px; }
 
 </style>

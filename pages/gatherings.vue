@@ -181,10 +181,6 @@
               <div class="attendees-header">
               <div class="attendees-stats">
                 <div class="stat-pill">
-                  <span class="stat-num">{{ attendeesByEvent[event.id]?.length ?? 0 }}</span>
-                  <span class="stat-lbl">signed up</span>
-                </div>
-                <div class="stat-pill">
                   <span class="stat-num">RM {{ totalSpent(event.id).toFixed(2) }}</span>
                   <span class="stat-lbl">total spent</span>
                 </div>
@@ -192,17 +188,12 @@
                   <span class="stat-num">RM {{ avgSpent(event.id).toFixed(2) }}</span>
                   <span class="stat-lbl">average spend</span>
                 </div>
-                <div v-if="canEditEvent(event)" class="stat-pill stat-pill-min">
-                  <span class="stat-num">RM10</span>
-                  <span class="stat-lbl">minimum spend</span>
-                </div>
               </div>
             </div>
 
             <div v-if="canEditEvent(event)" class="attendees-notice">
               <p class="notice-intro">Help us plan a good gathering and look after the venue. Your edits save automatically when you leave a field.</p>
               <ul>
-                <li><strong>Order at least RM10 per person.</strong> Supporting the venue helps keep these gatherings going.</li>
                 <li>Bringing someone? Give each person their own row, including their spend. A name like <em>Adam’s +1 (Eve)</em> works.</li>
                 <li>Add your spend after ordering, then pay at the counter.</li>
               </ul>

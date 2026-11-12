@@ -7,7 +7,6 @@
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">Plan your first visit <span aria-hidden="true">↓</span></a>
-          <a class="text-link" href="#community-pillars">See what we play <span aria-hidden="true">↓</span></a>
         </div>
       </div>
       <figure class="hero-artwork">
@@ -64,14 +63,13 @@
           </ul>
         </article>
       </div>
-      <p class="first-gathering-reassurance">Coming on your own? Ask around for Saujana BGC and tell us it’s your first time. We’ll help you find a table. <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Can’t find us? Message Saujana on WhatsApp</a>.</p>
     </section>
 
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
       <div class="first-visit-layout">
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">When you arrive, ask around for Saujana BGC. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>Check dates, venues and sign-up details</NuxtLink>.</p>
+          <p class="section-intro">Coming on your own? Ask around for Saujana BGC and tell us it’s your first time. We’ll help you find a table. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>Check dates, venues and sign-up details</NuxtLink>.</p>
         </div>
         <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
         <div class="expect-guide">
@@ -186,10 +184,8 @@ const expectations = [
 .home > * { min-width: 0; }
 
 .hero-section {
-  padding: clamp(20px, 4vw, 40px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--surface-soft);
+  padding: clamp(24px, 5vw, 56px) 0;
+  border-bottom: 1px solid var(--line);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
   align-items: center;
@@ -213,8 +209,8 @@ const expectations = [
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 18px;
-  margin-top: 24px;
+  gap: 8px 22px;
+  margin-top: 28px;
 }
 
 .hero-gatherings-link,
@@ -261,11 +257,9 @@ const expectations = [
   align-items: center;
   justify-content: space-between;
   gap: 12px 24px;
-  margin-top: clamp(20px, 3vw, 36px);
-  padding: 18px 22px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--lavender-mist);
+  margin-top: clamp(24px, 4vw, 40px);
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .next-gathering-label {
@@ -327,8 +321,8 @@ const expectations = [
 }
 
 .home-section {
-  margin-top: clamp(32px, 5.5vw, 68px);
-  padding-top: clamp(24px, 3.5vw, 40px);
+  margin-top: clamp(48px, 7vw, 80px);
+  padding-top: clamp(28px, 4vw, 44px);
   border-top: 1px solid var(--line);
 }
 
@@ -405,10 +399,7 @@ const expectations = [
 
 .community-card {
   min-width: 0;
-  padding: clamp(16px, 2.5vw, 28px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--white-pure);
+  padding: 8px clamp(8px, 1.5vw, 18px) 8px 0;
 }
 
 .community-card h3 {
@@ -438,16 +429,6 @@ const expectations = [
 }
 
 .community-card .text-link span { flex-shrink: 0; }
-.first-gathering-reassurance {
-  max-width: 72ch;
-  margin: 18px auto 0;
-  color: var(--clay-text);
-  font-size: .96rem;
-  line-height: 1.65;
-  text-align: center;
-}
-.first-gathering-reassurance a { color: var(--matcha-leaf); font-weight: 650; text-underline-offset: 3px; }
-
 .first-visit-photo {
   aspect-ratio: 4 / 3;
   object-fit: cover;
@@ -510,6 +491,7 @@ const expectations = [
 
 @media (max-width: 600px) {
   .home { width: calc(100% - 32px); }
+  .hero-section { padding-top: 12px; border-bottom: 0; }
   .hero-copy,
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 18px; }
