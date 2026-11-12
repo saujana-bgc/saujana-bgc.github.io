@@ -35,9 +35,7 @@ const error = ref('')
 const busy = ref(false)
 let restoreWatchdog
 function isCurrentPage(to) {
-  const [path, hash] = to.split('#')
-  if (route.path !== path) return false
-  return hash ? route.hash === `#${hash}` : !route.hash
+  return route.path.replace(/\/+$/, '') === to
 }
 
 onMounted(async () => {

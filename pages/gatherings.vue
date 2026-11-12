@@ -1,6 +1,6 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <header class="fade-up">
+    <header class="page-intro fade-up">
       <p class="page-eyebrow">Something to look forward to</p>
       <h1 class="hero-title">Board game gatherings</h1>
       <div class="stats-container">Find your next gathering and check the details. New to Saujana? Ask the host to help you get started.</div>
@@ -2108,7 +2108,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .btn-add, .btn-save, .btn-cancel, .page-btn { min-height: 44px; border-radius: 6px; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 @media (max-width: 600px) { .first-time-panel { padding: 20px; } }
 @media (max-width: 600px) {
-  .page-content > div:has(> .gatherings-main) > header { padding-bottom: 12px; }
   .first-time-panel { padding: 14px 18px; }
   .tabs { margin: 8px auto 18px; }
   .event-card { padding: 18px; }

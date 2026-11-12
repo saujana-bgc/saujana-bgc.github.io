@@ -1,6 +1,6 @@
 <template>
   <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1) }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
-    <header class="calculator-heading">
+    <header class="page-intro calculator-heading">
       <p class="page-eyebrow">A quick table-side guide</p>
       <h1 class="hero-title">Riichi mahjong calculator</h1>
       <p class="calculator-description">Check a Japanese mahjong hand or enter han and fu to calculate ron and tsumo payments.</p>
@@ -1074,7 +1074,7 @@ onBeforeUnmount(() => {
 <style scoped>
 :global(body.riichi-calculator-body) { overflow-x: clip; }
 .calculator-page { width: min(1140px, 92%); margin: 0 auto; padding: 0 0 52px; color: var(--clay-text); }
-.calculator-page .calculator-heading { width: 100%; max-width: 700px; margin: 0 auto 22px; padding: 8px 0 0; text-align: center; }
+.calculator-page .calculator-heading { max-width: 700px; margin: 0 auto 22px; padding: 0; }
 .calculator-heading .page-eyebrow { margin-bottom: 14px; }
 .calculator-heading .hero-title { font-size: clamp(2.25rem, 5.3vw, 3.7rem); }
 .calculator-heading > .calculator-description { max-width: 580px; margin: 14px auto 0; color: var(--muted); font-size: .95rem; line-height: 1.7; }

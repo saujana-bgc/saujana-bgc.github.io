@@ -662,12 +662,10 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 14px 0 18px;
+  padding-bottom: 18px;
   border-bottom: 1px solid var(--line);
 }
-.admin-masthead .eyebrow { margin: 0; color: var(--matcha-leaf); font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.admin-masthead h1 { margin: 3px 0; color: var(--desk-ink); font: 400 clamp(1.85rem, 4vw, 2.7rem)/1.12 var(--font-display); text-wrap: balance; }
-.admin-masthead p:last-child { margin: 0; color: var(--muted); font-size: .9rem; }
+.admin-masthead p:last-child { margin: 12px 0 0; color: var(--muted); font-size: .9rem; }
 .editor { display: grid; gap: 18px; margin-top: 16px; padding: var(--desk-pad); padding-bottom: calc(var(--desk-pad) + 58px); border-color: var(--desk-rule); background: #faf5ed; }
 .editor-heading, .game-heading, .saved, .save-row, .section-heading {
   display: flex;

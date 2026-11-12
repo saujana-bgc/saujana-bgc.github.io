@@ -1,11 +1,13 @@
 <template>
   <main class="clocktower-page">
-    <header class="page-header">
-      <img class="hero-art" src="/images/clocktower-night.svg" alt="" width="640" height="500" fetchpriority="high">
-      <div class="hero-copy">
-        <h1>Only Blood <em>in the Clocktower</em></h1>
-        <p class="intro">Blood on the Clocktower is a social game of hidden roles. Talk, share clues and vote to find the Demon. New players are welcome; we’ll explain as you play.</p>
-      </div>
+    <header class="page-intro">
+      <p class="page-eyebrow">Social deduction</p>
+      <h1 class="hero-title">Only Blood in the Clocktower</h1>
+      <p class="stats-container">Blood on the Clocktower is a social game of hidden roles. Talk, share clues and vote to find the Demon. New players are welcome; we’ll explain as you play.</p>
+    </header>
+
+    <div class="gathering-banner">
+      <img class="hero-art" src="/images/clocktower-night.svg" alt="" width="640" height="500">
       <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
         <div class="calendar-mark" aria-hidden="true">
           <template v-if="nextGathering"><strong>{{ nextDateStamp.day }}</strong><span>{{ nextDateStamp.month }}</span></template>
@@ -24,11 +26,10 @@
         <a v-else-if="!eventLoading" class="calendar-link" href="/gatherings/">See all gatherings <span aria-hidden="true">↗</span></a>
       </section>
       <nav class="hero-actions" aria-label="Clocktower page links">
-        <a class="hero-secondary" :href="heroSecondaryHref">{{ heroSecondaryLabel }} <span aria-hidden="true">↓</span></a>
+        <a class="hero-secondary" href="#what-to-expect">First time? Start here <span aria-hidden="true">↓</span></a>
         <a v-if="recapSessions.length" class="hero-tertiary" href="#clocktower-archive">Browse gathering recaps <span aria-hidden="true">↓</span></a>
       </nav>
-      <span class="hero-caption" aria-hidden="true">Ravenswood Bluff <span>✦</span> After dark</span>
-    </header>
+    </div>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
       <div class="welcome-heading">
@@ -197,8 +198,6 @@ const nextGathering = computed(() => {
   return null
 })
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
-const heroSecondaryHref = '#what-to-expect'
-const heroSecondaryLabel = 'First time? Start here'
 const featured = computed(() => [...recapSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
 const nextDateStamp = computed(() => {
   if (!nextGathering.value) return null
@@ -349,29 +348,27 @@ onMounted(() => {
   --rule: #e3d6c6;
   --panel-pad: clamp(15px, 2.6vw, 34px);
   width: min(1320px, calc(100% - clamp(28px, 6vw, 88px)));
-  margin: auto;
-  padding: clamp(18px, 3vw, 34px) 0 64px;
+  margin-inline: auto;
+  padding-bottom: 64px;
   color: var(--ink);
 }
-.clocktower-page > .page-header {
+.gathering-banner {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
-  grid-template-areas: "copy date" "actions date";
-  align-items: center;
+  grid-template-columns: minmax(0, 480px);
   overflow: hidden;
-  min-height: 350px;
+  min-height: 280px;
   align-content: center;
-  gap: 12px clamp(24px, 3.2vw, 48px);
-  padding: clamp(34px, 4.5vw, 56px);
-  text-align: left;
-  border-radius: 16px;
+  gap: 10px;
+  margin-bottom: var(--space-5);
+  padding: clamp(24px, 3.5vw, 48px);
+  border-radius: var(--radius-card);
   background: radial-gradient(ellipse at 77% 44%, #533132, var(--night) 74%);
   color: #fff5e6;
   box-shadow: 0 16px 36px #34212523;
 }
-.page-header::before {
+.gathering-banner::before {
   content: '';
   position: absolute;
   z-index: 1;
@@ -380,12 +377,12 @@ onMounted(() => {
   border-radius: 10px;
   pointer-events: none;
 }
-.page-header::after {
+.gathering-banner::after {
   content: '';
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(90deg, var(--night) 12%, #21171deb 31%, #21171d91 52%, transparent 73%);
+  background: linear-gradient(90deg, var(--night) 12%, #21171dc9 38%, transparent 78%);
 }
 .hero-art {
   position: absolute;
@@ -396,20 +393,6 @@ onMounted(() => {
   object-fit: cover;
   object-position: center 62%;
 }
-.hero-copy { grid-area: copy; max-width: 680px; z-index: 1; }
-.hero-caption {
-  position: absolute;
-  right: 26px;
-  bottom: 20px;
-  padding: 4px 8px;
-  border-radius: 3px;
-  background: #21171de0;
-  color: #f1d8b6;
-  font-size: .65rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
-.hero-caption span { margin-inline: 5px; color: var(--gold); }
 .eyebrow {
   margin: 0;
   color: var(--wine);
@@ -419,15 +402,8 @@ onMounted(() => {
   line-height: 1.5;
   text-transform: uppercase;
 }
-.page-header h1 {
-  margin: 0 0 18px;
-  font: 400 clamp(2.7rem, 6.25vw, 5rem)/1.02 var(--font-display);
-  letter-spacing: -.055em;
-}
-.page-header h1 em { display: block; color: #efd0a4; }
-.intro { max-width: 52ch; margin: 0; color: #e1d0c8; font-size: clamp(.97rem, 1.6vw, 1.1rem); }
-.hero-actions { grid-area: actions; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; align-self: start; }
-.hero-primary, .hero-secondary {
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 20px; }
+.hero-secondary {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -438,16 +414,12 @@ onMounted(() => {
   font-weight: 700;
   text-decoration: none;
 }
-.hero-primary { padding: 10px 16px; border-radius: 6px; }
-.hero-primary { background: var(--gold); color: var(--night); }
-.hero-primary:hover { background: #f0d1a4; }
-.hero-date { font-size: .78em; font-weight: 650; }
 .hero-secondary { color: #f2e3da; }
 .hero-secondary:hover { text-decoration: underline; text-underline-offset: 4px; }
 .hero-tertiary { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; color: #e1d0c8; font-size: .82rem; text-underline-offset: 4px; }
 .hero-tertiary:hover { color: #fff5e6; }
 .clocktower-page :is(a, button, summary, select):focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
-.page-header a:focus-visible { outline-color: var(--gold); }
+.gathering-banner .hero-actions a:focus-visible { outline-color: var(--gold); }
 
 .next-night, .session-card, .archive-state {
   border: 1px solid var(--rule);
@@ -455,7 +427,6 @@ onMounted(() => {
   background: var(--paper);
 }
 .next-night {
-  grid-area: date;
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -549,7 +520,7 @@ onMounted(() => {
 .stat-row strong { color: #f2d6ad; font: 400 clamp(1.65rem, 4vw, 2.55rem)/1 var(--font-display); }
 .stat-row span { color: #e5d4c6; font-size: .81rem; line-height: 1.3; }
 
-.clocktower-page .archive-heading { margin-bottom: 18px; padding: 0; text-align: left; }
+.archive-heading { margin-bottom: 18px; }
 .archive-state, .session-card { padding: var(--panel-pad); }
 .archive-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 9px; background: var(--parchment); }
 .archive-filters label { display: grid; gap: 4px; min-width: min(100%, 190px); color: var(--soft-ink); font-size: .76rem; font-weight: 700; }
@@ -568,7 +539,7 @@ onMounted(() => {
 .session-cover { display: block; width: 100%; max-height: 200px; aspect-ratio: 16 / 9; border-radius: 8px; background: var(--parchment); object-fit: cover; }
 .game-grid { display: grid; gap: 12px; margin-top: 18px; }
 .game-recap { min-width: 0; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; background: #f8f1e8; }
-.game-recap .game-recap-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; padding: 0; text-align: left; }
+.game-recap-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; }
 .game-title { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .game-label { color: var(--wine); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
 .game-script { margin: 0; font: 400 1.12rem/1.3 var(--font-display); }
@@ -595,7 +566,6 @@ onMounted(() => {
 .photo-gallery img { display: block; width: 100%; max-height: 300px; object-fit: cover; background: var(--parchment); transition: transform .2s ease; }
 .photo-link:hover img { transform: scale(1.025); }
 .archive-button { min-height: 44px; padding: 7px 11px; border: 1px solid #d3bdb1; border-radius: 6px; background: transparent; color: var(--wine); font: 700 .85rem var(--font-body); cursor: pointer; }
-.next-night, .archive, .session-card, .game-recap { scroll-margin-top: 86px; }
 
 @media (min-width: 861px) {
   .recap-story { grid-template-columns: 105px minmax(0, 1fr); gap: 20px; }
@@ -605,25 +575,17 @@ onMounted(() => {
   .welcome-link { grid-column: 2; }
 }
 @media (max-width: 760px) {
-  .clocktower-page > .page-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "date" "actions"; gap: 18px; min-height: 0; padding: 28px 22px 26px; }
-  .page-header::after { background: linear-gradient(180deg, var(--night) 14%, #21171def 42%, #21171db8 75%, #21171d30 100%); }
-  .hero-art { inset: 105px 0 auto auto; z-index: 0; width: min(82%, 370px); height: 320px; max-height: none; object-fit: cover; object-position: right center; opacity: .42; }
-  .hero-caption { display: none; }
-  .next-night { margin: 0; }
-  .page-header h1 { font-size: clamp(2.2rem, 8.9vw, 4rem); }
-  .hero-actions { gap: 6px 14px; }
-  .hero-primary, .hero-secondary { font-size: .8rem; }
-  .hero-primary { padding-inline: 10px; }
+  .gathering-banner { min-height: 0; padding: 22px; }
+  .gathering-banner::after { background: linear-gradient(90deg, var(--night), #21171d96); }
+  .hero-art { width: min(100%, 420px); }
+  .hero-actions { gap: 0 14px; }
   .stats { grid-template-columns: 1fr; text-align: center; gap: 2px; }
   .stat-row { grid-column: 1; grid-row: auto; margin-top: 10px; }
   .stat-row div:first-child { border: 0; }
   .has-cover .session-masthead { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
-  .clocktower-page > .page-header { padding: 22px 18px; gap: 18px; }
-  .page-header h1 { font-size: clamp(2rem, 8.2vw, 3rem); }
-  .intro { font-size: .91rem; line-height: 1.5; }
-  .hero-secondary { font-size: .76rem; }
+  .gathering-banner { padding: 18px; }
   .next-night { grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: start; }
   .next-copy { min-width: 0; }
   .next-copy p:not(.eyebrow) { overflow-wrap: anywhere; }
@@ -632,7 +594,6 @@ onMounted(() => {
   .archive-filters label { flex: 1 1 112px; min-width: 0; }
   .welcome-note, .welcome-steps { grid-template-columns: minmax(0, 1fr); }
   .welcome-link { grid-column: 1; }
-  .next-night .calendar-link { grid-column: 2; }
   .recap-prose { font-size: .96rem; }
   .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-gallery img { max-height: 180px; }

@@ -1,6 +1,6 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <header class="fade-up">
+    <header class="page-intro fade-up">
       <p class="page-eyebrow">A little more to celebrate</p>
       <h1 class="hero-title">Birthday Club</h1>
       <div class="stats-container">

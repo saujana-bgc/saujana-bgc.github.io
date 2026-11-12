@@ -1,6 +1,6 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <header class="collection-header fade-up">
+    <header class="page-intro fade-up">
       <p class="page-eyebrow">What shall we play next?</p>
       <h1 class="hero-title">Board game collection</h1>
       <div class="stats-container collection-summary">
@@ -590,7 +590,6 @@ watch([search, currentSort, selectedCategories], () => {
 }
 
 /* Boutique surfaces and readable controls. */
-.collection-header { padding-bottom: 20px; }
 .collection-summary { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 24px; }
 .collection-summary strong { color: var(--matcha-leaf); }
 .collection-updated { margin: 10px 0 0; font-size: .72rem; color: var(--muted); }
@@ -629,8 +628,6 @@ main:has(.collection-search) > .sort-controls { order: 2; width: 90%; margin: 0 
 main:has(.collection-search) > .editorial-grid,
 main:has(.collection-search) > .collection-empty { order: 4; }
 main:has(.collection-search) > .collection-invite { order: 5; width: 90%; max-width: 720px; margin: 22px auto 18px; }
-.collection-header { padding-bottom: 10px; }
-.collection-header .hero-title { margin-bottom: 8px; }
 .collection-updated { margin-top: 6px; }
 .collection-sort-options .surprise { line-height: 1.25; }
 @media (max-width: 480px) {

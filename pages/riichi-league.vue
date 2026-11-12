@@ -1,6 +1,6 @@
 <template>
   <main class="league-page">
-    <header class="league-hero fade-up">
+    <header class="page-intro league-hero fade-up">
       <p class="page-eyebrow">One more hand?</p>
       <h1 class="hero-title">Riichi mahjong league</h1>
       <p class="league-intro">Follow the standings, revisit a week, or add your latest result.</p>

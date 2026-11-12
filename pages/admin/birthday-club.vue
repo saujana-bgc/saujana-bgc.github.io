@@ -206,7 +206,7 @@ onMounted(loadBirthdays)
   width: min(1500px, 100%);
   min-height: calc(100vh - 180px);
   margin: 0 auto;
-  padding: 0 clamp(14px, 3vw, 42px) 82px;
+  padding-bottom: 82px;
   box-sizing: border-box;
 }
 
@@ -229,8 +229,7 @@ onMounted(loadBirthdays)
   margin: 0 auto;
 }
 
-.login-intro h1,
-.calendar-header h1 {
+.login-intro h1 {
   margin: 0;
   color: var(--clay-text);
   font-family: 'Playfair Display', serif;
@@ -240,8 +239,7 @@ onMounted(loadBirthdays)
   line-height: 0.94;
 }
 
-.login-intro h1 em,
-.calendar-header h1 em {
+.login-intro h1 em {
   color: var(--matcha-leaf);
   font-weight: 400;
 }
@@ -400,26 +398,14 @@ onMounted(loadBirthdays)
   opacity: 0.48;
 }
 
-.calendar-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 32px;
-  width: 100%;
-  margin: 0 0 42px;
-  padding: 0;
-  text-align: left;
-}
-
-.calendar-header h1 { font-size: clamp(2.8rem, 6vw, 5.6rem); }
-.calendar-header h1 em { white-space: nowrap; }
+.calendar-header { margin-bottom: var(--space-5); }
 
 .header-copy {
   max-width: 680px;
-  margin: 22px 0 0;
+  margin: 12px 0 0;
   font-size: 0.9rem;
   line-height: 1.75;
-  opacity: 0.68;
+  color: var(--muted);
 }
 
 .logout-button {
@@ -679,12 +665,10 @@ onMounted(loadBirthdays)
 }
 
 @media (max-width: 820px) {
-  .calendar-page { padding-top: 0; }
   .login-wrap { grid-template-columns: 1fr; gap: 34px; min-height: auto; padding: 24px 0; }
   .login-intro { text-align: center; }
   .login-intro > p:last-child { margin-left: auto; margin-right: auto; }
   .login-card { width: min(480px, 100%); margin: 0 auto; box-sizing: border-box; }
-  .calendar-header { align-items: flex-start; }
   .calendar-toolbar { grid-template-columns: 1fr auto; }
   .summary-stats { justify-content: flex-end; }
   .today-button { grid-column: 1 / -1; justify-self: center; }
@@ -694,11 +678,9 @@ onMounted(loadBirthdays)
 }
 
 @media (max-width: 520px) {
-  .calendar-page { padding-left: 12px; padding-right: 12px; padding-bottom: 60px; }
-  .login-intro h1, .calendar-header h1 { font-size: clamp(2.65rem, 14vw, 4rem); }
+  .calendar-page { padding-bottom: 60px; }
+  .login-intro h1 { font-size: clamp(2.65rem, 14vw, 4rem); }
   .login-card { padding: 27px 21px; border-radius: var(--radius-card); }
-  .calendar-header { display: block; margin-bottom: 28px; padding: 0 6px; }
-  .header-copy { margin-top: 16px; }
   .logout-button { margin-top: 21px; }
   .calendar-toolbar { display: flex; flex-direction: column; gap: 13px; padding: 14px; }
   .summary-stats { gap: 15px; }
