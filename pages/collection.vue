@@ -8,6 +8,7 @@
         <span v-else><strong>{{ isError ? '—' : unplayedCount }}</strong> {{ isError ? 'play history unavailable' : 'games with no plays logged' }}</span>
       </div>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>
+      <p class="collection-invitation">Pick an unplayed game and find a gathering to try it with us.</p>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -589,6 +590,7 @@ watch([search, currentSort, selectedCategories], () => {
 .collection-summary { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 24px; }
 .collection-summary strong { color: var(--matcha-leaf); }
 .collection-updated { margin: 10px 0 0; font-size: .72rem; color: var(--muted); }
+.collection-invitation { margin: 5px 0 0; color: var(--clay-text); font-size: .86rem; }
 
 .collection-invite { max-width: 760px; padding: 0; background: none; border: 0; box-shadow: none; margin-bottom: 24px; }
 .collection-invite h2 { font-style: normal; }

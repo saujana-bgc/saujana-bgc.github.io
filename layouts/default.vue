@@ -32,7 +32,7 @@
     <WhatsAppButton v-if="!isAdminRoute && !isRiichiCalculatorRoute" :in-content="isBrowseRoute" />
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
-      <p class="footer-signature">Good games. Good company. See you soon.</p>
+      <p class="footer-signature">Come Away with Saujana</p>
       <nav class="footer-pillars" aria-label="Community pillars">
         <NuxtLink v-for="pillar in communityPillars" :key="pillar.id" :to="pillar.links[0].to" no-prefetch>
           {{ pillar.id === 'riichi' ? 'Riichi League' : pillar.label }}

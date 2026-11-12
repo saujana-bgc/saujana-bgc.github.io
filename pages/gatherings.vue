@@ -950,7 +950,7 @@ async function saveNewRow(eventId) {
         // Remembering a name is optional; blocked storage must not hide a successful signup.
         try { localStorage.setItem('saujana_name', data.name) } catch {}
         mergeAttendeeNameOptions([data.name])
-        signupSuccess[eventId] = `You’re on the sign-up list, ${data.name}.`
+        signupSuccess[eventId] = `You’re on the sign-up list, ${data.name}. On the day, say hello to the Saujana host and we’ll help you find a table.`
         delete newRows[eventId]
         focusSignupTrigger(eventId)
     } catch {
