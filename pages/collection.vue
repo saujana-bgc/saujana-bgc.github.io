@@ -11,11 +11,6 @@
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-      <section class="collection-invite fade-up">
-        <p>Revisit a favourite or find something you’ve never tried. Browse the host’s collection, then ask about a title you’d like to play at your next gathering.</p>
-        <NuxtLink class="context-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
-      </section>
-
       <div class="collection-search fade-up">
         <UInput
           class="collection-search-input w-full"
@@ -28,6 +23,11 @@
         <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
         <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
       </div>
+
+      <section class="collection-invite fade-up">
+        <p>Found a game you’d like to try?</p>
+        <NuxtLink class="context-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+      </section>
 
       <div class="sort-controls fade-up" role="group" aria-label="Sort and filter games">
         <div class="collection-sort-options" aria-label="Sort games">
@@ -621,13 +621,11 @@ watch([search, currentSort, selectedCategories], () => {
     .collection-result-count { flex: 1; }
 }
 
-/* Put browsing first, with the invitation close to the shelf itself. */
+/* Keep keyboard and visual order aligned on the collection page. */
 main:has(.collection-search) { gap: 10px; }
-main:has(.collection-search) > .collection-search { order: 1; margin-bottom: 0; }
-main:has(.collection-search) > .sort-controls { order: 2; width: 90%; margin: 0 auto 8px; }
-main:has(.collection-search) > .editorial-grid,
-main:has(.collection-search) > .collection-empty { order: 4; }
-main:has(.collection-search) > .collection-invite { order: 5; width: 90%; max-width: 720px; margin: 22px auto 18px; }
+main:has(.collection-search) > .collection-search { margin-bottom: 0; }
+main:has(.collection-search) > .collection-invite { width: 90%; max-width: 720px; margin: 0 auto 4px; }
+main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; }
 .collection-updated { margin-top: 6px; }
 .collection-sort-options .surprise { line-height: 1.25; }
 @media (max-width: 480px) {

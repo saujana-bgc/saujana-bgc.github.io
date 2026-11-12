@@ -8,7 +8,7 @@
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
-      <details class="first-time-panel fade-up" open>
+      <details class="first-time-panel fade-up">
         <summary>
           <span class="first-time-summary-title">Your first visit, made easy</span>
           <span class="first-time-summary-hint">No game experience needed. You can watch a round or join in.</span>
