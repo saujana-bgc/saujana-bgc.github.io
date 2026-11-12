@@ -14,7 +14,18 @@
     </section>
     <template v-else>
       <header class="admin-topbar"><NuxtLink to="/admin" class="admin-brand" aria-label="Saujana organiser workspace"><img class="admin-brand-mark brand-mark" src="/images/saujana-brand.webp" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>organiser workspace</small></span></NuxtLink><div><NuxtLink to="/" class="admin-public-link">Back to the website</NuxtLink><UButton class="admin-signout" color="neutral" variant="outline" @click="signOut">Sign out</UButton></div></header>
-      <nav class="admin-nav" aria-label="Admin pages"><NuxtLink v-for="item in adminNavigation" :key="item.id" :to="item.to" :class="{ active: isCurrentPage(item.to) }" :aria-label="item.id === 'botc-archive' ? item.title : undefined">{{ item.id === 'botc-archive' ? 'Clocktower' : item.title }}</NuxtLink></nav>
+      <nav class="admin-nav" aria-label="Admin pages">
+        <NuxtLink
+          v-for="item in adminNavigation"
+          :key="item.id"
+          :to="item.to"
+          :class="{ active: isCurrentPage(item.to) }"
+          :aria-current="isCurrentPage(item.to) ? 'page' : undefined"
+          :aria-label="item.id === 'botc-archive' ? item.title : undefined"
+        >
+          {{ item.id === 'botc-archive' ? 'Clocktower' : item.title }}
+        </NuxtLink>
+      </nav>
       <div class="admin-page"><slot /></div>
     </template>
   </main>
@@ -76,7 +87,7 @@ async function signOut() { await auth.logout(); password.value = '' }
 .admin-primary,.admin-action{border:0;border-radius:6px;background:var(--matcha-leaf);color:white;padding:12px 17px;font:inherit;font-weight:650;cursor:pointer}.admin-primary:disabled{opacity:.6;cursor:wait}.admin-help,.admin-error{margin:0;color:var(--muted);font-size:.86rem;line-height:1.55}.admin-error{color:#913f45}
 .admin-topbar{display:flex;justify-content:space-between;align-items:center;padding:0 0 18px;border-bottom:1px solid var(--line)}.admin-brand{display:inline-flex;align-items:center;gap:12px;color:var(--matcha-leaf);text-decoration:none;font:1.35rem var(--font-display)}.admin-brand-mark{flex:0 0 auto}.admin-brand-copy{display:block}.admin-brand-copy small{display:block;margin-top:4px;font: .57rem 'Segoe UI',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.admin-login-intro>.admin-brand{margin-bottom:34px}.admin-topbar>div{display:flex;align-items:center;gap:16px}.admin-public-link,.admin-signout{color:var(--matcha-leaf);font:inherit}.admin-signout{border:1px solid var(--line);background:var(--white-pure);padding:8px 14px;border-radius:6px;cursor:pointer}
 .admin-nav{display:flex;gap:7px;overflow:auto;padding:14px 0;border-bottom:1px solid var(--line)}.admin-nav a{flex:0 0 auto;text-decoration:none;color:var(--muted);padding:8px 10px;border-radius:5px;font-size:.82rem}.admin-nav a:hover,.admin-nav a.active{color:var(--matcha-leaf);background:var(--surface-soft)}.admin-page{padding-top:var(--page-top-inset)}.admin-page h1{font-size:clamp(2rem,4vw,3.3rem)}.admin-page .eyebrow,.admin-login-intro .eyebrow{color:var(--gold-leaf);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px}
-.admin-card{background:var(--white-pure);border:1px solid var(--line);border-radius:var(--radius-card);padding:22px;box-shadow:var(--shadow-card)}.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:14px;margin-top:24px}.admin-link-card{display:block;color:inherit;text-decoration:none;transition:transform .15s,border-color .15s}.admin-link-card:hover{transform:translateY(-2px);border-color:var(--gold-leaf)}.admin-link-card h2{font:1.3rem var(--font-display);color:var(--matcha-leaf);margin:0 0 8px}.admin-link-card p{color:var(--muted);line-height:1.55;margin:0}.admin-link-card span{display:block;color:var(--gold-leaf);font-size:.8rem;margin-top:16px}
+.admin-card{background:var(--white-pure);border:1px solid var(--line);border-radius:var(--radius-card);padding:22px;box-shadow:var(--shadow-card)}
 .admin-form-row{display:flex;flex-wrap:wrap;align-items:end;gap:12px}.admin-form-row label{display:grid;gap:6px;font-size:.84rem}.admin-form-row input,.admin-form-row select,.admin-form-row textarea{font:inherit;padding:10px;border:1px solid var(--line);border-radius:6px}.admin-table{width:100%;border-collapse:collapse}.admin-table th,.admin-table td{text-align:left;padding:11px;border-bottom:1px solid var(--line);vertical-align:top}.admin-table-wrap{overflow:auto}.admin-section{scroll-margin-top:24px;margin-top:34px}.admin-status{padding:12px 14px;background:var(--surface-soft);border-radius:6px;color:var(--matcha-leaf)}
 @media(max-width:720px){.admin-login-wrap{grid-template-columns:1fr;padding:30px 0;gap:20px}.admin-login-intro{text-align:center}.admin-login-intro>.admin-brand{margin:0 auto 18px}.admin-login-intro>p:last-child{margin-inline:auto}.admin-topbar{align-items:flex-start;gap:14px}.admin-topbar>div{gap:10px;flex-wrap:wrap;justify-content:flex-end}.admin-brand{font-size:1.15rem}.admin-nav{margin-inline:-3vw;padding-inline:3vw}.admin-table{min-width:700px}}
 @media (min-width: 721px) {
@@ -84,6 +95,7 @@ async function signOut() { await auth.logout(); password.value = '' }
   .admin-login-intro { justify-self: end; }
   .admin-login-card { margin-inline: 0; width: 100%; }
 }
-.admin-nav a { min-height: 42px; display: inline-flex; align-items: center; }
+.admin-nav { flex-wrap: wrap; }
+.admin-nav a { min-height: 44px; display: inline-flex; align-items: center; }
 .admin-nav a.active { box-shadow: inset 0 -2px 0 var(--gold-leaf); }
 </style>
