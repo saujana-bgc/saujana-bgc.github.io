@@ -68,12 +68,12 @@
     <section class="format-strip"><div><p class="eyebrow">The format</p><h2>Three hanchans to a champion</h2></div><p>Play two qualifying East–South hanchans. The top four eligible players meet in one final, starting again at 30,000 points. Entry and registration do not require a player account.</p><UButton ref="guideTrigger" type="button" class="guide-trigger hero-guide" @click="openGuide">Tournament rules <span aria-hidden="true">↗</span></UButton></section>
 
     <section class="event-schedule" aria-labelledby="schedule-heading">
-      <div class="schedule-intro"><p class="eyebrow">Saturday, 14 November</p><h2 id="schedule-heading">Tournament schedule</h2><p>Each qualifying round has a 75-minute limit to help the tournament finish at a reasonable time.</p></div>
+      <div class="schedule-intro"><p class="eyebrow">Saturday, 14 November</p><h2 id="schedule-heading">Tournament schedule</h2><p>Both qualifiers and the Grand Final have a 75-minute limit. The final’s 90-minute slot includes time to verify scores before the prize presentation.</p></div>
       <div class="schedule-details">
         <div class="qualifier-time-limit">
           <h3>How we’ll enforce the limit</h3>
           <ol>
-            <li>Start one shared countdown timer for all four tables.</li>
+            <li>Start one shared countdown timer for all tables in the hanchan.</li>
             <li>Announce when 15 minutes remain.</li>
             <li>At 75 minutes, finish the current hand.</li>
             <li>Do not start another hand after the timer expires.</li>
