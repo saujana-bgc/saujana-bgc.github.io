@@ -113,6 +113,7 @@
             <div v-if="activeTab === 'present'" class="signup-intro">
               <h3>Sign up</h3>
               <p>Choose the name you’d like us to know you by. Your name and any arrival time, games, notes or spend you enter appear in the public list. Keep private requests for <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">WhatsApp</a>.</p>
+              <p v-if="canEditEvent(event)" class="signup-minimum-spend">Regular gatherings have a minimum spend of RM10 per person. Pay at the counter.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
@@ -168,8 +169,12 @@
               </form>
             </div>
 
-            <div class="attendees-header">
-              <h3 class="attendees-title">{{ activeTab === 'past' ? 'Who signed up' : 'Who’s signed up' }}</h3>
+            <details class="attendee-list-details">
+              <summary class="attendee-list-summary">
+                <span>{{ activeTab === 'past' ? 'Who signed up' : 'Who’s signed up' }}</span>
+                <span class="attendee-list-count">{{ attendeesByEvent[event.id]?.length ?? 0 }} signed up</span>
+              </summary>
+              <div class="attendees-header">
               <div class="attendees-stats">
                 <div class="stat-pill">
                   <span class="stat-num">{{ attendeesByEvent[event.id]?.length ?? 0 }}</span>
@@ -265,6 +270,7 @@
                 </div>
               </div>
             </div>
+            </details>
 
           </div>
 
@@ -1589,7 +1595,21 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     line-height: 1.75;
     opacity: 0.82;
 }
+.signup-intro .signup-minimum-spend { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--clay-text); font-weight: 650; opacity: 1; }
 .signup-intro .signup-care { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+
+.attendee-list-details { margin-top: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
+.attendee-list-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 14px; color: var(--matcha-leaf); font-size: .9rem; font-weight: 700; cursor: pointer; list-style: none; }
+.attendee-list-summary::-webkit-details-marker { display: none; }
+.attendee-list-summary::after { content: '+'; margin-left: auto; font-size: 1.15rem; }
+.attendee-list-details[open] > .attendee-list-summary::after { content: '−'; }
+.attendee-list-count { color: var(--muted); font-size: .8rem; font-weight: 500; }
+.attendee-list-details[open] > .attendees-header,
+.attendee-list-details[open] > .attendees-notice,
+.attendee-list-details[open] > .attendees-table-wrap,
+.attendee-list-details[open] > .attendees-cards { margin-inline: 14px; }
+.attendee-list-details[open] > .attendees-header { padding-top: 10px; }
+.attendee-list-details[open] > .attendees-cards { padding-bottom: 14px; }
 
 .attendees-header {
     display: flex;
