@@ -47,7 +47,7 @@
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header class="archive-heading">
         <p class="eyebrow">Past games</p>
-        <h2 id="archive-title">Gathering recaps</h2>
+        <h2 id="archive-title" tabindex="-1">Gathering recaps</h2>
         <p v-if="recapSessions.length" class="metadata">Read what happened and see each game’s results.</p>
       </header>
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
@@ -55,7 +55,8 @@
         <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" v-model="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" /></label>
         <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
       </div>
-      <p v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="filter-count" role="status">Showing {{ filteredSessions.length }} of {{ recapSessions.length }} gatherings</p>
+      <p v-if="shareNotice" class="archive-state share-notice" role="status">{{ shareNotice }}</p>
+      <p v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="filter-count" role="status">{{ filteredSessions.length }} of {{ recapSessions.length }} gatherings match these filters</p>
       <p v-if="error" class="archive-state" role="alert">{{ error }} <UButton class="archive-button" type="button" @click="loadArchive">Try again</UButton></p>
       <p v-else-if="loading" class="archive-state" role="status">Loading recaps…</p>
       <div v-else-if="!recapSessions.length" class="archive-state empty-archive">
@@ -65,7 +66,7 @@
       </div>
 
       <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
-      <article v-for="session in filteredSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id, 'has-cover': session.id === featured?.id && Boolean(coverPhoto(session)) }">
+      <article v-for="session in paginatedSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id, 'has-cover': session.id === featured?.id && Boolean(coverPhoto(session)) }">
         <div class="session-masthead">
           <div class="session-heading">
             <p class="session-kicker"><span v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</span><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
@@ -115,6 +116,12 @@
           </div>
         </details>
       </article>
+      <nav v-if="pageCount > 1 && !loading && !error" class="archive-pagination" aria-label="Gathering recap pages">
+        <UButton class="archive-button page-button" type="button" :disabled="currentPage === 1" @click="changePage(currentPage - 1)">Previous</UButton>
+        <span class="page-status" aria-live="polite">Page {{ currentPage }} of {{ pageCount }}</span>
+        <UButton class="archive-button page-button" type="button" :disabled="currentPage === pageCount" @click="changePage(currentPage + 1)">Next</UButton>
+      </nav>
+      <p v-if="!loading && !error && pageCount > 1" class="pagination-count" aria-live="polite">Showing {{ rangeStart }}–{{ rangeEnd }} of {{ filteredSessions.length }} gatherings</p>
     </section>
 
     <section v-if="!loading && !error && recapSessions.length" class="stats" aria-labelledby="stats-title">
@@ -146,6 +153,9 @@ const sessions = ref([])
 const photoUrls = ref({})
 const selectedYear = ref('all')
 const selectedScript = ref('all')
+const currentPage = ref(1)
+const shareNotice = ref('')
+const PAGE_SIZE = 3
 const loading = ref(true)
 const error = ref('')
 const eventLoading = ref(true)
@@ -159,7 +169,7 @@ const localDate = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit',
 }).format(new Date())
 // The archive endpoint already filters to published sessions.
-const recapSessions = computed(() => sessions.value.filter(hasResults))
+const recapSessions = computed(() => sessions.value.filter(hasResults).sort((a, b) => String(b.session_date || '').localeCompare(String(a.session_date || ''))))
 const nextNight = computed(() => communityEvents.value
   .filter(event => /clocktower/i.test(event.name) && (
     event.date > localDate || (event.date === localDate && !recapSessions.value.some(session =>
@@ -219,6 +229,10 @@ const filteredSessions = computed(() => recapSessions.value.filter(session =>
   (selectedYear.value === 'all' || session.session_date?.startsWith(selectedYear.value)) &&
   (selectedScript.value === 'all' || session.games?.some(game => game.script === selectedScript.value)),
 ))
+const pageCount = computed(() => Math.ceil(filteredSessions.value.length / PAGE_SIZE))
+const paginatedSessions = computed(() => filteredSessions.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE))
+const rangeStart = computed(() => filteredSessions.value.length ? (currentPage.value - 1) * PAGE_SIZE + 1 : 0)
+const rangeEnd = computed(() => Math.min(currentPage.value * PAGE_SIZE, filteredSessions.value.length))
 const statistics = computed(() => ({
   sessions: recapSessions.value.length,
   games: recapSessions.value.reduce((total, session) => total + (session.games?.length || 0), 0),
@@ -264,6 +278,53 @@ function clearArchiveFilters() {
   selectedScript.value = 'all'
 }
 
+watch([selectedYear, selectedScript], () => { currentPage.value = 1 })
+
+async function changePage(page) {
+  currentPage.value = Math.min(Math.max(1, page), pageCount.value)
+  await nextTick()
+  const heading = document.getElementById('archive-title')
+  heading?.scrollIntoView({ block: 'start' })
+  heading?.focus({ preventScroll: true })
+}
+
+async function focusSharedTarget() {
+  const sharedGameId = route.query.game
+  const sharedSessionId = route.query.session
+  if (typeof sharedGameId !== 'string' && typeof sharedSessionId !== 'string') return
+
+  let session = typeof sharedSessionId === 'string'
+    ? recapSessions.value.find(item => String(item.id) === sharedSessionId)
+    : null
+  let game = null
+  if (typeof sharedGameId === 'string') {
+    if (session) game = (session.games || []).find(item => String(item.id) === sharedGameId)
+    if (!game) {
+      session = recapSessions.value.find(item => (item.games || []).some(candidate => String(candidate.id) === sharedGameId))
+      game = session?.games?.find(item => String(item.id) === sharedGameId)
+    }
+  }
+
+  if (!session) {
+    shareNotice.value = 'This shared gathering or game is no longer available. Browse the recaps below.'
+    return
+  }
+
+  // A shared URL should remain useful even when the target is outside the active filters.
+  selectedYear.value = 'all'
+  selectedScript.value = 'all'
+  currentPage.value = Math.floor(recapSessions.value.findIndex(item => String(item.id) === String(session.id)) / PAGE_SIZE) + 1
+  await nextTick()
+
+  const target = game ? document.getElementById('game-' + game.id) : null
+  const fallback = document.getElementById('session-' + session.id)
+  const element = target || fallback
+  if (element) {
+    element.scrollIntoView({ block: 'start' })
+    element.querySelector(game && target ? '.game-script' : 'h3')?.focus({ preventScroll: true })
+  }
+}
+
 async function loadArchive() {
   loading.value = true
   error.value = ''
@@ -277,40 +338,7 @@ async function loadArchive() {
     photoUrls.value = body.photo_urls || {}
     loading.value = false
     await nextTick()
-    const sharedGameId = route.query.game
-    const sharedId = route.query.session
-    if (typeof sharedGameId === 'string') {
-      const sharedSession = typeof sharedId === 'string' ? document.getElementById('session-' + sharedId) : null
-      const target = sharedSession
-        ? [...sharedSession.querySelectorAll('.game-recap')].find(game => game.id === 'game-' + sharedGameId)
-        : document.getElementById('game-' + sharedGameId)
-      if (target) {
-        target.scrollIntoView({ block: 'start' })
-        target.querySelector('.game-script')?.focus({ preventScroll: true })
-        return
-      }
-      const fallback = typeof sharedId === 'string' ? document.getElementById('session-' + sharedId) : null
-      if (fallback) {
-        fallback.scrollIntoView({ block: 'start' })
-        fallback.querySelector('h3')?.focus({ preventScroll: true })
-        return
-      }
-      error.value = 'This shared gathering or game is no longer available. Browse other gatherings below.'
-      await nextTick()
-      document.querySelector('.archive-state[role="alert"]')?.scrollIntoView({ block: 'center' })
-      document.querySelector('.archive-state[role="alert"]')?.setAttribute('tabindex', '-1')
-      document.querySelector('.archive-state[role="alert"]')?.focus({ preventScroll: true })
-      return
-    }
-    if (typeof sharedId === 'string') {
-      const target = document.getElementById('session-' + sharedId)
-      if (target) {
-        target.scrollIntoView({ block: 'start' })
-        target.querySelector('h3')?.focus({ preventScroll: true })
-      } else {
-        error.value = 'This shared gathering is no longer available. Browse other gatherings below.'
-      }
-    }
+    await focusSharedTarget()
   } catch {
     error.value = 'We couldn’t load the recaps. Try again.'
   } finally {
@@ -529,6 +557,12 @@ onMounted(() => {
 .archive-heading { margin-bottom: 18px; }
 .archive-state, .session-card { padding: var(--panel-pad); }
 .archive-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 9px; background: var(--parchment); }
+.share-notice { margin-bottom: 12px; }
+.archive-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin: 22px 0 0; }
+.page-status { min-width: 104px; color: var(--soft-ink); font-size: .88rem; font-variant-numeric: tabular-nums; text-align: center; }
+.page-button { min-width: 104px; }
+.archive-button:disabled { opacity: .5; cursor: not-allowed; }
+.pagination-count { margin: 10px 0 0; color: var(--soft-ink); font-size: .8rem; text-align: center; }
 .archive-filters label { display: grid; gap: 4px; min-width: min(100%, 190px); color: var(--soft-ink); font-size: .76rem; font-weight: 700; }
 .archive-filters select { min-height: 42px; padding: 7px 32px 7px 10px; border: 1px solid #d3bdb1; border-radius: 6px; background: var(--paper); color: var(--ink); font: inherit; }
 .archive-state { margin: 0; color: var(--soft-ink); }
