@@ -20,7 +20,7 @@ export const communityPillars = [
   },
   {
     id: 'clocktower',
-    label: 'Blood on the Clocktower',
+    label: 'Only Blood in the Clocktower',
     description: 'Share clues, read the room, and try to find the Demon in this social deduction game.',
     links: [
       { label: 'Clocktower Gatherings and Recaps', to: '/only-blood-in-the-clocktower' },
