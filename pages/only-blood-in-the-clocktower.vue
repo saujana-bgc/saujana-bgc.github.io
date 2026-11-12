@@ -349,7 +349,7 @@ onMounted(() => {
   --panel-pad: clamp(15px, 2.6vw, 34px);
   width: min(1320px, calc(100% - clamp(28px, 6vw, 88px)));
   margin-inline: auto;
-  padding-bottom: 64px;
+  padding-bottom: 24px;
   color: var(--ink);
 }
 .gathering-banner {

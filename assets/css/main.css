@@ -167,7 +167,7 @@ button:disabled { cursor: not-allowed; }
 ::selection { background: #dce3d3; color: #253b2d; }
 .site-shell, .page-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .site-shell { min-height: 100vh; }
-.page-content { flex: 1; outline: none; padding-top: var(--page-top-inset); }
+.page-content { outline: none; padding-top: var(--page-top-inset); }
 .skip-link { position: fixed; top: -100px; left: 16px; z-index: 2000; padding: 12px 20px; background: var(--matcha-leaf); color: white; border-radius: 8px; }
 .skip-link:focus { top: 12px; }
 .version-update { position: fixed; top: 8px; right: 12px; z-index: 2001; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); box-shadow: var(--shadow-card); font-size: .8rem; }
