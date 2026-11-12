@@ -4,7 +4,7 @@
         <header class="calendar-header fade-up">
           <div>
             <p class="eyebrow">For community organisers</p>
-            <h1>Birthday Club <em>calendar</em></h1>
+            <h1>Birthday Club <em>Calendar</em></h1>
             <p class="header-copy">Check the greeting preference beside each name before posting a public birthday greeting.</p>
           </div>
         </header>
@@ -104,7 +104,7 @@
 <script setup>
 definePageMeta({ layout: 'admin' })
 useHead({
-  title: 'Birthday Club calendar | Saujana BGC',
+  title: 'Birthday Club Calendar | Saujana BGC',
   meta: [
     { name: 'robots', content: 'noindex, nofollow, noarchive' },
     { name: 'description', content: 'Private Saujana BGC birthday calendar.' },

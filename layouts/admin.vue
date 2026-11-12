@@ -1,7 +1,7 @@
 <template>
   <main class="admin-root">
     <section v-if="isRestoring || !isAuthenticated" class="admin-login-wrap">
-      <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Master <em>admin</em></h1><p>Sign in to manage the Birthday Club calendar, Clocktower recaps and Riichi Open I.</p></div>
+      <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark" src="/favicon.ico" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Master Admin</h1><p>Sign in to manage the Birthday Club calendar, Clocktower recaps and Riichi Open I.</p></div>
       <form class="admin-login-card" @submit.prevent="submitLogin">
         <label>Username<UInput v-model="username" class="admin-login-input" autocomplete="username" required /></label>
         <label>Password<UInput v-model="password" class="admin-login-input" type="password" autocomplete="current-password" required /></label>
@@ -23,7 +23,7 @@
 <script setup>
 import { adminNavigation } from '~/utils/adminNavigation.js'
 
-useHead({ title: 'Saujana master admin', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
+useHead({ title: 'Master Admin | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
 const auth = useAdminAuth()
 const { isRestoring, isAuthenticated } = auth
 const route = useRoute()

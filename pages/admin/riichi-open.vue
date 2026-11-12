@@ -1,6 +1,6 @@
 <template>
   <section class="riichi-admin">
-    <div class="event-admin-heading"><div><p class="eyebrow">Event management</p><h1>Riichi Open I</h1></div><NuxtLink to="/riichi-open?tab=standings" target="_blank" class="public-event-link">Public standings ↗</NuxtLink></div>
+    <div class="event-admin-heading"><div><p class="eyebrow">Event Management</p><h1>Riichi Open I Admin</h1></div><NuxtLink to="/riichi-open?tab=standings" target="_blank" class="public-event-link">Public standings ↗</NuxtLink></div>
     <p class="admin-lede">Manage the roster, payment checks and round records. Public scores change only when you certify a complete round.</p>
     <p v-if="error" class="admin-error" role="alert">{{ error }}</p><p v-if="message" class="admin-status" role="status">{{ message }}</p>
     <p v-if="busy" class="admin-status" role="status">Saving event changes…</p>
@@ -44,7 +44,7 @@
 <script setup>
 import { scoreFourPlayerTable } from '~/utils/riichiOpenScoring.js'
 definePageMeta({layout:'admin'})
-useHead({title:'Riichi Open admin | Saujana BGC',meta:[{name:'robots',content:'noindex, nofollow, noarchive'}]})
+useHead({title:'Riichi Open I Admin | Saujana BGC',meta:[{name:'robots',content:'noindex, nofollow, noarchive'}]})
 const {callAdmin,callPublic}=useRiichiOpen(),route=useRoute()
 const data=ref(null),loading=ref(true),busy=ref(false),error=ref(''),message=ref(''),preview=ref(null)
 const registrationNotes=reactive({}),savedRegistrationNotes=reactive({}),registrationNoteConflicts=reactive({}),registrationNoteSavePending=reactive({}),participantEdits=reactive({}),savedParticipantEdits=reactive({}),participantConflicts=reactive({}),participantSaveStates=reactive({}),scores=reactive({}),sticks=reactive({}),tableSaveStates=reactive({})

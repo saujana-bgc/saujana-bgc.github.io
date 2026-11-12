@@ -1,7 +1,7 @@
 <template>
   <main class="clocktower-admin">
     <header class="admin-masthead">
-      <div><p class="eyebrow">The storyteller’s desk</p><h1>Clocktower organiser</h1><p>Log games, write the recap and prepare the next gathering.</p></div>
+      <div><p class="eyebrow">The Storyteller’s Desk</p><h1>Clocktower Organiser</h1><p>Log games, write the recap and prepare the next gathering.</p></div>
       <UButton class="admin-primary" type="button" :disabled="busy" @click="startNew">New gathering</UButton>
     </header>
     <p v-if="error" class="message error" role="alert">{{ error }}</p>
@@ -181,6 +181,7 @@
 
 <script setup>
 definePageMeta({ layout: 'admin' })
+useHead({ title: 'Clocktower Organiser | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
 
 const config = useRuntimeConfig()
 const auth = useAdminAuth()

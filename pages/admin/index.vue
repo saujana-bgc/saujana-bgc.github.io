@@ -1,7 +1,7 @@
 <template>
   <section>
     <p class="eyebrow">Organiser workspace</p>
-    <h1>Master admin</h1>
+    <h1>Master Admin</h1>
     <p class="admin-lede">Choose a page to manage the community calendar, Clocktower recaps, or Riichi Open I.</p>
     <div v-for="group in groups" :key="group.name" class="admin-section" :class="{ 'riichi-links': group.name === 'Riichi Open' }">
       <h2 class="admin-group-title">{{ group.name }}</h2>
@@ -17,7 +17,7 @@
 <script setup>
 import { adminDashboardLinks } from '~/utils/adminNavigation.js'
 definePageMeta({ layout: 'admin' })
-useHead({ title: 'Master admin | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
+useHead({ title: 'Master Admin | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
 const groups = computed(() => ['Community', 'Riichi Open'].map(name => ({ name, items: adminDashboardLinks.filter(item => item.group === name) })))
 </script>
 

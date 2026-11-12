@@ -2,7 +2,7 @@
   <main class="home">
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
-        <h1 id="home-title" class="hero-title">Come play with Saujana</h1>
+        <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
         <p>Board games and riichi mahjong, with help learning the rules. Come solo or bring a friend.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
