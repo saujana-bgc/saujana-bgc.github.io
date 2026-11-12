@@ -8,7 +8,7 @@
     <nav v-if="!isAdminRoute" class="site-nav" aria-label="Primary navigation">
       <div class="mobile-nav-bar">
         <NuxtLink to="/" class="mobile-brand" no-prefetch @click="closeMenu">
-          <img class="mobile-brand-logo" src="/images/saujana-brand.webp" alt="" width="114" height="114" />
+          <img class="mobile-brand-logo brand-mark" src="/images/saujana-brand.webp" alt="" width="114" height="114" />
           <span class="brand-wordmark">Saujana<span class="brand-caption">Board Game Community</span></span>
         </NuxtLink>
         <USlideover v-model:open="menuOpen" title="Explore Saujana" description="Find gatherings, games, and community resources." side="right" :ui="{ content: 'bg-[var(--bg-silk)]', body: 'p-5' }">
