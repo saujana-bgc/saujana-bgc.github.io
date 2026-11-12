@@ -52,15 +52,17 @@
       <h2 id="community-pillars-title" class="hero-title story-title">What We Play</h2>
       <div class="community-pillars">
         <article v-for="pillar in communityPillars" :key="pillar.id" class="community-card">
-          <img
-            class="community-card-image"
-            :src="`/images/site/what-we-play-${pillar.id}.webp`"
-            :alt="pillar.image.alt"
-            :width="pillar.image.width"
-            :height="pillar.image.height"
-            loading="lazy"
-            decoding="async"
-          >
+          <div class="community-card-image-frame" :class="{ 'is-rotated': pillar.id === 'board-games' }">
+            <img
+              class="community-card-image"
+              :src="`/images/site/what-we-play-${pillar.id}.webp`"
+              :alt="pillar.image.alt"
+              :width="pillar.image.width"
+              :height="pillar.image.height"
+              loading="lazy"
+              decoding="async"
+            >
+          </div>
           <h3>{{ pillar.label }}</h3>
           <p>{{ pillar.description }}</p>
           <ul>
@@ -411,15 +413,29 @@ const expectations = [
   padding: 8px 0;
 }
 
+.community-card-image-frame {
+  --image-ratio: 1.5;
+  position: relative;
+  aspect-ratio: var(--image-ratio);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  margin-bottom: 16px;
+}
+
 .community-card-image {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
+  height: 100%;
   object-fit: cover;
-  object-position: center;
-  border-radius: var(--radius-card);
-  margin-bottom: 16px;
+}
+
+.community-card-image-frame.is-rotated .community-card-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(100% / var(--image-ratio));
+  height: calc(100% * var(--image-ratio));
+  transform: translate(-50%, -50%) rotate(-90deg);
 }
 
 .community-card h3 {
@@ -507,7 +523,7 @@ const expectations = [
 
 @media (max-width: 700px) {
   .community-pillars { grid-template-columns: minmax(0, 1fr); }
-  .community-card-image { aspect-ratio: 2 / 1; }
+  .community-card-image-frame { --image-ratio: 2; }
 }
 
 @media (max-width: 600px) {

@@ -32,7 +32,7 @@ export const communityPillars = [
   },
   {
     id: 'clocktower',
-    label: 'Only Blood in the Clocktower',
+    label: 'Blood on the Clocktower',
     image: {
       alt: 'An illustrated ring of tokens on an ornate purple mat beside a lantern.',
       width: 900,
