@@ -67,62 +67,82 @@
         </div>
 
         <section v-if="!matchingGames" class="session-card stats-panel fade-up">
-          <div class="session-date">Our time in games</div>
-          <div class="stats-layout">
-            <div class="stats-grid" aria-label="Play history statistics">
-              <div class="stat-tile">
-                <span class="stat-value">{{ playlogStats.totalPlays }}</span>
-                <span class="stat-label">plays logged</span>
-              </div>
-              <div class="stat-tile">
-                <span class="stat-value">{{ playlogStats.uniqueGames }}</span>
-                <span class="stat-label">games played</span>
-              </div>
-              <div class="stat-tile">
-                <span class="stat-value">{{ playlogStats.avgGamesPerSession }}</span>
-                <span class="stat-label">games per gathering, on average</span>
-              </div>
-              <div class="stat-tile stat-tile-wide">
-                <span class="stat-value">{{ playlogStats.biggestSession.count }}</span>
-                <span class="stat-label">busiest gathering / {{ playlogStats.biggestSession.date }}</span>
-              </div>
-              <div class="stat-tile stat-tile-wide">
-                <span class="stat-value stat-game">{{ playlogStats.newestDiscovery.game }}</span>
-                <span class="stat-label">newest discovery / {{ playlogStats.newestDiscovery.date }}</span>
-              </div>
-            </div>
+          <header class="stats-heading">
+            <p class="eyebrow">A little look back</p>
+            <h2 class="session-date">Our time in games</h2>
+          </header>
 
-            <div class="rankings-panel">
-              <div class="ranking-group">
-                <div class="ranking-title">Most played games</div>
-                <UButton
-                  v-for="game in topPlayedGames"
-                  :key="game.label"
-                  class="ranking-item"
-                  type="button"
-                  @mouseenter="showGameImageFromPointer($event, game.label, false)"
-                  @mouseleave="hideGameImage"
-                  @focus="showGameImageFromPointer($event, game.label, false)"
-                  @blur="hideGameImage"
-                  @click="showGameImageFromPointer($event, game.label, false)"
-                >
-                  <span class="ranking-label">{{ game.label }}</span>
-                  <span class="ranking-count">{{ game.value }}</span>
-                </UButton>
-              </div>
-
-              <div class="ranking-group">
-                <div class="ranking-title">Most active players</div>
-                <div
-                  v-for="player in topPlayers"
-                  :key="player.label"
-                  class="ranking-item ranking-item-static"
-                >
-                  <span class="ranking-label">{{ player.label }}</span>
-                  <span class="ranking-count">{{ player.value }}</span>
-                </div>
-              </div>
+          <div class="stats-totals" aria-label="Play history totals">
+            <div class="total-item">
+              <strong>{{ playlogStats.totalPlays }}</strong>
+              <span>plays logged</span>
             </div>
+            <div class="total-item">
+              <strong>{{ playlogStats.uniqueGames }}</strong>
+              <span>different games</span>
+            </div>
+            <div class="total-item">
+              <strong>{{ sessions.length }}</strong>
+              <span>gatherings</span>
+            </div>
+          </div>
+
+          <p class="stats-average">We play {{ playlogStats.avgGamesPerSession }} games per gathering, on average.</p>
+
+          <div v-if="topPlayedGames.length" class="stats-feature-grid">
+            <section class="featured-game" aria-labelledby="most-played-title">
+              <p class="ranking-title">A familiar favourite</p>
+              <h3 id="most-played-title">Most played</h3>
+              <UButton
+                class="featured-game-button"
+                type="button"
+                @mouseenter="showGameImageFromPointer($event, topPlayedGames[0].label, false)"
+                @mouseleave="hideGameImage"
+                @focus="showGameImageFromPointer($event, topPlayedGames[0].label, false)"
+                @blur="hideGameImage"
+                @click="showGameImageFromPointer($event, topPlayedGames[0].label, false)"
+              >
+                <img :src="topPlayedGames[0].cover" :alt="topPlayedGames[0].label + ' cover'" loading="lazy" decoding="async" @error="hideBrokenCover">
+                <span class="featured-game-copy"><strong>{{ topPlayedGames[0].label }}</strong><span>{{ topPlayedGames[0].value }} {{ topPlayedGames[0].value === 1 ? 'play' : 'plays' }}</span></span>
+              </UButton>
+            </section>
+
+            <section class="game-ranking" aria-label="Other most played games">
+              <UButton
+                v-for="(game, index) in topPlayedGames.slice(1)"
+                :key="game.label"
+                class="ranking-item"
+                type="button"
+                :aria-label="`${game.label}, ${game.value} ${game.value === 1 ? 'play' : 'plays'}`"
+                @mouseenter="showGameImageFromPointer($event, game.label, false)"
+                @mouseleave="hideGameImage"
+                @focus="showGameImageFromPointer($event, game.label, false)"
+                @blur="hideGameImage"
+                @click="showGameImageFromPointer($event, game.label, false)"
+              >
+                <span class="ranking-position">{{ String(index + 2).padStart(2, '0') }}</span>
+                <span class="ranking-label">{{ game.label }}</span>
+                <span class="ranking-count">{{ game.value }}</span>
+                <span class="ranking-track" aria-hidden="true"><span :style="{ width: `${game.value / topPlayedGames[0].value * 100}%` }"></span></span>
+              </UButton>
+            </section>
+          </div>
+
+          <div class="stats-moments">
+            <article class="moment-card">
+              <span class="moment-mark" aria-hidden="true">✳</span>
+              <p class="ranking-title">Busiest gathering</p>
+              <strong>{{ playlogStats.biggestSession.count }} games played</strong>
+              <span>{{ playlogStats.biggestSession.date }}</span>
+            </article>
+            <article class="moment-card discovery-card">
+              <img :src="gameCoverPath(playlogStats.newestDiscovery.game)" :alt="playlogStats.newestDiscovery.game + ' cover'" loading="lazy" decoding="async" @error="hideBrokenCover">
+              <div>
+                <p class="ranking-title">New to the table</p>
+                <strong>{{ playlogStats.newestDiscovery.game }}</strong>
+                <span>First played {{ playlogStats.newestDiscovery.date }}</span>
+              </div>
+            </article>
           </div>
         </section>
       </template>
@@ -169,7 +189,6 @@ const processedData = computed(() => {
     const rows = rawRows.value ?? []
     const byDate = {}
     const gameCounts = {}
-    const playerCounts = {}
     const gamePlayers = {}
 
     rows.forEach((row, index) => {
@@ -181,9 +200,6 @@ const processedData = computed(() => {
             players,
         })
         gameCounts[row.game] = (gameCounts[row.game] || 0) + 1
-        for (const player of players) {
-            playerCounts[player] = (playerCounts[player] || 0) + 1
-        }
         if (!gamePlayers[row.game]) gamePlayers[row.game] = []
         gamePlayers[row.game].push(...players)
     })
@@ -202,7 +218,7 @@ const processedData = computed(() => {
         }
     })
 
-    return { sessionList, gameCounts, playerCounts, gamePlayers }
+    return { sessionList, gameCounts, gamePlayers }
 })
 
 const sessions = computed(() => processedData.value.sessionList)
@@ -223,15 +239,21 @@ const topPlayedGames = computed(() => {
     return Object.entries(processedData.value.gameCounts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
-        .map(([label, value]) => ({ label, value }))
+        .map(([label, value]) => ({ label, value, cover: gameCoverPath(label) }))
 })
 
-const topPlayers = computed(() => {
-    return Object.entries(processedData.value.playerCounts)
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], undefined, { sensitivity: 'base' }))
-        .slice(0, 5)
-        .map(([label, value]) => ({ label, value }))
-})
+function gameCoverPath(gameName) {
+    const filename = gameName
+        .replace(/:\s*/g, ' ')
+        .replace(/[<>"/\\|?*]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+    return `/images/playlog/${filename}.avif`
+}
+
+function hideBrokenCover(event) {
+    event.currentTarget.hidden = true
+}
 
 const playlogStats = computed(() => {
     const sessionsList = sessions.value
@@ -270,16 +292,11 @@ const goToPage = (p) => {
 }
 
 function showGameImageAt(x, y, gameName, showPlayers = true, key = gameName) {
-    const filename = gameName
-        .replace(/:\s*/g, ' ')
-        .replace(/[<>"/\\|?*]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
     const cardWidth = Math.min(190, window.innerWidth - 28)
     const anchorX = Number.isFinite(x) ? x : window.innerWidth / 2
     const anchorY = Number.isFinite(y) ? y : 60
     const above = anchorY > window.innerHeight / 2
-    hoverImage.src = `/images/playlog/${filename}.avif`
+    hoverImage.src = gameCoverPath(gameName)
     hoverImage.name = gameName
     hoverImage.key = key
     hoverImage.showPlayers = showPlayers
@@ -352,7 +369,7 @@ function toggleGameImageFromPointer(e, gameName, showPlayers = true) {
 }
 
 function onDocClick(e) {
-    if (!e.target.closest('.game-pill') && !e.target.closest('.rankings-panel')) hideGameImage()
+    if (!e.target.closest('.game-pill, .game-ranking, .featured-game-button')) hideGameImage()
 }
 
 function onKeydown(e) {
@@ -769,6 +786,52 @@ main > .pagination { order: 3; }
   .clocktower-link a { justify-content: center; width: 100%; box-sizing: border-box; text-align: center; }
   .session-card:not(.stats-panel) { padding: 22px 18px; }
   .stats-panel { margin-top: 18px; }
+}
+
+.stats-panel { padding: clamp(22px, 4vw, 38px); }
+.stats-heading { margin-bottom: 18px; }
+.stats-heading .eyebrow, .ranking-title { margin: 0; color: var(--muted); font-size: .72rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.stats-heading .session-date { margin: 5px 0 0; color: var(--matcha-leaf); font: 400 clamp(1.65rem, 4vw, 2.15rem)/1.2 var(--font-display); }
+.stats-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--line); }
+.total-item { display: grid; gap: 5px; padding: 18px 14px; }
+.total-item + .total-item { border-left: 1px solid var(--line); }
+.total-item strong { color: var(--matcha-leaf); font: 400 clamp(1.8rem, 5vw, 2.8rem)/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.total-item span { color: var(--muted); font-size: .78rem; }
+.stats-average { margin: 12px 0 24px; color: var(--muted); font-size: .83rem; }
+.stats-feature-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 22px; align-items: stretch; }
+.featured-game { display: flex; flex-direction: column; gap: 7px; padding: 20px; border-radius: 10px; background: var(--surface-soft); }
+.featured-game h3 { margin: 0 0 4px; color: var(--matcha-leaf); font: 400 1.45rem/1.2 var(--font-display); }
+.featured-game-button { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 15px; align-items: center; width: 100%; padding: 0; border: 0; background: transparent; color: var(--clay-text); text-align: left; cursor: pointer; }
+.featured-game-button img { width: 104px; height: 116px; border-radius: 7px; background: var(--white-pure); object-fit: contain; }
+.featured-game-copy { display: grid; gap: 7px; min-width: 0; }
+.featured-game-copy strong { font: 400 1.14rem/1.3 var(--font-display); overflow-wrap: anywhere; }
+.featured-game-copy span { color: var(--muted); font-size: .8rem; }
+.game-ranking { display: grid; align-content: center; gap: 3px; }
+.ranking-item { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 6px 10px; padding: 10px 4px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; font-size: .82rem; }
+.ranking-item:hover { background: transparent; }
+.ranking-position { grid-row: span 2; align-self: center; color: var(--muted); font: .75rem var(--font-display); }
+.ranking-label { color: var(--clay-text); font-weight: 500; white-space: normal; }
+.ranking-count { color: var(--matcha-leaf); font-size: .75rem; font-weight: 650; white-space: nowrap; }
+.ranking-track { grid-column: 2 / 4; height: 4px; overflow: hidden; border-radius: 99px; background: var(--line); }
+.ranking-track > span { display: block; height: 100%; border-radius: inherit; background: var(--matcha-leaf); }
+.stats-moments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.moment-card { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; align-content: center; min-height: 96px; padding: 16px; border: 1px solid var(--line); border-radius: 9px; }
+.moment-mark { grid-row: span 3; align-self: center; color: var(--gold-leaf); font-size: 1.15rem; }
+.moment-card strong { color: var(--matcha-leaf); font: 400 1.16rem/1.3 var(--font-display); overflow-wrap: anywhere; }
+.moment-card > span:last-child { color: var(--muted); font-size: .76rem; }
+.discovery-card { grid-template-columns: 70px minmax(0, 1fr); align-items: center; }
+.discovery-card img { width: 70px; height: 74px; border-radius: 5px; background: var(--surface-soft); object-fit: contain; }
+.discovery-card > div { display: grid; gap: 4px; min-width: 0; }
+.discovery-card strong { font-size: 1rem; }
+
+@media (max-width: 600px) {
+  .stats-panel { padding: 22px 18px; }
+  .total-item { padding: 15px 9px; }
+  .total-item span { font-size: .7rem; }
+  .stats-feature-grid { grid-template-columns: 1fr; gap: 12px; }
+  .featured-game { padding: 16px; }
+  .game-ranking { padding-inline: 4px; }
+  .stats-moments { grid-template-columns: 1fr; }
 }
 
 </style>
