@@ -151,7 +151,7 @@ Deno.serve(async (request) => {
       as_of: today,
       timezone: TIME_ZONE,
       events,
-      rsvp_url: "https://saujana-bgc.github.io/gatherings/",
+      rsvp_url: "https://saujana-bgc.org/gatherings/",
     }, 200, headOnly)
   } catch {
     console.error("public-gatherings could not reach Supabase")

@@ -2,12 +2,12 @@ import { createClient, type SupabaseClient, type User } from 'npm:@supabase/supa
 
 export const bucket = 'riichi-open-receipts'
 export const eventSlug = 'riichi-open-i'
-const allowedOrigins = new Set(['https://saujana-bgc.github.io', 'http://localhost:3000', 'http://127.0.0.1:3000'])
+const allowedOrigins = new Set(['https://saujana-bgc.org', 'https://saujana-bgc.github.io', 'http://localhost:3000', 'http://127.0.0.1:3000'])
 
 export function corsHeaders(request: Request) {
   const origin = request.headers.get('origin') ?? ''
   return {
-    'Access-Control-Allow-Origin': allowedOrigins.has(origin) ? origin : 'https://saujana-bgc.github.io',
+    'Access-Control-Allow-Origin': allowedOrigins.has(origin) ? origin : 'https://saujana-bgc.org',
     'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Max-Age': '86400',

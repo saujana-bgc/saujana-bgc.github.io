@@ -1,4 +1,4 @@
-export const siteUrl = 'https://saujana-bgc.github.io'
+export const siteUrl = 'https://saujana-bgc.org'
 export const siteName = 'Saujana Board Game Community'
 
 // Keep public search metadata and the static export's route list together.
