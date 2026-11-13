@@ -33,7 +33,7 @@
             <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
           </div>
         </details>
-        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: currentSort === 'surprise' }" :aria-pressed="currentSort === 'surprise'" :disabled="isPending || isError" @click="generateSurprise">Browse games with no plays logged</UButton>
+        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Show all games' : 'Browse games with no plays logged' }}</UButton>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
@@ -77,7 +77,7 @@
       <div v-if="!isPending && displayedGames.length === 0" class="collection-empty">
         <p>{{ search.trim() ? `No games match “${search.trim()}”.` : 'No games match these filters.' }}</p>
         <p>Try a shorter search, or give the whole shelf another look.</p>
-        <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; resetCategories()">Show all games</UButton>
+        <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Show all games</UButton>
       </div>
     </main>
 
@@ -123,6 +123,7 @@ import { collectionDataSimple } from '~/assets/data/game_data_simple.js'
 const currentSort = ref('name')
 const search = ref('')
 const selectedCategories = ref([])
+const unplayedOnly = ref(false)
 function resetSort() { currentSort.value = null }
 function resetCategories() { selectedCategories.value = [] }
 const selectedGame = ref(null)
@@ -183,13 +184,11 @@ const gamesByPlayed = computed(() => [...gamesWithStats.value].sort((a, b) => {
 const normalizedSearch = computed(() => search.value.trim().toLowerCase())
 
 const displayedGames = computed(() => {
-    const unplayedOnly = currentSort.value === 'surprise'
-    const list = unplayedOnly ? gamesWithStats.value
-        : currentSort.value === 'played' ? gamesByPlayed.value : gamesByName.value
+    const list = currentSort.value === 'played' ? gamesByPlayed.value : gamesByName.value
     const query = normalizedSearch.value
     const cats = selectedCategories.value
-    if (!unplayedOnly && !query && !cats.length) return list
-    return list.filter(game => (!unplayedOnly || game.stats.count === 0)
+    if (!unplayedOnly.value && !query && !cats.length) return list
+    return list.filter(game => (!unplayedOnly.value || game.stats.count === 0)
         && (!query || game.searchText.includes(query))
         && (!cats.length || cats.some(category => game.categories?.includes(category))))
 })
@@ -239,11 +238,10 @@ const totalGames = computed(() => collectionDataSimple?.total || 0)
 const unplayedCount = computed(() => gamesWithStats.value.filter(g => g.stats.count === 0).length)
 const lastTended = computed(() => collectionDataSimple?.date || '--')
 
-const generateSurprise = () => {
+const toggleUnplayed = () => {
     if (isPending.value || isError.value) return
-    const unplayed = gamesWithStats.value.filter(g => g.stats.count === 0)
-    if (unplayed.length === 0) { alert('Every game on the shelf has a logged play. Try Recently played to find a favourite.'); return }
-    currentSort.value = 'surprise'
+    if (!unplayedOnly.value && unplayedCount.value === 0) return
+    unplayedOnly.value = !unplayedOnly.value
 }
 
 const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23f7e9e6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='13' fill='%236b7a68' opacity='0.5'%3EAwaiting Visual%3C/text%3E%3C/svg%3E"
@@ -330,7 +328,7 @@ onUnmounted(() => {
     window.removeEventListener('resize', onResize)
 })
 
-watch([search, currentSort, selectedCategories], () => {
+watch([search, currentSort, selectedCategories, unplayedOnly], () => {
     nextTick(() => updateViewport({ measure: true }))
 })
 </script>
