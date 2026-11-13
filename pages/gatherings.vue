@@ -46,8 +46,10 @@
         :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
       >
         <div v-if="getEventImage(event)" class="event-image-wrap">
-          <span class="event-image-date">{{ formatDate(event.date) }}</span>
-          <h2 class="hero-title event-image-title">{{ event.name }}</h2>
+          <div class="event-image-content">
+            <span class="event-image-date">{{ formatDate(event.date) }}</span>
+            <h2 class="hero-title event-image-title">{{ event.name }}</h2>
+          </div>
           <img
             :src="getEventImage(event)"
             :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
@@ -101,10 +103,6 @@
           </div>
 
           <div v-else-if="!isSpookyGameDay(event)" class="attendees-section">
-            <div v-if="activeTab === 'present'" class="signup-intro">
-              <h3>Sign up</h3>
-            </div>
-
             <div v-if="canEditEvent(event)" class="signup-section">
               <div v-if="signupSuccess[event.id]" class="signup-success" role="status">
                 <p>{{ signupSuccess[event.id] }}</p>
@@ -117,18 +115,15 @@
                 v-else
                 :ref="el => setSignupFormRef(event.id, el)"
                 class="signup-form"
-                :aria-labelledby="`signup-title-${event.id}`"
+                :aria-label="`Sign up for ${event.name}`"
                 :aria-busy="Boolean(savingRows[event.id])"
                 @submit.prevent="saveNewRow(event.id)"
               >
-                <div class="signup-form-heading">
-                  <h4 :id="`signup-title-${event.id}`">Your sign-up</h4>
-                </div>
                 <fieldset class="signup-fields" :disabled="savingRows[event.id]">
                   <legend class="signup-sr-only">Your details</legend>
                   <div class="signup-field signup-field-name">
                     <label :for="`signup-name-${event.id}`">Name <span class="signup-required">(required)</span></label>
-                    <p class="signup-field-hint">Your name or nickname appears on the attendee list. It’s all you need to sign up.</p>
+                    <p class="signup-field-hint">This name appears on the public attendee list.</p>
                     <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-error-${event.id}` : undefined" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === newRows[event.id] && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === newRows[event.id] && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @keydown="onNameAutocompleteKeydown($event, newRows[event.id])" @blur="hideNameAutocompleteSoon" />
                     <p v-if="nameErrors[event.id]" :id="`signup-name-error-${event.id}`" class="signup-error" role="alert">Add the name you’d like us to know you by.</p>
                   </div>
@@ -1264,15 +1259,13 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     text-shadow: 0 2px 12px #0009;
 }
 .event-image-date {
-    position: absolute;
-    z-index: 2;
-    inset: auto 20px 57px;
     color: rgba(255, 255, 255, .88);
     font-size: .7rem;
     font-weight: 700;
     letter-spacing: .14em;
     text-transform: uppercase;
     text-shadow: 0 2px 12px #0009;
+    line-height: 1.4;
 }
 .event-image-facts {
     display: grid;
@@ -1302,6 +1295,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 
 .event-card .event-image-title {
+    position: static;
+    inset: auto;
     color: white;
     margin: 0;
     max-width: 680px;
@@ -2221,7 +2216,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 18px 20px;
     min-width: 0;
-    margin: 22px 0;
+    margin: 6px 0 22px;
     padding: 0;
     border: 0;
 }
