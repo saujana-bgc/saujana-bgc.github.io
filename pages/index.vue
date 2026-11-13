@@ -3,7 +3,7 @@
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
         <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
-        <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Come solo or with a friend. New to a game? We’ll help you get started.</p>
+        <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Coming on your own? You’re welcome to watch a round before joining in.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">Plan your first visit <span aria-hidden="true">↓</span></a>
@@ -22,7 +22,8 @@
       </figure>
     </section>
 
-    <section v-if="nextGathering" class="next-gathering" aria-labelledby="next-gathering-title" aria-live="polite">
+    <section class="next-gathering" :class="{ 'next-gathering-loading': !nextGathering }" aria-labelledby="next-gathering-title" :aria-busy="!nextGathering">
+      <template v-if="nextGathering">
       <div>
         <p class="next-gathering-label">Something to look forward to</p>
         <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
@@ -45,6 +46,8 @@
       <NuxtLink class="next-gathering-link" :to="`/gatherings#gathering-${nextGathering.id}`" no-prefetch>
         See gathering details <span aria-hidden="true">→</span>
       </NuxtLink>
+      </template>
+      <p v-else class="next-gathering-loading-copy">Finding the next gathering…</p>
     </section>
 
     <section id="community-pillars" class="home-section" aria-labelledby="community-pillars-title" tabindex="-1">
@@ -271,6 +274,9 @@ const expectations = [
   padding: 20px 0;
   border-bottom: 1px solid var(--line);
 }
+
+.next-gathering-loading { min-height: 124px; }
+.next-gathering-loading-copy { margin: 0; color: var(--muted); }
 
 .next-gathering-label {
   margin: 0 0 4px;

@@ -42,6 +42,7 @@
         :style="{ transitionDelay: (index * 0.07) + 's' }"
       >
         <div v-if="getEventImage(event)" class="event-image-wrap">
+          <h2 class="hero-title event-image-title">{{ event.name }}</h2>
           <img
             :src="getEventImage(event)"
             :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
@@ -52,29 +53,6 @@
             :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
             decoding="async"
           />
-          <div class="event-image-content">
-            <div class="event-image-copy">
-              <span class="date-badge event-image-date">🌿 {{ formatDate(event.date) }}</span>
-              <h2 class="hero-title event-image-title">{{ event.name }}</h2>
-            </div>
-            <div class="event-image-details" aria-label="Gathering details">
-              <div class="event-detail">
-                <span class="event-detail-label">Time</span>
-                <span class="event-detail-value">{{ event.time }}</span>
-              </div>
-              <div class="event-detail event-detail-venue">
-                <span class="event-detail-label">Venue</span>
-                <span class="event-detail-value">{{ event.venue }}</span>
-              </div>
-              <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer" class="event-directions" aria-label="Open directions">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11Z"/>
-                  <circle cx="12" cy="10" r="2.4"/>
-                </svg>
-                <span>Directions</span>
-              </a>
-            </div>
-          </div>
         </div>
 
         <div v-else class="event-heading">
@@ -85,6 +63,13 @@
             <span>{{ event.venue }}</span>
             <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions</a>
           </div>
+        </div>
+
+        <div v-if="getEventImage(event)" class="event-image-facts" aria-label="Gathering details">
+          <span><small>Date</small><strong>{{ formatDate(event.date) }}</strong></span>
+          <span><small>Time</small><strong>{{ event.time }}</strong></span>
+          <span><small>Venue</small><strong>{{ event.venue }}</strong></span>
+          <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
         <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
@@ -1263,6 +1248,30 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     gap: 8px;
 }
 
+.event-image-title {
+    position: absolute;
+    z-index: 2;
+    inset: auto 20px 20px;
+    color: white;
+    font-size: clamp(1.4rem, 4vw, 2.1rem);
+    text-shadow: 0 2px 12px #0009;
+}
+.event-image-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 12px 0 20px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white-pure);
+    color: var(--clay-text);
+}
+.event-image-facts span { min-width: 0; }
+.event-image-facts small { display: block; margin-bottom: 3px; color: var(--muted); }
+.event-image-facts strong { display: block; font-weight: 600; line-height: 1.45; }
+.event-image-facts a { min-height: 44px; display: flex; align-items: center; color: var(--matcha-leaf); }
+
 .event-image-copy {
     max-width: 680px;
 }
@@ -1434,24 +1443,12 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     .event-image-wrap {
         height: auto;
         min-height: 0;
+        aspect-ratio: 3 / 2;
     }
 
     .event-image {
         position: absolute;
         inset: 0;
-    }
-
-    .event-image-content {
-        position: relative;
-        left: auto;
-        right: auto;
-        top: auto;
-        bottom: auto;
-        min-height: 255px;
-        padding: 18px;
-        box-sizing: border-box;
-        gap: 8px;
-        background: linear-gradient(180deg, rgba(20, 30, 22, 0.24), rgba(20, 30, 22, 0.84) 42%, rgba(20, 30, 22, 0.9));
     }
 
     .event-card .event-image-title {

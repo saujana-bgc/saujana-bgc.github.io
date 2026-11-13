@@ -63,14 +63,9 @@
           </div>
 
           <div class="last-played">
-            <div>
-              <span v-if="game.stats.date">Last played {{ formatDate(game.stats.date) }}</span>
-              <span v-else-if="!isPending && !isError" style="opacity: 0.65; font-style: italic;">No plays logged yet</span>
-              <span v-else aria-hidden="true">—</span>
-            </div>
-            <div style="margin-top: 6px; opacity: 0.65;">
-              Plays logged: {{ isPending || isError ? '—' : game.stats.count }}
-            </div>
+            <span v-if="game.stats.date">Last played {{ formatDate(game.stats.date) }} · {{ game.stats.count }} {{ game.stats.count === 1 ? 'play' : 'plays' }}</span>
+            <span v-else-if="!isPending && !isError">No plays logged</span>
+            <span v-else aria-hidden="true">Play history loading</span>
           </div>
         </article>
 
