@@ -19,7 +19,6 @@
           loading="eager"
           fetchpriority="high"
         >
-        <span class="hero-site-address" aria-hidden="true">saujana-bgc.org</span>
       </figure>
     </section>
 
@@ -280,24 +279,6 @@ const expectations = [
   width: 100%;
   min-width: 0;
   margin: 0;
-}
-
-.hero-site-address {
-  position: absolute;
-  top: 78.2%;
-  left: 22.1%;
-  display: flex;
-  width: 18.6%;
-  height: 5.4%;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #9c6222;
-  color: #fffefa;
-  font-size: clamp(.32rem, .7vw, .75rem);
-  letter-spacing: .01em;
-  white-space: nowrap;
 }
 
 .hero-banner {
