@@ -2,7 +2,7 @@
   <main class="clocktower-page">
     <header class="page-intro">
       <p class="page-eyebrow">Social deduction</p>
-      <h1 class="hero-title">Only Blood in the Clocktower</h1>
+      <h1 class="hero-title">Blood on the Clocktower</h1>
       <p class="stats-container">Blood on the Clocktower is a social game of hidden roles. Talk, share clues and vote to find the Demon. New players are welcome; we’ll explain as you play.</p>
     </header>
 

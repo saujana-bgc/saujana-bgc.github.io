@@ -25,7 +25,7 @@
     <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
       <template v-if="nextGathering">
       <div>
-        <p class="next-gathering-label">Something to look forward to</p>
+        <p class="next-gathering-label">Next gathering</p>
         <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
         <div class="next-gathering-details">
           <span class="gathering-detail">

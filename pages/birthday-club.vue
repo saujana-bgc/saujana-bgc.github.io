@@ -84,8 +84,8 @@
             <input id="public-greeting" v-model="allowPublicGreeting" type="checkbox" name="public_greeting">
             <span class="check-box" aria-hidden="true"></span>
             <span>
-              <strong>I’m happy for Saujana to share a birthday greeting publicly</strong>
-              <small>Leave this unchecked and your birthday stays in the organisers’ private calendar.</small>
+              <strong>Allow a public birthday greeting</strong>
+              <small>Otherwise, your birthday stays in the organisers’ private calendar.</small>
             </span>
           </label>
 

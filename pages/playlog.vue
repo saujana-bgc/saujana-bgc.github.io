@@ -38,7 +38,7 @@
 
           <div class="game-grid">
             <UButton
-              v-for="game in session.games"
+              v-for="game in visibleSessionGames(session)"
               :key="game.key"
               class="game-pill"
               type="button"
@@ -47,6 +47,13 @@
               @click="toggleGameImage($event, game)"
             >{{ game.name }}</UButton>
           </div>
+          <UButton
+            v-if="matchingGames && session.games.some(game => !game.name.toLocaleLowerCase().includes(matchingGames))"
+            class="show-session-games"
+            type="button"
+            :aria-expanded="expandedSessionGames.has(session.date)"
+            @click="toggleSessionGames(session.date)"
+          >{{ expandedSessionGames.has(session.date) ? 'Show matching games only' : `Show all ${session.games.length} games from this gathering` }}</UButton>
         </section>
 
         <div v-if="filteredSessions.length === 0" class="loading-state">
@@ -169,6 +176,7 @@ const HOVER_CARD_HEIGHT = 245
 
 const currentPage = ref(1)
 const search = ref('')
+const expandedSessionGames = reactive(new Set())
 const hoverImage = reactive({ visible: false, src: '', name: '', key: '', showPlayers: true, players: [], x: 0, y: 0, above: true })
 const matchingGames = computed(() => search.value.trim().toLocaleLowerCase())
 const collectionMatch = computed(() => {
@@ -284,7 +292,17 @@ const playlogStats = computed(() => {
     }
 })
 
-watch(search, () => { currentPage.value = 1 })
+watch(search, () => { currentPage.value = 1; expandedSessionGames.clear() })
+
+function visibleSessionGames(session) {
+    if (!matchingGames.value || expandedSessionGames.has(session.date)) return session.games
+    return session.games.filter(game => game.name.toLocaleLowerCase().includes(matchingGames.value))
+}
+
+function toggleSessionGames(date) {
+    if (expandedSessionGames.has(date)) expandedSessionGames.delete(date)
+    else expandedSessionGames.add(date)
+}
 
 const goToPage = (p) => {
     currentPage.value = p
@@ -563,6 +581,8 @@ onUnmounted(() => {
     background: var(--lavender-mist);
     box-shadow: inset 0 0 0 1px var(--matcha-leaf);
 }
+
+.show-session-games { margin-top: 14px; min-height: 44px; color: var(--matcha-leaf); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; }
 
 .pagination {
     display: flex;

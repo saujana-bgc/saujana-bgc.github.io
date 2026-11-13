@@ -12,14 +12,14 @@
           :ui="{ base: 'collection-search-field' }"
           v-model="search"
           type="search"
-          placeholder="Find your next game"
+          placeholder="Search by title, category, or player count"
           aria-label="Search the collection by title, category, player count, or designer"
         />
         <div class="collection-search-meta">
           <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
           <p class="collection-updated">Shelf updated {{ lastTended }}</p>
         </div>
-        <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
+        <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="collection-search-clear" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
       </div>
 
       <div class="sort-controls fade-up">

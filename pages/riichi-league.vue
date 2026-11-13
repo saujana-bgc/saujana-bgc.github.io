@@ -53,10 +53,10 @@
           <p class="section-kicker">Season table</p>
           <h2 id="standings-heading">Standings</h2>
         </div>
-        <p>
-          Your best league score each day counts as one daily result. Your season
-          total adds up your best {{ selectedSeason.bestResultsCount }} daily results. Play again without risking the points you’ve already earned.
-        </p>
+        <details class="league-scoring-details">
+          <summary>How league points work</summary>
+          <p>Your best league score each day counts as one daily result. Your season total adds up your best {{ selectedSeason.bestResultsCount }} daily results. Play again without risking the points you’ve already earned.</p>
+        </details>
       </div>
 
       <label class="standing-search">
@@ -1310,6 +1310,10 @@ onBeforeUnmount(() => {
   opacity: .65;
 }
 
+.league-scoring-details { max-width: 360px; color: var(--muted); font-size: .76rem; line-height: 1.6; }
+.league-scoring-details summary { min-height: 44px; display: flex; align-items: center; justify-content: flex-end; color: var(--matcha-leaf); font-weight: 600; cursor: pointer; }
+.league-scoring-details p { margin: 8px 0 0; }
+
 .standings-table-wrap,
 .result-table-wrap {
   overflow-x: auto;
@@ -2277,7 +2281,9 @@ onBeforeUnmount(() => {
   .season-stats > div { padding: 12px 8px; }
   .season-stats span { font-size: .75rem; line-height: 1.45; opacity: .85; }
   .league-hero { padding: 0 8px 24px; }
-  .league-intro, .section-heading > p, .rules-card > div > p { font-size: .9rem; opacity: .85; }
+  .league-intro, .section-heading > p, .rules-card > div > p, .league-scoring-details { font-size: .9rem; opacity: .85; }
+  .league-scoring-details { max-width: none; }
+  .league-scoring-details summary { justify-content: flex-start; }
   .mobile-week-select { display: grid; gap: 8px; margin: 18px 0; font-size: .9rem; }
   .week-picker { display: none; }
   .standings-toggle { display: flex; width: 100%; margin-top: 14px; }
