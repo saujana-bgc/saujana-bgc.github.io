@@ -83,14 +83,6 @@
       </div>
     </section>
 
-    <section class="social-note" aria-label="Follow Saujana on Instagram">
-      <div>
-        <h2 class="story-title">A little look around</h2>
-        <p>Photos and recaps from the community</p>
-      </div>
-      <SocialLink channel="instagram" label="See gathering photos on Instagram" />
-    </section>
-
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
       <div class="first-visit-layout">
         <div class="first-visit-copy">
@@ -116,6 +108,14 @@
           </article>
         </div>
       </div>
+    </section>
+
+    <section class="social-note" aria-label="Follow Saujana on Instagram">
+      <div>
+        <h2 class="story-title">A little look around</h2>
+        <p>Photos and recaps from the community</p>
+      </div>
+      <SocialLink channel="instagram" label="See gathering photos on Instagram" />
     </section>
 
     <section class="home-section" aria-labelledby="community-values-title">

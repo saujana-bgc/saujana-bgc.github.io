@@ -63,7 +63,7 @@
           </div>
 
           <div class="last-played">
-            <span v-if="game.stats.date">Last played {{ formatDate(game.stats.date) }} · {{ game.stats.count }} {{ game.stats.count === 1 ? 'play' : 'plays' }}</span>
+            <NuxtLink v-if="game.stats.date" :to="{ path: '/playlog', query: { game: game.name } }">Last played {{ formatDate(game.stats.date) }} · {{ game.stats.count }} {{ game.stats.count === 1 ? 'play' : 'plays' }}</NuxtLink>
             <span v-else-if="!isPending && !isError">No plays logged</span>
             <span v-else aria-hidden="true"></span>
           </div>

@@ -305,6 +305,9 @@ onMounted(async () => {
   if (disposed) return
   await loadPublic()
   if (disposed) return
+  if (publicLoaded.value && !canRegister.value && !hold.value && !complete.value && route.query.tab !== 'registration') {
+    activeTab.value = 'standings'
+  }
   refreshTimer=window.setInterval(refreshWhenVisible,30000)
   window.addEventListener('focus',refreshWhenVisible)
   document.addEventListener('visibilitychange',refreshWhenVisible)

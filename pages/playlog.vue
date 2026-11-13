@@ -141,6 +141,7 @@
 </template>
 
 <script setup>
+const route = useRoute()
 const PAGE_SIZE = 10
 const HOVER_CARD_HEIGHT = 245
 
@@ -153,6 +154,10 @@ const matchingGameCount = computed(() => matchingGames.value
     : 0)
 
 const { data: rawRows, isPending, isError } = usePlaylogData()
+
+onMounted(() => {
+  if (typeof route.query.game === 'string') search.value = route.query.game
+})
 
 const processedData = computed(() => {
     const rows = rawRows.value ?? []
