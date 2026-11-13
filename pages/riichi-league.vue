@@ -3,7 +3,7 @@
     <header class="page-intro league-hero fade-up">
       <p class="page-eyebrow">Riichi mahjong</p>
       <h1 class="hero-title">Riichi League</h1>
-      <p class="league-intro">Follow the standings, revisit a week, or add your latest result.</p>
+      <p class="league-intro">{{ seasonStatus === 'completed' ? 'View the final standings or revisit a week.' : 'Follow the standings, revisit a week, or add your latest result.' }}</p>
       <div class="season-switcher">
         <label class="league-field-label" for="season-select">Season</label>
         <USelect class="league-control w-full" id="season-select" v-model="selectedSeasonId" :items="seasons.map(item => ({ label: `Season ${item.number}`, value: item.id }))" :disabled="isLoadingLeague || !seasons.length || isSubmittingScore" />

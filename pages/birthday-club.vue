@@ -21,7 +21,8 @@
         </div>
 
         <form v-else novalidate @submit.prevent="submitBirthday">
-               <div class="field-group">
+          <p class="privacy-note">Only the organisers can see your birthday. A public greeting is optional.</p>
+          <div class="field-group">
             <label for="birthday-name">Name or nickname</label>
             <UInput
               class="birthday-control"
@@ -79,16 +80,12 @@
             </div>
           </fieldset>
 
-          <p class="privacy-note">
-            Just your chosen name, month, and day. We don’t need your birth year. Organisers keep your birthday and greeting preference in a private calendar.
-          </p>
-
           <label class="consent-row" for="public-greeting">
             <input id="public-greeting" v-model="allowPublicGreeting" type="checkbox" name="public_greeting">
             <span class="check-box" aria-hidden="true"></span>
             <span>
               <strong>I’m happy for Saujana to share a birthday greeting publicly</strong>
-              <small>This is optional. Your birthday stays in our private calendar if you leave this unchecked.</small>
+              <small>Leave this unchecked and your birthday stays in the organisers’ private calendar.</small>
             </span>
           </label>
 

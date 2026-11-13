@@ -56,6 +56,33 @@
       </div>
     </section>
 
+    <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
+      <div class="first-visit-layout">
+        <div class="first-visit-copy">
+          <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
+          <p class="section-intro">Your first game or your hundredth, you’re welcome here. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
+        </div>
+        <img
+          class="first-visit-photo"
+          src="/images/site/first-gathering-cafe.webp"
+          alt="Saujana players chatting around a café table scattered with cards and tokens."
+          width="1200"
+          height="900"
+          loading="lazy"
+          decoding="async"
+        >
+        <div class="expect-guide">
+          <article v-for="item in expectations" :key="item.title" class="expect-card">
+            <svg class="guide-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="item.icon"/></svg>
+            <div>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.copy }}</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section id="community-pillars" class="home-section" aria-labelledby="community-pillars-title" tabindex="-1">
       <h2 id="community-pillars-title" class="hero-title story-title">What We Play</h2>
       <div class="community-pillars">
@@ -81,33 +108,6 @@
             </li>
           </ul>
         </article>
-      </div>
-    </section>
-
-    <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
-      <div class="first-visit-layout">
-        <div class="first-visit-copy">
-          <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">Your first game or your hundredth, you’re welcome here. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
-        </div>
-        <img
-          class="first-visit-photo"
-          src="/images/site/first-gathering-cafe.webp"
-          alt="Saujana players chatting around a café table scattered with cards and tokens."
-          width="1200"
-          height="900"
-          loading="lazy"
-          decoding="async"
-        >
-        <div class="expect-guide">
-          <article v-for="item in expectations" :key="item.title" class="expect-card">
-            <svg class="guide-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="item.icon"/></svg>
-            <div>
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.copy }}</p>
-            </div>
-          </article>
-        </div>
       </div>
     </section>
 

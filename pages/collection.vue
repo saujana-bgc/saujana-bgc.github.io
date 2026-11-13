@@ -33,7 +33,7 @@
             <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
           </div>
         </details>
-        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Show all games' : 'Browse games with no plays logged' }}</UButton>
+        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'Browse games with no plays logged' }}</UButton>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
