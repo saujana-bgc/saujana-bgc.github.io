@@ -13,6 +13,7 @@
         <a class="league-button" href="#weeks-heading">Weekly results</a>
         <UButton class="league-button league-button-primary" v-if="entryWeek" type="button" :disabled="isSubmittingScore" @click="goToEntry">Add results</UButton>
       </nav>
+      <div v-else-if="isLoadingLeague" class="league-shortcuts-placeholder" aria-hidden="true"></div>
     </header>
 
     <p v-if="leagueLoadError" class="league-load-error" role="alert">{{ leagueLoadError }} <UButton type="button" @click="loadLeagueFromSupabase">Try again</UButton></p>
@@ -2254,6 +2255,7 @@ onBeforeUnmount(() => {
 }
 /* Comfortable touch targets and shortcuts shared across screen sizes. */
 .league-shortcuts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
+.league-shortcuts-placeholder { min-height: 68px; margin-top: 22px; }
 .league-shortcuts a, .league-shortcuts button, .standings-toggle { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 8px 16px; border: 1px solid #9ba995; border-radius: 999px; background: #fffdf9; color: #41513d; font: inherit; font-size: .9rem; text-decoration: none; cursor: pointer; }
 .league-shortcuts button { background: var(--matcha-leaf); color: white; }
 #standings-heading, #weeks-heading, #score-entry { scroll-margin-top: 90px; }

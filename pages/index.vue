@@ -12,17 +12,17 @@
       <figure class="hero-artwork">
         <img
           class="hero-banner"
-          src="/images/site/saujana-home-hero.webp"
-          alt="A collage of Saujana players at board game and riichi mahjong gatherings."
-          width="1671"
-          height="941"
+          src="/images/site/first-gathering-cafe.webp"
+          alt="Saujana players chatting around a café table scattered with cards and tokens."
+          width="1200"
+          height="900"
           loading="eager"
           fetchpriority="high"
         >
       </figure>
     </section>
 
-    <section class="next-gathering" :class="{ 'next-gathering-loading': !nextGathering }" aria-labelledby="next-gathering-title" :aria-busy="!nextGathering">
+    <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
       <template v-if="nextGathering">
       <div>
         <p class="next-gathering-label">Something to look forward to</p>
@@ -47,7 +47,12 @@
         See gathering details <span aria-hidden="true">→</span>
       </NuxtLink>
       </template>
-      <p v-else class="next-gathering-loading-copy">Finding the next gathering…</p>
+      <div v-else class="next-gathering-empty" role="status">
+        <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
+        <p v-else-if="gatheringStatus === 'unavailable'">The calendar isn’t available just now.</p>
+        <p v-else>No date has been announced yet.</p>
+        <NuxtLink class="text-link" to="/gatherings" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
+      </div>
     </section>
 
     <section id="community-pillars" class="home-section" aria-labelledby="community-pillars-title" tabindex="-1">
@@ -92,7 +97,6 @@
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
           <p class="section-intro">When you arrive, ask for Saujana BGC. If you’d like help choosing a game, just ask. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Send us a message on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
         </div>
-        <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
         <div class="expect-guide">
           <article v-for="item in expectations" :key="item.title" class="expect-card">
             <svg class="guide-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="item.icon"/></svg>
@@ -125,21 +129,28 @@
 import { communityPillars } from '~/utils/communityPillars'
 
 const nextGathering = ref(null)
+const gatheringStatus = ref('loading')
 
 onMounted(async () => {
-  const { data, error } = await useSupabase()
-    .from('events')
-    .select('id,name,date,time,venue,venue_url')
-    .gte('date', new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Kuala_Lumpur',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(new Date()))
-    .order('date', { ascending: true })
-    .limit(1)
+  try {
+    const { data, error } = await useSupabase()
+      .from('events')
+      .select('id,name,date,time,venue,venue_url')
+      .gte('date', new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kuala_Lumpur',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date()))
+      .order('date', { ascending: true })
+      .limit(1)
 
-  if (!error) nextGathering.value = data?.[0] ?? null
+    if (error) throw error
+    nextGathering.value = data?.[0] ?? null
+    gatheringStatus.value = 'ready'
+  } catch {
+    gatheringStatus.value = 'unavailable'
+  }
 })
 
 function formatGatheringDate(dateValue) {
@@ -278,8 +289,9 @@ const expectations = [
   border-bottom: 1px solid var(--line);
 }
 
-.next-gathering-loading { min-height: 124px; }
-.next-gathering-loading-copy { margin: 0; color: var(--muted); }
+.next-gathering { min-height: 124px; }
+.next-gathering-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+.next-gathering-empty p { margin: 0; color: var(--muted); }
 
 .next-gathering-label {
   margin: 0 0 4px;
@@ -331,14 +343,6 @@ const expectations = [
   text-underline-offset: .2em;
 }
 
-.first-visit-photo {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius-card);
-  object-fit: cover;
-}
-
 .home-section {
   margin-top: clamp(48px, 7vw, 80px);
   padding-top: clamp(28px, 4vw, 44px);
@@ -354,13 +358,12 @@ const expectations = [
 
 .first-visit-layout {
   display: grid;
-  grid-template-areas: "copy copy" "photo steps";
-  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  grid-template-areas: "copy" "steps";
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 20px 28px;
 }
 .first-visit-copy { grid-area: copy; }
-.first-visit-photo { grid-area: photo; }
 .first-visit-layout > .expect-guide { grid-area: steps; width: 100%; }
 
 .story-title { font-size: clamp(1.7rem, 4vw, 2.55rem); }
@@ -473,11 +476,6 @@ const expectations = [
 }
 
 .community-card .text-link span { flex-shrink: 0; }
-.first-visit-photo {
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
 .social-note {
   display: flex;
   flex-wrap: wrap;

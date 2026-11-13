@@ -29,10 +29,9 @@
 
       <template v-else>
         <section
-          v-for="(session, i) in pagedSessions"
+          v-for="session in pagedSessions"
           :key="session.date"
           class="session-card fade-up"
-          :style="{ transitionDelay: Math.min(i * 0.07, 0.5) + 's' }"
         >
           <div class="session-date">{{ session.displayDate }}</div>
 

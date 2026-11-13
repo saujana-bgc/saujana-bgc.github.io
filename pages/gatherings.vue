@@ -32,8 +32,8 @@
         </div>
       </details>
 
-      <div class="first-visit-contact">
-        <span>Questions about your first visit?</span>
+      <div v-if="activeTab === 'present'" class="first-visit-contact">
+        <span>New to Saujana? Ask us anything.</span>
         <SocialLink channel="whatsapp" label="Message us on WhatsApp" />
       </div>
 
@@ -44,7 +44,6 @@
         class="event-card fade-up"
         tabindex="-1"
         :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
-        :style="{ transitionDelay: (index * 0.07) + 's' }"
       >
         <div v-if="getEventImage(event)" class="event-image-wrap">
           <h2 class="hero-title event-image-title">{{ event.name }}</h2>
@@ -333,13 +332,12 @@
       </div>
 
       <template v-if="loading">
-        <div class="loading-copy">Loading gatherings…</div>
-        <div class="event-card" v-for="n in 2" :key="'skel-'+n" style="pointer-events: none;">
-          <div class="skel" style="width: 32%; margin-bottom: 18px;"></div>
-          <div class="skel" style="width: 55%; height: 30px; margin-bottom: 14px;"></div>
-          <div class="skel" style="margin-bottom: 8px;"></div>
-          <div class="skel" style="width: 80%; margin-bottom: 30px;"></div>
-          <div class="skel" style="height: 110px; border-radius: 20px; margin-bottom: 0;"></div>
+        <p class="loading-copy" role="status">Checking the calendar…</p>
+        <div class="event-card loading-event-card" aria-hidden="true">
+          <div class="loading-event-banner"></div>
+          <div class="loading-event-facts"><span v-for="n in 4" :key="n"></span></div>
+          <div class="loading-event-copy"><span v-for="n in 4" :key="n"></span></div>
+          <div class="loading-event-signup"><span></span><span></span></div>
         </div>
       </template>
 
@@ -1383,15 +1381,10 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .first-visit-contact {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 4px 16px;
+    align-items: baseline;
+    gap: 0 12px;
     width: min(960px, calc(100% - 40px));
-    margin: -2px 0 24px;
-    padding: 10px 14px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--surface-soft);
+    margin: -12px 0 20px;
     color: var(--muted);
     font-size: .86rem;
 }
@@ -1547,6 +1540,21 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     text-transform: uppercase;
     opacity: 0.58;
 }
+
+.loading-event-card { min-height: 650px; pointer-events: none; }
+.loading-event-banner,
+.loading-event-facts span,
+.loading-event-copy span,
+.loading-event-signup span { background: rgba(107, 122, 104, .08); border-radius: 8px; }
+.loading-event-banner { height: 235px; margin-bottom: 18px; }
+.loading-event-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 12px 0 20px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; }
+.loading-event-facts span { height: 42px; }
+.loading-event-copy { display: grid; gap: 10px; margin: 24px 0 30px; }
+.loading-event-copy span { height: 12px; }
+.loading-event-copy span:last-child { width: 72%; }
+.loading-event-signup { display: grid; gap: 14px; padding-top: 26px; border-top: 1px solid var(--line); }
+.loading-event-signup span:first-child { width: 35%; height: 22px; }
+.loading-event-signup span:last-child { width: 60%; height: 42px; }
 
 @media (min-width: 768px) {
     .event-card { border-radius: var(--radius-card); margin-bottom: 50px; }

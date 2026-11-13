@@ -15,7 +15,7 @@
           placeholder="Find your next game"
           aria-label="Search the collection by title, category, player count, or designer"
         />
-        <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found<span v-if="isPending"> · Loading play history…</span></p>
+        <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
         <p class="collection-updated">Shelf updated {{ lastTended }}</p>
         <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
       </div>
@@ -65,7 +65,7 @@
           <div class="last-played">
             <span v-if="game.stats.date">Last played {{ formatDate(game.stats.date) }} · {{ game.stats.count }} {{ game.stats.count === 1 ? 'play' : 'plays' }}</span>
             <span v-else-if="!isPending && !isError">No plays logged</span>
-            <span v-else aria-hidden="true">Play history loading</span>
+            <span v-else aria-hidden="true"></span>
           </div>
         </article>
 
@@ -606,7 +606,7 @@ watch([search, currentSort, selectedCategories], () => {
 .pebble-container { flex-shrink: 0; border-radius: 6px; background: #f6f5f0; border: 0; margin: 16px 0; }
 .card-meta { font-size: .72rem; opacity: 1; color: var(--muted); letter-spacing: 0; text-transform: none; }
 .card-players { font-size: .73rem; letter-spacing: 0; text-transform: none; }
-.last-played { font-size: .7rem; letter-spacing: 0; text-transform: none; font-weight: 400; padding-top: 12px; }
+.last-played { min-height: 2.8em; box-sizing: border-box; font-size: .7rem; letter-spacing: 0; text-transform: none; font-weight: 400; padding-top: 12px; }
 .modal-container { border-radius: 16px 16px 0 0; }
 @media (min-width: 768px) { .collection-category-options { flex-wrap: wrap; overflow-x: visible; } .editorial-card { padding: 22px; border-radius: 10px; } .modal-container { border-radius: 16px; } }
 @media (max-width: 400px) { .editorial-card { padding: 12px; } .card-game-title { font-size: 1.05rem; } .sort-btn { font-size: .75rem; } }
