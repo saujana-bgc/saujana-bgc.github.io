@@ -45,6 +45,14 @@
         tabindex="-1"
         :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
       >
+        <div v-if="getEventImage(event)" class="event-image-facts" aria-label="Gathering details">
+          <span><small>Date</small><strong>{{ formatDate(event.date) }}</strong></span>
+          <span><small>Time</small><strong>{{ event.time }}</strong></span>
+          <span><small>Venue</small><strong>{{ event.venue }}</strong></span>
+          <span v-if="canEditEvent(event)" class="spend-fact"><small>At the venue</small><strong>RM10 minimum spend per person · pay at the counter</strong></span>
+          <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
+        </div>
+
         <div v-if="getEventImage(event)" class="event-image-wrap">
           <h2 class="hero-title event-image-title">{{ event.name }}</h2>
           <img
@@ -65,17 +73,9 @@
           <div class="event-heading-details">
             <span>{{ event.time }}</span>
             <span>{{ event.venue }}</span>
-          <span v-if="canEditEvent(event)">RM10 minimum spend · pay at the counter</span>
+          <span v-if="canEditEvent(event)">RM10 minimum spend per person · pay at the counter</span>
             <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions</a>
           </div>
-        </div>
-
-        <div v-if="getEventImage(event)" class="event-image-facts" aria-label="Gathering details">
-          <span><small>Date</small><strong>{{ formatDate(event.date) }}</strong></span>
-          <span><small>Time</small><strong>{{ event.time }}</strong></span>
-          <span><small>Venue</small><strong>{{ event.venue }}</strong></span>
-          <span v-if="canEditEvent(event)" class="spend-fact"><small>At the venue</small><strong>RM10 minimum spend · pay at the counter</strong></span>
-          <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
         <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
@@ -103,7 +103,6 @@
           <div v-else-if="!isSpookyGameDay(event)" class="attendees-section">
             <div v-if="activeTab === 'present'" class="signup-intro">
               <h3>Sign up</h3>
-              <p>A name or nickname is all you need to sign up.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
@@ -124,12 +123,12 @@
               >
                 <div class="signup-form-heading">
                   <h4 :id="`signup-title-${event.id}`">Your sign-up</h4>
-                  <p>Your name is the only required detail.</p>
                 </div>
                 <fieldset class="signup-fields" :disabled="savingRows[event.id]">
                   <legend class="signup-sr-only">Your details</legend>
                   <div class="signup-field signup-field-name">
                     <label :for="`signup-name-${event.id}`">Name <span class="signup-required">(required)</span></label>
+                    <p class="signup-field-hint">Your name or nickname appears on the attendee list. It’s all you need to sign up.</p>
                     <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-error-${event.id}` : undefined" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === newRows[event.id] && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === newRows[event.id] && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @keydown="onNameAutocompleteKeydown($event, newRows[event.id])" @blur="hideNameAutocompleteSoon" />
                     <p v-if="nameErrors[event.id]" :id="`signup-name-error-${event.id}`" class="signup-error" role="alert">Add the name you’d like us to know you by.</p>
                   </div>

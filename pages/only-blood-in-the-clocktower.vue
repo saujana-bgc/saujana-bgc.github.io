@@ -59,8 +59,8 @@
       <p v-else-if="loading" class="archive-state" role="status">Loading recaps…</p>
       <div v-else-if="!recapSessions.length" class="archive-state empty-archive">
         <span class="empty-mark" aria-hidden="true">✧</span>
-        <h3>No recaps yet</h3>
-        <p>Retellings, game results and approved photos will appear here after a gathering.</p>
+        <h3>The archive is quiet for now</h3>
+        <p>Gathering stories, game results and approved photos will find their place here as sessions are added.</p>
       </div>
 
       <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
