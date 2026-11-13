@@ -49,6 +49,10 @@
           <div class="event-image-content">
             <span class="event-image-date">{{ formatDate(event.date) }}</span>
             <h2 class="hero-title event-image-title">{{ event.name }}</h2>
+            <div v-if="event.time || event.venue" class="event-image-details">
+              <span v-if="event.time">{{ event.time }}</span>
+              <span v-if="event.venue" class="event-detail-venue">{{ event.venue }}</span>
+            </div>
           </div>
           <img
             :src="getEventImage(event)"
@@ -62,23 +66,17 @@
           />
         </div>
 
-        <div v-if="getEventImage(event)" class="event-image-facts" aria-label="Gathering details">
-          <span class="event-fact-time"><small>Time</small><strong>{{ event.time }}</strong></span>
-          <span class="event-fact-venue"><small>Venue</small><strong>{{ event.venue }}</strong></span>
-          <span v-if="canEditEvent(event)" class="spend-fact"><strong>RM10 minimum spend per person · pay at the counter</strong></span>
-          <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
-        </div>
-
         <div v-else class="event-heading">
           <span class="date-badge">🌿 {{ formatDate(event.date) }}</span>
           <h2 class="hero-title">{{ event.name }}</h2>
           <div class="event-heading-details">
             <span>{{ event.time }}</span>
             <span>{{ event.venue }}</span>
-          <span v-if="canEditEvent(event)">RM10 minimum spend per person · pay at the counter</span>
             <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions</a>
           </div>
         </div>
+
+        <a v-if="getEventImage(event) && event.venue_url" class="event-photo-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
 
         <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>Look back at this gathering</span>
@@ -330,7 +328,6 @@
         <p class="loading-copy" role="status">Checking the calendar…</p>
         <div class="event-card loading-event-card" aria-hidden="true">
           <div class="loading-event-banner"></div>
-          <div class="loading-event-facts"><span v-for="n in 4" :key="n"></span></div>
           <div class="loading-event-copy"><span v-for="n in 4" :key="n"></span></div>
           <div class="loading-event-signup"><span></span><span></span></div>
         </div>
@@ -1206,11 +1203,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .event-image-wrap {
     margin-bottom: 10px;
-    height: 235px;
+    min-height: 235px;
+    display: grid;
+    align-items: end;
     overflow: hidden;
     position: relative;
     border-radius: 28px;
     border: 1px solid rgba(201, 190, 239, 0.2);
+    background: #211e1b;
     box-shadow: 0 18px 42px rgba(74, 68, 63, 0.14);
     isolation: isolate;
 }
@@ -1220,7 +1220,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(to top, rgba(33, 30, 27, 0.82), rgba(48, 43, 39, 0.3) 58%, rgba(48, 43, 39, 0.08)),
+        linear-gradient(to top, rgba(33, 30, 27, 0.93), rgba(33, 30, 27, 0.76) 38%, rgba(48, 43, 39, 0.08) 88%),
         radial-gradient(circle at 82% 74%, rgba(248, 236, 215, 0.22), transparent 34%),
         linear-gradient(135deg, rgba(107, 122, 104, 0.24), rgba(176, 80, 112, 0.12));
     z-index: 1;
@@ -1228,6 +1228,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 
 .event-image {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
@@ -1237,26 +1239,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 
 .event-image-content {
-    position: absolute;
-    left: clamp(20px, 5vw, 42px);
-    right: clamp(20px, 5vw, 42px);
-    top: clamp(16px, 4vw, 28px);
-    bottom: clamp(16px, 4vw, 26px);
+    position: relative;
+    padding: clamp(18px, 4vw, 26px) clamp(18px, 5vw, 42px);
     z-index: 2;
     color: white;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     gap: 8px;
-}
-
-.event-image-title {
-    position: absolute;
-    z-index: 2;
-    inset: auto 20px 20px;
-    color: white;
-    font-size: clamp(1.4rem, 4vw, 2.1rem);
-    text-shadow: 0 2px 12px #0009;
+    overflow-wrap: anywhere;
 }
 .event-image-date {
     color: rgba(255, 255, 255, .88);
@@ -1267,36 +1257,13 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     text-shadow: 0 2px 12px #0009;
     line-height: 1.4;
 }
-.event-image-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px 20px;
-    margin: 0 0 20px;
-    padding: 10px 4px 14px;
-    border-bottom: 1px solid var(--line);
-    color: var(--clay-text);
-}
-.event-image-facts span { min-width: 0; }
-.event-image-facts .spend-fact { grid-column: 1 / -1; }
-.event-image-facts small { display: block; margin-bottom: 3px; color: var(--muted); }
-.event-image-facts strong { display: block; font-weight: 600; line-height: 1.45; }
-.event-image-facts a { min-height: 44px; display: flex; align-items: center; color: var(--matcha-leaf); }
-.event-image-facts .event-fact-venue { grid-column: 1 / -1; }
 
-.event-image-copy {
-    max-width: 680px;
-}
-
-.date-badge.event-image-date {
-    display: block;
-    color: rgba(255, 255, 255, 0.86);
-    margin-bottom: 4px;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+.event-card .hero-title {
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    margin-bottom: 15px;
 }
 
 .event-card .event-image-title {
-    position: static;
-    inset: auto;
     color: white;
     margin: 0;
     max-width: 680px;
@@ -1308,79 +1275,29 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .event-image-details {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     flex-wrap: wrap;
-    gap: 6px 16px;
+    gap: 4px 16px;
     width: min(100%, 680px);
     padding-top: 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.34);
-}
-
-.event-detail {
-    min-width: 0;
+    font-size: .875rem;
+    line-height: 1.4;
+    text-shadow: 0 2px 10px #0009;
 }
 
 .event-detail-venue {
     flex: 1 1 260px;
 }
 
-.event-detail-label {
-    display: block;
-    margin-bottom: 2px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.56rem;
-    font-weight: 700;
-    letter-spacing: 1.7px;
-    line-height: 1.2;
-    text-transform: uppercase;
-}
-
-.event-detail-value {
-    display: block;
-    color: rgba(255, 255, 255, 0.95);
-    font-size: 0.78rem;
-    font-weight: 600;
-    line-height: 1.28;
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.26);
-}
-
-.event-detail-venue .event-detail-value {
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
-.event-directions {
+.event-photo-directions {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    min-height: 22px;
-    padding: 0 0 2px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.54);
-    color: white;
-    text-decoration: none;
-    font-size: 0.58rem;
-    font-weight: 800;
-    letter-spacing: 1.7px;
-    text-transform: uppercase;
-    transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
-}
-
-.event-directions svg {
-    width: 14px;
-    height: 14px;
-    flex: 0 0 auto;
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 1.8;
-}
-
-.event-directions:hover {
-    color: var(--gold-leaf);
-    border-color: var(--gold-leaf);
+    gap: 6px;
+    min-height: 44px;
+    margin-bottom: 8px;
+    color: var(--matcha-leaf);
+    text-underline-offset: 3px;
 }
 
 .event-heading {
@@ -1465,14 +1382,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 @media (max-width: 640px) {
     .event-image-wrap {
-        height: auto;
-        min-height: 0;
-        aspect-ratio: 3 / 2;
-    }
-
-    .event-image {
-        position: absolute;
-        inset: 0;
+        aspect-ratio: 4 / 3;
     }
 
     .event-card .event-image-title {
@@ -1480,32 +1390,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
         line-height: 1.12;
     }
 
-    .event-image-details {
-        align-items: flex-start;
-        gap: 7px 14px;
-        padding-top: 8px;
-    }
-
-    .event-detail {
-        flex: 1 1 108px;
-    }
-
     .event-detail-venue {
         flex-basis: 100%;
-    }
-
-    .event-detail-venue .event-detail-value {
-        -webkit-line-clamp: 3;
-    }
-
-    .event-detail-value {
-        font-size: 0.76rem;
     }
 }
 
 @media (min-width: 768px) {
     .event-image-wrap {
-        height: 265px;
+        min-height: 265px;
         border-radius: 36px;
     }
 }
@@ -1518,17 +1410,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     margin-bottom: 15px;
     display: block;
     font-weight: 700;
-}
-
-.event-card .hero-title {
-    font-size: clamp(1.6rem, 6vw, 2.2rem);
-    margin-bottom: 15px;
-}
-
-.event-card .event-image-title {
-    font-size: clamp(1.36rem, 4.2vw, 1.82rem);
-    line-height: 1.08;
-    margin-bottom: 0;
 }
 
 .empty-state {
@@ -1552,12 +1433,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .loading-event-card { min-height: 650px; pointer-events: none; }
 .loading-event-banner,
-.loading-event-facts span,
 .loading-event-copy span,
 .loading-event-signup span { background: rgba(107, 122, 104, .08); border-radius: 8px; }
 .loading-event-banner { height: 235px; margin-bottom: 18px; }
-.loading-event-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 12px 0 20px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; }
-.loading-event-facts span { height: 42px; }
 .loading-event-copy { display: grid; gap: 10px; margin: 24px 0 30px; }
 .loading-event-copy span { height: 12px; }
 .loading-event-copy span:last-child { width: 72%; }
@@ -2188,8 +2066,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .first-time-panel { padding: 14px 18px; }
   .tabs { margin: 8px auto 18px; }
   .event-card { padding: 18px; }
-  .event-image-facts { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .event-image-facts .spend-fact, .event-image-facts .event-fact-venue { grid-column: 1; }
   .event-image-wrap { margin-bottom: 14px; }
   .event-quick-details { margin-top: 8px; }
 }
