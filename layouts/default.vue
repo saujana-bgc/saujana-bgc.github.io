@@ -27,6 +27,10 @@
                 <NuxtLink v-else class="mobile-navigation-link" :class="{ 'is-current': isCurrentDestination(item.to) }" :to="item.to" :aria-current="isCurrentDestination(item.to) ? 'page' : undefined" no-prefetch>{{ item.label }}</NuxtLink>
               </template>
             </nav>
+            <div class="mobile-social-links" @click.capture="closeMenuOnNavigationLink">
+              <SocialLink channel="whatsapp" label="Questions? Message us on WhatsApp" />
+              <SocialLink channel="instagram" label="See gathering photos on Instagram" />
+            </div>
           </template>
         </USlideover>
       </div>
@@ -44,8 +48,11 @@
         <NuxtLink to="/collection" no-prefetch>Collection</NuxtLink>
         <NuxtLink to="/riichi-league" no-prefetch>Riichi League</NuxtLink>
         <NuxtLink to="/only-blood-in-the-clocktower" no-prefetch>Clocktower</NuxtLink>
-        <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Say hello on WhatsApp <span aria-hidden="true">↗</span></a>
       </nav>
+      <div class="footer-social-links">
+        <SocialLink channel="whatsapp" label="Say hello on WhatsApp" />
+        <SocialLink channel="instagram" label="See gathering photos on Instagram" />
+      </div>
       <span class="footer-copyright">&copy; {{ year }} Saujana Board Game Community</span>
       <ClientOnly v-if="showVisitorCounter">
         <LazyVisitorCounter />
@@ -166,6 +173,16 @@ onMounted(() => {
   color: var(--matcha-leaf);
 }
 
+.footer-social-links,
+.mobile-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 18px;
+}
+
+.footer-social-links { margin: 4px 0 8px; }
+
 .footer-copyright {
   color: var(--muted);
   font-size: 0.72rem;
@@ -180,6 +197,8 @@ onMounted(() => {
 }
 
 .mobile-navigation { display: grid; gap: 8px; }
+.mobile-social-links { display: grid; justify-content: stretch; gap: 2px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.mobile-social-links .social-link { padding: 0 12px; }
 .mobile-navigation-link,
 .mobile-navigation-child { display: flex; min-height: 44px; align-items: center; border-radius: var(--radius-control); color: var(--clay-text); text-decoration: none; }
 .mobile-navigation-link { padding: 0 12px; font-size: 1rem; font-weight: 600; }

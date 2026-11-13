@@ -78,6 +78,14 @@
       </div>
     </section>
 
+    <section class="social-note" aria-label="Follow Saujana on Instagram">
+      <div>
+        <h2 class="story-title">A little look around</h2>
+        <p>Photos and recaps from the community</p>
+      </div>
+      <SocialLink channel="instagram" label="See gathering photos on Instagram" />
+    </section>
+
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
       <div class="first-visit-layout">
         <div class="first-visit-copy">
@@ -108,11 +116,6 @@
         </div>
       </div>
       <p id="respect-at-table" class="respect-note"><strong>Respect at the table.</strong> Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
-    </section>
-
-    <section class="social-note" aria-label="Follow Saujana on Instagram">
-      <p>Photos and recaps from the community</p>
-      <a class="text-link" href="https://www.instagram.com/saujana.bgc" target="_blank" rel="noopener noreferrer">See Saujana on Instagram <span aria-hidden="true">↗</span></a>
     </section>
 
   </main>
@@ -487,10 +490,12 @@ const expectations = [
 }
 
 .social-note p {
-  margin: 0;
+  margin: 4px 0 0;
   color: var(--muted);
   line-height: 1.5;
 }
+
+.social-note h2 { margin: 0; color: var(--matcha-leaf); font: 400 1.35rem/1.3 var(--font-display); }
 
 .care-guide { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 28px; }
 .pillar {

@@ -32,6 +32,11 @@
         </div>
       </details>
 
+      <div class="first-visit-contact">
+        <span>Questions about your first visit?</span>
+        <SocialLink channel="whatsapp" label="Message us on WhatsApp" />
+      </div>
+
       <div
         v-for="(event, index) in currentEvents"
         :key="event.id"
@@ -1373,6 +1378,22 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .event-heading {
     margin-bottom: 8px;
+}
+
+.first-visit-contact {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px 16px;
+    width: min(960px, calc(100% - 40px));
+    margin: -2px 0 24px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-soft);
+    color: var(--muted);
+    font-size: .86rem;
 }
 
 .event-heading-details {
