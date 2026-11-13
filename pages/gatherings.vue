@@ -45,15 +45,8 @@
         tabindex="-1"
         :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
       >
-        <div v-if="getEventImage(event)" class="event-image-facts" aria-label="Gathering details">
-          <span><small>Date</small><strong>{{ formatDate(event.date) }}</strong></span>
-          <span><small>Time</small><strong>{{ event.time }}</strong></span>
-          <span><small>Venue</small><strong>{{ event.venue }}</strong></span>
-          <span v-if="canEditEvent(event)" class="spend-fact"><small>At the venue</small><strong>RM10 minimum spend per person · pay at the counter</strong></span>
-          <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
-        </div>
-
         <div v-if="getEventImage(event)" class="event-image-wrap">
+          <span class="event-image-date">{{ formatDate(event.date) }}</span>
           <h2 class="hero-title event-image-title">{{ event.name }}</h2>
           <img
             :src="getEventImage(event)"
@@ -65,6 +58,13 @@
             :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
             decoding="async"
           />
+        </div>
+
+        <div v-if="getEventImage(event)" class="event-image-facts" aria-label="Gathering details">
+          <span class="event-fact-time"><small>Time</small><strong>{{ event.time }}</strong></span>
+          <span class="event-fact-venue"><small>Venue</small><strong>{{ event.venue }}</strong></span>
+          <span v-if="canEditEvent(event)" class="spend-fact"><strong>RM10 minimum spend per person · pay at the counter</strong></span>
+          <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
         <div v-else class="event-heading">
@@ -1210,7 +1210,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .collapse-bar:hover svg { transform: translateY(-1px); }
 
 .event-image-wrap {
-    margin-bottom: 18px;
+    margin-bottom: 10px;
     height: 235px;
     overflow: hidden;
     position: relative;
@@ -1263,15 +1263,24 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     font-size: clamp(1.4rem, 4vw, 2.1rem);
     text-shadow: 0 2px 12px #0009;
 }
+.event-image-date {
+    position: absolute;
+    z-index: 2;
+    inset: auto 20px 57px;
+    color: rgba(255, 255, 255, .88);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 12px #0009;
+}
 .event-image-facts {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin: 12px 0 20px;
-    padding: 16px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--white-pure);
+    gap: 8px 20px;
+    margin: 0 0 20px;
+    padding: 10px 4px 14px;
+    border-bottom: 1px solid var(--line);
     color: var(--clay-text);
 }
 .event-image-facts span { min-width: 0; }
@@ -1279,6 +1288,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-image-facts small { display: block; margin-bottom: 3px; color: var(--muted); }
 .event-image-facts strong { display: block; font-weight: 600; line-height: 1.45; }
 .event-image-facts a { min-height: 44px; display: flex; align-items: center; color: var(--matcha-leaf); }
+.event-image-facts .event-fact-venue { grid-column: 1 / -1; }
 
 .event-image-copy {
     max-width: 680px;
@@ -2183,6 +2193,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .first-time-panel { padding: 14px 18px; }
   .tabs { margin: 8px auto 18px; }
   .event-card { padding: 18px; }
+  .event-image-facts { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .event-image-facts .spend-fact, .event-image-facts .event-fact-venue { grid-column: 1; }
   .event-image-wrap { margin-bottom: 14px; }
   .event-quick-details { margin-top: 8px; }
 }

@@ -350,6 +350,7 @@ const expectations = [
 
 .gathering-detail { display: inline-flex; min-width: 0; align-items: center; gap: 7px; }
 .gathering-detail:last-child { overflow-wrap: anywhere; }
+.gathering-directions { color: var(--matcha-leaf); text-underline-offset: 3px; }
 .gathering-detail svg, .guide-icon, .pillar-icon {
   width: 20px;
   height: 20px;

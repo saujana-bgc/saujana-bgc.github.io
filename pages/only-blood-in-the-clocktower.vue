@@ -508,6 +508,7 @@ onMounted(() => {
 }
 .next-night h2 { font-size: clamp(1.35rem, 3vw, 1.95rem); }
 .next-copy p:not(.eyebrow) { margin: 3px 0 0; color: var(--soft-ink); font-size: .91rem; }
+.next-copy a { color: var(--wine); text-underline-offset: 3px; }
 .calendar-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--wine); font-size: .84rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .calendar-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .retry-button { justify-self: start; min-height: 40px; margin-top: 8px; padding: 7px 11px; border: 1px solid #b99577; border-radius: 6px; background: transparent; color: var(--wine); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
