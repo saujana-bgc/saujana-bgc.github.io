@@ -12,10 +12,10 @@
       <figure class="hero-artwork">
         <img
           class="hero-banner"
-          src="/images/site/first-gathering-cafe.webp"
-          alt="Saujana players chatting around a café table scattered with cards and tokens."
-          width="1200"
-          height="900"
+          src="/images/site/saujana-home-hero.webp"
+          alt="A collage of Saujana players at board game and riichi mahjong gatherings."
+          width="1671"
+          height="941"
           loading="eager"
           fetchpriority="high"
         >
@@ -97,6 +97,15 @@
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
           <p class="section-intro">When you arrive, ask for Saujana BGC. If you’d like help choosing a game, just ask. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Send us a message on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
         </div>
+        <img
+          class="first-visit-photo"
+          src="/images/site/first-gathering-cafe.webp"
+          alt="Saujana players chatting around a café table scattered with cards and tokens."
+          width="1200"
+          height="900"
+          loading="lazy"
+          decoding="async"
+        >
         <div class="expect-guide">
           <article v-for="item in expectations" :key="item.title" class="expect-card">
             <svg class="guide-icon" aria-hidden="true" viewBox="0 0 24 24"><path :d="item.icon"/></svg>
@@ -358,12 +367,21 @@ const expectations = [
 
 .first-visit-layout {
   display: grid;
-  grid-template-areas: "copy" "steps";
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "copy copy" "photo steps";
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
   align-items: center;
   gap: 20px 28px;
 }
 .first-visit-copy { grid-area: copy; }
+.first-visit-photo {
+  grid-area: photo;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-card);
+}
 .first-visit-layout > .expect-guide { grid-area: steps; width: 100%; }
 
 .story-title { font-size: clamp(1.7rem, 4vw, 2.55rem); }
