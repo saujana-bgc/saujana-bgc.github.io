@@ -4,7 +4,7 @@
       <p class="page-eyebrow">A little more to celebrate</p>
       <h1 class="hero-title">Birthday Club</h1>
       <div class="stats-container">
-        Share your birthday so we can celebrate you with the community.
+        If you’d like us to remember your birthday, share your name, month and day.
       </div>
     </header>
 
@@ -87,8 +87,8 @@
             <input id="public-greeting" v-model="allowPublicGreeting" type="checkbox" name="public_greeting">
             <span class="check-box" aria-hidden="true"></span>
             <span>
-              <strong>I’m happy to receive a public birthday greeting</strong>
-              <small>Saujana may greet you on community channels. Leave this unchecked if you’d rather not have a public greeting.</small>
+              <strong>I’m happy for Saujana to share a birthday greeting publicly</strong>
+              <small>This is optional. Your birthday stays in our private calendar if you leave this unchecked.</small>
             </span>
           </label>
 

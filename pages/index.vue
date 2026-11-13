@@ -6,7 +6,7 @@
         <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Coming on your own? You’re welcome to watch a round before joining in.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
-          <a class="text-link" href="#first-visit">Plan your first visit <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
         </div>
       </div>
       <figure class="hero-artwork">
@@ -82,7 +82,7 @@
       <div class="first-visit-layout">
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">Coming on your own? Ask around for Saujana BGC and tell us it’s your first time. We’ll help you find a table. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>Check dates, venues and sign-up details</NuxtLink>.</p>
+          <p class="section-intro">When you arrive, ask for Saujana BGC. If you’d like help choosing a game, just ask. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Send us a message on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
         </div>
         <img class="first-visit-photo" src="/images/site/first-gathering-cafe.webp" alt="Saujana players chatting around a café table scattered with cards and tokens." loading="lazy" decoding="async" width="1200" height="900">
         <div class="expect-guide">
@@ -151,9 +151,9 @@ function formatGatheringDate(dateValue) {
 
 const communityValues = [
   {
-    title: 'Make the first hello',
+    title: 'Help someone feel welcome',
     icon: 'M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6a7.5 7.5 0 1 1 17-3.5Z',
-    content: 'Notice someone new? Introduce yourself and invite them into a game. A small welcome makes arriving alone much easier.'
+    content: 'If you notice someone new, introduce yourself and let them know they’re welcome to join a game.'
   },
   {
     title: 'Stay curious',

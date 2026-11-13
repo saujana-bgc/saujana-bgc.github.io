@@ -19,13 +19,13 @@
 
       <details v-if="activeTab === 'present'" class="first-time-panel fade-up">
         <summary>
-          <span class="first-time-summary-title">Your first visit, made easy</span>
-          <span class="first-time-summary-hint">No game experience needed. You can watch a round or join in.</span>
+          <span class="first-time-summary-title">Your first visit</span>
+          <span class="first-time-summary-hint">No game experience needed. Watch a round or join in.</span>
         </summary>
         <div class="first-time-details-content">
-          <p>Use Directions on the gathering card to reach the venue. Once there, ask around for Saujana BGC and we’ll help you choose a game and explain as you play. If you can’t find us or need an expected finish time to plan your journey home, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message Saujana on WhatsApp</a>.</p>
+          <p>Use Directions on the gathering card to reach the venue. When you arrive, ask for Saujana BGC. We can help you choose a game and explain the rules as you play. If you can’t find us or need an expected finish time, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">send us a message on WhatsApp</a>.</p>
           <ul class="first-time-details">
-            <li><strong>Before you come:</strong> Check the date, time and venue. Still deciding? Add “tentative” to your notes when you sign up.</li>
+            <li><strong>Before you come:</strong> Check the date, time and venue. Still deciding? “Tentative” is fine in your sign-up notes.</li>
             <li><strong>At regular gatherings:</strong> Order at least RM10 per person to support our hosts. Add your spend to the list after ordering, and pay at the counter.</li>
           </ul>
           <p class="first-time-care">Everyone should feel welcome and respected. Read <a href="/#respect-at-table">Respect at the table</a>, or <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">raise a concern privately with an admin on WhatsApp</a>.</p>
@@ -97,7 +97,7 @@
           <div v-else-if="!isSpookyGameDay(event)" class="attendees-section">
             <div v-if="activeTab === 'present'" class="signup-intro">
               <h3>Sign up</h3>
-              <p>Add the name you’d like us to know you by. Names and optional details appear in the public list.</p>
+              <p>A name or nickname is all you need to sign up.</p>
               <p v-if="canEditEvent(event)" class="signup-minimum-spend">RM10 minimum spend per person. Pay at the counter.</p>
             </div>
 
@@ -133,6 +133,7 @@
                     <div class="signup-optional-fields">
                       <div class="signup-field">
                         <label :for="`signup-eta-${event.id}`">Arrival time</label>
+                        <p class="signup-field-hint">You can leave this blank if you’re unsure.</p>
                         <input :id="`signup-eta-${event.id}`" v-model="newRows[event.id].eta" name="eta" type="time" class="signup-input" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, newRows[event.id])" />
                       </div>
                       <div class="signup-field">
@@ -345,7 +346,7 @@
       <div v-else-if="!loading && currentEvents.length === 0" class="empty-state fade-up">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true" style="width:1em;height:1em;font-size:2rem;margin-bottom:15px;display:block;color:var(--matcha-leaf);opacity:0.5"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.2c-6.3-.3-12.6-.5-19-.5z"/></svg>
         <p v-if="activeTab === 'past'">No past gatherings are listed yet.<br>Our next get-together could be your first.</p>
-        <p v-else>No upcoming date is listed yet.<br>Check back soon, or say hello on WhatsApp.</p>
+            <p v-else>No upcoming date has been announced yet.<br>Check back soon, or say hello on WhatsApp.</p>
       </div>
 
     </main>
@@ -936,7 +937,7 @@ async function saveNewRow(eventId) {
             .single()
 
         if (error || !data) {
-            signupErrors[eventId] = 'Your sign-up hasn’t been saved. Your details are still here. Try again.'
+            signupErrors[eventId] = 'We couldn’t save your sign-up. Your details are still here, so you can try again.'
             return
         }
         if (!attendeesByEvent[eventId]) attendeesByEvent[eventId] = []
@@ -949,7 +950,7 @@ async function saveNewRow(eventId) {
         delete newRows[eventId]
         focusSignupTrigger(eventId)
     } catch {
-        signupErrors[eventId] = 'We couldn’t save your sign-up. Check your connection and try again.'
+        signupErrors[eventId] = 'We couldn’t save your sign-up. Check your connection, then try again. Your details are still here.'
     } finally {
         delete savingRows[eventId]
     }
