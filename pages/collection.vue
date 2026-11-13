@@ -184,11 +184,13 @@ const gamesByPlayed = computed(() => [...gamesWithStats.value].sort((a, b) => {
 const normalizedSearch = computed(() => search.value.trim().toLowerCase())
 
 const displayedGames = computed(() => {
+    const legacyUnplayedSort = currentSort.value === 'surprise'
+    const filterUnplayed = unplayedOnly.value || legacyUnplayedSort
     const list = currentSort.value === 'played' ? gamesByPlayed.value : gamesByName.value
     const query = normalizedSearch.value
     const cats = selectedCategories.value
-    if (!unplayedOnly.value && !query && !cats.length) return list
-    return list.filter(game => (!unplayedOnly.value || game.stats.count === 0)
+    if (!filterUnplayed && !query && !cats.length) return list
+    return list.filter(game => (!filterUnplayed || game.stats.count === 0)
         && (!query || game.searchText.includes(query))
         && (!cats.length || cats.some(category => game.categories?.includes(category))))
 })
