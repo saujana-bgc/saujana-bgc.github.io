@@ -65,6 +65,7 @@
           <div class="event-heading-details">
             <span>{{ event.time }}</span>
             <span>{{ event.venue }}</span>
+          <span v-if="canEditEvent(event)">RM10 minimum spend · pay at the counter</span>
             <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions</a>
           </div>
         </div>
@@ -73,6 +74,7 @@
           <span><small>Date</small><strong>{{ formatDate(event.date) }}</strong></span>
           <span><small>Time</small><strong>{{ event.time }}</strong></span>
           <span><small>Venue</small><strong>{{ event.venue }}</strong></span>
+          <span v-if="canEditEvent(event)" class="spend-fact"><small>At the venue</small><strong>RM10 minimum spend · pay at the counter</strong></span>
           <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
@@ -102,7 +104,6 @@
             <div v-if="activeTab === 'present'" class="signup-intro">
               <h3>Sign up</h3>
               <p>A name or nickname is all you need to sign up.</p>
-              <p v-if="canEditEvent(event)" class="signup-minimum-spend">RM10 minimum spend per person. Pay at the counter.</p>
             </div>
 
             <div v-if="canEditEvent(event)" class="signup-section">
@@ -1275,6 +1276,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     color: var(--clay-text);
 }
 .event-image-facts span { min-width: 0; }
+.event-image-facts .spend-fact { grid-column: 1 / -1; }
 .event-image-facts small { display: block; margin-bottom: 3px; color: var(--muted); }
 .event-image-facts strong { display: block; font-weight: 600; line-height: 1.45; }
 .event-image-facts a { min-height: 44px; display: flex; align-items: center; color: var(--matcha-leaf); }

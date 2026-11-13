@@ -87,7 +87,7 @@
       <div class="first-visit-layout">
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">When you arrive, ask for Saujana BGC. If you’d like help choosing a game, just ask. Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Send us a message on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
+          <p class="section-intro">Your first game or your hundredth, you’re welcome here. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
         </div>
         <img
           class="first-visit-photo"
@@ -192,19 +192,19 @@ const communityValues = [
 
 const expectations = [
   {
-    title: 'Settle in',
+    title: 'Find us',
     icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
-    copy: 'Take a moment to settle in. You can start by watching a game or joining a table.'
+    copy: 'When you arrive, ask for Saujana BGC. If you can’t find us, message us on WhatsApp.'
   },
   {
-    title: 'Find your game',
+    title: 'Choose a game',
     icon: 'M3 7h18v13H3zM7 7V4h10v3M8 12h8M8 16h5',
-    copy: 'Tell us what you enjoy. We’ll suggest a game and walk you through the rules.'
+    copy: 'Tell us what you enjoy. We’ll suggest a game and explain the rules as you play.'
   },
   {
-    title: 'Watch or join in',
+    title: 'Join at your pace',
     icon: 'M3 5h18v12H3zM8 21h8m-4-4v4M10 9l5 2-5 2z',
-    copy: 'Watch a round or play at your own pace.'
+    copy: 'Watch a round first, or join a table whenever you feel ready.'
   }
 ]
 </script>

@@ -346,7 +346,7 @@ async function loadArchive() {
     await nextTick()
     await focusSharedTarget()
   } catch {
-    error.value = 'We couldn’t load the recaps. Try again.'
+    error.value = 'The recaps aren’t available right now.'
   } finally {
     loading.value = false
   }
