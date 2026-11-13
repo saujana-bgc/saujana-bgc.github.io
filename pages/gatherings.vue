@@ -45,7 +45,7 @@
         tabindex="-1"
         :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
       >
-        <div v-if="getEventImage(event)" class="event-image-wrap">
+        <div v-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
           <div class="event-image-content">
             <span class="event-image-date">{{ formatDate(event.date) }}</span>
             <h2 class="hero-title event-image-title">{{ event.name }}</h2>
@@ -59,8 +59,8 @@
             :src="getEventImage(event)"
             :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
             class="event-image"
-            width="1536"
-            height="1024"
+            :width="isSpookyGameDay(event) ? 768 : 1536"
+            :height="1024"
             :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
             :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
             decoding="async"
@@ -573,6 +573,14 @@ function isSpookyGameDay(event) {
 
 function getEventImage(event) {
     return isSpookyGameDay(event) ? '/images/venues/richeese.png' : getVenueImage(event.venue)
+}
+
+function getEventImageAspectRatio(event) {
+    if (isSpookyGameDay(event)) return '3 / 4'
+    const image = getEventImage(event)
+    return image === '/images/venues/mcdcurve.avif' || image === '/images/venues/starbucks-oasis.avif'
+        ? '4 / 3'
+        : '3 / 2'
 }
 
 function eventTags(event) {
@@ -1382,13 +1390,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     cursor: pointer;
 }
 
-.event-card:hover .event-image {
-    transform: scale(1.04);
-}
+    @media (hover: hover) and (pointer: fine) {
+        .event-card:hover .event-image { transform: scale(1.04); }
+    }
 
 @media (max-width: 640px) {
     .event-image-wrap {
-        aspect-ratio: 4 / 3;
+        min-height: 0;
+        aspect-ratio: var(--event-image-aspect, 3 / 2);
     }
 
     .event-card .event-image-title {
