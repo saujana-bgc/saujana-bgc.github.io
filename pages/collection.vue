@@ -15,8 +15,10 @@
           placeholder="Find your next game"
           aria-label="Search the collection by title, category, player count, or designer"
         />
-        <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
-        <p class="collection-updated">Shelf updated {{ lastTended }}</p>
+        <div class="collection-search-meta">
+          <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
+          <p class="collection-updated">Shelf updated {{ lastTended }}</p>
+        </div>
         <UButton v-if="search" class="collection-search-clear" type="button" @click="search = ''">Clear search</UButton>
       </div>
 
@@ -24,7 +26,6 @@
         <div class="collection-sort-options" aria-label="Sort games">
           <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" :aria-pressed="currentSort === 'name'" @click="currentSort = 'name'">A to Z</UButton>
           <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" :aria-pressed="currentSort === 'played'" @click="currentSort = 'played'">Recently played</UButton>
-          <UButton class="sort-btn surprise" :class="{ active: currentSort === 'surprise' }" :aria-pressed="currentSort === 'surprise'" :disabled="isPending || isError" @click="generateSurprise">Pick a game with no plays logged</UButton>
         </div>
         <details class="collection-categories">
           <summary>Categories<span v-if="selectedCategories.length" class="category-selection"> · {{ selectedCategories[0] === 'Card Game' ? 'Card games' : selectedCategories[0] === 'Party Game' ? 'Party games' : selectedCategories[0] }}</span></summary>
@@ -32,6 +33,7 @@
             <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
           </div>
         </details>
+        <UButton class="surprise-action" :class="{ active: currentSort === 'surprise' }" :aria-pressed="currentSort === 'surprise'" :disabled="isPending || isError" @click="generateSurprise">Browse games with no plays logged</UButton>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
@@ -620,13 +622,22 @@ watch([search, currentSort, selectedCategories], () => {
 main:has(.collection-search) { gap: 10px; }
 main:has(.collection-search) > .collection-search { margin-bottom: 0; }
 main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; }
-.collection-updated { margin-top: 6px; }
-.collection-sort-options .surprise { line-height: 1.25; }
+.collection-search { flex-direction: column; align-items: stretch; gap: 7px; }
+.collection-search-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.collection-result-count, .collection-updated { margin: 0; }
+.collection-search-meta .collection-result-count { color: var(--matcha-leaf); font-size: .78rem; font-weight: 600; }
+.collection-search-meta .collection-updated { font-size: .72rem; }
+.collection-search-clear { align-self: flex-end; }
+.sort-controls { gap: 9px; }
+.collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.surprise-action { align-self: flex-start; min-height: 44px; padding: 8px 2px; color: var(--matcha-leaf); font-size: .82rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.surprise-action.active { color: var(--clay-text); }
+.surprise-action:hover { text-decoration-thickness: 2px; }
 @media (max-width: 480px) {
   .collection-search { align-items: center; }
+  .collection-search-meta { width: 100%; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .collection-sort-options .surprise { grid-column: 1 / -1; }
   .collection-category-options { gap: 6px; flex-wrap: wrap; padding: 2px 0 8px; }
   .collection-category-options .category-btn { flex: 0 1 auto; }
   .collection-updated { font-size: .68rem; }

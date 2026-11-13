@@ -2171,11 +2171,23 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .first-time-panel .first-time-summary-hint { color: var(--muted); }
 .gatherings-main > .tabs { margin-top: 2px; }
 .first-time-panel { width: min(calc(100% - 40px), 960px); box-sizing: border-box; }
+.event-image-wrap::after {
+  background:
+    linear-gradient(to top, rgba(33, 30, 27, .96), rgba(33, 30, 27, .84) 42%, rgba(33, 30, 27, .2) 82%),
+    radial-gradient(circle at 82% 74%, rgba(248, 236, 215, .12), transparent 34%),
+    linear-gradient(135deg, rgba(75, 91, 72, .2), rgba(72, 48, 54, .14));
+}
+.event-image-date { color: rgba(255, 255, 255, .96); text-shadow: 0 2px 10px rgba(0, 0, 0, .8); }
+.event-image-title, .event-image-details { text-shadow: 0 2px 12px rgba(0, 0, 0, .72); }
+.first-visit-contact { margin-top: -7px; margin-bottom: 14px; }
 @media (max-width: 600px) {
   .first-time-panel { padding: 15px 17px; margin-bottom: 12px; }
   .first-time-panel summary { display: grid; grid-template-columns: minmax(0, 1fr) 1.4rem; align-items: center; gap: 3px 8px; }
   .first-time-panel summary::after { grid-column: 2; grid-row: 1 / span 2; justify-self: center; }
   .first-time-summary-hint { font-size: .78rem; line-height: 1.45; }
+  .gatherings-main > .tabs { margin-bottom: 14px; }
+  .first-time-panel { margin-bottom: 9px; }
+  .first-visit-contact { margin-top: -5px; margin-bottom: 10px; }
 }
 
 </style>
