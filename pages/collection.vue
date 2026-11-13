@@ -120,7 +120,6 @@
 <script setup>
 import { collectionDataSimple } from '~/assets/data/game_data_simple.js'
 
-const route = useRoute()
 const currentSort = ref('name')
 const search = ref('')
 const selectedCategories = ref([])
@@ -316,7 +315,8 @@ watch(gridRef, (grid) => {
 })
 
 onMounted(() => {
-    if (typeof route.query.game === 'string') search.value = route.query.game
+    const gameQuery = new URLSearchParams(window.location.search).get('game')
+    if (gameQuery) search.value = gameQuery
     nextTick(() => updateViewport({ measure: true }))
     window.addEventListener('scroll', scheduleViewportUpdate, { passive: true })
     window.addEventListener('resize', onResize)
