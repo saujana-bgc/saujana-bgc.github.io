@@ -9,6 +9,7 @@
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <div class="search-wrap fade-up">
         <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
+        <NuxtLink v-if="collectionMatch" class="context-link" :to="{ path: '/collection', query: { game: collectionMatch.name } }" no-prefetch>Back to {{ collectionMatch.name }} in the collection <span aria-hidden="true">→</span></NuxtLink>
         <p v-if="!isPending && !isError && filteredSessions.length && !matchingGames" class="page-hint">Select a game to see its cover and players.</p>
         <p v-if="!isPending && !isError && matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
       </div>
@@ -141,6 +142,7 @@
 </template>
 
 <script setup>
+import { collectionDataSimple } from '~/assets/data/game_data_simple.js'
 const route = useRoute()
 const PAGE_SIZE = 10
 const HOVER_CARD_HEIGHT = 245
@@ -149,6 +151,10 @@ const currentPage = ref(1)
 const search = ref('')
 const hoverImage = reactive({ visible: false, src: '', name: '', key: '', showPlayers: true, players: [], x: 0, y: 0, above: true })
 const matchingGames = computed(() => search.value.trim().toLocaleLowerCase())
+const collectionMatch = computed(() => {
+  const query = search.value.trim().toLocaleLowerCase()
+  return query ? collectionDataSimple.games.find(game => game.name.toLocaleLowerCase() === query) ?? null : null
+})
 const matchingGameCount = computed(() => matchingGames.value
     ? filteredSessions.value.reduce((total, session) => total + session.games.filter(game => game.name.toLocaleLowerCase().includes(matchingGames.value)).length, 0)
     : 0)
