@@ -33,7 +33,7 @@
             <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
           </div>
         </details>
-        <UButton class="surprise-action" :class="{ active: currentSort === 'surprise' }" :aria-pressed="currentSort === 'surprise'" :disabled="isPending || isError" @click="generateSurprise">Browse games with no plays logged</UButton>
+        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: currentSort === 'surprise' }" :aria-pressed="currentSort === 'surprise'" :disabled="isPending || isError" @click="generateSurprise">Browse games with no plays logged</UButton>
       </div>
 
       <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
@@ -630,9 +630,9 @@ main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; 
 .collection-search-clear { align-self: flex-end; }
 .sort-controls { gap: 9px; }
 .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.surprise-action { align-self: flex-start; min-height: 44px; padding: 8px 2px; color: var(--matcha-leaf); font-size: .82rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-.surprise-action.active { color: var(--clay-text); }
-.surprise-action:hover { text-decoration-thickness: 2px; }
+.surprise-action { align-self: flex-start; min-height: 44px; padding: 8px 13px; color: var(--matcha-leaf); background: var(--surface-soft); border-color: var(--line); border-radius: 6px; font-size: .82rem; font-weight: 600; text-decoration: none; }
+.surprise-action.active { color: var(--clay-text); border-color: var(--matcha-leaf); background: var(--surface-soft); }
+.surprise-action:hover { background: var(--white-pure); }
 @media (max-width: 480px) {
   .collection-search { align-items: center; }
   .collection-search-meta { width: 100%; }

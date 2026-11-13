@@ -120,7 +120,6 @@
                   <legend class="signup-sr-only">Your details</legend>
                   <div class="signup-field signup-field-name">
                     <label :for="`signup-name-${event.id}`">Name <span class="signup-required">(required)</span></label>
-                    <p class="signup-field-hint">This name appears on the public attendee list.</p>
                     <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-error-${event.id}` : undefined" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === newRows[event.id] && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === newRows[event.id] && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @keydown="onNameAutocompleteKeydown($event, newRows[event.id])" @blur="hideNameAutocompleteSoon" />
                     <p v-if="nameErrors[event.id]" :id="`signup-name-error-${event.id}`" class="signup-error" role="alert">Add the name you’d like us to know you by.</p>
                   </div>
@@ -143,7 +142,7 @@
                     </div>
                   </details>
                 </fieldset>
-                <p class="signup-privacy-note">Names, arrival times, games and public notes appear in the attendee list. For private requests, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin on WhatsApp</a>.</p>
+                <p class="signup-privacy-note">Your name, arrival time, games and public notes appear in the attendee list. For a private request, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin on WhatsApp</a>.</p>
                 <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
                 <div class="signup-form-footer">
                   <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your sign-up…' : '' }}</p>
