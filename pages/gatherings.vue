@@ -53,6 +53,7 @@
               <span v-if="event.time">{{ event.time }}</span>
               <span v-if="event.venue" class="event-detail-venue">{{ event.venue }}</span>
             </div>
+            <a v-if="event.venue_url" class="event-photo-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
           </div>
           <img
             :src="getEventImage(event)"
@@ -75,8 +76,6 @@
             <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions</a>
           </div>
         </div>
-
-        <a v-if="getEventImage(event) && event.venue_url" class="event-photo-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
 
         <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>Look back at this gathering</span>
@@ -1292,12 +1291,20 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .event-photo-directions {
     display: inline-flex;
+    align-self: flex-start;
     align-items: center;
     gap: 6px;
     min-height: 44px;
-    margin-bottom: 8px;
-    color: var(--matcha-leaf);
+    color: white;
+    font-size: .875rem;
+    font-weight: 600;
+    text-decoration: underline;
     text-underline-offset: 3px;
+}
+
+.event-photo-directions:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 3px;
 }
 
 .event-heading {
