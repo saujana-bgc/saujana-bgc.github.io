@@ -13,6 +13,8 @@
         <img
           class="hero-banner"
           src="/images/site/saujana-home-hero.webp"
+          srcset="/images/site/saujana-home-hero-768.webp 768w, /images/site/saujana-home-hero-1280.webp 1280w"
+          sizes="(max-width: 600px) 420px, (max-width: 900px) 40vw, 560px"
           alt="A collage of Saujana players at board game and riichi mahjong gatherings."
           width="1671"
           height="941"

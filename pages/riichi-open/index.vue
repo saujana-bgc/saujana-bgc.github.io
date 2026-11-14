@@ -20,7 +20,7 @@
         <div v-if="publicLoaded || hold || complete" class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue your registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton></div>
         <p v-if="canRegister" class="hero-reassurance">16 places · No participant account needed · Payment checked by the organiser</p>
       </div>
-      <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster.png" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="1122" height="1402"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
+      <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open I event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster-380.webp" srcset="/images/riichi-open/riichi-open-i-poster-380.webp 380w, /images/riichi-open/riichi-open-i-poster-760.webp 760w" sizes="(max-width: 760px) 46vw, 380px" alt="Riichi Open I tournament poster with event date, venue, entry fee and format" width="760" height="950"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
     </section>
 
     <section v-if="publicLoaded || hold || complete || restorePending || restoreFailed" id="registration" ref="registrationPanel" class="registration-panel" aria-labelledby="register-heading" tabindex="-1">
@@ -124,7 +124,7 @@
     </dialog>
     </section>
 
-    <dialog ref="posterDialog" class="poster-dialog" aria-label="Riichi Open I event poster" @click="closePosterFromBackdrop" @close="restorePosterFocus">
+    <dialog v-if="posterOpen" ref="posterDialog" class="poster-dialog" aria-label="Riichi Open I event poster" @click="closePosterFromBackdrop" @close="restorePosterFocus">
       <UButton type="button" class="poster-close" aria-label="Close event poster" @click="closePoster">×</UButton>
       <img src="/images/riichi-open/riichi-open-i-poster.png" alt="Full Riichi Open I tournament poster">
     </dialog>
@@ -153,6 +153,7 @@ const guideReader = ref(null)
 const guideMobileToc = ref(null)
 const guideScrollTop = ref(0)
 const posterDialog = ref(null)
+const posterOpen = ref(false)
 const guideMarkdown = ref('')
 const guideLibraries = shallowRef(null)
 const guideLoading = ref(false)
@@ -281,10 +282,18 @@ async function jumpToGuideSection(id) {
   guideScrollTop.value = top
   heading.focus({ preventScroll: true })
 }
-function openPoster(event) { posterReturnFocus=event.currentTarget;posterDialog.value?.showModal() }
+async function openPoster(event) {
+  posterReturnFocus = event.currentTarget
+  posterOpen.value = true
+  await nextTick()
+  posterDialog.value?.showModal()
+}
 function closePoster() { posterDialog.value?.close() }
 function closePosterFromBackdrop(event) { if (event.target === posterDialog.value) closePoster() }
-function restorePosterFocus() { posterReturnFocus?.focus() }
+function restorePosterFocus() {
+  posterOpen.value = false
+  posterReturnFocus?.focus()
+}
 
 onMounted(async () => {
   clockTimer = window.setInterval(() => { if (document.visibilityState !== 'hidden') now.value = Date.now() }, 1000)

@@ -36,34 +36,3 @@ on conflict (id) do nothing;
 insert into public.riichi_league_weeks(id, season_id, week_number, event_date, status)
 values ('local-season-week-1', 'local-season', 1, current_date, 'active')
 on conflict (id) do nothing;
-
-insert into public.botc_sessions(
-  id, session_date, session_time, venue, recap, featured_game_id, published, games
-)
-values (
-  'cd53cd31-4699-47a9-9c53-cd8eaad31b80',
-  current_date - 7,
-  '19:30',
-  'Local Clocktower sample',
-  'The town compared clues until Leena used her Slayer shot on the Imp.',
-  'dd8b78dc-de28-4e0a-b084-8ce50fdb9e17',
-  true,
-  $games$
-  [
-    {
-      "id": "dd8b78dc-de28-4e0a-b084-8ce50fdb9e17",
-      "script": "Trouble Brewing",
-      "outcome": "Good wins",
-      "players": [
-        {"name": "Aina", "character": "Empath", "died": true},
-        {"name": "Jian", "character": "Fortune Teller", "died": false},
-        {"name": "Leena", "character": "Slayer", "died": false},
-        {"name": "Hafiz", "character": "Poisoner", "died": false},
-        {"name": "Maya", "character": "Imp", "died": true}
-      ],
-      "photos": []
-    }
-  ]
-  $games$::jsonb
-)
-on conflict (id) do nothing;

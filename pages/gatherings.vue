@@ -100,6 +100,10 @@
           </div>
 
           <div v-else-if="!isSpookyGameDay(event)" class="attendees-section">
+            <p v-if="attendeeLoadErrors[event.id]" class="attendee-load-error" role="alert">
+              Sign-up details couldn’t be loaded.
+              <UButton type="button" size="sm" @click="retryAttendees(event)">Try again</UButton>
+            </p>
             <div v-if="canEditEvent(event)" class="signup-section">
               <div v-if="signupSuccess[event.id]" class="signup-success" role="status">
                 <p>{{ signupSuccess[event.id] }}</p>
@@ -355,6 +359,8 @@ const PAGE_SIZE = 10
 const MINIMUM_SPEND = 10
 const loadingTab = ref(null)
 const loading = computed(() => {
+    if (activeTab.value === 'present' && presentLoaded.value) return false
+    if (activeTab.value === 'past' && pastLoaded.value) return false
     if (loadingTab.value === activeTab.value) return true
     return activeTab.value === 'present' ? !presentLoaded.value && !eventsError.present : !pastLoaded.value && !eventsError.past
 })
@@ -364,6 +370,7 @@ const presentLoaded = ref(false)
 const pastLoaded = ref(false)
 const eventsError = reactive({ present: false, past: false })
 const attendeesByEvent = reactive({})
+const attendeeLoadErrors = reactive({})
 const savedPayloads = new Map()
 const attendeeSaveStates = new Map()
 const attendeeEventIds = new Set()
@@ -665,8 +672,8 @@ async function getPresentEvents() {
 
     if (error) throw error
     presentEventsList.value = events ?? []
-    await getAttendeesForEvents(presentEventsList.value)
     presentLoaded.value = true
+    await getAttendeesForEvents(presentEventsList.value)
 }
 
 async function getPastEvents() {
@@ -679,8 +686,8 @@ async function getPastEvents() {
 
     if (error) throw error
     pastEventsList.value = events ?? []
-    await getAttendeesForEvents(pastEventsList.value)
     pastLoaded.value = true
+    await getAttendeesForEvents(pastEventsList.value)
 }
 
 async function getAttendeesForEvents(events) {
@@ -700,7 +707,10 @@ async function getAttendeesForEvents(events) {
         .in('event_id', ids)
         .order('id', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+        for (const id of ids) attendeeLoadErrors[id] = true
+        return
+    }
     const grouped = {}
     for (const attendee of attendees ?? []) {
         if (!grouped[attendee.event_id]) grouped[attendee.event_id] = []
@@ -712,7 +722,12 @@ async function getAttendeesForEvents(events) {
     for (const event of events) {
         attendeesByEvent[event.id] = grouped[event.id] ?? []
         attendeeEventIds.add(event.id)
+        attendeeLoadErrors[event.id] = false
     }
+}
+
+async function retryAttendees(event) {
+    await getAttendeesForEvents([event])
 }
 
 async function loadEventsForTab(tab) {
@@ -727,8 +742,8 @@ async function loadEventsForTab(tab) {
         else await getPastEvents()
     } catch (error) {
         eventsError[tab] = true
-        if (tab === 'present') presentEventsList.value = []
-        else pastEventsList.value = []
+        if (tab === 'present' && !presentLoaded.value) presentEventsList.value = []
+        else if (tab === 'past' && !pastLoaded.value) pastEventsList.value = []
         throw error
     } finally {
         if (loadingTab.value === tab) loadingTab.value = null
