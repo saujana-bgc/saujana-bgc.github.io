@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     prerender: {
       routes: [
         ...publicRoutes,
+        '/sitemap.xml',
         '/admin',
         '/admin/birthday-club',
         '/admin/riichi-open',

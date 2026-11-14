@@ -38,7 +38,7 @@ export const publicPages = {
   },
   '/riichi-open': {
     title: 'Riichi Open I | Saujana BGC',
-    description: 'Join Riichi Open I, a Japanese mahjong tournament on 14 November 2026 at Boardroom Bandit, Ara Damansara. Read the format, register and follow standings.',
+    description: 'See the format, schedule and standings for Riichi Open I, Saujana’s Japanese mahjong tournament on 14 November 2026 at Boardroom Bandit, Ara Damansara.',
     image: '/images/riichi-open/riichi-open-i-poster.png',
   },
 } satisfies Record<string, { title: string; description: string; image?: string }>
