@@ -11,15 +11,25 @@
           <img class="mobile-brand-logo brand-mark" src="/images/saujana-brand.webp" alt="" width="114" height="114" />
           <span class="brand-wordmark">Saujana<span class="brand-caption">Board Game Community</span></span>
         </NuxtLink>
-        <USlideover v-model:open="menuOpen" title="Explore Saujana" description="Find gatherings, games, and community resources." side="right" :ui="{ content: 'bg-[var(--bg-silk)]', body: 'p-5' }">
-          <template #default="{ open }">
-            <UButton variant="outline" color="neutral" type="button" class="menu-toggle" :class="{ open }" aria-controls="primary-nav-links" :aria-expanded="open" :aria-label="open ? 'Close navigation menu' : 'Open navigation menu'">
-              <span></span><span></span><span></span>
-              <span class="menu-toggle-label">{{ open ? 'Close' : 'Menu' }}</span>
+        <USlideover v-model:open="menuOpen" title="Explore Saujana" side="right" :ui="mobileMenuUi">
+          <template #default>
+            <UButton variant="ghost" color="neutral" type="button" class="menu-toggle">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              Menu
+            </UButton>
+          </template>
+          <template #close>
+            <UButton variant="ghost" color="neutral" type="button" class="menu-close">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="m6 6 12 12M18 6 6 18" />
+              </svg>
+              Close
             </UButton>
           </template>
           <template #body>
-            <nav id="primary-nav-links" class="mobile-navigation" aria-label="Explore Saujana" @click.capture="closeMenuOnNavigationLink">
+            <nav class="mobile-navigation" aria-label="Explore Saujana" @click.capture="closeMenuOnNavigationLink">
               <template v-for="item in navigation" :key="item.id">
                 <section v-if="item.children" class="mobile-navigation-group" :aria-labelledby="`mobile-navigation-heading-${item.id}`">
                   <h2 :id="`mobile-navigation-heading-${item.id}`">{{ item.label }}</h2>
@@ -97,6 +107,13 @@ const desktopNavigationUi = {
   link: 'no-underline rounded-lg px-3 py-2 text-sm text-[var(--muted)] hover:text-[var(--matcha-leaf)] data-[active]:text-[var(--matcha-leaf)]',
   childList: 'm-0 min-w-56 list-none rounded-xl border border-[var(--line)] bg-[var(--bg-silk)] p-2 shadow-lg',
   childLink: 'no-underline min-h-11 rounded-lg px-3 py-2 text-sm text-[var(--clay-text)] hover:bg-[var(--surface-soft)] hover:text-[var(--matcha-leaf)]',
+}
+const mobileMenuUi = {
+  overlay: 'z-[2002] bg-black/40',
+  content: 'z-[2003] bg-[var(--bg-silk)]',
+  header: 'min-h-[72px] justify-between gap-3 px-5 py-3',
+  title: 'font-[family-name:var(--font-display)] text-xl font-normal text-[var(--matcha-leaf)]',
+  body: 'px-5 py-3',
 }
 
 const { lastUpdated, versionUpdateAvailable, refreshToLatest } = useVersion()
@@ -195,6 +212,21 @@ onMounted(() => {
   color: var(--muted);
   font-size: 0.68rem;
   letter-spacing: 0.02em;
+}
+
+.menu-toggle,
+.menu-close {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  color: var(--matcha-leaf);
+  cursor: pointer;
+}
+
+.menu-toggle:hover,
+.menu-close:hover {
+  background: var(--surface-soft);
 }
 
 .mobile-navigation { display: grid; gap: 8px; }
