@@ -22,19 +22,19 @@
         <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="collection-search-clear" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
       </div>
 
-      <div class="sort-controls fade-up">
-        <div class="collection-sort-options" aria-label="Sort games">
-          <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" :aria-pressed="currentSort === 'name'" @click="currentSort = 'name'">A to Z</UButton>
-          <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" :aria-pressed="currentSort === 'played'" @click="currentSort = 'played'">Recently played</UButton>
-        </div>
-        <details class="collection-categories">
-          <summary>Categories<span v-if="selectedCategories.length" class="category-selection"> · {{ selectedCategories[0] === 'Card Game' ? 'Card games' : selectedCategories[0] === 'Party Game' ? 'Party games' : selectedCategories[0] }}</span></summary>
+      <details class="sort-controls collection-filters fade-up">
+        <summary class="collection-filters-summary">Sort and filter<span v-if="selectedFilterSummary" class="category-selection"> · {{ selectedFilterSummary }}</span></summary>
+        <div class="collection-filter-options">
+          <div class="collection-sort-options" aria-label="Sort games">
+            <UButton class="sort-btn" :class="{ active: currentSort === 'name' }" :aria-pressed="currentSort === 'name'" @click="currentSort = 'name'">A to Z</UButton>
+            <UButton class="sort-btn" :class="{ active: currentSort === 'played' }" :aria-pressed="currentSort === 'played'" @click="currentSort = 'played'">Recently played</UButton>
+          </div>
           <div class="collection-category-options" role="group" aria-label="Filter by category">
             <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
           </div>
-        </details>
-        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'Browse games with no plays logged' }}</UButton>
-      </div>
+          <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'Browse games with no plays logged' }}</UButton>
+        </div>
+      </details>
 
       <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
 
@@ -122,6 +122,11 @@ import { collectionDataSimple } from '~/assets/data/game_data_simple.js'
 
 const currentSort = ref('name')
 const search = ref('')
+const selectedFilterSummary = computed(() => [
+  currentSort.value === 'played' ? 'Recently played' : '',
+  ...selectedCategories.value.map(category => category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category),
+  unplayedOnly.value ? 'No plays logged' : '',
+].filter(Boolean).join(', '))
 const selectedCategories = ref([])
 const unplayedOnly = ref(false)
 function resetSort() { currentSort.value = null }
@@ -592,6 +597,13 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 .sort-controls { display: flex; flex-direction: column; max-width: 720px; gap: 10px; margin-bottom: 8px; }
 .collection-sort-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .collection-category-options { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 0 8px; }
+.collection-filters { width: 90%; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
+.collection-filters > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 9px 12px; color: var(--matcha-leaf); font-size: .82rem; font-weight: 600; cursor: pointer; list-style: none; }
+.collection-filters > summary::-webkit-details-marker { display: none; }
+.collection-filters > summary::after { content: '⌄'; color: var(--gold-leaf); font-size: 1.1rem; transition: transform .16s ease; }
+.collection-filters[open] > summary::after { transform: rotate(180deg); }
+.collection-filters > summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
+.collection-filter-options { display: grid; gap: 10px; padding: 0 10px 10px; }
 .collection-categories { border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
 .collection-categories summary { display: flex; align-items: center; min-height: 44px; padding: 9px 12px; color: var(--matcha-leaf); font-size: .82rem; font-weight: 600; cursor: pointer; }
 .collection-categories summary { list-style: none; justify-content: space-between; }
@@ -600,6 +612,7 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 .collection-categories[open] summary::after { transform: rotate(180deg); }
 .collection-categories summary:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
 .category-selection { color: var(--muted); font-weight: 400; }
+.collection-filter-options .collection-category-options { padding: 0; }
 .collection-categories[open] .collection-category-options { padding: 2px 10px 10px; }
 .sort-btn { padding: 10px 12px; min-height: 44px; border-radius: 6px; text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
 .category-btn { flex: 0 0 auto; }

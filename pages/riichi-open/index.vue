@@ -139,8 +139,13 @@
 const route = useRoute()
 const router = useRouter()
 const activeTab = ref(route.query.tab === 'standings' ? 'standings' : 'registration')
-watch(() => route.query.tab, tab => { activeTab.value = tab === 'standings' ? 'standings' : 'registration' })
+let tabWasChosen = typeof route.query.tab === 'string'
+watch(() => route.query.tab, tab => {
+  tabWasChosen = typeof tab === 'string'
+  activeTab.value = tab === 'standings' ? 'standings' : 'registration'
+})
 watch(activeTab, tab => {
+  tabWasChosen = true
   const query = { ...route.query }
   if (tab === 'standings') query.tab = 'standings'
   else delete query.tab
@@ -332,6 +337,7 @@ async function loadPublic() {
   try {
     const data = await callPublic('summary')
     event.value = data.event
+    if (!tabWasChosen && data.event?.stage !== 'registration') activeTab.value = 'standings'
     registrations.value = data.registrations ?? []
     activeHolds.value = Number(data.active_holds ?? 0)
     snapshot.value = data.publication?.snapshot ?? null

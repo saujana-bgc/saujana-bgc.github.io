@@ -15,6 +15,7 @@
           <template #default="{ open }">
             <UButton variant="outline" color="neutral" type="button" class="menu-toggle" :class="{ open }" aria-controls="primary-nav-links" :aria-expanded="open" :aria-label="open ? 'Close navigation menu' : 'Open navigation menu'">
               <span></span><span></span><span></span>
+              <span class="menu-toggle-label">{{ open ? 'Close' : 'Menu' }}</span>
             </UButton>
           </template>
           <template #body>
