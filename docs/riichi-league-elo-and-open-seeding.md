@@ -2,7 +2,7 @@
 
 Pilot operating rules · Revised 16 November 2026
 
-Run **Riichi League Season 2** for three months using four-player Elo with **K=24**. Everyone starts at **1,500**, and players earn a rank after **eight rated hanchans across four dates**. Use the frozen Season 2 standings to build pots for **Riichi Open II**'s first qualifier. Open II has **three qualifiers and a top-four final**, with a **90-minute clock** for every round. Open II results determine who advances and any final tie-break.
+Run **Riichi League Season 2** for three months using four-player Elo with **K=24**. Everyone starts at **1,500**, and players earn a rank after **eight rated hanchans across four dates**. Use the frozen Season 2 standings to build pots for **Riichi Open II**'s first qualifier. Players can enter and win Open II without a league rank. Open II has **three qualifiers and a top-four final**, with a **90-minute clock** for every round. Open II results determine who advances and any final tie-break.
 
 ## What would change
 
@@ -23,15 +23,21 @@ Riichi Open I used a random draw for the first qualifier, a snake assignment bas
 
 Use a stable league player ID. During Open registration, have an organiser confirm a player's identity if their entry name differs from their league name. The current league form assigns a table number when a result is saved, so submission order can differ from play order. [Current league score entry](../pages/riichi-league.vue#L165)
 
+The Season 2 standings on the Riichi League page will show each player's Elo, counted rated games and number of different playing dates. Players report missing or incorrect results to the league organiser with the date, session and round number, and the score they believe should be recorded.
+
+The corrections window covers results submitted on time, including results missing from the standings. The organiser checks the original submission. If nobody at the table submitted the result by the three-day deadline, the game does not count towards Elo or rank eligibility.
+
 ### Shared gameplay rules
 
 Use the **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025** and the **29 June 2025 Official Rules Clarification** as adopted by Riichi Open I. Use ordinary fives in every suit and follow Open I's choice to play without optional WRC variants. Both events calculate an official hanchan score from final table points, placement uma and tournament-point penalties. Keep table points, unclaimed riichi sticks, shared uma where applicable, and penalties in the result record. [Open I rules and official references](../public/riichi-open/rules.md#L5) · [Open I tournament scoring](../public/riichi-open/rules.md#L69)
 
 ### Rated game completion
 
-A rated hanchan uses Open I's **75-minute limit**. If it is still in progress at the time signal, finish the current hand and record the result. A hand reset by chombo must still be replayed. A verified timed finish counts in full for Elo and eligibility.
+Season 2 league games have **no time limit**. Rated games run to their normal conclusion under WRC gameplay rules. Apply the WRC replay procedure if chombo resets a hand.
 
-If play stops for a withdrawal, venue closure or other disruption, the organiser may resume the game within the season with the same four players, a recoverable game state and the remaining clock time. Void the result if those conditions cannot be met or the game cannot reach an official finish. A void game contributes neither Elo nor eligibility. A resumed game counts on its original session date, with the submission deadline measured from completion. [Open I time limits](../public/riichi-open/rules.md#L218) · [Open I chombo procedure](../public/riichi-open/rules.md#L319)
+Before each session, the organiser announces the latest rated start based on the venue closing time and the time a hanchan typically takes. The cutoff applies to new rated games. Tables already playing can continue to a normal finish while the venue is open.
+
+If play stops for a withdrawal, venue closure or other disruption, the organiser may resume the game within the season with the same four players and a recoverable game state. Void the result if those conditions cannot be met or the game cannot reach an official finish. A void game contributes neither Elo nor eligibility. A resumed game counts on its original session date, with the submission deadline measured from completion. [Open I chombo procedure](../public/riichi-open/rules.md#L319)
 
 ### How Elo is calculated
 
@@ -72,6 +78,14 @@ Hold seats for confirmed entrants who check in on time. Release unclaimed seats 
 
 If there are too few players to fill the last table, run the largest field that fills tables of four and has at least four final-eligible entrants. Keep on-time confirmed entrants in order of confirmation, then draw from the waitlist and organiser reserves in their published order. For example, if 15 people are available after check-in and there is no fourth person for the last table, seat 12. Publish this fallback and the applicable registration and refund terms before taking entries. If fewer than four final-eligible entrants can be seated, postpone the tournament.
 
+If a confirmed entrant checks in on time and cannot be seated under this fallback, refund any entry fee they paid in full.
+
+### Refunds and rescheduling
+
+- The registration organiser contacts confirmed on-time entrants who cannot be seated to arrange their full refund. Players can follow up through the registration contact with their entry name and payment reference.
+- If the event is postponed or the remaining qualifiers move to another day, carry entries over. A player who cannot attend the new date may withdraw through the registration organiser and get a full refund. Certified rounds stay on record. Withdrawn entrants are ineligible for the final.
+- Aim to issue each refund within seven calendar days of confirming eligibility and receiving any payment details needed to return it. Contact the player privately if extra details are needed.
+
 ### Withdrawals and reserves
 
 - Before or between qualifiers, an announced reserve takes the withdrawn player's place in the remaining table assignments and joins that round's starting-wind draw. Certified results stay with the players who earned them. Record the reserve's games under the reserve's own name. A withdrawn entrant and an organiser reserve are ineligible for the final.
@@ -111,6 +125,8 @@ Add the **three** qualifying hanchan scores before penalties, then deduct all qu
 ### Example event schedule
 
 This sample schedule starts play at **1:00 pm Malaysia time**. It allows 25 minutes after each of the first two clocks for finishing hands, checking scores and changing tables. Later start times are targets. If play runs late, keep the 90-minute clock for each round and move the later starts. Awards follow verification of the final result. Confirm the venue and publish the actual schedule before registration.
+
+Ask entrants to stay until the finalists and any standbys are announced, around **7:05 pm** on this schedule. Everyone except finalists and standbys can leave after the announcement. Tell standbys when their commitment ends. Finalists should plan for awards around **8:55 pm**, with room for delays.
 
 | Time | Session |
 | --- | --- |
