@@ -15,6 +15,14 @@ export const publicPages = {
     title: 'Collection | Saujana BGC',
     description: 'Explore the Saujana host’s board game collection. Search by title, designer, player count or category, and find a game to try at your next gathering.',
   },
+  '/board-games': {
+    title: 'Board Games | Saujana BGC',
+    description: 'Join Saujana for board games in Kuala Lumpur. New to the table? We’ll help you find a game, learn the rules and join a gathering.',
+  },
+  '/riichi-mahjong': {
+    title: 'Riichi Mahjong | Saujana BGC',
+    description: 'Discover riichi mahjong with Saujana. Watch a hand, learn as you play, and find a casual gathering, league results, scoring tools or tournament details.',
+  },
   '/playlog': {
     title: 'Play History | Saujana BGC',
     description: 'Explore the board games played at Saujana gatherings. Look back at past gatherings and discover the games our community keeps coming back to.',

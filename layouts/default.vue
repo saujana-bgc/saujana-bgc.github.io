@@ -81,8 +81,9 @@ const navigation = computed(() => [
     id: 'board-games',
     label: 'Board Games',
     type: 'trigger',
-    active: ['/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
+    active: ['/board-games', '/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
     children: [
+      { label: 'Board Games overview', to: '/board-games/', prefetch: false },
       { label: 'Collection', to: '/collection/', prefetch: false },
       { label: 'Play History', to: '/playlog/', prefetch: false },
     ],
@@ -91,8 +92,9 @@ const navigation = computed(() => [
     id: 'riichi',
     label: 'Riichi Mahjong',
     type: 'trigger',
-    active: ['/riichi-league', '/riichi-calculator', '/riichi-open'].includes(route.path.replace(/\/+$/, '')),
+    active: ['/riichi-mahjong', '/riichi-league', '/riichi-calculator', '/riichi-open'].includes(route.path.replace(/\/+$/, '')),
     children: [
+      { label: 'Riichi Mahjong overview', to: '/riichi-mahjong/', prefetch: false },
       { label: 'Riichi League', to: '/riichi-league/', prefetch: false },
       { label: 'Riichi Calculator', to: '/riichi-calculator/', prefetch: false },
       { label: 'Riichi Open I', to: '/riichi-open/', prefetch: false },
