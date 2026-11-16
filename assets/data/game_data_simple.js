@@ -1,6 +1,6 @@
 const collectionDataSimple = {
-    "total": 344,
-    "date": "10 Nov 2026",
+    "total": 343,
+    "date": "16 Nov 2026",
     "games": [
         {
             "name": "5-Minute One Piece",
@@ -1782,19 +1782,6 @@ const collectionDataSimple = {
                 "Action / Dexterity",
                 "Deduction",
                 "Exploration"
-            ]
-        },
-        {
-            "name": "Halloween II",
-            "designers": [
-                "Emerson Matsuuchi"
-            ],
-            "img": "images/games/429456.avif",
-            "players": "2-4P",
-            "weight": 1.5,
-            "categories": [
-                "Horror",
-                "Movies / TV / Radio theme"
             ]
         },
         {

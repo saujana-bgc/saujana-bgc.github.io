@@ -1,6 +1,6 @@
 const collectionData = {
-    "total": 344,
-    "date": "10 Nov 2026",
+    "total": 343,
+    "date": "16 Nov 2026",
     "games": [
         {
             "name": "5-Minute One Piece",
@@ -1912,20 +1912,6 @@ const collectionData = {
                 "Exploration"
             ],
             "description": "Hako Onna is a game of horror hide-and-seek. One player plays the “Hako Onna” (the Woman in the Box), and the rest are “Visitors”, who are trying to escape from the mansion. As Visitors, you’ll try not to make noise as you search the shadowy rooms of the mansion for items to protect yourself, for information, and for a way to escape what you do not see, but know is there. But if you stumble upon the Hako Onna, you’re dead. Players who discover the Hako Onna become a Hakobito, one of her servants, and wake up with her to move throughout the house.\n\nDuring most of Hako Onna's turn, the human players must keep their eyes closed so they cannot see where she moves to or what action she has done. The game also features a unique optional dexterity element that adds to the game's overall tension and dread. Before a visitor can take their turn, they need to avoid making noise by stacking a small disc on top the previous ones; if the tower collapses, they've made noise and it instantly becomes Hako Onna's turn.\n\nHako Onna can win the game in two ways:\n\n    If all visitors are turned into Hakobito, or\n    If she has made it impossible for the visitors to win.\n\n\nThe human players can win in one of three ways:\n\n    If they manage to kill Hako Onna after finding her only weakness,\n    If they find the secret exit, while in posession of the key ring hidden inside the safe, or\n    If they can bring peace to Hako Onna by bringing the remains of her body to her precious doll, Mary.\n\n\nSince its original publication in Japanese, Hako Onna has reached its fourth edition, and has been republished in English by WizKids. The English edition features all-new cards for players to use as they experience the thrilling horror of this thematically-rich game.\n\n•••\n\nã‚¸ãƒ£ãƒ‘ãƒ‹ãƒ¼ã‚ºãƒ»ãƒ›ãƒ©ãƒ¼ã‚’ãƒ†ãƒ¼ãƒžã�¨ã�—ã�Ÿé�žå¯¾ç§°å¯¾æˆ¦ï¼†å�”åŠ›åž‹è„±å‡ºã‚²ãƒ¼ãƒ ã€‚\né¤¨ã�«æ½œã‚€æ€¨éœŠã€Œç®±å¥³ã€�ã�¨ã€�é¤¨ã‚’è¨ªã‚Œã�Ÿè¨ªå•�è€…ã�«åˆ†ã�‹ã‚Œã�¦ã‚²ãƒ¼ãƒ ã‚’è¡Œã�„ã�¾ã�™ã€‚\nç®±å¥³ã‚’è¦‹ã�¤ã�‘ã�¦ã�—ã�¾ã�†ã�¨è¨ªå•�è€…ã�¯æ­»äº¡ã�—ã€�ãƒ�ã‚³ã‚ªãƒ³ãƒŠã�®çœ·å±žã€�ç®±äººã�¨ã�ªã�£ã�¦ã�—ã�¾ã�„ã�¾ã�™ã€‚è¨ªå•�è€…å…¨å“¡ã�Œç®±äººã�«ã�ªã�£ã�¦ã�—ã�¾ã�ˆã�°ç®±å¥³ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã�®å‹�ã�¡ã€�è¨ªå•�è€…å…¨å“¡ã�Œç®±äººã�«ã�ªã‚‹å‰�ã�«ï¼“ã�¤ã�®å‹�åˆ©æ�¡ä»¶ã�®ã�„ã�šã‚Œã�‹ã‚’é�”æˆ�ã�§ã��ã‚Œã�°è¨ªå•�è€…ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã�®å‹�åˆ©ã�¨ã�ªã‚Šã�¾ã�™ã€‚"
-        },
-        {
-            "name": "Halloween II",
-            "designers": [
-                "Emerson Matsuuchi"
-            ],
-            "img": "images/games/429456.avif",
-            "players": "2-4P",
-            "weight": 1.5,
-            "categories": [
-                "Horror",
-                "Movies / TV / Radio theme"
-            ],
-            "description": "Laurie Strode needs your help – get her some medicine, or a wheelchair, or... why did the lights just go out?\n\nIn this 1-versus-many game based on Halloween II, you'll need to run around the board to accomplish your objectives while Michael stalks you from the darkness. Michael will track his movement secretly on a separate board, revealing his location only when he is seen by your character... or when he attacks! Co-operation is key, so you'd better get moving before it's too late.\n\nMyers wins by killing enough characters (players respawn with a new character but lose their items), or preventing the others from winning for long enough. The other players win by getting the objective cards and escaping in a vehicle, or dealing enough damage to Myers to incapacitate him.\n\nThis stand-alone game uses the same core system as Halloween from Trick or Treat Studios, with added optional rules for Michael to harm Laurie. The map, player powers, and most of the cards are new. These elements can be swapped between the games.\n\n—description from the publisher"
         },
         {
             "name": "Ham's Sandwich Shop",
