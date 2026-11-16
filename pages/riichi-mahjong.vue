@@ -3,7 +3,7 @@
     <header class="page-intro">
       <p class="page-eyebrow">Japanese mahjong</p>
       <h1 class="hero-title">Riichi Mahjong</h1>
-      <p class="stats-container">Curious about the tiles? Watch a hand and ask one of our players to walk you through it. You can learn the basics at the table.</p>
+      <p class="stats-container">Riichi is a Japanese version of mahjong, usually played by four people. Players draw and discard tiles while building a winning hand, a set of groups and a pair. You can learn the flow by watching a hand at the table.</p>
       <NuxtLink class="activity-primary" to="/gatherings/?game=riichi" no-prefetch>Find a riichi gathering <span aria-hidden="true">→</span></NuxtLink>
     </header>
 
@@ -12,10 +12,10 @@
         <img src="/images/site/what-we-play-riichi.webp" alt="An illustration of players moving yellow-backed mahjong tiles around a green table." width="900" height="600" loading="lazy">
       </figure>
       <div class="activity-copy">
-        <p class="page-eyebrow">New to riichi?</p>
-        <h2 id="first-hand-title">Start by watching a hand.</h2>
-        <p>Riichi is Japanese mahjong played with tiles. A player can show you how a hand comes together, explain the table’s rules, and answer questions as you go.</p>
-        <p>Check the gatherings page for the next date, venue and sign-up details. You’re welcome to observe first.</p>
+        <p class="page-eyebrow">A turn at the table</p>
+        <h2 id="first-hand-title">Draw a tile. Choose what to keep.</h2>
+        <p>On your turn, draw a tile and discard one. You’re trying to make groups, such as three tiles in number order from the same suit, plus a pair. When your tiles make a complete hand, you can win.</p>
+        <p>There are more rules for calling tiles and scoring, but you don’t need to memorize them to visit. Watch a hand and ask a player what they’re collecting. If you decide to try a turn, someone at the table can guide you through it.</p>
       </div>
     </section>
 

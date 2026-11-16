@@ -3,7 +3,7 @@
     <header class="page-intro">
       <p class="page-eyebrow">Come try a game</p>
       <h1 class="hero-title">Board Games</h1>
-      <p class="stats-container">From quick party games to thoughtful strategy, we’ll help you find a place at the table. Come on your own, bring a friend, or watch a round first.</p>
+      <p class="stats-container">If Monopoly and Uno are the games you know, you already have a starting point. Board games also include quick team challenges, creative guessing games and thoughtful strategy games. We’ll help you find one that fits.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
     </header>
 
@@ -12,10 +12,12 @@
         <img src="/images/site/what-we-play-board-games.webp" alt="An illustrated tabletop game with a colourful track, cards and dice." width="900" height="1350" loading="lazy">
       </figure>
       <div class="activity-copy">
-        <p class="page-eyebrow">Your first game</p>
-        <h2 id="first-game-title">We’ll find something that fits.</h2>
-        <p>Tell us what you enjoy, or pick a game from the collection. Hosts can explain the rules as you play, so you don’t need to prepare before you arrive.</p>
-        <p>Coming alone? Say hello to a host when you arrive. You’re welcome to watch a round before joining a game.</p>
+        <p class="page-eyebrow">What playing can look like</p>
+        <h2 id="first-game-title">There’s more than one way to play.</h2>
+        <p><strong>Work as a team.</strong> Give clues so your teammates can guess the right words before time runs out.</p>
+        <p><strong>Read the room.</strong> Make a guess about what the other players are thinking, then see if the group agrees.</p>
+        <p><strong>Plan a few turns ahead.</strong> Collect useful pieces, build a pattern or block another player’s route.</p>
+        <p>Those are examples of the kinds of things modern board games ask you to do. At a gathering, tell a host what sounds fun. They can recommend and teach a game. Coming alone or unsure? Watch a round first.</p>
       </div>
     </section>
 

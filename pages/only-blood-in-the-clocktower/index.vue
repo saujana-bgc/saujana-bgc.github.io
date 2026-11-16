@@ -3,7 +3,7 @@
     <header class="page-intro">
       <p class="page-eyebrow">Social deduction</p>
       <h1 class="hero-title">Blood on the Clocktower</h1>
-      <p class="stats-container">Blood on the Clocktower is a social game of hidden roles. Talk, share clues and vote to find the Demon. New players are welcome; we’ll explain as you play.</p>
+      <p class="stats-container">Blood on the Clocktower is a group mystery with secret roles. The good team gathers clues to find the Demon while the evil team tries to stay hidden. You can watch first, and the Storyteller will guide you through your role.</p>
     </header>
 
     <div class="gathering-banner">
@@ -36,10 +36,15 @@
       <div class="welcome-heading">
         <h2 id="welcome-title">Your first game</h2>
       </div>
-      <ul class="welcome-steps">
-        <li><strong>Meet the Storyteller</strong><span>They guide the game, explain your role and answer questions as you play.</span></li>
-        <li><strong>Choose how to join</strong><span>Come solo or with a friend. You can watch a round before taking part.</span></li>
-      </ul>
+      <div class="welcome-details">
+        <ul class="welcome-steps">
+          <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
+          <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
+          <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
+          <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
+        </ul>
+        <p class="welcome-joining">You can come on your own or with a friend. At the gathering, tell the host you’re new. They’ll explain what to expect and help you decide whether to watch or play.</p>
+      </div>
       <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
     </section>
 
@@ -446,6 +451,7 @@ onMounted(() => {
 }
 .welcome-note h2 { margin: 4px 0 6px; color: var(--ink); font: 400 clamp(1.45rem, 3vw, 2rem)/1.15 var(--font-display); letter-spacing: -.025em; }
 .welcome-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; margin: 0; padding: 0; list-style: none; }
+.welcome-joining { margin: 14px 0 0; color: var(--soft-ink); font-size: .9rem; line-height: 1.5; }
 .welcome-steps li { display: grid; gap: 2px; color: var(--soft-ink); font-size: .9rem; line-height: 1.5; }
 .welcome-steps strong { color: var(--ink); }
 .welcome-link { display: inline-flex; align-items: center; justify-self: start; align-self: center; gap: 8px; min-height: 44px; padding: 9px 13px; border: 1px solid #b99577; border-radius: 6px; color: var(--wine); font-size: .86rem; font-weight: 700; text-decoration: none; }
