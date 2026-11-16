@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { publicRoutes } from './utils/siteSeo'
+import { getPublicPage, publicRoutes } from './utils/siteSeo'
 
 export default defineNuxtConfig({
   modules: ['@nuxt/ui'],
@@ -10,8 +10,10 @@ export default defineNuxtConfig({
     // Bundle Nuxt 4.6's renderer so its generated build artifacts resolve in Nitro.
     externals: { inline: ['nuxt/internal'] },
     prerender: {
+      // Nuxt also discovers file-based routes without slashes. Export each public page once.
+      ignore: [path => path !== '/' && publicRoutes.includes(path)],
       routes: [
-        ...publicRoutes,
+        ...publicRoutes.map(path => new URL(getPublicPage(path)!.canonical).pathname),
         '/sitemap.xml',
         '/admin',
         '/admin/birthday-club',
@@ -19,7 +21,6 @@ export default defineNuxtConfig({
         '/admin/only-blood-in-the-clocktower',
         '/admin/visitors',
         '/birthday-club-calendar',
-        '/only-blood-in-the-clocktower',
       ],
     },
   },

@@ -65,7 +65,7 @@
           </div>
 
           <div class="last-played">
-            <NuxtLink v-if="game.stats.date" :to="{ path: '/playlog', query: { game: game.name } }">Last played {{ formatDate(game.stats.date) }} · {{ game.stats.count }} {{ game.stats.count === 1 ? 'play' : 'plays' }}</NuxtLink>
+            <NuxtLink v-if="game.stats.date" :to="{ path: '/playlog/', query: { game: game.name } }">Last played {{ formatDate(game.stats.date) }} · {{ game.stats.count }} {{ game.stats.count === 1 ? 'play' : 'plays' }}</NuxtLink>
             <span v-else-if="!isPending && !isError">No plays logged</span>
             <span v-else aria-hidden="true"></span>
           </div>
@@ -108,7 +108,7 @@
               Designed by {{ selectedGame.designers.join(', ') }}
             </div>
             <div style="font-size: 0.95rem; line-height: 1.8; font-weight: 300; opacity: 0.9; white-space: pre-wrap;" v-html="selectedGame.description"></div>
-            <NuxtLink class="context-link" to="/gatherings" no-prefetch>Want to try this one? Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+            <NuxtLink class="context-link" to="/gatherings/" no-prefetch>Want to try this one? Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           </div>
         </div>
       </div>

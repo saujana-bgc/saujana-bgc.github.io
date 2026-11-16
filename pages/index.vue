@@ -5,7 +5,7 @@
         <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
         <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Coming on your own? You’re welcome to watch a round before joining in.</p>
         <div class="hero-actions">
-          <NuxtLink class="hero-gatherings-link" to="/gatherings" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+          <NuxtLink class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -45,7 +45,7 @@
           <a v-if="nextGathering.venue_url" class="gathering-detail gathering-directions" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
       </div>
-      <NuxtLink class="next-gathering-link" :to="`/gatherings#gathering-${nextGathering.id}`" no-prefetch>
+      <NuxtLink class="next-gathering-link" :to="`/gatherings/#gathering-${nextGathering.id}`" no-prefetch>
         See gathering details <span aria-hidden="true">→</span>
       </NuxtLink>
       </template>
@@ -53,7 +53,7 @@
         <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
         <p v-else-if="gatheringStatus === 'unavailable'">The calendar isn’t available just now.</p>
         <p v-else>No date has been announced yet.</p>
-        <NuxtLink class="text-link" to="/gatherings" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
       </div>
     </section>
 
@@ -61,7 +61,7 @@
       <div class="first-visit-layout">
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">Your first game or your hundredth, you’re welcome here. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>. <NuxtLink to="/gatherings" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
+          <p class="section-intro">Your first game or your hundredth, you’re welcome here. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>. <NuxtLink to="/gatherings/" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
         </div>
         <img
           class="first-visit-photo"

@@ -9,7 +9,7 @@
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <div class="search-wrap fade-up">
         <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
-        <NuxtLink v-if="collectionMatch" class="context-link" :to="{ path: '/collection', query: { game: collectionMatch.name } }" no-prefetch>Back to {{ collectionMatch.name }} in the collection <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink v-if="collectionMatch" class="context-link" :to="{ path: '/collection/', query: { game: collectionMatch.name } }" no-prefetch>Back to {{ collectionMatch.name }} in the collection <span aria-hidden="true">→</span></NuxtLink>
         <p v-if="!isPending && !isError && filteredSessions.length && !matchingGames" class="page-hint">Select a game to see its cover and players.</p>
         <p v-if="!isPending && !isError && matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
       </div>
@@ -25,7 +25,7 @@
 
       <div v-else-if="isError" class="loading-state" role="alert">
         <p>We couldn’t load play history. Refresh the page to try again.</p>
-        <NuxtLink class="context-link" to="/collection" no-prefetch>Browse the collection while you’re here <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="context-link" to="/collection/" no-prefetch>Browse the collection while you’re here <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
       <template v-else>
@@ -58,7 +58,7 @@
 
         <div v-if="filteredSessions.length === 0" class="loading-state">
           <p>{{ search.trim() ? `No gatherings include “${search.trim()}”. Try another game title.` : 'Our play history is waiting for its first entry.' }}</p>
-          <NuxtLink class="context-link" to="/collection" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
+          <NuxtLink class="context-link" to="/collection/" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
         </div>
 
         <div v-if="totalPages > 1" class="pagination">
@@ -153,7 +153,7 @@
           </div>
         </section>
       </template>
-      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower" no-prefetch>See Clocktower recaps and the next gathering →</NuxtLink></p>
+      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>See Clocktower recaps and the next gathering →</NuxtLink></p>
     </main>
 
     <Teleport to="body">

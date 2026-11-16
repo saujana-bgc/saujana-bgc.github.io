@@ -9,8 +9,8 @@ export const communityPillars = [
     },
     description: 'Played party games before? Start with something quick. We’ll help you choose a game and explain the rules as you play.',
     links: [
-      { label: 'Collection', to: '/collection' },
-      { label: 'Play History', to: '/playlog' },
+      { label: 'Collection', to: '/collection/' },
+      { label: 'Play History', to: '/playlog/' },
     ],
   },
   {
@@ -23,9 +23,9 @@ export const communityPillars = [
     },
     description: 'Riichi is Japanese mahjong played with tiles. At a Riichi gathering, watch a hand and ask someone to walk you through it.',
     links: [
-      { label: 'Riichi League', to: '/riichi-league' },
-      { label: 'Riichi Calculator', to: '/riichi-calculator' },
-      { label: 'Riichi Open I', to: '/riichi-open' },
+      { label: 'Riichi League', to: '/riichi-league/' },
+      { label: 'Riichi Calculator', to: '/riichi-calculator/' },
+      { label: 'Riichi Open I', to: '/riichi-open/' },
     ],
   },
   {
@@ -38,7 +38,7 @@ export const communityPillars = [
     },
     description: 'Everyone gets a secret role. Share clues and work out who the Demon is. You can watch a round first, and the Storyteller will explain your role if you decide to play.',
     links: [
-      { label: 'Clocktower gatherings and recaps', to: '/only-blood-in-the-clocktower' },
+      { label: 'Clocktower gatherings and recaps', to: '/only-blood-in-the-clocktower/' },
     ],
   },
 ] as const

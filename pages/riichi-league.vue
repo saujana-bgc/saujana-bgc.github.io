@@ -109,7 +109,7 @@
       </UButton>
     </section>
 
-    <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings" no-prefetch>Come to a gathering</NuxtLink> to watch a hand and meet the players. Ask around for Saujana BGC and let us know you’re new to riichi.</p>
+    <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings/" no-prefetch>Come to a gathering</NuxtLink> to watch a hand and meet the players. Ask around for Saujana BGC and let us know you’re new to riichi.</p>
 
     <section class="content-card weeks-card fade-up" aria-labelledby="weeks-heading">
       <div class="section-heading">

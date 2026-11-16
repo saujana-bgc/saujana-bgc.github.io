@@ -21,8 +21,16 @@ for (const path of publicRoutes) {
   assert.deepEqual([...head.matchAll(/<link rel="canonical" href="([^"]+)"/g)].map(match => match[1]), [page.canonical], `${path}: one canonical without query parameters`)
   assert.ok(head.includes(`<meta property="og:url" content="${page.canonical}"`), `${path}: social URL matches canonical`)
   assert.doesNotMatch(head, /<meta[^>]+(?:noindex|nofollow)/i, `${path}: public page allows indexing`)
+  assert.doesNotMatch(head, /<meta[^>]+http-equiv="refresh"/i, `${path}: public page serves content without a redirect`)
   assert.match(body, /<h1\b[^>]*>[^<\s]/, `${path}: real heading without executing JavaScript`)
   assert.match(body, /<a\b[^>]*href="\/[^"]*"/, `${path}: crawlable internal links`)
+  for (const [, href] of body.matchAll(/<a\b[^>]*\shref="([^"]+)"/gi)) {
+    const target = new URL(decode(href), page.canonical)
+    if (target.origin !== siteUrl) continue
+    const destination = getPublicPage(target.pathname)
+    if (!destination) continue
+    assert.equal(target.pathname, new URL(destination.canonical).pathname, `${path}: ${href} links directly to its canonical path`)
+  }
   const structured = head.match(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)
   assert.ok(structured, `${path}: structured data in HTML`)
   const graph = JSON.parse(structured[1])['@graph']

@@ -1,6 +1,6 @@
 <template>
   <section class="riichi-admin">
-    <div class="event-admin-heading"><div><p class="eyebrow">Event Management</p><h1>Riichi Open I Admin</h1></div><NuxtLink to="/riichi-open?tab=standings" target="_blank" class="public-event-link">Public standings ↗</NuxtLink></div>
+    <div class="event-admin-heading"><div><p class="eyebrow">Event Management</p><h1>Riichi Open I Admin</h1></div><NuxtLink to="/riichi-open/?tab=standings" target="_blank" class="public-event-link">Public standings ↗</NuxtLink></div>
     <p class="admin-lede">Manage the roster, payment checks and round records. Public scores change only when you certify a complete round.</p>
     <p v-if="error" class="admin-error" role="alert">{{ error }}</p><p v-if="message" class="admin-status" role="status">{{ message }}</p>
     <p v-if="busy" class="admin-status" role="status">Saving event changes…</p>

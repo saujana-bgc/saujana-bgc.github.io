@@ -55,10 +55,10 @@
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Come Play with Saujana</p>
       <nav class="footer-pillars" aria-label="Explore Saujana">
-        <NuxtLink to="/gatherings" no-prefetch>Gatherings</NuxtLink>
-        <NuxtLink to="/collection" no-prefetch>Collection</NuxtLink>
-        <NuxtLink to="/riichi-league" no-prefetch>Riichi League</NuxtLink>
-        <NuxtLink to="/only-blood-in-the-clocktower" no-prefetch>Clocktower</NuxtLink>
+        <NuxtLink to="/gatherings/" no-prefetch>Gatherings</NuxtLink>
+        <NuxtLink to="/collection/" no-prefetch>Collection</NuxtLink>
+        <NuxtLink to="/riichi-league/" no-prefetch>Riichi League</NuxtLink>
+        <NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower</NuxtLink>
       </nav>
       <div class="footer-social-links">
         <SocialLink channel="whatsapp" label="Say hello on WhatsApp" />
@@ -76,15 +76,15 @@
 <script setup>
 const route = useRoute()
 const navigation = computed(() => [
-  { id: 'gatherings', label: 'Gatherings', to: '/gatherings', prefetch: false },
+  { id: 'gatherings', label: 'Gatherings', to: '/gatherings/', prefetch: false },
   {
     id: 'board-games',
     label: 'Board Games',
     type: 'trigger',
     active: ['/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
     children: [
-      { label: 'Collection', to: '/collection', prefetch: false },
-      { label: 'Play History', to: '/playlog', prefetch: false },
+      { label: 'Collection', to: '/collection/', prefetch: false },
+      { label: 'Play History', to: '/playlog/', prefetch: false },
     ],
   },
   {
@@ -93,13 +93,13 @@ const navigation = computed(() => [
     type: 'trigger',
     active: ['/riichi-league', '/riichi-calculator', '/riichi-open'].includes(route.path.replace(/\/+$/, '')),
     children: [
-      { label: 'Riichi League', to: '/riichi-league', prefetch: false },
-      { label: 'Riichi Calculator', to: '/riichi-calculator', prefetch: false },
-      { label: 'Riichi Open I', to: '/riichi-open', prefetch: false },
+      { label: 'Riichi League', to: '/riichi-league/', prefetch: false },
+      { label: 'Riichi Calculator', to: '/riichi-calculator/', prefetch: false },
+      { label: 'Riichi Open I', to: '/riichi-open/', prefetch: false },
     ],
   },
-  { id: 'clocktower', label: 'Clocktower', to: '/only-blood-in-the-clocktower', prefetch: false },
-  { id: 'birthday-club', label: 'Birthday Club', to: '/birthday-club', prefetch: false },
+  { id: 'clocktower', label: 'Clocktower', to: '/only-blood-in-the-clocktower/', prefetch: false },
+  { id: 'birthday-club', label: 'Birthday Club', to: '/birthday-club/', prefetch: false },
 ])
 const desktopNavigationUi = {
   root: 'ml-auto',
@@ -128,7 +128,7 @@ function closeMenu() {
 }
 
 function isCurrentDestination(destination) {
-  return route.path.replace(/\/+$/, '') === destination
+  return route.path.replace(/\/+$/, '') === destination.replace(/\/+$/, '')
 }
 
 function closeMenuOnNavigationLink(event) {

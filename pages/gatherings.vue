@@ -342,7 +342,7 @@
 
       <div v-else-if="!loading && currentEvents.length === 0" class="empty-state fade-up">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true" style="width:1em;height:1em;font-size:2rem;margin-bottom:15px;display:block;color:var(--matcha-leaf);opacity:0.5"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.2c-6.3-.3-12.6-.5-19-.5z"/></svg>
-        <p v-if="riichiOnly && activeTab === 'present'">No upcoming Riichi Mahjong date has been announced yet. <NuxtLink to="/gatherings" no-prefetch>See all gatherings</NuxtLink>.</p>
+        <p v-if="riichiOnly && activeTab === 'present'">No upcoming Riichi Mahjong date has been announced yet. <NuxtLink to="/gatherings/" no-prefetch>See all gatherings</NuxtLink>.</p>
         <p v-else-if="activeTab === 'past'">No past gatherings are listed yet.<br>Our next get-together could be your first.</p>
         <p v-else>No upcoming date has been announced yet.<br>Check back soon, or say hello on WhatsApp.</p>
       </div>
