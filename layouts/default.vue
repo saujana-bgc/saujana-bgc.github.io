@@ -81,11 +81,10 @@ const navigation = computed(() => [
     id: 'board-games',
     label: 'Board Games',
     type: 'trigger',
-    active: ['/board-games', '/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
+    active: ['/board-games', '/collection'].includes(route.path.replace(/\/+$/, '')),
     children: [
       { label: 'Overview', to: '/board-games/', prefetch: false },
       { label: 'Collection', to: '/collection/', prefetch: false },
-      { label: 'Play History', to: '/playlog/', prefetch: false },
     ],
   },
   {
@@ -101,6 +100,7 @@ const navigation = computed(() => [
     ],
   },
   { id: 'clocktower', label: 'Clocktower', to: '/only-blood-in-the-clocktower/', prefetch: false },
+  { id: 'play-history', label: 'Play History', to: '/playlog/', prefetch: false },
   { id: 'birthday-club', label: 'Birthday Club', to: '/birthday-club/', prefetch: false },
 ])
 const desktopNavigationUi = {
