@@ -14,7 +14,7 @@
       <div class="activity-copy">
         <p class="page-eyebrow">A turn at the table</p>
         <h2 id="first-hand-title">Draw a tile. Choose what to keep.</h2>
-        <p>On your turn, draw a tile and discard one. You’re trying to make groups, such as three tiles in number order from the same suit, plus a pair. When your tiles make a complete hand, you can win.</p>
+        <p>On your turn, draw a tile and discard one. For example, if you have a 3 and 4 of the same suit and draw the 5, you’ve made a sequence, one group toward a winning hand. Your goal is to complete four groups and a pair.</p>
         <p>There are more rules for calling tiles and scoring, but you don’t need to memorize them to visit. Watch a hand and ask a player what they’re collecting. If you decide to try a turn, someone at the table can guide you through it.</p>
       </div>
     </section>

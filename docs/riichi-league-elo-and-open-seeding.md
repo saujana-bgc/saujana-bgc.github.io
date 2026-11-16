@@ -18,14 +18,18 @@ Riichi Open I used a random draw for the first qualifier, a snake assignment bas
 | Gameplay rules | Season 2 rated games and Riichi Open II use the Riichi Open I gameplay rules, including four-player East–South hanchans, **30,000 starting points** and **no red fives**. |
 | Rated games | Publish which four-player hanchans are rated before play. Count every verified completion. Keep casual tables available, including three-player games. |
 | Rank eligibility | Show players as provisional until they complete **at least eight rated hanchans across at least four different dates** in the season. |
-| Results and corrections | Give each hanchan a session and round number when it starts. Have the four players confirm the full result. An organiser approves corrections, then the ratings are replayed in round order. |
-| Season close | Publish the December opening session date before play begins. The season ends on **28 February 2027**. Results are due by **11:59 pm Malaysia time on the third calendar day after play**. For games completed on 28 February, that is 3 March. Corrections close at **11:59 pm Malaysia time on 7 March 2027**, seven calendar days after the season ends. Freeze the standings after resolving corrections filed on time. The highest-rated eligible player wins the season. Players with exactly equal ratings share their place. |
+| Season winner activity | In addition to rank eligibility, play at least **two rated hanchans from 8–28 February 2027**. Both may be on one date. This is a title-eligibility rule, not a rating adjustment. |
+| Rating decay | **None during the pilot.** Elo changes only after a rated game. Inactivity does not change ratings, rank eligibility or Open seeding. Review carryover and decay after observing a full season. |
+| Results and corrections | Assign each game its official gathering date, session and round number when it starts. Have all four players confirm the result and have one player submit it. Submission can happen any time within three days, but Elo is processed in the recorded playing order, not the order entries arrive. |
+| Season close | Publish the December opening session date before play begins. The season ends on **28 February 2027**. Submit results by **11:59 pm Malaysia time on the third calendar day after the official gathering date**. An official gathering may run after midnight, and its games retain the assigned gathering date. A 28 February gathering’s deadline is 3 March. Corrections close at **11:59 pm Malaysia time on 7 March 2027**, seven calendar days after the season ends. Freeze the standings after resolving corrections filed on time. The highest-rated eligible player wins the season. Players with exactly equal ratings share their place. |
 
-Use a stable league player ID. During Open registration, have an organiser confirm a player's identity if their entry name differs from their league name. The current league form assigns a table number when a result is saved, so submission order can differ from play order. [Current league score entry](../pages/riichi-league.vue#L165)
+Use a stable league player ID. During Open registration, have an organiser confirm a player's identity if their entry name differs from their league name. The score-entry workflow must capture the gathering date and round number assigned when the game starts. The current league form assigns a table number when a result is saved, so the form will need to preserve the official round sequence separately from submission time. [Current league score entry](../pages/riichi-league.vue#L165)
 
 The Season 2 standings on the Riichi League page will show each player's Elo, counted rated games and number of different playing dates. Players report missing or incorrect results to the league organiser with the date, session and round number, and the score they believe should be recorded.
 
-The corrections window covers results submitted on time, including results missing from the standings. The organiser checks the original submission. If nobody at the table submitted the result by the three-day deadline, the game does not count towards Elo or rank eligibility.
+Encourage one player to submit each result as soon as the table confirms it. The full three-day window remains available. The organiser checks a reported omission against the original submission. If nobody at the table submitted by the deadline, the game does not count towards Elo or rank eligibility. If results arrive out of order, calculate ratings by the recorded gathering date, session and round sequence. Apply corrections by replaying all affected games from that sequence onward. If an official gathering continues after midnight, games keep the gathering date assigned when that event began. For example, a gathering dated Saturday has a Tuesday 11:59 pm deadline even if a game finishes early Sunday morning.
+
+Immediate entry helps catch scoring errors while players are together, but it is not required for Elo accuracy if the entry record preserves play order. The three-day window accommodates late sessions and post-event entry.
 
 ### Shared gameplay rules
 
@@ -46,6 +50,12 @@ Compare each player's **official hanchan score after tournament-point penalties*
 A higher official score earns 1, a tie earns 0.5, and a lower score earns 0. Calculate the expected result for each opponent as `1 / (1 + 10^((opponent rating − player rating) / 400))`. Subtract the expected result from the actual result, average the three differences, then multiply by **24**. Use the pre-game ratings for all four players, apply the adjustments together, and round only for display. Games played while provisional affect ratings from the first game.
 
 At an equally rated table with four distinct official scores, first through fourth change by **+12, +4, −4 and −12 Elo**. Equal official scores count as ties regardless of starting wind.
+
+Do not apply rating decay during this pilot. Decay would lower a rating without a new result, and a chosen decay rate would also change the Elo stakes when that player returns. That can make a returning player affect opponents' ratings differently despite the same table result. Since Open II is seeded from these standings, inactivity-based movement would also change seeding without play. Instead, require two rated games during 8–28 February for Season 2 title eligibility. This keeps a light activity check while preserving result-based ratings. Observe a full season before considering decay or rating carryover.
+
+### New players and calibration
+
+Keep the 1,500 starting rating for every player in Season 2. A special newcomer rating has no reliable calibration data yet, and a different baseline would affect the ratings of every opponent at that player's first tables. Track provisional players' first eight results and their rating trajectories. After the pilot, assess whether 1,500 tends to overrate or underrate newcomers as more results accumulate. Treat this as a pilot review, not a reason to adjust individual ratings mid-season.
 
 ### What the Season 1 archive shows
 
@@ -125,7 +135,7 @@ Generate candidate rotations after check-in. Discard rotations that put three or
 
 ### Saujana time rule
 
-Open II uses WRC 2025 gameplay with a **shared 90-minute clock** for each qualifier and the final. Keep the clock visible at all tables and give a 15-minute warning. For this cutoff, a hand begins when the first tiles are taken from the wall to deal the hand. When the signal sounds, finish the hand if dealing has already begun. If the signal sounds between hands, finish scoring the previous hand and end the game. A chombo that resets the hand in progress still requires that hand to be replayed. The head referee decides any dispute about whether a hand had begun. A game can finish naturally before the signal. [Open I timing precedent](../public/riichi-open/rules.md#L218)
+Open II uses WRC 2025 gameplay with a **shared 90-minute clock** for each qualifier and the final. The clock cutoff is a **Saujana competition variation to WRC 2025 §10.1**. Keep the clock visible at all tables and give a 15-minute warning. For this cutoff, a hand begins when the first tiles are taken from the wall to deal the hand. When the signal sounds, finish the hand if dealing has already begun. If the signal sounds between hands, finish scoring the previous hand and end the game. A chombo that resets the hand in progress still requires that hand to be replayed. The head referee decides any dispute about whether a hand had begun. A game can finish naturally before the signal. [WRC Rules 2025 §10.1](https://www.worldriichi.org/s/WRC-Rules-2025-42fx.pdf#page=37) · [Open I timing precedent](../public/riichi-open/rules.md#L218)
 
 Allow time after each clock window to finish hands, check scores and change tables.
 
@@ -157,6 +167,18 @@ Before registration, rehearse the 90-minute clock, the four-round rotation, and 
 ## Review after the pilot
 
 - Count how many players qualified for a league rank and how many ranked players were in the confirmed Open field.
+- Count title-eligible players and check whether the two-game February activity rule reduced the inactive-leader incentive without excluding active players who had reasonable opportunities to play.
+- Review provisional players' starting ratings and first-eight-game trajectories. Keep any calibration changes for a future season rather than changing ratings mid-season.
+- Check whether ratings and Open seeds would materially change under a proposed decay or carryover rule before adopting one.
 - Check whether eligible players kept playing late in the season and how much the standings changed in the final weeks.
+- Audit the recorded play order against submission timestamps and quantify how many results were submitted after the game or after the gathering.
 - Check the spread of ranked players across the opening tables and count repeat opponents across qualifiers.
 - Use the results to revisit the eligibility threshold, the K-factor, and whether Elo should carry into the next three-month season.
+
+## Plain-language terms
+
+- **Elo:** a rating that rises or falls based on a player's result compared with the ratings of their opponents.
+- **Hanchan:** one full four-player East–South game.
+- **Uma:** the bonus or deduction for finishing position, added to table-point changes to produce the tournament score.
+- **Chombo:** a serious play error handled under WRC penalty rules. The Open I rules apply a 30-tournament-point penalty.
+- **K-factor:** the multiplier controlling how quickly Elo changes. Season 2 uses 24.

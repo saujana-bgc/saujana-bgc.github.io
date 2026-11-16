@@ -120,6 +120,7 @@
     <strong class="contents-title">Contents</strong>
     <ul>
       <li><a href="#gameplay">Shared gameplay and scoring</a></li>
+      <li><a href="#at-a-glance">At a glance</a></li>
       <li><a href="#league">Riichi League Season 2</a></li>
       <li>
         <a href="#open">Riichi Open II</a>
@@ -137,6 +138,18 @@
   </nav>
 
   <main id="rules-content" tabindex="-1">
+  <section id="at-a-glance" aria-labelledby="at-a-glance-title">
+    <h2 id="at-a-glance-title">At a glance</h2>
+    <p>Season 2 rewards consistent league play. Open II gives everyone four chances to build a qualifying score before a separate final.</p>
+    <ul>
+      <li><strong>League:</strong> December 2026 to 28 February 2027. Untimed rated games. Start at 1,500 Elo and earn a rank after eight rated games across four dates.</li>
+      <li><strong>Season winner:</strong> in addition to the rank requirement, play at least two rated games from 8–28 February 2027. No rating decay applies.</li>
+      <li><strong>Results:</strong> submit by 11:59 pm Malaysia time on the third calendar day after the official gathering. A gathering may continue after midnight, and those games keep that gathering’s date.</li>
+      <li><strong>Open II:</strong> March 2027. Four 90-minute qualifiers, followed by a reset final for the top four. League rank helps set opening tables but does not guarantee a final place.</li>
+      <li><strong>Rules:</strong> Riichi Open I gameplay and scoring, including ordinary fives only. No red fives.</li>
+    </ul>
+  </section>
+
   <section id="gameplay" aria-labelledby="gameplay-title">
     <h2 id="gameplay-title">Shared gameplay and scoring</h2>
     <p>Rated league games and Open II use the <strong>World Riichi Championship (WRC) Rules 2025</strong>, <strong>WRC Penalties 2025</strong> and the <strong>29 June 2025 Official Rules Clarification</strong>, as adopted by Riichi Open I. The clarification takes precedence where it amends the earlier documents. Saujana’s clock and competition procedures appear below.</p>
@@ -180,7 +193,7 @@
       <li><strong>Starting rating.</strong> Everyone starts at <strong>1,500 Elo</strong>. Season 2 games determine all Season 2 ratings and eligibility.</li>
       <li><strong>Rated games.</strong> The organiser announces which four-player hanchans are rated before play. Every verified completion counts. Casual play, including three-player games, is also available.</li>
       <li><strong>League rank.</strong> A player earns a rank after at least <strong>eight rated hanchans on at least four different dates</strong>. Until then the player is provisional, with a rating that updates from their first rated game.</li>
-      <li><strong>Season winner.</strong> The highest-rated eligible player wins the season. Players with exactly equal ratings share their place.</li>
+      <li><strong>Season winner.</strong> To be eligible, a player needs the rank requirement above and at least <strong>two rated hanchans played from 8–28 February 2027</strong>. The highest-rated eligible player wins. Players with exactly equal ratings share their place. Both games may be played on the same date.</li>
     </ul>
 
     <h3>Untimed games and interruptions</h3>
@@ -191,12 +204,13 @@
     <h3>Submitting and correcting results</h3>
     <p>The Season 2 standings on the <a href="https://saujana-bgc.github.io/riichi-league/">Riichi League page</a> will show your Elo, the rated games that counted and how many different dates you’ve played. For a missing or incorrect result, contact the league organiser with the date, session and round number, and the score you believe should be recorded.</p>
     <ol>
-      <li>Use a stable league player ID for each player. Assign each rated hanchan a session and round number when it starts so ratings follow play order.</li>
-      <li>Have all four players check the result. Submit it by <strong>11:59 pm Malaysia time on the third calendar day after play</strong>.</li>
-      <li>Submit any corrections by <strong>11:59 pm Malaysia time on <time datetime="2027-03-07">7 March 2027</time></strong>, the seventh calendar day after the season ends. The organiser approves corrections and replays the ratings in round order.</li>
+      <li>Use a stable league player ID for each player. Assign each rated hanchan its official gathering date, session and round number when it starts. The recorded round order determines the rating calculation, even if results are submitted in a different order.</li>
+      <li>Have all four players check the result. One player submits it by <strong>11:59 pm Malaysia time on the third calendar day after the official gathering</strong>. Submitting soon after the game helps catch errors, but the full three-day window remains available.</li>
+      <li>A rated game at an official gathering may continue after midnight while the venue is open. It keeps the gathering date assigned when play began. The submission deadline is calculated from that gathering date.</li>
+      <li>Submit any corrections by <strong>11:59 pm Malaysia time on <time datetime="2027-03-07">7 March 2027</time></strong>, the seventh calendar day after the season ends. The organiser approves corrections and replays the ratings in the original round order.</li>
       <li>Freeze the standings after resolving corrections filed on time. If an Open entrant uses a different name, the organiser confirms which league player ID belongs to them.</li>
     </ol>
-    <p class="callout">For games completed on 28 February, the result submission deadline is <strong>11:59 pm Malaysia time on <time datetime="2027-03-03">3 March 2027</time></strong>.</p>
+    <p class="callout">For a gathering dated 28 February, the result submission deadline is <strong>11:59 pm Malaysia time on <time datetime="2027-03-03">3 March 2027</time></strong>, including a game that finishes after midnight on 1 March.</p>
     <p>The corrections window covers results submitted on time, including results missing from the standings. Ask the organiser to check the original submission. If nobody at the table submitted the result by the three-day deadline, the game does not count towards Elo or rank eligibility.</p>
 
     <h3>How Elo changes</h3>
@@ -204,6 +218,7 @@
     <p class="formula"><code>Expected result = 1 ÷ (1 + 10^((opponent rating − player rating) ÷ 400))</code></p>
     <p>Subtract the expected result from the actual result for each opponent. Average the three differences and multiply by <strong>24</strong>. Use the pre-game ratings to calculate all four adjustments, apply the changes together and round only for display. Equal official scores count as ties regardless of starting wind.</p>
     <p>Four equally rated players with four distinct official scores change by <strong>+12, +4, −4 and −12 Elo</strong> from first to fourth. A 1,500-rated player who finishes first against opponents rated 1,700, 1,500 and 1,500 gains approximately +14.1 Elo.</p>
+    <p>Ratings do not decay during or after the season. A player’s rating changes only when they complete a rated game. Inactivity does not change Elo or rank eligibility. The February activity requirement applies only to eligibility for the Season 2 title. This pilot avoids changing ratings without a game and keeps Open II seeds tied to results; review rating carryover and any decay after the pilot.</p>
   </section>
 
   <section id="open" aria-labelledby="open-title">
@@ -311,6 +326,7 @@
     </ul>
 
     <h3 id="open-clock">Open II’s 90-minute clock</h3>
+    <p>This clock cutoff is a <strong>Saujana competition variation</strong> to WRC 2025 §10.1, adopted to keep the event schedule manageable. When the signal sounds after dealing has begun, finish that hand and end the game. WRC 2025’s additional-hand timing procedure does not apply to this event.</p>
     <p>Use one visible <strong>90-minute clock</strong> for every qualifier and the final. Give a warning when 15 minutes remain. For the cutoff, a hand begins when the first tiles are taken from the wall to start dealing.</p>
     <ul>
       <li>If the signal sounds after dealing has begun, finish that hand and record the result. If chombo resets the hand in progress, replay that hand.</li>
@@ -365,6 +381,16 @@
     </ul>
     <h3>What to measure after the pilot</h3>
     <p>Count how many players earn a league rank and how many ranked players check in for the Open. Review late-season participation, changes to the standings, how ranked players are spread across tables, and how often opponents repeat. Use those results to revisit the eligibility threshold, the K-factor and rating carryover into future seasons.</p>
+    <h3>Newcomer ratings</h3>
+    <p>New players start at 1,500 like everyone else. During the pilot, record provisional players’ results and how their ratings move over their first eight games. Check whether early ratings appear systematically too high or low once more games are available. The Season 1 archive is too small and was played under different rules, so it does not justify a newcomer-specific starting rating now.</p>
+    <h3>Quick glossary</h3>
+    <dl>
+      <dt><strong>Elo</strong></dt><dd>A rating that rises or falls according to results and opponents’ ratings.</dd>
+      <dt><strong>Hanchan</strong></dt><dd>One complete four-player East–South game.</dd>
+      <dt><strong>Uma</strong></dt><dd>Placement bonus or deduction added to table-point changes to calculate a hanchan score.</dd>
+      <dt><strong>Chombo</strong></dt><dd>A serious play error handled under the WRC penalty rules. Here its penalty is 30 tournament points.</dd>
+      <dt><strong>K-factor</strong></dt><dd>The Elo adjustment size. Season 2 uses 24, so larger score differences move ratings more.</dd>
+    </dl>
   </section>
   </main>
 </div>

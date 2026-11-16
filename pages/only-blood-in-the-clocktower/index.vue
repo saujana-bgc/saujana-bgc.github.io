@@ -1,9 +1,9 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <p class="page-eyebrow">Social deduction</p>
+      <p class="page-eyebrow">A mystery with secret roles</p>
       <h1 class="hero-title">Blood on the Clocktower</h1>
-      <p class="stats-container">Blood on the Clocktower is a group mystery with secret roles. The good team gathers clues to find the Demon while the evil team tries to stay hidden. You can watch first, and the Storyteller will guide you through your role.</p>
+      <p class="stats-container">Blood on the Clocktower is a group mystery with secret roles. The good team gathers clues to find the Demon while the evil team tries to stay hidden. Two players tell you different stories about last night. Who do you trust? You can watch first, and the Storyteller will guide you through your role.</p>
     </header>
 
     <div class="gathering-banner">
@@ -24,7 +24,10 @@
           <UButton v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</UButton>
         </div>
         <a v-if="nextGathering" class="calendar-link" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
-        <a v-else-if="!eventLoading" class="calendar-link" href="/gatherings/">See all gatherings <span aria-hidden="true">↗</span></a>
+        <template v-else-if="!eventLoading">
+          <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next Clocktower game <span aria-hidden="true">↗</span></a>
+          <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>See all gatherings <span aria-hidden="true">↗</span></NuxtLink>
+        </template>
       </section>
       <nav class="hero-actions" aria-label="Clocktower page links">
         <a class="hero-secondary" href="#what-to-expect">First time? Start here <span aria-hidden="true">↓</span></a>
