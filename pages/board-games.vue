@@ -12,14 +12,14 @@
         src="/images/site/overview-mika-board-games.webp"
         alt="Mika, Albert, Bryan and Erin play Just One with three word clues on the table."
       >
-      <div class="activity-copy">
-        <p class="page-eyebrow">What playing can look like</p>
-        <h2 id="first-game-title">There’s more than one way to play.</h2>
-        <p><strong>Work as a team.</strong> In <em>Just One</em>, everyone writes a one-word clue to help one player guess a mystery word. Matching clues cancel, so you’re trying to be helpful and original.</p>
-        <p><strong>Read the room.</strong> Make a guess about what the other players are thinking, then see if the group agrees.</p>
-        <p><strong>Plan a few turns ahead.</strong> Collect useful pieces, build a pattern or block another player’s route.</p>
-        <p>Those are examples of the kinds of things modern board games ask you to do. At a gathering, tell a host what sounds fun. They can recommend and teach a game. Coming alone or unsure? Watch a round first.</p>
-      </div>
+        <div class="activity-copy">
+          <p class="page-eyebrow">What playing can look like</p>
+          <h2 id="first-game-title">There’s more than one way to play.</h2>
+          <p><strong>Work as a team.</strong> In <em>Just One</em>, everyone writes a one-word clue to help one player guess a mystery word. Matching clues cancel, so you’re trying to be helpful and original.</p>
+          <p><strong>Read the room.</strong> Make a guess about what the other players are thinking, then see if the group agrees.</p>
+          <p><strong>Plan a few turns ahead.</strong> Collect useful pieces, build a pattern or block another player’s route.</p>
+          <p>Those are examples of the kinds of things modern board games ask you to do. At a gathering, tell a host what sounds fun. They can recommend and teach a game. Coming alone or unsure? Watch a round first.</p>
+        </div>
       </ActivityOverviewFeature>
     </section>
 

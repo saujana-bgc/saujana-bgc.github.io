@@ -7,7 +7,6 @@
     </header>
 
     <div class="gathering-banner">
-      <img class="hero-art" src="/images/clocktower-night.svg" alt="" width="640" height="500">
       <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
         <div class="calendar-mark" aria-hidden="true">
           <template v-if="nextGathering"><strong>{{ nextDateStamp.day }}</strong><span>{{ nextDateStamp.month }}</span></template>
@@ -36,10 +35,11 @@
     </div>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
-      <div class="welcome-heading">
+      <ActivityOverviewFeature
+        src="/images/site/overview-mika-clocktower.webp"
+        alt="Mika, Nick, Jac and Tom compare stories over a Clocktower town-square mat."
+      >
         <h2 id="welcome-title">Your first game</h2>
-      </div>
-      <div class="welcome-details">
         <ul class="welcome-steps">
           <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
           <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
@@ -47,8 +47,8 @@
           <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
         </ul>
         <p class="welcome-joining">You can come on your own or with a friend. At the gathering, tell the host you’re new. They’ll explain what to expect and help you decide whether to watch or play.</p>
-      </div>
-      <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
+        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
+      </ActivityOverviewFeature>
     </section>
 
     <footer class="art-credit">
@@ -346,22 +346,6 @@ onMounted(() => {
   border-radius: 10px;
   pointer-events: none;
 }
-.gathering-banner::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: linear-gradient(90deg, var(--night) 12%, #21171dc9 38%, transparent 78%);
-}
-.hero-art {
-  position: absolute;
-  z-index: -2;
-  inset: auto 0 0 auto;
-  width: min(70%, 770px);
-  height: 100%;
-  object-fit: cover;
-  object-position: center 62%;
-}
 .eyebrow {
   margin: 0;
   color: var(--wine);
@@ -443,16 +427,12 @@ onMounted(() => {
 .retry-button { justify-self: start; min-height: 40px; margin-top: 8px; padding: 7px 11px; border: 1px solid #b99577; border-radius: 6px; background: transparent; color: var(--wine); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
 .retry-button:focus-visible { outline: 2px solid var(--wine); outline-offset: 2px; }
 .welcome-note {
-  display: grid;
-  grid-template-columns: minmax(155px, .75fr) minmax(0, 2.8fr) auto;
-  align-items: start;
-  gap: 14px clamp(16px, 2.6vw, 36px);
   margin: 0 0 clamp(26px, 4vw, 48px);
   padding: clamp(19px, 3vw, 28px) 0;
   border-block: 1px solid #dfd0be;
   background: transparent;
 }
-.welcome-note h2 { margin: 4px 0 6px; color: var(--ink); font: 400 clamp(1.45rem, 3vw, 2rem)/1.15 var(--font-display); letter-spacing: -.025em; }
+.welcome-note h2 { margin: 0 0 12px; color: var(--ink); font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.2 var(--font-display); }
 .welcome-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; margin: 0; padding: 0; list-style: none; }
 .welcome-joining { margin: 14px 0 0; color: var(--soft-ink); font-size: .9rem; line-height: 1.5; }
 .welcome-steps li { display: grid; gap: 2px; color: var(--soft-ink); font-size: .9rem; line-height: 1.5; }
@@ -547,14 +527,8 @@ onMounted(() => {
 @media (min-width: 861px) {
   .recap-story { grid-template-columns: 105px minmax(0, 1fr); gap: 20px; }
 }
-@media (max-width: 950px) {
-  .welcome-note { grid-template-columns: minmax(145px, .8fr) minmax(0, 2fr); }
-  .welcome-link { grid-column: 2; }
-}
 @media (max-width: 760px) {
   .gathering-banner { min-height: 0; padding: 22px; }
-  .gathering-banner::after { background: linear-gradient(90deg, var(--night), #21171d96); }
-  .hero-art { width: min(100%, 420px); }
   .hero-actions { gap: 0 14px; }
   .stats { grid-template-columns: 1fr; text-align: center; gap: 2px; }
   .stat-row { grid-column: 1; grid-row: auto; margin-top: 10px; }
@@ -569,8 +543,7 @@ onMounted(() => {
   .calendar-mark { width: 50px; height: 58px; }
   .calendar-mark strong { font-size: 1.5rem; }
   .archive-filters label { flex: 1 1 112px; min-width: 0; }
-  .welcome-note, .welcome-steps { grid-template-columns: minmax(0, 1fr); }
-  .welcome-link { grid-column: 1; }
+  .welcome-steps { grid-template-columns: minmax(0, 1fr); }
   .recap-prose { font-size: .96rem; }
   .photo-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo-gallery img { max-height: 180px; }
