@@ -5,50 +5,138 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Riichi League Season 2 and Riichi Open II Rules | Saujana BGC</title>
   <style>
-    body { margin: 0; color: #242923; background: #fff; font: 1rem/1.6 system-ui, sans-serif; }
-    main { max-width: 52rem; margin: auto; padding: 1.5rem 1.25rem 3rem; }
-    h1, h2, h3 { color: #234437; line-height: 1.2; }
-    h1 { font-size: clamp(1.9rem, 5vw, 2.65rem); margin: .25em 0; }
-    h2 { border-top: 1px solid #cdd6d0; padding-top: .85em; margin-top: 1.65em; }
-    h3 { margin-top: 1.45em; }
-    a { color: #205d49; text-underline-offset: .15em; }
-    .status { color: #4d5b53; }
-    nav { margin: 1.45rem 0; }
-    ul, ol { padding-inline-start: 1.55rem; }
-    li + li { margin-top: .25em; }
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    caption { text-align: left; font-weight: bold; padding-bottom: .4rem; }
-    th, td { border: 1px solid #cdd6d0; text-align: left; vertical-align: top; padding: .45rem .6rem; }
-    thead { background: #edf3ef; }
-    code { font-size: .95em; overflow-wrap: anywhere; }
+    :root {
+      color-scheme: light;
+      --ink: #26312b;
+      --muted: #526158;
+      --green: #214939;
+      --deep: #193e32;
+      --paper: #faf9f5;
+      --surface: #fff;
+      --soft: #eef4ed;
+      --line: #d1dcd4;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 1rem/1.65 system-ui, sans-serif; }
+    .page-width { max-width: 75rem; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 3rem); }
+    .hero { background: var(--deep); color: #fdfcf7; border-bottom: .25rem solid #aa8a58; }
+    .hero-inner { padding-block: clamp(2rem, 6vw, 4.5rem) clamp(1.75rem, 4vw, 3rem); }
+    .status { margin: 0; color: #e7d6b9; font-size: .9rem; font-weight: 650; }
+    h1 { font-size: clamp(2rem, 5.5vw, 3.85rem); letter-spacing: -.035em; line-height: 1.08; max-width: 18ch; margin: .45rem 0 1rem; }
+    .hero-intro { max-width: 63ch; margin: 0 0 1.75rem; color: #f3f6ef; }
+    .dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 2.5rem; max-width: 51rem; margin: 0; }
+    .dates > div { border-top: 1px solid #719087; padding-top: .75rem; }
+    .dates dt { color: #e7d6b9; font-size: .875rem; font-weight: 650; }
+    .dates dd { margin: .15rem 0 0; font-size: clamp(1rem, 2.2vw, 1.24rem); font-weight: 675; }
+    .dates dd + dd { font-size: .9rem; font-weight: 400; color: #f3f6ef; }
+    .page-layout { display: grid; gap: clamp(1.5rem, 4vw, 3rem); padding-block: 1.5rem 3.5rem; }
+    .contents { background: var(--surface); border: 1px solid var(--line); border-radius: .6rem; padding: .8rem 1rem; }
+    .contents-title { color: var(--green); display: block; margin-bottom: .25rem; }
+    .contents ul { list-style: none; padding: 0; margin: 0; }
+    .contents li { margin: 0; }
+    .contents a { display: flex; align-items: center; min-height: 2.55rem; padding: .3rem .35rem; border-radius: .3rem; text-decoration: none; line-height: 1.35; }
+    .contents a:hover, .contents a:focus-visible { background: var(--soft); text-decoration: underline; }
+    .contents .sub-links { margin-inline-start: .4rem; padding-inline-start: .45rem; border-inline-start: 1px solid var(--line); font-size: .92rem; }
+    main { min-width: 0; max-width: 51rem; }
+    section { margin-bottom: 2.5rem; }
+    h2, h3, h4 { color: var(--green); line-height: 1.25; }
+    h2 { border-top: 1px solid var(--line); padding-top: 1.25rem; margin: 0 0 .65rem; font-size: clamp(1.55rem, 3.5vw, 2.15rem); letter-spacing: -.02em; }
+    main > section:first-child h2 { padding-top: 0; border-top: 0; }
+    h3 { margin: 1.9rem 0 .5rem; font-size: 1.23rem; }
+    h4 { margin: 1.15rem 0 .5rem; font-size: 1.06rem; }
+    p { margin: .65rem 0; }
+    ul, ol { padding-inline-start: 1.5rem; }
+    li + li { margin-top: .35rem; }
+    a { color: #205d49; text-underline-offset: .18em; }
+    a:focus-visible { outline: 2px solid #276054; outline-offset: 3px; }
+    [id] { scroll-margin-block-start: 1.15rem; }
+    :target:is(h3, section) { outline: 2px solid #88a899; outline-offset: .35rem; }
+    .skip-link { position: absolute; z-index: 2; top: .75rem; left: .75rem; transform: translateY(-200%); background: #fff; padding: .45rem .8rem; }
+    .skip-link:focus { transform: none; }
+    .callout { background: var(--soft); border-inline-start: .25rem solid #6b9581; padding: .8rem .95rem; margin: 1rem 0; }
+    .callout p { margin: 0; }
+    .formula { background: var(--soft); padding: .65rem .8rem; border-radius: .35rem; }
+    code { font-size: .93em; overflow-wrap: anywhere; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--surface); font-variant-numeric: tabular-nums; }
+    caption { text-align: left; color: var(--green); font-weight: 675; padding-bottom: .45rem; }
+    th, td { border: 1px solid var(--line); text-align: left; vertical-align: top; padding: .5rem clamp(.3rem, 1.6vw, .75rem); }
+    thead { background: var(--soft); }
+    tbody tr:nth-child(even) { background: #f5f7f2; }
+    .matrix :is(td, th):not(:first-child) { text-align: center; white-space: nowrap; }
+    .worked-example { margin: 1.35rem 0; padding-inline-start: clamp(.65rem, 2vw, 1.15rem); border-inline-start: 2px solid var(--line); }
+    .worked-example h4 { margin-top: 0; }
+    .schedule th[scope="row"] { width: 37%; }
+    .schedule .schedule-key th { color: var(--green); }
+    @media (min-width: 53rem) {
+      .page-layout { grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr); padding-top: 2.5rem; }
+      .contents { position: sticky; top: 1rem; align-self: start; }
+    }
+    @media (max-width: 35rem) {
+      .dates { grid-template-columns: 1fr; gap: .8rem; }
+      .contents .sub-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      th, td { font-size: .9rem; }
+      .matrix th, .matrix td { padding-inline: .3rem; }
+      .callout { padding-inline: .7rem; }
+    }
     @media print {
       :root { font-size: 10pt; }
-      main { max-width: none; padding: 0; }
-      h2, h3, caption { break-after: avoid; }
+      body, .hero { color: #000; background: #fff; }
+      .hero { border-color: #777; }
+      .hero-inner, .page-width { max-width: none; padding: 0; }
+      .status, .hero-intro, .dates dt, .dates dd + dd { color: #333; }
+      .page-layout { display: block; padding-top: 1rem; }
+      .contents, .skip-link { display: none; }
+      main { max-width: none; outline: none; }
+      h2, h3, h4, caption { break-after: avoid; }
+      thead { display: table-header-group; }
       tr { break-inside: avoid; }
     }
   </style>
 </head>
 <body>
-<main>
-  <header>
+<a class="skip-link" href="#rules-content">Skip to rules</a>
+<header class="hero">
+  <div class="page-width hero-inner">
     <p class="status">Saujana Board Game Community · Review draft</p>
     <h1>Riichi League Season 2 and Riichi Open II</h1>
-    <p><strong>League Season 2 runs from December 2026 through 28 February 2027.</strong> Everyone starts at 1,500 Elo. The final league standings seed the opening draw for <strong>Riichi Open II in March 2027</strong>. The Open has four qualifiers and a top-four final.</p>
-    <p><strong>You can enter and win Open II without a league rank.</strong> The league standings help set your first table.</p>
-  </header>
+    <p class="hero-intro">The final league standings help set the opening tables at Open II. <strong>You can enter and win Open II without a league rank.</strong></p>
+    <dl class="dates">
+      <div>
+        <dt>League Season 2</dt>
+        <dd>December 2026 to 28 February 2027</dd>
+        <dd>Untimed games · Starting rating of 1,500 Elo</dd>
+      </div>
+      <div>
+        <dt>Riichi Open II</dt>
+        <dd>March 2027</dd>
+        <dd>Four qualifiers and a top-four final · 90-minute rounds</dd>
+      </div>
+    </dl>
+  </div>
+</header>
 
-  <nav aria-label="Contents">
-    <strong>Contents</strong>
+<div class="page-width page-layout">
+  <nav class="contents" aria-label="Contents">
+    <strong class="contents-title">Contents</strong>
     <ul>
       <li><a href="#gameplay">Shared gameplay and scoring</a></li>
       <li><a href="#league">Riichi League Season 2</a></li>
-      <li><a href="#open">Riichi Open II</a></li>
+      <li>
+        <a href="#open">Riichi Open II</a>
+        <ul class="sub-links">
+          <li><a href="#check-in">Check-in and no-shows</a></li>
+          <li><a href="#opening-draw">Opening draw</a></li>
+          <li><a href="#table-rotation">Table rotation</a></li>
+          <li><a href="#open-clock">90-minute clock</a></li>
+          <li><a href="#qualification">Qualification and final</a></li>
+        </ul>
+      </li>
       <li><a href="#schedule">Example Open II schedule</a></li>
       <li><a href="#review">Organiser review and rehearsal</a></li>
     </ul>
   </nav>
 
+  <main id="rules-content" tabindex="-1">
   <section id="gameplay" aria-labelledby="gameplay-title">
     <h2 id="gameplay-title">Shared gameplay and scoring</h2>
     <p>Rated league games and Open II use the <strong>World Riichi Championship (WRC) Rules 2025</strong>, <strong>WRC Penalties 2025</strong> and the <strong>29 June 2025 Official Rules Clarification</strong>, as adopted by Riichi Open I. The clarification takes precedence where it amends the earlier documents. Saujana’s clock and competition procedures appear below.</p>
@@ -60,7 +148,8 @@
     </ul>
 
     <h3>Hanchan scores and penalties</h3>
-    <p><code>Hanchan score before penalties = (final table points − 30,000) ÷ 1,000 + placement uma</code></p>
+    <p>Table points are the points used during play. For the hanchan score, every 1,000 table points gained or lost is worth one tournament point. Then apply <em>uma</em>, the bonus or deduction for finishing position.</p>
+    <p class="formula"><code>Hanchan score before penalties = (final table points − 30,000) ÷ 1,000 + placement uma</code></p>
     <table>
       <caption>Placement uma</caption>
       <thead><tr><th scope="col">Place</th><th scope="col">Uma</th></tr></thead>
@@ -100,19 +189,19 @@
     <p>If a withdrawal, venue closure or other disruption stops play, the organiser may resume the game within the season with the same four players and a recoverable game state. Void the result if the game cannot meet those conditions or reach an official finish. A void game contributes neither Elo nor eligibility. A resumed game counts on the original session date. Its submission deadline runs from completion.</p>
 
     <h3>Submitting and correcting results</h3>
-    <p>The Season 2 standings on the <a href="/riichi-league/">Riichi League page</a> will show your Elo, the rated games that counted and how many different dates you’ve played. For a missing or incorrect result, contact the league organiser with the date, session and round number, and the score you believe should be recorded.</p>
+    <p>The Season 2 standings on the <a href="https://saujana-bgc.github.io/riichi-league/">Riichi League page</a> will show your Elo, the rated games that counted and how many different dates you’ve played. For a missing or incorrect result, contact the league organiser with the date, session and round number, and the score you believe should be recorded.</p>
     <ol>
       <li>Use a stable league player ID for each player. Assign each rated hanchan a session and round number when it starts so ratings follow play order.</li>
       <li>Have all four players check the result. Submit it by <strong>11:59 pm Malaysia time on the third calendar day after play</strong>.</li>
       <li>Submit any corrections by <strong>11:59 pm Malaysia time on <time datetime="2027-03-07">7 March 2027</time></strong>, the seventh calendar day after the season ends. The organiser approves corrections and replays the ratings in round order.</li>
       <li>Freeze the standings after resolving corrections filed on time. If an Open entrant uses a different name, the organiser confirms which league player ID belongs to them.</li>
     </ol>
-    <p>For games completed on 28 February, the result submission deadline is <strong>11:59 pm Malaysia time on <time datetime="2027-03-03">3 March 2027</time></strong>.</p>
+    <p class="callout">For games completed on 28 February, the result submission deadline is <strong>11:59 pm Malaysia time on <time datetime="2027-03-03">3 March 2027</time></strong>.</p>
     <p>The corrections window covers results submitted on time, including results missing from the standings. Ask the organiser to check the original submission. If nobody at the table submitted the result by the three-day deadline, the game does not count towards Elo or rank eligibility.</p>
 
     <h3>How Elo changes</h3>
     <p>Compare a player with each of their three opponents using the official hanchan score <strong>after</strong> penalties. The actual result for each comparison is 1 for a higher score, 0.5 for a tie and 0 for a lower score.</p>
-    <p><code>Expected result = 1 ÷ (1 + 10^((opponent rating − player rating) ÷ 400))</code></p>
+    <p class="formula"><code>Expected result = 1 ÷ (1 + 10^((opponent rating − player rating) ÷ 400))</code></p>
     <p>Subtract the expected result from the actual result for each opponent. Average the three differences and multiply by <strong>24</strong>. Use the pre-game ratings to calculate all four adjustments, apply the changes together and round only for display. Equal official scores count as ties regardless of starting wind.</p>
     <p>Four equally rated players with four distinct official scores change by <strong>+12, +4, −4 and −12 Elo</strong> from first to fourth. A 1,500-rated player who finishes first against opponents rated 1,700, 1,500 and 1,500 gains approximately +14.1 Elo.</p>
   </section>
@@ -122,7 +211,7 @@
     <p>Open II is scheduled for <strong>March 2027</strong>, after the final Season 2 standings are frozen. The organiser publishes the event date before registration.</p>
     <p>Everyone in the playing field is scheduled for <strong>four qualifying hanchans</strong>. The four eligible players with the highest combined qualifying scores play one final hanchan. Ranked and unranked entrants follow the same registration and qualification rules. League rank is used for seeding the opening draw and as a check on how the top seeds are spread across the qualifying schedule.</p>
 
-    <h3>Check-in and no-shows</h3>
+    <h3 id="check-in">Check-in and no-shows</h3>
     <ol>
       <li>Freeze Season 2 standings before the event. Publish a check-in cutoff <strong>30 minutes before the scheduled start of Qualifier 1</strong>.</li>
       <li>Hold seats for confirmed entrants who check in on time. At the cutoff, late arrivals lose their reserved seat. Offer vacancies to checked-in waitlisted players in signup order, then to on-site organiser reserves in the announced order.</li>
@@ -138,7 +227,7 @@
       <li><strong>Refund timing.</strong> The organiser aims to issue the refund within seven calendar days of confirming eligibility and receiving any payment details needed to return it. The organiser will contact you privately if extra details are needed.</li>
     </ul>
 
-    <h3>Opening draw and starting winds</h3>
+    <h3 id="opening-draw">Opening draw and starting winds</h3>
     <p>Draw tables after check-in using the players who will actually play. Order them by eligible league rank, then randomise the order of the provisional and unranked players after the ranked players. Resolve an exact rating tie at a pot boundary with a recorded random draw.</p>
     <p>Make four pots. Each pot holds as many players as there are tables. Draw one player from each pot to every opening table. If the roster changes before seating is published, rebuild the pots and redraw if needed. Publication locks the draw. At each table in each round, draw starting East, South, West and North separately using the same random method.</p>
     <table>
@@ -152,50 +241,62 @@
       </tbody>
     </table>
 
-    <p>With four tables, the top four league seeds start at separate tables in Qualifier 1. This gives them an opening draw advantage because each avoids the other three top seeds. They can face each other in Qualifiers 2–4. Everyone starts each game with 30,000 table points, and all four final places are decided by Open results.</p>
+    <p>In a four-table field with at least four ranked entrants, the top four seeds start at separate tables. They avoid each other in Qualifier 1 and can meet in Qualifiers 2–4. Everyone starts each game with 30,000 table points, and all four final places are decided by Open results.</p>
 
-    <h3>Qualifying table rotation</h3>
-    <p>Publish all four table assignments together before play. The rotation below gives each player <strong>12 different opponents if the same 16 play all four qualifiers</strong>. With a different field size, publish a rotation that minimises repeat opponents across the four games.</p>
-    <p>Number the opening tables 1 to 4 and randomly assign slots 1 to 4 within each table. A player’s slot becomes their Qualifier 2 table number. For Qualifiers 3 and 4, find the row for their opening table and read the number in the position of their slot. Draw starting winds separately.</p>
-    <table>
-      <caption>Table numbers for Qualifiers 3 and 4, listed in slot order from 1 to 4</caption>
-      <thead><tr><th scope="col">Opening table</th><th scope="col">Qualifier 3</th><th scope="col">Qualifier 4</th></tr></thead>
+    <h3 id="table-rotation">Qualifying table rotation</h3>
+    <p>After check-in, the organiser publishes where you’ll sit in all four qualifiers. With the same 16 players throughout, you’ll face <strong>12 different opponents</strong>. For a smaller field, the organiser draws a schedule that minimises repeat opponents.</p>
+    <h4>How to read the 16-player rotation</h4>
+    <ol>
+      <li><strong>Qualifier 1.</strong> Draw opening tables 1–4. Within each table, randomly assign each player one slot from 1 to 4.</li>
+      <li><strong>Qualifier 2.</strong> Your slot number is your table number.</li>
+      <li><strong>Qualifiers 3 and 4.</strong> Find your opening table’s row and your slot’s column. The two numbers in that cell give your table for Qualifier 3 and Qualifier 4, in that order.</li>
+    </ol>
+    <p class="callout">Slots are for table assignments. You draw your starting wind separately at each table.</p>
+    <table class="matrix">
+      <caption>Table numbers by slot, shown as Q3 / Q4</caption>
+      <thead><tr><th scope="col">Opening table</th><th scope="col">Slot 1</th><th scope="col">Slot 2</th><th scope="col">Slot 3</th><th scope="col">Slot 4</th></tr></thead>
       <tbody>
-        <tr><th scope="row">1</th><td>1, 2, 3, 4</td><td>1, 3, 4, 2</td></tr>
-        <tr><th scope="row">2</th><td>2, 1, 4, 3</td><td>2, 4, 3, 1</td></tr>
-        <tr><th scope="row">3</th><td>3, 4, 1, 2</td><td>3, 1, 2, 4</td></tr>
-        <tr><th scope="row">4</th><td>4, 3, 2, 1</td><td>4, 2, 1, 3</td></tr>
+        <tr><th scope="row">1</th><td>1 / 1</td><td>2 / 3</td><td>3 / 4</td><td>4 / 2</td></tr>
+        <tr><th scope="row">2</th><td>2 / 2</td><td>1 / 4</td><td>4 / 3</td><td>3 / 1</td></tr>
+        <tr><th scope="row">3</th><td>3 / 3</td><td>4 / 1</td><td>1 / 2</td><td>2 / 4</td></tr>
+        <tr><th scope="row">4</th><td>4 / 4</td><td>3 / 2</td><td>2 / 1</td><td>1 / 3</td></tr>
       </tbody>
     </table>
 
-    <h4>Example 1 · Find your table for each qualifier</h4>
-    <p>In these examples, A1–A4 start at table 1, B1–B4 at table 2, C1–C4 at table 3 and D1–D4 at table 4. The number in each label is the player’s randomly assigned slot. For B3, slot 3 means table 3 in Qualifier 2. In the opening-table-2 row of the lookup, the third entry is 4 for Qualifier 3 and 3 for Qualifier 4.</p>
-    <table>
-      <caption>Table assignments for three example players</caption>
-      <thead><tr><th scope="col">Player</th><th scope="col">Q1</th><th scope="col">Q2</th><th scope="col">Q3</th><th scope="col">Q4</th></tr></thead>
-      <tbody>
-        <tr><th scope="row">A1</th><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-        <tr><th scope="row">B3</th><td>2</td><td>3</td><td>4</td><td>3</td></tr>
-        <tr><th scope="row">C4</th><td>3</td><td>4</td><td>2</td><td>4</td></tr>
-      </tbody>
-    </table>
-    <p>A player can return to the same table number and still face three new opponents each time. Table numbers identify where to sit. They do not identify a fixed group of players.</p>
+    <div class="worked-example">
+      <h4>Example 1 · Find your four tables</h4>
+      <p>In these examples, players A1–A4 open at table 1, B1–B4 at table 2, C1–C4 at table 3 and D1–D4 at table 4. The number in each label is the player’s slot.</p>
+      <p><strong>B3</strong> opens at table 2. Slot 3 sends them to table 3 for Q2. In the lookup, opening table 2 and slot 3 shows <strong>4 / 3</strong>, so they go to table 4 for Q3 and table 3 for Q4.</p>
+      <table class="matrix">
+        <caption>Table assignments for three example players</caption>
+        <thead><tr><th scope="col">Player</th><th scope="col">Q1</th><th scope="col">Q2</th><th scope="col">Q3</th><th scope="col">Q4</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">A1</th><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+          <tr><th scope="row">B3</th><td>2</td><td>3</td><td>4</td><td>3</td></tr>
+          <tr><th scope="row">C4</th><td>3</td><td>4</td><td>2</td><td>4</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-    <h4>Example 2 · Follow B3’s opponents</h4>
-    <table>
-      <caption>B3’s four games produce 12 different opponents</caption>
-      <thead><tr><th scope="col">Round</th><th scope="col">Table</th><th scope="col">Opponents</th></tr></thead>
-      <tbody>
-        <tr><th scope="row">Qualifier 1</th><td>2</td><td>B1, B2, B4</td></tr>
-        <tr><th scope="row">Qualifier 2</th><td>3</td><td>A3, C3, D3</td></tr>
-        <tr><th scope="row">Qualifier 3</th><td>4</td><td>A4, C2, D1</td></tr>
-        <tr><th scope="row">Qualifier 4</th><td>3</td><td>A2, C1, D4</td></tr>
-      </tbody>
-    </table>
-    <p>Qualifier 4 table 3 contains A2, B3, C1 and D4. Each came from a different opening table. B3 plays at table 3 in both Qualifiers 2 and 4, with three different opponents each time.</p>
+    <div class="worked-example">
+      <h4>Example 2 · Follow B3’s opponents</h4>
+      <p>B3 sits at table 3 in both Q2 and Q4. The people at table 3 change, so B3 faces three new opponents in each game.</p>
+      <table>
+        <caption>B3’s 12 different opponents</caption>
+        <thead><tr><th scope="col">Round</th><th scope="col">Table</th><th scope="col">Opponents</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Qualifier 1</th><td>2</td><td>B1, B2, B4</td></tr>
+          <tr><th scope="row">Qualifier 2</th><td>3</td><td>A3, C3, D3</td></tr>
+          <tr><th scope="row">Qualifier 3</th><td>4</td><td>A4, C2, D1</td></tr>
+          <tr><th scope="row">Qualifier 4</th><td>3</td><td>A2, C1, D4</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-    <h4>Example 3 · What changes with 12 players</h4>
-    <p>With three opening tables, a later table of four must contain at least two players from the same opening table. For example, A1, A2, B1 and C1 at one later table means A1 and A2 meet again. The organiser minimises repeats when drawing the four rounds for a smaller field.</p>
+    <div class="worked-example">
+      <h4>Example 3 · What changes with 12 players</h4>
+      <p>With only three opening tables, every Q2 table of four must include two players from the same opening table. If A1, A2, B1 and C1 share a Q2 table, A1 and A2 meet again. With 12 players, some repeat opponents are unavoidable.</p>
+    </div>
 
     <h4>Checking the spread of top seeds</h4>
     <p>Generate candidate rotations after check-in. Discard rotations that put three or more of the top four checked-in league seeds together at a later table. Compare how many of those seeds each other player faces across all four rounds. Choose randomly among candidates with the smallest gap between the highest and lowest counts. Use the available checked-in ranked players for this check if there are fewer than four.</p>
@@ -209,7 +310,7 @@
       <li><strong>Before the final.</strong> Offer a vacant seat to the next available eligible player in the certified qualification standings. Use the standard qualification tie-breakers for tied candidates. Their qualification rank still applies in a final tie. Confirm the final roster before drawing starting winds.</li>
     </ul>
 
-    <h3>Open II’s 90-minute clock</h3>
+    <h3 id="open-clock">Open II’s 90-minute clock</h3>
     <p>Use one visible <strong>90-minute clock</strong> for every qualifier and the final. Give a warning when 15 minutes remain. For the cutoff, a hand begins when the first tiles are taken from the wall to start dealing.</p>
     <ul>
       <li>If the signal sounds after dealing has begun, finish that hand and record the result. If chombo resets the hand in progress, replay that hand.</li>
@@ -218,8 +319,8 @@
     </ul>
     <p>Allow time after each clock window to finish hands, verify results and change tables.</p>
 
-    <h3>Qualification, tie-breakers and the final</h3>
-    <p><code>Qualification score = Q1 hanchan score + Q2 hanchan score + Q3 hanchan score + Q4 hanchan score − all qualifying penalties</code></p>
+    <h3 id="qualification">Qualification, tie-breakers and the final</h3>
+    <p class="formula"><code>Qualification score = Q1 hanchan score + Q2 hanchan score + Q3 hanchan score + Q4 hanchan score − all qualifying penalties</code></p>
     <p>Use the four hanchan scores before penalties in this formula and count each qualifying penalty once. The four eligible players with the highest qualification scores advance. For an equal qualification score, apply these tie-breakers in order across all four qualifiers, including when determining the order of eligible final replacements.</p>
     <ol>
       <li>Most first-place finishes.</li>
@@ -235,20 +336,20 @@
   <section id="schedule" aria-labelledby="schedule-title">
     <h2 id="schedule-title">Example Open II schedule</h2>
     <p>This sample schedule starts play at <strong>11:00 am Malaysia time</strong>. The first qualifier is followed by a 45-minute meal break. Allow 25 minutes after each later qualifier for finishing hands, checking scores and changing tables. Later start times are targets. If play runs late, keep the 90-minute clock for each round and move the later starts. Awards follow verification of the final result.</p>
-    <p>Plan to stay until the finalists and any standbys are announced, around <strong>7:00 pm</strong> on this schedule. If you’re neither a finalist nor a standby, you’re free to leave after that announcement. If you’re asked to stand by, the organiser will tell you when your commitment ends. Finalists should plan for awards around <strong>8:50 pm</strong>, with room for delays.</p>
-    <table>
+    <p class="callout"><strong>When you can leave.</strong> Plan to stay until the finalists and standbys are announced, around <strong>7:00 pm</strong>. If you’re asked to stand by, the organiser will tell you when you can leave. Finalists should allow time for awards around <strong>8:50 pm</strong> and for any delays.</p>
+    <table class="schedule">
       <caption>Sample event day</caption>
       <thead><tr><th scope="col">Time</th><th scope="col">Session</th></tr></thead>
       <tbody>
         <tr><th scope="row">10:00 am</th><td>Check-in opens</td></tr>
-        <tr><th scope="row">10:30 am</th><td>Check-in closes, then draw and briefing</td></tr>
-        <tr><th scope="row">11:00 am–12:30 pm</th><td>Qualifier 1 clock</td></tr>
+        <tr class="schedule-key"><th scope="row">10:30 am</th><td>Check-in closes, then draw and briefing</td></tr>
+        <tr class="schedule-key"><th scope="row">11:00 am–12:30 pm</th><td>Qualifier 1 clock</td></tr>
         <tr><th scope="row">12:30–1:15 pm</th><td>Meal break and score checks</td></tr>
         <tr><th scope="row">1:15–2:45 pm</th><td>Qualifier 2 clock</td></tr>
         <tr><th scope="row">3:10–4:40 pm</th><td>Qualifier 3 clock</td></tr>
         <tr><th scope="row">5:05–6:35 pm</th><td>Qualifier 4 clock</td></tr>
         <tr><th scope="row">6:35–7:00 pm</th><td>Verify qualification scores and announce finalists</td></tr>
-        <tr><th scope="row">7:00–8:30 pm</th><td>Final clock</td></tr>
+        <tr class="schedule-key"><th scope="row">7:00–8:30 pm</th><td>Final clock</td></tr>
         <tr><th scope="row">About 8:50 pm</th><td>Awards</td></tr>
       </tbody>
     </table>
@@ -265,6 +366,7 @@
     <h3>What to measure after the pilot</h3>
     <p>Count how many players earn a league rank and how many ranked players check in for the Open. Review late-season participation, changes to the standings, how ranked players are spread across tables, and how often opponents repeat. Use those results to revisit the eligibility threshold, the K-factor and rating carryover into future seasons.</p>
   </section>
-</main>
+  </main>
+</div>
 </body>
 </html>
