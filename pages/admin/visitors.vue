@@ -3,7 +3,7 @@
     <header>
       <p class="eyebrow">For community organisers</p>
       <h1 id="visitor-names-title">Visitor names</h1>
-      <p class="page-intro">Names saved with visits over the past seven days, including today.</p>
+      <p class="page-intro">Each name appears under its latest visit date in the past seven days, Kuala Lumpur time.</p>
     </header>
 
     <section v-if="loadError" class="admin-card result-state" role="alert">
@@ -15,9 +15,14 @@
     <section v-else class="admin-card results" aria-label="Recent visitor names" aria-live="polite">
       <p v-if="isLoading" class="result-state">Loading visitor names…</p>
       <p v-else-if="!visitors.length" class="result-state">No named visitors in the past seven days.</p>
-      <ul v-else>
-        <li v-for="visitor in visitors" :key="visitor.name">{{ visitor.name }}</li>
-      </ul>
+      <div v-else class="visit-days">
+        <div v-for="[date, names] in visitorsByDate" :key="date">
+          <h2><time :datetime="date">{{ visitDateLabel(date) }}</time></h2>
+          <ul>
+            <li v-for="name in names" :key="name">{{ name }}</li>
+          </ul>
+        </div>
+      </div>
     </section>
   </section>
 </template>
@@ -36,6 +41,23 @@ const auth = useAdminAuth()
 const visitors = ref([])
 const isLoading = ref(true)
 const loadError = ref('')
+const visitDateFormatter = new Intl.DateTimeFormat('en-GB', {
+  dateStyle: 'full',
+  timeZone: 'UTC',
+})
+
+const visitorsByDate = computed(() => {
+  const dates = new Map()
+  for (const { name, visited_on: date } of visitors.value) {
+    if (!dates.has(date)) dates.set(date, [])
+    dates.get(date).push(name)
+  }
+  return dates
+})
+
+function visitDateLabel(date) {
+  return visitDateFormatter.format(new Date(date))
+}
 
 async function loadVisitors() {
   isLoading.value = true
@@ -43,7 +65,7 @@ async function loadVisitors() {
 
   try {
     const config = useRuntimeConfig()
-    const response = await auth.authenticatedFetch(`${config.public.supabaseUrl}/rest/v1/rpc/get_recent_named_visitors`, {
+    const response = await auth.authenticatedFetch(`${config.public.supabaseUrl}/rest/v1/rpc/get_recent_named_visitors_by_date`, {
       method: 'POST',
       headers: {
         apikey: config.public.supabaseKey,
@@ -76,7 +98,8 @@ onMounted(loadVisitors)
   margin-top: 24px;
 }
 
-.result-state h2 {
+.result-state h2,
+.visit-days h2 {
   margin: 0 0 8px;
   color: var(--matcha-leaf);
   font: 400 1.35rem var(--font-display);
@@ -84,6 +107,11 @@ onMounted(loadVisitors)
 
 .result-state p {
   color: var(--muted);
+}
+
+.visit-days {
+  display: grid;
+  gap: 24px;
 }
 
 .results ul {
