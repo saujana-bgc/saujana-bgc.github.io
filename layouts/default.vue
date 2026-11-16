@@ -54,13 +54,6 @@
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
       <p class="footer-signature">Come Play with Saujana</p>
-      <nav class="footer-pillars" aria-label="Explore Saujana">
-        <NuxtLink to="/gatherings/" no-prefetch>Gatherings</NuxtLink>
-        <NuxtLink to="/collection/" no-prefetch>Collection</NuxtLink>
-        <NuxtLink to="/riichi-league/" no-prefetch>Riichi League</NuxtLink>
-        <NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower</NuxtLink>
-        <NuxtLink to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Clocktower recaps</NuxtLink>
-      </nav>
       <div class="footer-social-links">
         <SocialLink channel="whatsapp" label="Say hello on WhatsApp" />
         <SocialLink channel="instagram" label="See gathering photos on Instagram" />
@@ -185,22 +178,6 @@ onMounted(() => {
   color: var(--matcha-leaf);
   font-family: var(--font-display);
   font-size: 1.15rem;
-}
-
-.footer-pillars {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  column-gap: 20px;
-  margin-bottom: 8px;
-  font-size: .85rem;
-}
-
-.footer-pillars a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  color: var(--matcha-leaf);
 }
 
 .footer-social-links,

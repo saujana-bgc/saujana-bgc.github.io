@@ -3,8 +3,27 @@
     <header class="page-intro">
       <p class="page-eyebrow">A mystery with secret roles</p>
       <h1 class="hero-title">Blood on the Clocktower</h1>
-      <p class="stats-container">Blood on the Clocktower is a group mystery with secret roles. The good team gathers clues to find the Demon while the evil team tries to stay hidden. Two players tell you different stories about last night. Who do you trust? You can watch first, and the Storyteller will guide you through your role.</p>
+      <p class="stats-container">Two players tell different stories about last night. Who do you trust? Blood on the Clocktower is a social mystery of secret roles. Talk, share clues and vote to find the Demon. You can watch first, and the Storyteller will guide you.</p>
+      <a class="activity-primary" href="#next-gathering">Find a game <span aria-hidden="true">→</span></a>
     </header>
+
+    <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
+      <ActivityOverviewFeature
+        src="/images/site/overview-mika-clocktower.webp"
+        alt="Mika, Nick, Jac and Tom compare stories over a Clocktower town-square mat."
+      >
+        <p class="page-eyebrow">Your first game</p>
+        <h2 id="welcome-title">A mystery you solve together.</h2>
+        <ul class="welcome-steps">
+          <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
+          <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
+          <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
+          <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
+        </ul>
+        <p class="welcome-joining">You can come on your own or with a friend. Tell the host you’re new; they’ll help you decide whether to watch or play.</p>
+        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
+      </ActivityOverviewFeature>
+    </section>
 
     <div class="gathering-banner">
       <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
@@ -29,27 +48,9 @@
         </template>
       </section>
       <nav class="hero-actions" aria-label="Clocktower page links">
-        <a class="hero-secondary" href="#what-to-expect">First time? Start here <span aria-hidden="true">↓</span></a>
         <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse gathering recaps <span aria-hidden="true">→</span></NuxtLink>
       </nav>
     </div>
-
-    <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
-      <ActivityOverviewFeature
-        src="/images/site/overview-mika-clocktower.webp"
-        alt="Mika, Nick, Jac and Tom compare stories over a Clocktower town-square mat."
-      >
-        <h2 id="welcome-title">Your first game</h2>
-        <ul class="welcome-steps">
-          <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
-          <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
-          <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
-          <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
-        </ul>
-        <p class="welcome-joining">You can come on your own or with a friend. At the gathering, tell the host you’re new. They’ll explain what to expect and help you decide whether to watch or play.</p>
-        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
-      </ActivityOverviewFeature>
-    </section>
 
     <footer class="art-credit">
       <span>Blood on the Clocktower is published by <a href="https://bloodontheclocktower.com/" target="_blank" rel="noopener noreferrer">The Pandemonium Institute</a>.</span>
@@ -321,30 +322,20 @@ onMounted(() => {
   padding-bottom: 24px;
   color: var(--ink);
 }
+.clocktower-page .page-intro { max-width: 960px; margin-inline: auto; padding-inline: 0; }
+.clocktower-page .stats-container { max-width: 580px; }
+.activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--wine); color: #fffaf5; font-weight: 700; text-decoration: none; }
+.activity-primary:hover { background: #5b303a; }
+.activity-primary:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .gathering-banner {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 480px);
-  overflow: hidden;
-  min-height: 280px;
-  align-content: center;
-  gap: 10px;
+  max-width: 960px;
+  margin-inline: auto;
+  gap: 12px;
   margin-bottom: var(--space-5);
-  padding: clamp(24px, 3.5vw, 48px);
-  border-radius: var(--radius-card);
-  background: radial-gradient(ellipse at 77% 44%, #533132, var(--night) 74%);
-  color: #fff5e6;
-  box-shadow: 0 16px 36px #34212523;
-}
-.gathering-banner::before {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  inset: 9px;
-  border: 1px solid #e6be854d;
-  border-radius: 10px;
-  pointer-events: none;
+  padding: 0;
 }
 .eyebrow {
   margin: 0;
@@ -367,10 +358,10 @@ onMounted(() => {
   font-weight: 700;
   text-decoration: none;
 }
-.hero-secondary { color: #f2e3da; }
+.hero-secondary { color: var(--wine); }
 .hero-secondary:hover { text-decoration: underline; text-underline-offset: 4px; }
-.hero-tertiary { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; color: #e1d0c8; font-size: .82rem; text-underline-offset: 4px; }
-.hero-tertiary:hover { color: #fff5e6; }
+.hero-tertiary { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; color: var(--wine); font-size: .9rem; font-weight: 700; text-underline-offset: 4px; }
+.hero-tertiary:hover { color: var(--ink); }
 .clocktower-page :is(a, button, summary, select):focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .gathering-banner .hero-actions a:focus-visible { outline-color: var(--gold); }
 
@@ -427,7 +418,8 @@ onMounted(() => {
 .retry-button { justify-self: start; min-height: 40px; margin-top: 8px; padding: 7px 11px; border: 1px solid #b99577; border-radius: 6px; background: transparent; color: var(--wine); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
 .retry-button:focus-visible { outline: 2px solid var(--wine); outline-offset: 2px; }
 .welcome-note {
-  margin: 0 0 clamp(26px, 4vw, 48px);
+  max-width: 960px;
+  margin: 0 auto clamp(26px, 4vw, 48px);
   padding: clamp(19px, 3vw, 28px) 0;
   border-block: 1px solid #dfd0be;
   background: transparent;
@@ -528,7 +520,7 @@ onMounted(() => {
   .recap-story { grid-template-columns: 105px minmax(0, 1fr); gap: 20px; }
 }
 @media (max-width: 760px) {
-  .gathering-banner { min-height: 0; padding: 22px; }
+  .gathering-banner { min-height: 0; padding: 0; }
   .hero-actions { gap: 0 14px; }
   .stats { grid-template-columns: 1fr; text-align: center; gap: 2px; }
   .stat-row { grid-column: 1; grid-row: auto; margin-top: 10px; }
@@ -536,7 +528,7 @@ onMounted(() => {
   .has-cover .session-masthead { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
-  .gathering-banner { padding: 18px; }
+  .gathering-banner { padding: 0; }
   .next-night { grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: start; }
   .next-copy { min-width: 0; }
   .next-copy p:not(.eyebrow) { overflow-wrap: anywhere; }

@@ -29,7 +29,7 @@ defineProps<{ src: string; alt: string }>()
 }
 @media (max-width: 680px) {
   .overview-feature {
-    grid-template-areas: 'copy' 'art';
+    grid-template-areas: 'art' 'copy';
     grid-template-columns: minmax(0, 1fr);
   }
 }
