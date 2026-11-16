@@ -3,7 +3,7 @@
     <header class="page-intro">
       <p class="page-eyebrow">Come try a game</p>
       <h1 class="hero-title">Board Games</h1>
-      <p class="stats-container">Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you and the other players write one-word clues to help Bryan solve it. If Monopoly or Uno are your main reference points, there’s a whole world of quick team games, clever word games and thoughtful strategy to discover.</p>
+      <p class="stats-container">Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you and the other players write one-word clues to help Bryan solve it.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
       <p class="activity-welcome">We play board games and riichi mahjong at the same weekly gathering. Come on your own, watch a round or ask a host to help you join in.</p>
     </header>
@@ -17,7 +17,7 @@
           <p class="page-eyebrow">What playing can look like</p>
           <h2 id="first-game-title">You can join with one good clue.</h2>
           <p>In <em>Just One</em>, everyone writes a one-word clue to help one player guess. Matching clues disappear, so clever clues help your team most.</p>
-          <p>It’s one of many ways to play. Tell a host you’re new and what sounds fun. They’ll recommend a game and teach you as you go. You can also watch a round first.</p>
+          <p>If Monopoly or Uno are your main reference points, there’s a whole world of quick team games, clever word games and thoughtful strategy to discover. Tell a host what sounds fun and they’ll suggest a game and teach you as you go. You can watch a round first, too.</p>
         </div>
       </ActivityOverviewFeature>
     </section>

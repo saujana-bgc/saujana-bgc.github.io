@@ -3,9 +3,10 @@
     <header class="page-intro">
       <p class="page-eyebrow">Saujana’s dedicated Clocktower gatherings</p>
       <h1 class="hero-title">Only Blood in the Clocktower</h1>
-      <p class="stats-container">Two players tell different stories about last night. Who do you trust? At Saujana’s Only Blood in the Clocktower gatherings, we play <em>Blood on the Clocktower</em>, a social mystery where one player is secretly the Demon. Share clues, compare stories and vote to find them before evil takes over the town.</p>
+      <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
       <a class="activity-primary" href="#next-gathering">See the next gathering <span aria-hidden="true">→</span></a>
       <p class="activity-welcome">New to the game? Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
+      <p v-if="nextGathering" class="next-date-teaser"><strong>{{ formatDate(nextGathering.date) }}</strong><span v-if="nextGathering.time"> · {{ nextGathering.time }}</span><span v-if="nextGathering.venue"> · {{ nextGathering.venue }}</span><a href="#next-gathering">Gathering details ↓</a></p>
     </header>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
@@ -327,6 +328,8 @@ onMounted(() => {
 .clocktower-page .stats-container { max-width: 580px; }
 .activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--wine); color: #fffaf5; font-weight: 700; text-decoration: none; }
 .activity-welcome { max-width: 580px; margin: 12px auto 0; color: var(--soft-ink); font-size: .9rem; line-height: 1.55; }
+.next-date-teaser { max-width: 700px; margin: 14px auto 0; color: var(--soft-ink); font-size: .84rem; line-height: 1.5; }
+.next-date-teaser a { margin-inline-start: 8px; color: var(--wine); font-weight: 700; text-underline-offset: 3px; }
 .activity-primary:hover { background: #5b303a; }
 .activity-primary:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .gathering-banner {

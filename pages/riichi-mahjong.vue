@@ -3,7 +3,7 @@
     <header class="page-intro">
       <p class="page-eyebrow">Japanese mahjong</p>
       <h1 class="hero-title">Riichi Mahjong</h1>
-      <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? Riichi is Japanese mahjong for four players. The fun is spotting which tiles fit and choosing what to keep.</p>
+      <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? Riichi is Japanese mahjong for four players, and the fun is spotting which tiles fit.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
       <p class="activity-welcome">We play riichi mahjong and board games at the same weekly gathering. Ask a host to show you the riichi table. You’re welcome to watch a hand or try a turn with help.</p>
     </header>
@@ -15,9 +15,9 @@
       >
         <div class="activity-copy">
           <p class="page-eyebrow">A turn at the table</p>
-          <h2 id="first-hand-title">Will this tile complete your hand?</h2>
-          <p>Draw a tile, then choose one to discard. You’re collecting matching sets and number runs, plus a pair. The satisfying part is seeing your hand come together one choice at a time.</p>
-          <p>You don’t need to know the rules before you come. Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
+          <h2 id="first-hand-title">See a hand take shape, one tile at a time.</h2>
+          <p>On your turn, draw one tile and discard another. You’re collecting matching sets, number runs and a pair. Complete the pattern and you win the hand.</p>
+          <p>No need to learn the rules first. Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
         </div>
       </ActivityOverviewFeature>
     </section>
@@ -45,10 +45,11 @@
 .activity-copy p:not(.page-eyebrow) { max-width: 560px; color: var(--muted); line-height: 1.75; }
 .activity-copy .page-eyebrow,.activity-tools > .page-eyebrow { justify-content: flex-start; margin-bottom: 12px; }
 .activity-tools { margin-bottom: 28px; }
-.activity-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.activity-tools .activity-links { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .activity-links a { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface-soft); color: var(--matcha-leaf); text-decoration: none; }
 .activity-links strong { font: 400 1.25rem/1.3 var(--font-display); }
 .activity-links a > span:nth-child(2) { grid-column: 1; color: var(--muted); font-size: .9rem; line-height: 1.5; }
 .activity-links a > span:last-child { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+@media (max-width: 760px) { .activity-tools .activity-links { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .activity-content { margin-top: 4px; } .activity-links { grid-template-columns: 1fr; gap: 10px; } }
 </style>
