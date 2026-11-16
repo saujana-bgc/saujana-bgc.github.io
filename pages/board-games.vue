@@ -3,7 +3,7 @@
     <header class="page-intro">
       <p class="page-eyebrow">Come try a game</p>
       <h1 class="hero-title">Board Games</h1>
-      <p class="stats-container">Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you and the other players write one-word clues to help Bryan solve it.</p>
+      <p class="stats-container">Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you and the other players write one-word clues to help someone solve it.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
       <p class="activity-welcome">We play board games and riichi mahjong at the same weekly gathering. Come on your own, watch a round or ask a host to help you join in.</p>
     </header>
@@ -11,7 +11,7 @@
     <section class="activity-content" aria-labelledby="first-game-title">
       <ActivityOverviewFeature
         src="/images/site/overview-mika-board-games.webp"
-        alt="Mika, Albert, Bryan and Erin play Just One with three word clues on the table."
+        alt="Mika, Albert, Erin and another player play Just One with word clues on the table."
       >
         <div class="activity-copy">
           <p class="page-eyebrow">What playing can look like</p>
