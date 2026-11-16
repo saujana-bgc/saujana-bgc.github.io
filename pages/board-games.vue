@@ -4,8 +4,8 @@
       <p class="page-eyebrow">Come try a game</p>
       <h1 class="hero-title">Board Games</h1>
       <p class="stats-container">Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you and the other players write one-word clues to help Bryan solve it. If Monopoly or Uno are your main reference points, there’s a whole world of quick team games, clever word games and thoughtful strategy to discover.</p>
-      <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
-      <p class="activity-welcome">New to the table? Come on your own, watch a round or join in. A host will help you get started.</p>
+      <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
+      <p class="activity-welcome">We play board games and riichi mahjong at the same weekly gathering. Come on your own, watch a round or ask a host to help you join in.</p>
     </header>
 
     <section class="activity-content" aria-labelledby="first-game-title">

@@ -20,7 +20,7 @@ export const communityPillars = [
       width: 900,
       height: 600,
     },
-    description: 'Riichi is Japanese mahjong played with tiles. At a Riichi gathering, watch a hand and ask someone to walk you through it.',
+    description: 'Riichi is Japanese mahjong played with tiles. At our weekly board games and riichi meetup, watch a hand and ask someone to walk you through it.',
     links: [
       { label: 'Explore Riichi Mahjong', to: '/riichi-mahjong/' },
     ],

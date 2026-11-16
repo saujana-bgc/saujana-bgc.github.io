@@ -1,7 +1,7 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <p class="page-eyebrow">Saujana’s Clocktower event series</p>
+      <p class="page-eyebrow">Saujana’s dedicated Clocktower gatherings</p>
       <h1 class="hero-title">Only Blood in the Clocktower</h1>
       <p class="stats-container">Two players tell different stories about last night. Who do you trust? At Saujana’s Only Blood in the Clocktower gatherings, we play <em>Blood on the Clocktower</em>, a social mystery where one player is secretly the Demon. Share clues, compare stories and vote to find them before evil takes over the town.</p>
       <a class="activity-primary" href="#next-gathering">See the next gathering <span aria-hidden="true">→</span></a>

@@ -9,7 +9,7 @@ export const publicPages = {
   },
   '/gatherings': {
     title: 'Gatherings | Saujana BGC',
-    description: 'Find upcoming Saujana gatherings for board games, riichi mahjong and Blood on the Clocktower. Check dates, venues and sign-up details.',
+    description: 'Find dates, venues and sign-up details for Saujana’s weekly board games and riichi mahjong meetup and dedicated Only Blood in the Clocktower events.',
   },
   '/collection': {
     title: 'Board Game Collection | Saujana BGC',
@@ -21,7 +21,7 @@ export const publicPages = {
   },
   '/riichi-mahjong': {
     title: 'Riichi Mahjong | Saujana BGC',
-    description: 'Discover riichi mahjong with Saujana. Watch a hand, learn as you play, and find a casual gathering, league results, scoring tools or tournament details.',
+    description: 'Learn riichi mahjong at Saujana’s weekly board games and riichi meetup. Find gathering dates, league results, scoring tools and tournament details.',
   },
   '/playlog': {
     title: 'Play History | Saujana BGC',

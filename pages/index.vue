@@ -3,7 +3,7 @@
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
         <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
-        <p>Join us for board games, riichi mahjong, or Blood on the Clocktower. Coming on your own? You’re welcome to watch a round before joining in.</p>
+        <p>Join us each week for board games and riichi mahjong, or come to an Only Blood in the Clocktower event. Coming on your own? You’re welcome to watch a round before joining in.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
