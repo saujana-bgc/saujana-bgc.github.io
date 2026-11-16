@@ -90,7 +90,7 @@ const navigation = computed(() => [
       { label: 'Overview', to: '/riichi-mahjong/', prefetch: false },
       { label: 'Riichi League', to: '/riichi-league/', prefetch: false },
       { label: 'Riichi Calculator', to: '/riichi-calculator/', prefetch: false },
-      { label: 'Riichi Open I', to: '/riichi-open/', prefetch: false },
+      { label: 'Riichi Open', to: '/riichi-open/', prefetch: false },
     ],
   },
   {

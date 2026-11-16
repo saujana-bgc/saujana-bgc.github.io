@@ -18,7 +18,7 @@
       </div>
 
       <section v-if="snapshot.final?.length" class="results-card champion-card">
-        <p class="eyebrow">Riichi Open I champion</p><h2>{{ snapshot.final[0].display_name }}</h2><p>One final table. A well-earned win.</p>
+        <p class="eyebrow">Riichi Open champion</p><h2>{{ snapshot.final[0].display_name }}</h2><p>One final table. A well-earned win.</p>
         <ol><li v-for="row in snapshot.final" :key="row.participant_id"><strong>{{ ordinal(row.rank) }}</strong><span>{{ row.display_name }}</span><small>{{ score(row.score) }} pts</small></li></ol>
       </section>
 

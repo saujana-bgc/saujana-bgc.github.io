@@ -1,12 +1,12 @@
-# Riichi Open I — Tournament rules
+# Riichi Open — Tournament rules
 
-Riichi Open I is a four-player Japanese riichi mahjong tournament organised by Saujana Board Game Community.
+Riichi Open is a four-player Japanese riichi mahjong tournament organised by Saujana Board Game Community.
 
 Each entrant is scheduled to play exactly **two qualifying East–South (South) hanchans**. After those rounds, the top four entrants play **one final South hanchan**. Finalists do not play additional qualifying hanchans.
 
 The event uses **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025**, and the **29 June 2025 Official Rules Clarification**. The official documents govern gameplay, scoring, conduct and penalties, including details not restated in this participant guide. Where the clarification amends an earlier document, the clarification takes precedence. No WRC optional rules are adopted.
 
-The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open I tournament arrangements, not the format of the World Championship itself. If this guide's gameplay summary conflicts with the official documents, use the official documents. Pause play and call the organiser for a disputed ruling.
+The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open tournament arrangements, not the format of the World Championship itself. If this guide's gameplay summary conflicts with the official documents, use the official documents. Pause play and call the organiser for a disputed ruling.
 
 ### Official references
 
@@ -15,7 +15,7 @@ The two-qualifier format, table assignments, qualification tie-breakers and Fina
 - [Official Rules Clarification, 29 June 2025](https://www.worldriichi.org/s/WRC_2025_Rules_Clarification.pdf).
 - [WRC rules and scoring downloads](https://www.worldriichi.org/wrc-rules).
 
-The main rulebook and penalties document are published under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). This guide summarises their application to Riichi Open I and adds the event arrangements above.
+The main rulebook and penalties document are published under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). This guide summarises their application to Riichi Open and adds the event arrangements above.
 
 ---
 
@@ -53,7 +53,7 @@ This is the **snake assignment pattern**. The last table receives consecutive ra
 - The four finalists begin the Final from equal starting scores.
 - Entrants who do not reach the Final are ranked below the finalists in qualification order.
 - Final finishing position determines the final tournament ranking:
-  - 1st — Riichi Open I champion
+  - 1st — Riichi Open champion
   - 2nd — Runner-up
   - 3rd
   - 4th
@@ -132,7 +132,7 @@ The Final is the event's one East–South (South) hanchan for the top four quali
 - Qualification scores do not carry over.
 - Calculate WRC hanchan scores using the same uma as the qualifiers, including shared uma for ties on final mahjong points.
 - Subtract any tournament-point penalties incurred during the Final stage from that player's Final hanchan score. Do not deduct these penalties from table points or recalculate placement uma after penalties.
-- The player with the highest resulting Final score becomes the **Riichi Open I champion**.
+- The player with the highest resulting Final score becomes the **Riichi Open champion**.
 
 Final finishing positions are ranked by **Final hanchan score minus Final-stage tournament-point penalties**. With no penalties, this gives the same order as final mahjong points. If two or more finalists tie on this Final score, the player with the better qualification rank (the higher seed, with seed 1 being the highest) ranks higher. Apply this event tie-breaker only after calculating shared WRC uma; it does not change table points or uma. This rule applies to every finishing place, including a tie involving three or four finalists. Qualifying penalties do not carry into the Final; Final-stage penalties do not change qualification scores or seeds.
 
@@ -217,7 +217,7 @@ There is therefore no double ron or triple ron.
 
 ### Time limits
 
-**Riichi Open I setting:** each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop: do not start another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the additional-hand procedure below for all event hanchans.
+**Riichi Open setting:** each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop: do not start another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the additional-hand procedure below for all event hanchans.
 
 **WRC Section 10.1 procedure for other timed hanchans:** unless the event announces a different procedure, at the signal finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. A chombo after the signal still requires the affected hand to be replayed.
 
@@ -378,7 +378,7 @@ The organiser acts as the event's referee and applies the official WRC documents
 
 ## 18. Spirit of the event
 
-Riichi Open I is a competitive tournament, but it remains a Saujana Board Game Community event.
+Riichi Open is a competitive tournament, but it remains a Saujana Board Game Community event.
 
 Players are expected to compete seriously while maintaining a friendly and welcoming atmosphere.
 

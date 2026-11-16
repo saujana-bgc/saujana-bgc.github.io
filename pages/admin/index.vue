@@ -3,7 +3,7 @@
     <header>
       <p class="eyebrow">Organiser workspace</p>
       <h1 id="admin-dashboard-title">Organiser dashboard</h1>
-      <p class="dashboard-lede">Manage birthdays, Clocktower recaps and the Riichi Open I tournament.</p>
+      <p class="dashboard-lede">Manage birthdays, Clocktower recaps and the Riichi Open tournament.</p>
     </header>
 
     <section

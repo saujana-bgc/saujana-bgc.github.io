@@ -1,7 +1,7 @@
 export const adminNavigation = [
   { id: 'dashboard', title: 'Dashboard', to: '/admin' },
   { id: 'birthday-calendar', title: 'Birthday Club calendar', to: '/admin/birthday-club' },
-  { id: 'riichi-overview', title: 'Riichi Open I', to: '/admin/riichi-open' },
+  { id: 'riichi-overview', title: 'Riichi Open', to: '/admin/riichi-open' },
   { id: 'botc-archive', title: 'Only Blood in the Clocktower', to: '/admin/only-blood-in-the-clocktower' },
   { id: 'visitor-names', title: 'Visitor names', to: '/admin/visitors' },
 ]
@@ -18,7 +18,7 @@ export const adminDashboardGroups = [
   },
   {
     id: 'riichi-open',
-    title: 'Riichi Open I',
+    title: 'Riichi Open',
     overview: { label: 'Open tournament overview', to: '/admin/riichi-open' },
     links: [
       { title: 'Registrations', description: 'Review receipts and verify payments.', to: '/admin/riichi-open#registrations' },

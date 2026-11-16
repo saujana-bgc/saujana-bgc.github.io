@@ -3,8 +3,9 @@
     <header class="page-intro">
       <p class="page-eyebrow">Japanese mahjong</p>
       <h1 class="hero-title">Riichi Mahjong</h1>
-      <p class="stats-container">Draw a tile. Could it complete the hand you’re building? Riichi is Japanese mahjong for four players, and you can learn by watching a hand with someone there to guide you.</p>
+      <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? Riichi is Japanese mahjong for four players. The fun is spotting which tiles fit and choosing what to keep.</p>
       <NuxtLink class="activity-primary" to="/gatherings/?game=riichi" no-prefetch>Find a riichi gathering <span aria-hidden="true">→</span></NuxtLink>
+      <p class="activity-welcome">Never played? Come on your own, watch a hand or try a turn with someone beside you to help.</p>
     </header>
 
     <section class="activity-content" aria-labelledby="first-hand-title">
@@ -14,9 +15,9 @@
       >
         <div class="activity-copy">
           <p class="page-eyebrow">A turn at the table</p>
-          <h2 id="first-hand-title">A small decision can change your hand.</h2>
-          <p>On your turn, draw a tile and choose what to keep. You’re collecting groups of tiles and a pair. Complete a winning hand, and you can call out your win.</p>
-          <p>You don’t need to know the rules before you come. Watch a hand, ask what a player is collecting, or try a turn with someone beside you to help.</p>
+          <h2 id="first-hand-title">Will this tile complete your hand?</h2>
+          <p>Draw a tile, then choose one to discard. You’re collecting matching sets and number runs, plus a pair. The satisfying part is seeing your hand come together one choice at a time.</p>
+          <p>You don’t need to know the rules before you come. Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
         </div>
       </ActivityOverviewFeature>
     </section>
@@ -27,7 +28,7 @@
       <nav class="activity-links" aria-label="Riichi Mahjong tools and events">
         <NuxtLink to="/riichi-league/" no-prefetch><strong>Riichi League</strong><span>Follow the season standings and weekly results.</span><span aria-hidden="true">→</span></NuxtLink>
         <NuxtLink to="/riichi-calculator/" no-prefetch><strong>Riichi Calculator</strong><span>Check a hand or calculate ron and tsumo payments.</span><span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink to="/riichi-open/" no-prefetch><strong>Riichi Open I</strong><span>See tournament information and event updates.</span><span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink to="/riichi-open/" no-prefetch><strong>Riichi Open</strong><span>See tournament information and event updates.</span><span aria-hidden="true">→</span></NuxtLink>
       </nav>
     </section>
   </main>
@@ -38,6 +39,7 @@
 .activity-page .page-intro { padding-inline: 0; }
 .activity-page .stats-container { max-width: 580px; }
 .activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--matcha-leaf); color: white; font-weight: 650; text-decoration: none; }
+.activity-welcome { max-width: 560px; margin: 12px auto 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
 .activity-content { margin: 18px auto 34px; }
 .activity-copy h2,.activity-tools h2 { margin: 0 0 12px; color: var(--matcha-leaf); font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.2 var(--font-display); }
 .activity-copy p:not(.page-eyebrow) { max-width: 560px; color: var(--muted); line-height: 1.75; }

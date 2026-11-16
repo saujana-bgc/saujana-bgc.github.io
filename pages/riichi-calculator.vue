@@ -183,7 +183,7 @@
             </UButton>
           </div>
 
-          <details class="hand-help"><summary>Table scoring rules</summary><p>Riichi Open I uses kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. Red fives and three-player scoring are optional variants. Riichi sticks are collected separately.</p></details>
+          <details class="hand-help"><summary>Table scoring rules</summary><p>Riichi Open uses kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. Red fives and three-player scoring are optional variants. Riichi sticks are collected separately.</p></details>
           </details>
 
           <div ref="honbaSection" class="bonus-control honba-control" tabindex="-1" aria-labelledby="honba-count-label">

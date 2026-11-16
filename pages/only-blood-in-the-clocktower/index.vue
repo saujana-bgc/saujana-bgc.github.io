@@ -3,8 +3,9 @@
     <header class="page-intro">
       <p class="page-eyebrow">Saujana’s Clocktower event series</p>
       <h1 class="hero-title">Only Blood in the Clocktower</h1>
-      <p class="stats-container">Two players tell different stories about last night. Who do you trust? At Saujana’s Only Blood in the Clocktower gatherings, we play Blood on the Clocktower, a social mystery game with secret roles. Share clues and vote to find the Demon. You can watch first, and the Storyteller will guide you.</p>
+      <p class="stats-container">Two players tell different stories about last night. Who do you trust? At Saujana’s Only Blood in the Clocktower gatherings, we play <em>Blood on the Clocktower</em>, a social mystery where one player is secretly the Demon. Share clues, compare stories and vote to find them before evil takes over the town.</p>
       <a class="activity-primary" href="#next-gathering">See the next gathering <span aria-hidden="true">→</span></a>
+      <p class="activity-welcome">New to the game? Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
     </header>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
@@ -325,6 +326,7 @@ onMounted(() => {
 .clocktower-page .page-intro { max-width: 960px; margin-inline: auto; padding-inline: 0; }
 .clocktower-page .stats-container { max-width: 580px; }
 .activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--wine); color: #fffaf5; font-weight: 700; text-decoration: none; }
+.activity-welcome { max-width: 580px; margin: 12px auto 0; color: var(--soft-ink); font-size: .9rem; line-height: 1.55; }
 .activity-primary:hover { background: #5b303a; }
 .activity-primary:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .gathering-banner {
