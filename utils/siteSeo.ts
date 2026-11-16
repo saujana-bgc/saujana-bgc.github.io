@@ -28,13 +28,13 @@ export const publicPages = {
     description: 'Explore the board games played at Saujana gatherings. Look back at past gatherings and discover the games our community keeps coming back to.',
   },
   '/only-blood-in-the-clocktower': {
-    title: 'Blood on the Clocktower | Saujana BGC',
-    description: 'Learn about Blood on the Clocktower at Saujana, see the next gathering, and find out what to expect at your first game.',
+    title: 'Only Blood in the Clocktower | Saujana BGC',
+    description: 'Join Saujana’s Only Blood in the Clocktower event series to play Blood on the Clocktower. See the next gathering and learn what to expect.',
     image: '/images/only-blood-clocktower-social.png',
   },
   '/only-blood-in-the-clocktower/recaps': {
-    title: 'Blood on the Clocktower Recaps | Saujana BGC',
-    description: 'Read gathering stories, Blood on the Clocktower game results, character lists and approved photos from Saujana sessions.',
+    title: 'Clocktower Recaps | Only Blood in the Clocktower',
+    description: 'Read stories, Blood on the Clocktower results, character lists and approved photos from Saujana’s Only Blood in the Clocktower gatherings.',
     image: '/images/only-blood-clocktower-social.png',
   },
   '/birthday-club': {

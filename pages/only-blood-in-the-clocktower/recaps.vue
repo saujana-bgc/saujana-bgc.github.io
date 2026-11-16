@@ -1,10 +1,10 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <p class="page-eyebrow">Past gatherings</p>
+      <p class="page-eyebrow">Only Blood in the Clocktower</p>
       <h1 class="hero-title">Clocktower Recaps</h1>
-      <p class="stats-container">Read the stories, game results and approved photos shared from previous gatherings.</p>
-      <NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower overview →</NuxtLink>
+      <p class="stats-container">Read stories, game results and approved photos from past Only Blood in the Clocktower gatherings, where we play Blood on the Clocktower.</p>
+      <NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>Only Blood in the Clocktower overview →</NuxtLink>
     </header>
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header class="archive-heading">
