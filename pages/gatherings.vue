@@ -3,7 +3,7 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board game and mahjong meet-ups</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Join us every week for board games and riichi mahjong at the same meetup. We play Blood on the Clocktower at its own events, Only Blood in the Clocktower. Find dates, venues and sign-up details below.</div>
+      <div class="stats-container">Board games and riichi mahjong are included at every gathering. On Only Blood in the Clocktower dates, we play Blood on the Clocktower too. Find dates, venues and sign-up details below.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -56,6 +56,11 @@
             <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions</a>
           </div>
         </div>
+
+        <p class="event-games-note">
+          <strong>At every gathering</strong> Board games and riichi mahjong
+          <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Plus, Blood on the Clocktower</span></template>
+        </p>
 
         <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>Look back at this gathering</span>
@@ -571,6 +576,10 @@ function getVenueImage(venue) {
 
 function isSpookyGameDay(event) {
     return /\bspooky\s+game\s+day\b/i.test(String(event?.name ?? ''))
+}
+
+function isClocktowerEvent(event) {
+    return /clocktower/i.test(String(event?.name ?? ''))
 }
 
 function getEventImage(event) {
@@ -1327,6 +1336,22 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-heading {
     margin-bottom: 8px;
 }
+
+.event-games-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin: 8px 0 16px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--surface-soft);
+    color: var(--muted);
+    font-size: .84rem;
+    line-height: 1.45;
+}
+
+.event-games-note strong { color: var(--matcha-leaf); }
+.event-games-extra { color: var(--clay-text); font-weight: 700; }
 
 .first-visit-contact {
     display: flex;

@@ -5,7 +5,7 @@
       <h1 class="hero-title">Only Blood in the Clocktower</h1>
       <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
       <a class="activity-primary" href="#next-gathering">See the next gathering <span aria-hidden="true">→</span></a>
-      <p class="activity-welcome">New to the game? Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
+      <p class="activity-welcome">Board games and riichi mahjong are available at this gathering too. New to Blood on the Clocktower? Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
       <p v-if="nextGathering" class="next-date-teaser"><strong>{{ formatDate(nextGathering.date) }}</strong><span v-if="nextGathering.time"> · {{ nextGathering.time }}</span><span v-if="nextGathering.venue"> · {{ nextGathering.venue }}</span><a href="#next-gathering">Gathering details ↓</a></p>
     </header>
 
