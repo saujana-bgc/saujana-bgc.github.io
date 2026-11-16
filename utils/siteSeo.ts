@@ -4,7 +4,7 @@ export const siteName = 'Saujana Board Game Community'
 // Keep public search metadata and the static export's route list together.
 export const publicPages = {
   '/': {
-    title: 'Come Play with Saujana | Saujana BGC',
+    title: 'Saujana Board Game Community',
     description: 'Join Saujana for board games, riichi mahjong and Blood on the Clocktower. See what we play and find an upcoming gathering.',
   },
   '/gatherings': {
@@ -12,7 +12,7 @@ export const publicPages = {
     description: 'Find upcoming Saujana gatherings for board games, riichi mahjong and Blood on the Clocktower. Check dates, venues and sign-up details.',
   },
   '/collection': {
-    title: 'Collection | Saujana BGC',
+    title: 'Board Game Collection | Saujana BGC',
     description: 'Explore the Saujana host’s board game collection. Search by title, designer, player count or category, and find a game to try at your next gathering.',
   },
   '/board-games': {
@@ -41,7 +41,7 @@ export const publicPages = {
     description: 'Follow the Saujana Riichi Mahjong League: season standings, weekly schedules and table results. New to Japanese mahjong? Ask us how to get started.',
   },
   '/riichi-calculator': {
-    title: 'Riichi Calculator | Saujana BGC',
+    title: 'Riichi Mahjong Score Calculator | Saujana BGC',
     description: 'Calculate riichi mahjong scores from tiles or han and fu. Check yaku, dora, ron and tsumo payments for three-player sanma and four-player Japanese mahjong.',
   },
   '/riichi-open': {
