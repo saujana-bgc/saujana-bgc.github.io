@@ -3,7 +3,7 @@
     <header>
       <p class="eyebrow">For community organisers</p>
       <h1 id="visitor-names-title">Visitor names</h1>
-      <p class="page-intro">Each name appears under its latest visit date in the past seven days, Kuala Lumpur time.</p>
+      <p class="page-intro">Each name appears once for every day they visited in the past seven days, Kuala Lumpur time.</p>
     </header>
 
     <section v-if="loadError" class="admin-card result-state" role="alert">
