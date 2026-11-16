@@ -17,26 +17,6 @@
         </UButton>
       </div>
 
-      <details v-if="activeTab === 'present'" class="first-time-panel fade-up">
-        <summary>
-          <span class="first-time-summary-title">Your first visit</span>
-          <span class="first-time-summary-hint">No game experience needed. Watch a round or join in.</span>
-        </summary>
-        <div class="first-time-details-content">
-          <p>Use Directions on the gathering card to reach the venue. When you arrive, ask for Saujana BGC. We can help you choose a game and explain the rules as you play. If you can’t find us or need an expected finish time, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">send us a message on WhatsApp</a>.</p>
-          <ul class="first-time-details">
-            <li><strong>Before you come:</strong> Check the date, time and venue. Still deciding? “Tentative” is fine in your sign-up notes.</li>
-            <li><strong>At regular gatherings:</strong> Order at least RM10 per person to support our hosts. Add your spend to the list after ordering, and pay at the counter.</li>
-          </ul>
-          <p class="first-time-care">Everyone should feel welcome and respected. Read <a href="/#respect-at-table">Respect at the table</a>, or <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">raise a concern privately with an admin on WhatsApp</a>.</p>
-        </div>
-      </details>
-
-      <div v-if="activeTab === 'present'" class="first-visit-contact">
-        <span>New to Saujana? Ask us anything.</span>
-        <SocialLink channel="whatsapp" label="Message us on WhatsApp" />
-      </div>
-
       <div
         v-for="(event, index) in currentEvents"
         :key="event.id"
@@ -345,6 +325,26 @@
         <p v-if="riichiOnly && activeTab === 'present'">No upcoming Riichi Mahjong date has been announced yet. <NuxtLink to="/gatherings/" no-prefetch>See all gatherings</NuxtLink>.</p>
         <p v-else-if="activeTab === 'past'">No past gatherings are listed yet.<br>Our next get-together could be your first.</p>
         <p v-else>No upcoming date has been announced yet.<br>Check back soon, or say hello on WhatsApp.</p>
+      </div>
+
+      <details v-if="activeTab === 'present'" class="first-time-panel fade-up">
+        <summary>
+          <span class="first-time-summary-title">Your first visit</span>
+          <span class="first-time-summary-hint">No game experience needed. Watch a round or join in.</span>
+        </summary>
+        <div class="first-time-details-content">
+          <p>Use Directions on the gathering card to reach the venue. When you arrive, ask for Saujana BGC. We can help you choose a game and explain the rules as you play. If you can’t find us or need an expected finish time, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">send us a message on WhatsApp</a>.</p>
+          <ul class="first-time-details">
+            <li><strong>Before you come:</strong> Check the date, time and venue. Still deciding? “Tentative” is fine in your sign-up notes.</li>
+            <li><strong>At regular gatherings:</strong> Order at least RM10 per person to support our hosts. Add your spend to the list after ordering, and pay at the counter.</li>
+          </ul>
+          <p class="first-time-care">Everyone should feel welcome and respected. Read <a href="/#respect-at-table">Respect at the table</a>, or <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">raise a concern privately with an admin on WhatsApp</a>.</p>
+        </div>
+      </details>
+
+      <div v-if="activeTab === 'present'" class="first-visit-contact">
+        <span>New to Saujana? Ask us anything.</span>
+        <SocialLink channel="whatsapp" label="Message us on WhatsApp" />
       </div>
 
     </main>
@@ -2083,13 +2083,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .tabs { margin: 8px auto 28px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; box-shadow: none; background: var(--surface-soft); }
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
-.gatherings-main > .tabs { order: 0; }
-.gatherings-main > .event-card,
-.gatherings-main > .loading-copy,
-.gatherings-main > .pagination,
-.gatherings-main > .empty-state { order: 1; }
-.gatherings-main > .first-time-panel { order: 2; }
-.gatherings-main > .first-visit-contact { order: 3; }
 .event-card { max-width: 960px; border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
 .event-card::before { display: none; }
 .event-card:hover { transform: none; box-shadow: var(--shadow-card); }

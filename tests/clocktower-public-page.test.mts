@@ -4,7 +4,7 @@ import test from 'node:test'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { computed, ref } from 'vue'
 
-const { descriptor } = parse(readFileSync(new URL('../pages/only-blood-in-the-clocktower.vue', import.meta.url), 'utf8'))
+const { descriptor } = parse(readFileSync(new URL('../pages/only-blood-in-the-clocktower/index.vue', import.meta.url), 'utf8'))
 const { content } = compileScript(descriptor, { id: 'clocktower-public-page' })
 
 function page() {

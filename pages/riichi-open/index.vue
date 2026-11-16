@@ -244,7 +244,7 @@ watch(receipt, file => {
 })
 function removeReceipt() { receipt.value = null; if (receiptInput.value) receiptInput.value.value = '' }
 async function goToRegistration() { activeTab.value = 'registration'; await nextTick(); registrationPanel.value?.scrollIntoView({behavior:'smooth',block:'start'}); registrationPanel.value?.focus({preventScroll:true}) }
-async function goToSchedule() { activeTab.value = 'registration'; await nextTick(); schedulePanel.value?.scrollIntoView({behavior:'smooth',block:'start'}); document.getElementById('schedule-heading')?.focus({preventScroll:true}) }
+async function goToSchedule() { await nextTick(); schedulePanel.value?.scrollIntoView({behavior:'smooth',block:'start'}); document.getElementById('schedule-heading')?.focus({preventScroll:true}) }
 
 function openGuide(event) {
   guideReturnFocus = event?.currentTarget ?? guideTrigger.value

@@ -28,7 +28,7 @@
       </section>
       <nav class="hero-actions" aria-label="Clocktower page links">
         <a class="hero-secondary" href="#what-to-expect">First time? Start here <span aria-hidden="true">↓</span></a>
-        <a class="hero-tertiary" href="#clocktower-archive">Browse gathering recaps <span aria-hidden="true">↓</span></a>
+        <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse gathering recaps <span aria-hidden="true">→</span></NuxtLink>
       </nav>
     </div>
 
@@ -43,94 +43,6 @@
       <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
     </section>
 
-    <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
-      <header class="archive-heading">
-        <p class="eyebrow">Past games</p>
-        <h2 id="archive-title" tabindex="-1">Gathering recaps</h2>
-      </header>
-      <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
-        <label v-if="archiveYears.length > 1">Year<USelect class="archive-select" :model-value="selectedYear" :items="[{ label: 'All years', value: 'all' }, ...archiveYears.map(year => ({ label: String(year), value: String(year) }))]" @update:model-value="setSelectedYear" /></label>
-        <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" :model-value="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" @update:model-value="setSelectedScript" /></label>
-        <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
-      </div>
-      <p v-if="shareNotice" class="archive-state share-notice" role="status">{{ shareNotice }}</p>
-      <p v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="filter-count" role="status">{{ filteredSessions.length }} of {{ recapSessions.length }} gatherings match these filters</p>
-      <p v-if="error" class="archive-state" role="alert">{{ error }} <UButton class="archive-button" type="button" @click="loadArchive">Try again</UButton></p>
-      <p v-else-if="loading" class="archive-state" role="status">Loading recaps…</p>
-      <div v-else-if="!recapSessions.length" class="archive-state empty-archive">
-        <span class="empty-mark" aria-hidden="true">✧</span>
-        <h3>The archive is quiet for now</h3>
-        <p>Gathering stories, game results and approved photos will find their place here as sessions are added.</p>
-      </div>
-
-      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
-      <article v-for="session in paginatedSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id, 'has-cover': session.id === featured?.id && Boolean(coverPhoto(session)) }">
-        <div class="session-masthead">
-          <div class="session-heading">
-            <p class="session-kicker"><span v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</span><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
-            <h3 tabindex="-1">{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
-            <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
-          </div>
-          <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="coverPhoto(session).alt || 'Table photo from ' + formatDate(session.session_date)" loading="lazy">
-        </div>
-        <section v-if="session.recap" class="recap-story" aria-label="Retelling">
-          <h4>Retelling</h4>
-          <div class="recap-prose">
-            <p v-for="(paragraph, index) in retellingParagraphs(session.recap)" :key="index">{{ paragraph }}</p>
-          </div>
-        </section>
-
-        <div v-if="session.games?.length" class="game-grid">
-          <article v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number" class="game-recap">
-            <header class="game-recap-heading">
-              <div class="game-title">
-                <span class="game-label">Game {{ number }}</span>
-                <h4 class="game-script" tabindex="-1">{{ game.script || 'Script not recorded' }}</h4>
-              </div>
-              <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
-            </header>
-            <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
-              <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
-                <img class="character-art" :src="characterIcon(player.character)" alt="" loading="lazy" decoding="async">
-                <div class="seat-copy">
-                  <span class="seat-name">{{ publicPlayerName(player, pIndex) }}</span>
-                  <div class="seat-meta">
-                    <span class="seat-character">{{ player.character || 'Character not recorded' }}</span>
-                    <span v-if="player.died" class="death-mark">Died</span>
-                  </div>
-                </div>
-              </li>
-            </ol>
-            <p v-if="game.notes" class="story-text">{{ game.notes }}</p>
-          </article>
-        </div>
-
-        <details v-if="sessionPhotos(session).length" class="photo-reveal">
-          <summary>Table photos · {{ sessionPhotos(session).length }}</summary>
-          <div class="photo-gallery" :aria-label="'Photos from ' + formatDate(session.session_date)">
-            <a v-for="photo in sessionPhotos(session)" :key="photo.path" class="photo-link" :href="photoUrls[photo.path]" target="_blank" rel="noopener noreferrer" :aria-label="'Open full-size photo from ' + formatDate(session.session_date) + ' in a new tab'">
-              <img :src="photoUrls[photo.path]" :alt="photo.alt || 'Photo from this Blood on the Clocktower gathering'" loading="lazy">
-            </a>
-          </div>
-        </details>
-      </article>
-      <nav v-if="pageCount > 1 && !loading && !error" class="archive-pagination" aria-label="Gathering recap pages">
-        <UButton class="archive-button page-button" type="button" :disabled="currentPage === 1" @click="changePage(currentPage - 1)">Previous</UButton>
-        <span class="page-status" aria-live="polite">Page {{ currentPage }} of {{ pageCount }}</span>
-        <UButton class="archive-button page-button" type="button" :disabled="currentPage === pageCount" @click="changePage(currentPage + 1)">Next</UButton>
-      </nav>
-      <p v-if="!loading && !error && pageCount > 1" class="pagination-count" aria-live="polite">Showing {{ rangeStart }}–{{ rangeEnd }} of {{ filteredSessions.length }} gatherings</p>
-    </section>
-
-    <section v-if="!loading && !error && recapSessions.length" class="stats" aria-labelledby="stats-title">
-      <p class="eyebrow">The tally</p>
-      <h2 id="stats-title">Clocktower in numbers</h2>
-      <div class="stat-row">
-        <div><strong>{{ statistics.sessions }}</strong><span>{{ statistics.sessions === 1 ? 'gathering' : 'gatherings' }}</span></div>
-        <div><strong>{{ statistics.games }}</strong><span>{{ statistics.games === 1 ? 'game played' : 'games played' }}</span></div>
-        <div><strong>{{ statistics.scripts }}</strong><span>{{ statistics.scripts === 1 ? 'script played' : 'scripts played' }}</span></div>
-      </div>
-    </section>
     <footer class="art-credit">
       <span>Blood on the Clocktower is published by <a href="https://bloodontheclocktower.com/" target="_blank" rel="noopener noreferrer">The Pandemonium Institute</a>.</span>
       <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">Character icon credits <span aria-hidden="true">↗</span></a>
@@ -373,6 +285,15 @@ async function loadCommunityEvents() {
 onMounted(() => {
   loadArchive()
   loadCommunityEvents()
+  const hasLegacyRecapHash = route.hash.startsWith('#clocktower-archive') || route.hash.startsWith('#session-') || route.hash.startsWith('#game-')
+  const hasLegacyRecapQuery = typeof route.query.game === 'string' || typeof route.query.session === 'string'
+  if (hasLegacyRecapHash || hasLegacyRecapQuery) {
+    useRouter().replace({
+      path: '/only-blood-in-the-clocktower/recaps/',
+      query: route.query,
+      hash: route.hash,
+    })
+  }
 })
 </script>
 

@@ -8,15 +8,15 @@
     </header>
 
     <section class="activity-content" aria-labelledby="first-hand-title">
+      <figure class="activity-art">
+        <img src="/images/site/what-we-play-riichi.webp" alt="An illustration of players moving yellow-backed mahjong tiles around a green table." width="900" height="600" loading="lazy">
+      </figure>
       <div class="activity-copy">
         <p class="page-eyebrow">New to riichi?</p>
         <h2 id="first-hand-title">Start by watching a hand.</h2>
         <p>Riichi is Japanese mahjong played with tiles. A player can show you how a hand comes together, explain the table’s rules, and answer questions as you go.</p>
         <p>Check the gatherings page for the next date, venue and sign-up details. You’re welcome to observe first.</p>
       </div>
-      <figure class="activity-art">
-        <img src="/images/site/what-we-play-riichi.webp" alt="An illustration of players moving yellow-backed mahjong tiles around a green table." width="900" height="600" loading="lazy">
-      </figure>
     </section>
 
     <section class="activity-tools" aria-labelledby="regular-play-title">
@@ -48,5 +48,5 @@
 .activity-links strong { font: 400 1.25rem/1.3 var(--font-display); }
 .activity-links a > span:nth-child(2) { grid-column: 1; color: var(--muted); font-size: .9rem; line-height: 1.5; }
 .activity-links a > span:last-child { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
-@media (max-width: 600px) { .activity-content { grid-template-columns: 1fr; gap: 12px; margin-top: 4px; } .activity-art img { max-height: 210px; } .activity-links { grid-template-columns: 1fr; gap: 10px; } }
+@media (max-width: 600px) { .activity-content { grid-template-columns: 1fr; gap: 12px; margin-top: 4px; } .activity-content .activity-art { order: 2; } .activity-art img { max-height: 210px; } .activity-links { grid-template-columns: 1fr; gap: 10px; } }
 </style>

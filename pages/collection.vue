@@ -12,7 +12,7 @@
           :ui="{ base: 'collection-search-field' }"
           v-model="search"
           type="search"
-          placeholder="Search by title, category, or player count"
+          placeholder="Search by title, designer, category, or player count"
           aria-label="Search the collection by title, category, player count, or designer"
         />
         <div class="collection-search-meta">
@@ -278,8 +278,9 @@ const openModal = async (game) => {
 }
 const closeModal = () => {
     if (!selectedGame.value) return
+    const trigger = modalTrigger
     selectedGame.value = null
-    modalTrigger?.focus()
+    nextTick(() => trigger?.focus())
 }
 const onModalOpenChange = (open) => { if (!open) closeModal() }
 const handleImgError = (e) => { e.target.src = FALLBACK_IMG }

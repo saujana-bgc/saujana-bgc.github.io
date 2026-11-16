@@ -1,9 +1,9 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
-      <p class="page-eyebrow">Board Games</p>
+      <p class="page-eyebrow">Past gatherings</p>
       <h1 class="hero-title">Play History</h1>
-      <div class="stats-container">Search what we’ve played and who joined us.</div>
+      <div class="stats-container">Search game titles from past gatherings. Open a game to see its cover and the players who joined in.</div>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -153,7 +153,7 @@
           </div>
         </section>
       </template>
-      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>See Clocktower recaps and the next gathering →</NuxtLink></p>
+      <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps →</NuxtLink></p>
     </main>
 
     <Teleport to="body">

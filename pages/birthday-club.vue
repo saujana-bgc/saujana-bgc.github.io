@@ -272,6 +272,7 @@ function resetForm() {
   color: var(--clay-text);
   font: inherit;
 }
+.field-group :deep(.birthday-control input) { min-height: 44px; }
 
 .field-group input::placeholder { color: rgba(74, 68, 61, 0.42); }
 .field-group select:disabled { cursor: not-allowed; opacity: 0.55; }

@@ -59,6 +59,7 @@
         <NuxtLink to="/collection/" no-prefetch>Collection</NuxtLink>
         <NuxtLink to="/riichi-league/" no-prefetch>Riichi League</NuxtLink>
         <NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower</NuxtLink>
+        <NuxtLink to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Clocktower recaps</NuxtLink>
       </nav>
       <div class="footer-social-links">
         <SocialLink channel="whatsapp" label="Say hello on WhatsApp" />
@@ -99,7 +100,16 @@ const navigation = computed(() => [
       { label: 'Riichi Open I', to: '/riichi-open/', prefetch: false },
     ],
   },
-  { id: 'clocktower', label: 'Clocktower', to: '/only-blood-in-the-clocktower/', prefetch: false },
+  {
+    id: 'clocktower',
+    label: 'Clocktower',
+    type: 'trigger',
+    active: ['/only-blood-in-the-clocktower', '/only-blood-in-the-clocktower/recaps'].includes(route.path.replace(/\/+$/, '')),
+    children: [
+      { label: 'Overview', to: '/only-blood-in-the-clocktower/', prefetch: false },
+      { label: 'Recaps', to: '/only-blood-in-the-clocktower/recaps/', prefetch: false },
+    ],
+  },
   { id: 'play-history', label: 'Play History', to: '/playlog/', prefetch: false },
   { id: 'birthday-club', label: 'Birthday Club', to: '/birthday-club/', prefetch: false },
 ])

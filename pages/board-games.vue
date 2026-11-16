@@ -8,15 +8,15 @@
     </header>
 
     <section class="activity-content" aria-labelledby="first-game-title">
+      <figure class="activity-art">
+        <img src="/images/site/what-we-play-board-games.webp" alt="An illustrated tabletop game with a colourful track, cards and dice." width="900" height="1350" loading="lazy">
+      </figure>
       <div class="activity-copy">
         <p class="page-eyebrow">Your first game</p>
         <h2 id="first-game-title">We’ll find something that fits.</h2>
         <p>Tell us what you enjoy, or pick a game from the collection. Hosts can explain the rules as you play, so you don’t need to prepare before you arrive.</p>
         <p>Coming alone? Say hello to a host when you arrive. You’re welcome to watch a round before joining a game.</p>
       </div>
-      <figure class="activity-art">
-        <img src="/images/site/what-we-play-board-games.webp" alt="An illustrated tabletop game with a colourful track, cards and dice." width="900" height="1350" loading="lazy">
-      </figure>
     </section>
 
     <nav class="activity-links" aria-label="Explore board games">
@@ -42,5 +42,5 @@
 .activity-links strong { font: 400 1.25rem/1.3 var(--font-display); }
 .activity-links a > span:nth-child(2) { grid-column: 1; color: var(--muted); font-size: .9rem; line-height: 1.5; }
 .activity-links a > span:last-child { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
-@media (max-width: 600px) { .activity-content { grid-template-columns: 1fr; gap: 12px; margin-top: 4px; } .activity-art img { max-height: 210px; } .activity-links { grid-template-columns: 1fr; gap: 10px; } }
+@media (max-width: 600px) { .activity-content { grid-template-columns: 1fr; gap: 12px; margin-top: 4px; } .activity-content .activity-art { order: 2; } .activity-art img { max-height: 210px; } .activity-links { grid-template-columns: 1fr; gap: 10px; } }
 </style>

@@ -1136,7 +1136,7 @@ onBeforeUnmount(() => {
 .field-problems { display: grid; gap: 5px; margin: 10px 0 0; padding-left: 18px; color: #823f38; font-size: .78rem; line-height: 1.5; }
 .closed-hand-correction { display: grid; justify-items: start; gap: 8px; margin: 10px 0 0; }
 .closed-hand-correction .field-hint { margin: 0; }
-.checkbox-row { display: flex; align-items: flex-start; gap: 9px; color: var(--clay-text); font-size: .79rem; line-height: 1.55; cursor: pointer; }
+.checkbox-row { display: flex; align-items: center; min-height: 44px; gap: 9px; color: var(--clay-text); font-size: .79rem; line-height: 1.55; cursor: pointer; }
 .checkbox-row > input { flex: 0 0 auto; width: 17px; height: 17px; margin: 2px 0 0; accent-color: var(--matcha-leaf); }
 .search-field { min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
 .search-field:focus-within { outline: 2px solid var(--matcha-leaf); outline-offset: 2px; }
