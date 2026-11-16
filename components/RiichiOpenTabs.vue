@@ -88,10 +88,10 @@ function moveTab(direction) {
   color: var(--matcha-leaf);
 }
 
-.riichi-tabs button.active { background: var(--white-pure); box-shadow: 0 2px 8px #2c372810; }
+.riichi-tabs button.active { background: var(--matcha-leaf); color: white; box-shadow: none; }
 
 .riichi-tabs button.active::after {
-  transform: scaleX(1);
+  transform: scaleX(0);
 }
 
 .riichi-tabs button:focus-visible {

@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
-      <p class="page-eyebrow">Something to look forward to</p>
+      <p class="page-eyebrow">Board game and mahjong meet-ups</p>
       <h1 class="hero-title">Gatherings</h1>
       <div class="stats-container">{{ riichiOnly ? 'See upcoming dates and details for Riichi Mahjong.' : 'See dates, venues and sign-up details for board games, riichi mahjong and Blood on the Clocktower.' }}</div>
     </header>
@@ -2083,6 +2083,13 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .tabs { margin: 8px auto 28px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; box-shadow: none; background: var(--surface-soft); }
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
+.gatherings-main > .tabs { order: 0; }
+.gatherings-main > .event-card,
+.gatherings-main > .loading-copy,
+.gatherings-main > .pagination,
+.gatherings-main > .empty-state { order: 1; }
+.gatherings-main > .first-time-panel { order: 2; }
+.gatherings-main > .first-visit-contact { order: 3; }
 .event-card { max-width: 960px; border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
 .event-card::before { display: none; }
 .event-card:hover { transform: none; box-shadow: var(--shadow-card); }

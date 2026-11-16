@@ -3,7 +3,7 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Play History</h1>
-      <div class="stats-container">A record of what we’ve played and who joined in. Look back at a gathering, or see which favourites keep making it to the table.</div>
+      <div class="stats-container">Search what we’ve played and who joined us.</div>
     </header>
 
     <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -407,9 +407,8 @@ onUnmounted(() => {
 
 <style scoped>
 .search-wrap {
-    width: 90%;
-    max-width: 800px;
-    margin-bottom: 20px;
+    width: min(90%, 720px);
+    margin: 0 auto 16px;
 }
 
 .search-input {
@@ -422,7 +421,7 @@ onUnmounted(() => {
     font-family: inherit;
     font-size: 0.88rem;
     color: inherit;
-    padding: 12px 20px;
+    padding: 13px 18px;
     border-radius: 40px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
