@@ -2,7 +2,7 @@
 
 Pilot operating rules · Revised 16 November 2026
 
-Run **Riichi League Season 2** for three months using four-player Elo with **K=24**. Everyone starts at **1,500**, and players earn a rank after **eight rated hanchans across four dates**. Use the frozen Season 2 standings to build pots for **Riichi Open II**'s first qualifier. Players can enter and win Open II without a league rank. Open II has **three qualifiers and a top-four final**, with a **90-minute clock** for every round. Open II results determine who advances and any final tie-break.
+Run **Riichi League Season 2** from **December 2026 through 28 February 2027** using four-player Elo with **K=24**. Everyone starts at **1,500**, and players earn a rank after **eight rated hanchans across four dates**. Use the frozen Season 2 standings to build pots for **Riichi Open II**'s first qualifier in **March 2027**. Players can enter and win Open II without a league rank. Open II has **four qualifiers and a top-four final**, with a **90-minute clock** for every round. Open II results determine who advances and any final tie-break.
 
 ## What would change
 
@@ -19,7 +19,7 @@ Riichi Open I used a random draw for the first qualifier, a snake assignment bas
 | Rated games | Publish which four-player hanchans are rated before play. Count every verified completion. Keep casual tables available, including three-player games. |
 | Rank eligibility | Show players as provisional until they complete **at least eight rated hanchans across at least four different dates** in the season. |
 | Results and corrections | Give each hanchan a session and round number when it starts. Have the four players confirm the full result. An organiser approves corrections, then the ratings are replayed in round order. |
-| Season close | Publish the three-month season dates and deadlines before play begins. Results are due by **11:59 pm Malaysia time on the third calendar day after play**. Corrections close at **11:59 pm on the seventh calendar day after the season ends**. Freeze the standings after resolving corrections filed on time. The highest-rated eligible player wins the season. Players with exactly equal ratings share their place. |
+| Season close | Publish the December opening session date before play begins. The season ends on **28 February 2027**. Results are due by **11:59 pm Malaysia time on the third calendar day after play**. For games completed on 28 February, that is 3 March. Corrections close at **11:59 pm Malaysia time on 7 March 2027**, seven calendar days after the season ends. Freeze the standings after resolving corrections filed on time. The highest-rated eligible player wins the season. Players with exactly equal ratings share their place. |
 
 Use a stable league player ID. During Open registration, have an organiser confirm a player's identity if their entry name differs from their league name. The current league form assigns a table number when a result is saved, so submission order can differ from play order. [Current league score entry](../pages/riichi-league.vue#L165)
 
@@ -63,6 +63,8 @@ Replaying the archive with K=16, 24 and 32 gave the same final order for the nin
 
 ## Riichi Open II draw
 
+Open II is scheduled for **March 2027**, after the final Season 2 standings are frozen. Publish the event date before registration.
+
 Borrow UEFA's ranking-based pots. UEFA uses a multi-season coefficient for seeding. Open II uses Season 2's final Elo standings. Revisit rating carryover after the pilot. [UEFA club coefficients](https://www.uefa.com/nationalassociations/uefarankings/club/) · [UEFA league-phase draw rules](https://documents.uefa.com/r/Regulations-of-the-UEFA-Champions-League-2026/27/Article-16-Draw-system-league-phase-Online)
 
 1. Freeze the Season 2 standings before the event. Publish a check-in cutoff **30 minutes before the scheduled start of Qualifier 1**. On the day, close check-in and confirm which players and announced reserves are present before drawing any tables. Use the frozen rankings of the people actually playing.
@@ -89,7 +91,7 @@ If a confirmed entrant checks in on time and cannot be seated under this fallbac
 ### Withdrawals and reserves
 
 - Before or between qualifiers, an announced reserve takes the withdrawn player's place in the remaining table assignments and joins that round's starting-wind draw. Certified results stay with the players who earned them. Record the reserve's games under the reserve's own name. A withdrawn entrant and an organiser reserve are ineligible for the final.
-- If no reserve is available after play has started, hold the next qualifier while the organiser looks for a replacement. If the field cannot fill four-player tables within the event's venue window, suspend play and reschedule the remaining qualifiers. Keep all certified round results. Confirm finalists after all three qualifying rounds are certified.
+- If no reserve is available after play has started, hold the next qualifier while the organiser looks for a replacement. If the field cannot fill four-player tables within the event's venue window, suspend play and reschedule the remaining qualifiers. Keep all certified round results. Confirm finalists after all four qualifying rounds are certified.
 - If a finalist withdraws before the final starts, offer the place to the next available eligible player in the certified qualifying standings. Apply the same qualification tie-breakers if two players are tied for the replacement place. The replacement's qualification rank applies to any final tie-break. Complete the final roster before drawing its starting winds.
 - If someone withdraws during a game, stop play at that table, keep the game state and call the head referee. The referee rules on how play can resume and which result, if any, can be certified. Record the ruling with the round results.
 
@@ -106,11 +108,20 @@ Example draw with nine ranked entrants out of 16
 
 With four tables of four, a fully random draw has about a **14%** chance of placing four particular top-ranked entrants at separate tables. A pot draw guarantees that spread when all four are in Pot 1. A strong visitor may still make a table tougher. All eligible entrants can reach the final through their Open results.
 
-### Three qualifiers and the final
+### Four qualifiers and the final
 
-Build all three qualifying rounds from the event-day roster. Qualifier 1 uses the league seed pots. For a 16-player field, assign Qualifier 2 so each table has one player from each first-round table. Assign Qualifier 3 so each table has one player from each first-round table and one from each second-round table. This gives each player **nine different opponents** when the same 16 players play all three games. Publish the three rounds together before play. For a different field size, build and publish a rotation that minimises repeat opponents before the first round.
+Build all four qualifying rounds from the event-day roster. Qualifier 1 uses the league seed pots. The rotation below gives each player **12 different opponents** when the same 16 play all four qualifiers. Publish the four rounds together before play. For a different field size, build and publish a rotation that minimises repeat opponents across the four games.
 
-One way to build the 16-player rotation is to number the Qualifier 1 tables from 0 to 3 and randomly assign each player a slot from 0 to 3 within their table. Use the slot number as the player's Qualifier 2 table. For Qualifier 3, add their Qualifier 1 table number and slot number and take the remainder after dividing by four. Generate candidate rotations after check-in. Discard rotations that put three or more of the four highest checked-in league seeds at a later table. Among the remaining candidates, compare how many of those seeds each other player faces across all three rounds. Randomly choose among candidates with the smallest gap between the highest and lowest counts. Use the available checked-in ranked players for this check if there are fewer than four. Starting winds are drawn separately from these slots.
+For the 16-player rotation, number the opening tables 1 to 4 and randomly assign slots 1 to 4 within each table. A player's slot becomes their Qualifier 2 table number. For Qualifiers 3 and 4, use the row for their opening table and the number in the position of their slot. For example, a player from opening table 2 in slot 3 plays at tables 3, 4 and 3 in Qualifiers 2, 3 and 4 respectively. Draw starting winds separately.
+
+| Opening table | Qualifier 3 table by slot 1 to 4 | Qualifier 4 table by slot 1 to 4 |
+| --- | --- | --- |
+| 1 | 1, 2, 3, 4 | 1, 3, 4, 2 |
+| 2 | 2, 1, 4, 3 | 2, 4, 3, 1 |
+| 3 | 3, 4, 1, 2 | 3, 1, 2, 4 |
+| 4 | 4, 3, 2, 1 | 4, 2, 1, 3 |
+
+Generate candidate rotations after check-in. Discard rotations that put three or more of the four highest checked-in league seeds together at a later table. Compare how many of those seeds each other player faces across all four rounds. Choose randomly among candidates with the smallest gap between the highest and lowest counts. Use the available checked-in ranked players for this check if there are fewer than four.
 
 ### Saujana time rule
 
@@ -120,26 +131,28 @@ Allow time after each clock window to finish hands, check scores and change tabl
 
 ### Qualification and final scoring
 
-Add the **three** qualifying hanchan scores before penalties, then deduct all qualifying penalties once. Apply Open I's tie-breakers across all three qualifiers to determine the four eligible finalists and their qualification rank. Randomise the final seats. Finalists start at 30,000 table points each and their final score determines the result. Resolve exact final-score ties in qualification order. [Open I qualification tie-breakers](../public/riichi-open/rules.md#L112) · [Open I final tie-break](../public/riichi-open/rules.md#L137)
+Add the **four** qualifying hanchan scores before penalties, then deduct all qualifying penalties once. Apply Open I's tie-breakers across all four qualifiers to determine the four eligible finalists and their qualification rank. Randomise the final seats. Finalists start at 30,000 table points each and their final score determines the result. Resolve exact final-score ties in qualification order. [Open I qualification tie-breakers](../public/riichi-open/rules.md#L112) · [Open I final tie-break](../public/riichi-open/rules.md#L137)
 
 ### Example event schedule
 
-This sample schedule starts play at **1:00 pm Malaysia time**. It allows 25 minutes after each of the first two clocks for finishing hands, checking scores and changing tables. Later start times are targets. If play runs late, keep the 90-minute clock for each round and move the later starts. Awards follow verification of the final result. Confirm the venue and publish the actual schedule before registration.
+This sample schedule starts play at **11:00 am Malaysia time**. The first qualifier is followed by a 45-minute meal break. Allow 25 minutes after each later qualifier for finishing hands, checking scores and changing tables. Later start times are targets. If play runs late, keep the 90-minute clock for each round and move the later starts. Awards follow verification of the final result. Confirm the venue and publish the actual schedule before registration.
 
-Ask entrants to stay until the finalists and any standbys are announced, around **7:05 pm** on this schedule. Everyone except finalists and standbys can leave after the announcement. Tell standbys when their commitment ends. Finalists should plan for awards around **8:55 pm**, with room for delays.
+Ask entrants to stay until the finalists and any standbys are announced, around **7:00 pm** on this schedule. Everyone except finalists and standbys can leave after the announcement. Tell standbys when their commitment ends. Finalists should plan for awards around **8:50 pm**, with room for delays.
 
 | Time | Session |
 | --- | --- |
-| 12:00 pm | Check-in opens |
-| 12:30 pm | Check-in closes, then draw and briefing |
-| 1:00–2:30 pm | Qualifier 1 clock |
-| 2:55–4:25 pm | Qualifier 2 clock |
-| 4:50–6:20 pm | Qualifier 3 clock |
-| 6:20–7:05 pm | Meal break and qualification score checks |
-| 7:05–8:35 pm | Final clock |
-| About 8:55 pm | Awards |
+| 10:00 am | Check-in opens |
+| 10:30 am | Check-in closes, then draw and briefing |
+| 11:00 am–12:30 pm | Qualifier 1 clock |
+| 12:30–1:15 pm | Meal break and score checks |
+| 1:15–2:45 pm | Qualifier 2 clock |
+| 3:10–4:40 pm | Qualifier 3 clock |
+| 5:05–6:35 pm | Qualifier 4 clock |
+| 6:35–7:00 pm | Verify qualification scores and announce finalists |
+| 7:00–8:30 pm | Final clock |
+| About 8:50 pm | Awards |
 
-Before registration, rehearse the 90-minute clock, the three-round rotation, and certification through the final with a sample field. Record the last completed hand and score verification time. Include a no-show at check-in, a withdrawal after Qualifier 1 with and without a reserve, and a finalist withdrawal with tied candidates for the replacement seat. Verify that the reserve appears under their own name, certified scores survive a suspension, Qualifier 3 is published, and the final cut and replacement order use all three rounds and the same tie-breakers. The current admin flow locks the roster during play and goes from Qualifier 2 to the final. [Current admin roster and round workflow](../pages/admin/riichi-open.vue#L25)
+Before registration, rehearse the 90-minute clock, the four-round rotation, and certification through the final with a sample field. Record the last completed hand and score verification time. Include a no-show at check-in, a withdrawal after Qualifier 1 with and without a reserve, and a finalist withdrawal with tied candidates for the replacement seat. Verify that the reserve appears under their own name, certified scores survive a suspension, Qualifiers 3 and 4 are published, and the final cut and replacement order use all four rounds and the same tie-breakers. The current admin flow locks the roster during play and goes from Qualifier 2 to the final. [Current admin roster and round workflow](../pages/admin/riichi-open.vue#L25)
 
 ## Review after the pilot
 

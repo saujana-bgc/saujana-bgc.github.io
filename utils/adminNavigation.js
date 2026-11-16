@@ -3,6 +3,7 @@ export const adminNavigation = [
   { id: 'birthday-calendar', title: 'Birthday Club calendar', to: '/admin/birthday-club' },
   { id: 'riichi-overview', title: 'Riichi Open I', to: '/admin/riichi-open' },
   { id: 'botc-archive', title: 'Only Blood in the Clocktower', to: '/admin/only-blood-in-the-clocktower' },
+  { id: 'visitor-names', title: 'Visitor names', to: '/admin/visitors' },
 ]
 
 export const adminDashboardGroups = [
@@ -12,6 +13,7 @@ export const adminDashboardGroups = [
     links: [
       { title: 'Birthday Club calendar', description: 'Check birthdays and greeting preferences.', to: '/admin/birthday-club' },
       { title: 'Clocktower organiser', description: 'Log games and publish gathering recaps.', to: '/admin/only-blood-in-the-clocktower' },
+      { title: 'Visitor names', description: 'See named visitors from the past seven days.', to: '/admin/visitors' },
     ],
   },
   {
@@ -29,4 +31,4 @@ export const adminDashboardGroups = [
   },
 ]
 
-export const adminPageRoutes = ['/admin', '/admin/birthday-club', '/admin/riichi-open', '/admin/only-blood-in-the-clocktower']
+export const adminPageRoutes = ['/admin', '/admin/birthday-club', '/admin/riichi-open', '/admin/only-blood-in-the-clocktower', '/admin/visitors']

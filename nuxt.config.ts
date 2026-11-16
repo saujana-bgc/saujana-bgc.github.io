@@ -17,6 +17,7 @@ export default defineNuxtConfig({
         '/admin/birthday-club',
         '/admin/riichi-open',
         '/admin/only-blood-in-the-clocktower',
+        '/admin/visitors',
         '/birthday-club-calendar',
         '/only-blood-in-the-clocktower',
       ],
