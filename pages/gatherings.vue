@@ -72,7 +72,7 @@
             <template v-if="isSpookyGameDay(event)">
               Celebrate Halloween with Pair of Dice × Saujana at Richeese Factory, the Curve. Join us for Blood on the Clocktower, 20+ board games, Riichi Mahjong and Halloween Bingo, plus a lucky draw and a costume contest with prizes. Come dressed in your Halloween best for an afternoon and evening of games and good company. Entry is free with a minimum RM20 food purchase at Richeese Factory.
             </template>
-            <template v-else>{{ event.description }}</template>
+            <template v-else>{{ getGatheringDescription(event) }}</template>
           </div>
 
           <div v-if="isSpookyGameDay(event) && activeTab === 'present'" class="external-rsvp">
@@ -356,6 +356,8 @@
 </template>
 
 <script setup>
+import { getGatheringDescription } from '~/utils/gatheringDescriptions'
+
 const supabase = useSupabase()
 const route = useRoute()
 
