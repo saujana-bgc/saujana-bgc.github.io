@@ -25,7 +25,22 @@
         tabindex="-1"
         :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
       >
-        <div v-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
+        <div v-if="hasFlyer(event)" class="event-flyer-wrap">
+          <a :href="getFlyerUrl(event)" class="event-flyer-link" target="_blank" rel="noopener noreferrer" :aria-label="`Open the full-size flyer for ${event.name}`">
+            <img
+              :src="getFlyerUrl(event)"
+              :alt="`Event flyer for ${event.name}.`"
+              class="event-flyer-image"
+              :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
+              :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
+              decoding="async"
+              @error="markFlyerUnavailable(event.id)"
+            />
+            <span class="event-flyer-open">View full-size flyer <span aria-hidden="true">↗</span></span>
+          </a>
+        </div>
+
+        <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
           <div class="event-image-content">
             <h2 class="hero-title event-image-title">{{ event.name }}</h2>
           </div>
@@ -46,13 +61,20 @@
         </div>
 
         <div class="event-facts">
-          <time class="event-fact" :datetime="event.date">{{ formatDate(event.date) }}</time>
-          <span v-if="event.time" class="event-fact">{{ event.time }}</span>
-          <span v-if="event.venue" class="event-fact">{{ event.venue }}</span>
+          <time v-if="!hasFlyer(event)" class="event-fact" :datetime="event.date">{{ formatDate(event.date) }}</time>
+          <span v-if="!hasFlyer(event) && event.time" class="event-fact">{{ event.time }}</span>
+          <span v-if="!hasFlyer(event) && event.venue" class="event-fact">{{ event.venue }}</span>
           <a v-if="event.venue_url" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
-        <p class="event-games-note">
+        <div v-if="hasFlyer(event)" class="signup-sr-only">
+          <h2>{{ event.name }}</h2>
+          <p>{{ formatDate(event.date) }}<template v-if="event.time">, {{ event.time }}</template><template v-if="event.venue"> at {{ event.venue }}</template>.</p>
+          <p>{{ getGatheringDescription(event) }}</p>
+          <p>Board games and riichi mahjong are included. <template v-if="isClocktowerEvent(event)">Blood on the Clocktower is also played.</template></p>
+        </div>
+
+        <p v-if="!hasFlyer(event)" class="event-games-note">
           <strong>At every gathering</strong> Board games and riichi mahjong
           <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Plus, Blood on the Clocktower</span></template>
         </p>
@@ -63,7 +85,7 @@
         </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
-          <div class="event-description">
+          <div v-if="!hasFlyer(event)" class="event-description">
             <template v-if="isSpookyGameDay(event)">
               Celebrate Halloween with Pair of Dice × Saujana at Richeese Factory, the Curve. Join us for Blood on the Clocktower, 20+ board games, Riichi Mahjong and Halloween Bingo, plus a lucky draw and a costume contest with prizes. Come dressed in your Halloween best for an afternoon and evening of games and good company. Entry is free with a minimum RM20 food purchase at Richeese Factory.
             </template>
@@ -91,7 +113,7 @@
               </div>
               <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
                 <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
-                <p v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
+                <p v-if="activeTab === 'present' && !isSpookyGameDay(event) && !hasFlyer(event)" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
               </div>
               <form
                 v-else
@@ -356,6 +378,7 @@ import { getGatheringDescription } from '~/utils/gatheringDescriptions'
 
 const supabase = useSupabase()
 const route = useRoute()
+const unavailableFlyerIds = ref(new Set())
 
 const PAGE_SIZE = 10
 const MINIMUM_SPEND = 10
@@ -584,6 +607,19 @@ function getEventImage(event) {
     return isSpookyGameDay(event) ? '/images/venues/richeese.png' : getVenueImage(event.venue)
 }
 
+function hasFlyer(event) {
+    return Boolean(event?.flyer_path) && !unavailableFlyerIds.value.has(event.id)
+}
+
+function getFlyerUrl(event) {
+    if (!event?.flyer_path) return ''
+    return supabase.storage.from('event-flyers').getPublicUrl(event.flyer_path).data.publicUrl
+}
+
+function markFlyerUnavailable(eventId) {
+    unavailableFlyerIds.value = new Set([...unavailableFlyerIds.value, eventId])
+}
+
 function getEventImageAspectRatio(event) {
     if (isSpookyGameDay(event)) return '3 / 4'
     const image = getEventImage(event)
@@ -668,7 +704,7 @@ function findEventById(eventId) {
 async function getPresentEvents() {
     const { data: events, error } = await supabase
         .from('events')
-        .select('id,name,date,description,venue,venue_url,time')
+        .select('id,name,date,description,venue,venue_url,time,flyer_path')
         .gte('date', todayIso())
         .order('date', { ascending: true })
 
@@ -681,7 +717,7 @@ async function getPresentEvents() {
 async function getPastEvents() {
     const { data: events, error } = await supabase
         .from('events')
-        .select('id,name,date,description,venue,venue_url,time')
+        .select('id,name,date,description,venue,venue_url,time,flyer_path')
         .lt('date', todayIso())
         .order('date', { ascending: false })
         .limit(5)
@@ -1236,6 +1272,51 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     background: #211e1b;
     box-shadow: 0 18px 42px rgba(74, 68, 63, 0.14);
     isolation: isolate;
+}
+
+.event-flyer-wrap {
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(53, 76, 62, 0.2);
+    border-radius: 20px;
+    background: var(--surface-soft);
+    box-shadow: 0 12px 32px rgba(74, 68, 63, 0.12);
+}
+
+.event-flyer-link {
+    display: block;
+    position: relative;
+    color: inherit;
+    line-height: 0;
+}
+
+.event-flyer-image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.event-flyer-open {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 999px;
+    background: rgba(31, 58, 46, 0.9);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 650;
+    line-height: 1.2;
+}
+
+.event-flyer-link:focus-visible {
+    outline: 3px solid var(--matcha-leaf);
+    outline-offset: -4px;
+}
+
+.event-flyer-link:hover .event-flyer-open {
+    background: #1f3a2e;
 }
 
 .event-image-wrap::after {
