@@ -70,7 +70,6 @@
         <div v-if="hasFlyer(event)" class="signup-sr-only">
           <h2>{{ event.name }}</h2>
           <p>{{ formatDate(event.date) }}<template v-if="event.time">, {{ event.time }}</template><template v-if="event.venue"> at {{ event.venue }}</template>.</p>
-          <p v-if="event.description">{{ event.description }}</p>
           <p>Board games and riichi mahjong are included. <template v-if="isClocktowerEvent(event)">Blood on the Clocktower is also played.</template></p>
         </div>
 
@@ -85,7 +84,7 @@
         </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
-          <div v-if="!hasFlyer(event) && event.description" class="event-description">
+          <div v-if="event.description" class="event-description">
             {{ event.description }}
           </div>
 
