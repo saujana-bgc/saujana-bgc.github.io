@@ -3,7 +3,7 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board game and mahjong meet-ups</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Board games and riichi mahjong at every gathering, with Clocktower on selected dates. Everyone’s welcome.</div>
+      <div class="stats-container">Board games, riichi mahjong and, on selected dates, Blood on the Clocktower. Everyone’s welcome.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -37,8 +37,9 @@
         </div>
 
         <p class="event-games-note">
-          <strong>At every gathering</strong> Board games and riichi mahjong
-          <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Plus, Blood on the Clocktower</span></template>
+          <strong>Games at the table</strong>
+          <span>Board games · Riichi mahjong</span>
+          <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Blood on the Clocktower</span></template>
         </p>
 
         <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-rsvp-actions">
@@ -2158,21 +2159,13 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-card:has(.event-flyer-image),
 .event-card:has(.event-image-wrap) {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, .9fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
   align-items: start;
   column-gap: 28px;
 }
-.event-card:has(.event-flyer-image) > .event-heading,
-.event-card:has(.event-image-wrap) > .event-heading { grid-column: 1; grid-row: 1; }
-.event-card:has(.event-flyer-image) > .event-facts,
-.event-card:has(.event-image-wrap) > .event-facts { grid-column: 1; grid-row: 2; }
-.event-card:has(.event-flyer-image) > .event-games-note,
-.event-card:has(.event-image-wrap) > .event-games-note { grid-column: 1; grid-row: 3; }
-.event-card:has(.event-flyer-image) > .event-rsvp-actions,
-.event-card:has(.event-image-wrap) > .event-rsvp-actions { grid-column: 1; grid-row: 4; }
 .event-card:has(.event-flyer-image) > .event-flyer-image,
 .event-card:has(.event-image-wrap) > .event-image-wrap {
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 1 / span 4;
   width: 100%;
   max-width: 100%;
@@ -2180,7 +2173,22 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   height: auto;
   margin: 0;
   object-fit: contain;
-  align-self: center;
+  align-self: start;
+}
+.event-card:has(.event-flyer-image) > .event-heading,
+.event-card:has(.event-image-wrap) > .event-heading { grid-column: 2; grid-row: 1; }
+.event-card:has(.event-flyer-image) > .event-facts,
+.event-card:has(.event-image-wrap) > .event-facts { grid-column: 2; grid-row: 2; }
+.event-card:has(.event-flyer-image) > .event-games-note,
+.event-card:has(.event-image-wrap) > .event-games-note { grid-column: 2; grid-row: 3; }
+.event-card:has(.event-flyer-image) > .event-rsvp-actions,
+.event-card:has(.event-image-wrap) > .event-rsvp-actions { grid-column: 2; grid-row: 4; }
+.event-card .event-games-note {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0;
+  background: transparent;
 }
 .event-card:has(.event-flyer-image) > .event-description,
 .event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 5; }
@@ -2202,9 +2210,17 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .event-card:has(.event-flyer-image) > .event-flyer-image,
   .event-card:has(.event-image-wrap) > .event-image-wrap {
     order: -1;
-    max-height: 300px;
+    width: 100%;
+    max-height: none;
     margin: 0 auto 18px;
   }
+  .event-card:has(.event-flyer-image) > .event-rsvp-actions,
+  .event-card:has(.event-image-wrap) > .event-rsvp-actions { order: 3; }
+  .event-card:has(.event-flyer-image) > .event-games-note,
+  .event-card:has(.event-image-wrap) > .event-games-note { order: 4; }
+  .event-description { order: 5; }
+  .gatherings-main > .tabs { margin-top: 0; }
+  .page-intro .stats-container { max-width: 340px; margin-inline: auto; }
   .first-time-panel { padding: 14px 18px; }
   .tabs { margin: 8px auto 18px; }
   .event-card { padding: 18px; }
@@ -2216,7 +2232,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .signup-section { margin-bottom: 20px; }
 .signup-minimum-note { margin: 4px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
 .signup-form-footer .signup-minimum-note { flex-basis: 100%; margin: -4px 0 2px; }
-.event-rsvp-actions > .btn-add { min-height: 46px; padding-inline: 20px; font-weight: 700; }
+.event-rsvp-actions > .btn-add { min-height: 46px; padding-inline: 20px; font-weight: 700; background: var(--matcha-leaf); color: var(--white-pure); }
 .signup-welcome-note { flex-basis: 100%; color: var(--muted); font-size: .82rem; line-height: 1.5; }
 .signup-form {
     padding: 24px;
