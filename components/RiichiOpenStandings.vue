@@ -1,7 +1,7 @@
 <template>
   <div class="event-results">
     <header class="results-heading">
-      <div><h2>Follow the field</h2><p>Find your table, follow the qualifiers and see who makes the final.</p></div>
+      <div><h2>{{ event?.stage === 'completed' ? 'Final standings' : 'Follow the field' }}</h2><p>{{ event?.stage === 'completed' ? 'See the champion, final table and certified qualification scores.' : 'Find your table, follow the qualifiers and see who makes the final.' }}</p></div>
       <UButton class="refresh-button" variant="outline" color="neutral" :disabled="refreshing" @click="$emit('refresh')">{{ refreshing ? 'Updating…' : '↻ Refresh' }}</UButton>
     </header>
 
