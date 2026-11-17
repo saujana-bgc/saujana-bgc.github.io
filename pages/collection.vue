@@ -643,18 +643,27 @@ main:has(.collection-search) { gap: 10px; }
 main:has(.collection-search) > .collection-search { margin-bottom: 0; }
 main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; }
 .collection-search { flex-direction: column; align-items: stretch; gap: 7px; }
+.collection-search {
+  width: min(960px, calc(100% - 40px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 16px;
+}
+.collection-search-input { grid-column: 1 / -1; }
 .collection-search-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .collection-result-count, .collection-updated { margin: 0; }
 .collection-search-meta .collection-result-count { color: var(--matcha-leaf); font-size: .78rem; font-weight: 600; }
 .collection-search-meta .collection-updated { font-size: .72rem; }
-.collection-search-clear { align-self: flex-end; }
+.collection-search-clear { align-self: center; justify-self: end; }
 .sort-controls { gap: 9px; }
 .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.surprise-action { align-self: flex-start; min-height: 44px; padding: 8px 13px; color: var(--matcha-leaf); background: var(--surface-soft); border-color: var(--line); border-radius: 6px; font-size: .82rem; font-weight: 600; text-decoration: none; }
+.surprise-action { align-self: center; justify-self: end; min-height: 44px; padding: 8px 13px; color: var(--matcha-leaf); background: var(--surface-soft); border-color: var(--line); border-radius: 6px; font-size: .82rem; font-weight: 600; text-decoration: none; }
 .surprise-action.active { color: var(--clay-text); border-color: var(--matcha-leaf); background: var(--surface-soft); }
 .surprise-action:hover { background: var(--white-pure); }
 @media (max-width: 480px) {
-  .collection-search { align-items: center; }
+  .collection-search { align-items: center; grid-template-columns: 1fr; }
+  .collection-search-input { grid-column: 1; }
   .collection-search-meta { width: 100%; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }

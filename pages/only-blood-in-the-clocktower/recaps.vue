@@ -3,8 +3,8 @@
     <header class="page-intro">
       <p class="page-eyebrow">Clocktower</p>
       <h1 class="hero-title">Recaps</h1>
-      <p class="stats-container">Read stories, game results and approved photos from past Only Blood in the Clocktower gatherings.</p>
-      <NuxtLink class="recaps-overview-link" to="/only-blood-in-the-clocktower/" no-prefetch>Only Blood in the Clocktower overview <span aria-hidden="true">→</span></NuxtLink>
+      <p class="stats-container">Stories, results and approved photos from our Blood on the Clocktower gatherings.</p>
+      <NuxtLink class="recaps-overview-link" to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower overview <span aria-hidden="true">→</span></NuxtLink>
     </header>
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header class="archive-heading">

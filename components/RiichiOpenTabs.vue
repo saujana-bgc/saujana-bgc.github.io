@@ -51,8 +51,10 @@ function moveTab(direction) {
   margin: 0 auto 18px;
   padding: 5px;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface-soft);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
 }
 
 .riichi-tabs button {
@@ -60,11 +62,13 @@ function moveTab(direction) {
   flex: 1;
   min-height: 46px;
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-size: .88rem;
+  font-size: .8rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -88,7 +92,7 @@ function moveTab(direction) {
   color: var(--matcha-leaf);
 }
 
-.riichi-tabs button.active { background: var(--matcha-leaf); color: white; box-shadow: none; }
+.riichi-tabs button.active { background: transparent; color: var(--matcha-leaf); box-shadow: inset 0 -2px 0 var(--matcha-leaf); }
 
 .riichi-tabs button.active::after {
   transform: scaleX(0);
