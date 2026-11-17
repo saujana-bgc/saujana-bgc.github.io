@@ -227,14 +227,6 @@ function resetForm() {
   align-self: end;
 }
 
-.birthday-heading .page-eyebrow {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.birthday-heading .page-eyebrow::before,
-.birthday-heading .page-eyebrow::after { content: none; }
-
 .birthday-heading .hero-title { font-size: clamp(2rem, 6vw, 3.5rem); }
 
 .birthday-intro-copy {
@@ -446,14 +438,14 @@ function resetForm() {
 
 @media (max-width: 560px) {
   .birthday-intro {
-    grid-template-columns: minmax(0, 1fr) clamp(132px, 40vw, 176px);
+    grid-template-columns: minmax(0, 1fr) clamp(112px, 32vw, 148px);
     grid-template-areas: 'heading mika' 'intro intro';
     gap: 4px 12px;
     padding: 0 16px 16px;
   }
 
   .birthday-heading { align-self: center; }
-  .birthday-heading .hero-title { font-size: clamp(1.7rem, 8.2vw, 2.65rem); }
+  .birthday-heading .hero-title { font-size: clamp(1.7rem, 7.4vw, 2.3rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {

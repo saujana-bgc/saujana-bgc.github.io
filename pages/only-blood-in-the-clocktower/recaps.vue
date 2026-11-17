@@ -7,7 +7,7 @@
       <NuxtLink class="recaps-overview-link" to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower overview <span aria-hidden="true">→</span></NuxtLink>
     </header>
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
-      <header class="archive-heading">
+      <header v-if="loading || error || recapSessions.length" class="archive-heading">
         <h2 id="archive-title" tabindex="-1">Gathering recaps</h2>
       </header>
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">

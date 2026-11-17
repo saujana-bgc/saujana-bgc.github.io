@@ -1293,7 +1293,7 @@ onBeforeUnmount(() => {
   .calculator-page { width: min(620px, calc(100% - 24px)); padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
   .calculator-page.result-panel-visible { padding-bottom: calc(min(35vh, 250px) + 24px + env(safe-area-inset-bottom)); }
   .calculator-page .calculator-heading { margin: 0 auto 10px; padding-top: 0; }
-  .calculator-heading .page-eyebrow { margin: 0 0 2px; font-size: .65rem; }
+  .calculator-heading .page-eyebrow { margin-bottom: 10px; }
   .calculator-heading .hero-title { font-size: clamp(1.65rem, 7vw, 2.25rem); line-height: 1.1; }
   .calculator-heading > .calculator-description { margin-top: 4px; font-size: .76rem; line-height: 1.4; }
   .tutorial-trigger { margin-top: 8px; }

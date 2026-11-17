@@ -4,7 +4,6 @@
       <h1 class="hero-title">Riichi Mahjong</h1>
       <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? Riichi is Japanese mahjong for four players, and the fun is spotting which tiles fit.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
-      <p class="activity-welcome">We play riichi mahjong and board games at the same weekly gathering. Come on your own and ask a host to show you the table.</p>
     </header>
 
     <section class="activity-content" aria-labelledby="first-hand-title">
@@ -38,7 +37,6 @@
 .activity-page .page-intro { padding-inline: 0; }
 .activity-page .stats-container { max-width: 580px; }
 .activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--matcha-leaf); color: white; font-weight: 650; text-decoration: none; }
-.activity-welcome { max-width: 560px; margin: 12px auto 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
 .activity-content { margin: 18px auto 34px; }
 .activity-copy h2,.activity-tools h2 { margin: 0 0 12px; color: var(--matcha-leaf); font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.2 var(--font-display); }
 .activity-copy p:not(.page-eyebrow) { max-width: 560px; color: var(--muted); line-height: 1.75; }

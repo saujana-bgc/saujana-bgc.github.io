@@ -752,8 +752,8 @@ onUnmounted(() => {
 }
 
 @media (min-width: 768px) {
-    .session-card { border-radius: var(--radius-card); padding: 40px; }
-    .game-pill { font-size: 0.72rem; padding: 8px 18px; }
+    .session-card { border-radius: var(--radius-card); padding: clamp(24px, 3vw, 30px); }
+    .game-pill { font-size: 0.78rem; padding: 8px 13px; }
 }
 
 @media (max-width: 767px) {

@@ -18,8 +18,6 @@
         <div class="collection-search-meta">
           <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
         </div>
-        <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="collection-search-clear" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
-        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'Browse games with no plays logged' }}</UButton>
       </div>
 
       <details class="sort-controls collection-filters fade-up">
@@ -32,6 +30,10 @@
           <div class="collection-category-options" role="group" aria-label="Filter by category">
             <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
           </div>
+          <div class="collection-category-options" role="group" aria-label="Filter by play history">
+            <UButton class="sort-btn category-btn" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'No plays logged' }}</UButton>
+          </div>
+          <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="sort-btn clear-collection-filters" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
         </div>
       </details>
 
@@ -410,27 +412,6 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
     box-shadow: 0 0 0 3px rgba(107, 122, 104, 0.1);
 }
 
-.collection-search-clear {
-    border: none;
-    border-radius: 40px;
-    background: var(--lavender-mist);
-    color: var(--matcha-leaf);
-    cursor: pointer;
-    flex-shrink: 0;
-    font-family: inherit;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    padding: 12px 16px;
-    text-transform: uppercase;
-    transition: opacity 0.2s, transform 0.2s;
-}
-
-.collection-search-clear:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
-}
-
 .loading-copy {
     grid-column: 1 / -1;
     color: var(--matcha-leaf);
@@ -655,12 +636,9 @@ main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; 
 .collection-result-count, .collection-updated { margin: 0; }
 .collection-search-meta .collection-result-count { color: var(--matcha-leaf); font-size: .78rem; font-weight: 600; }
 .collection-search-meta .collection-updated { font-size: .72rem; }
-.collection-search-clear { align-self: center; justify-self: end; }
 .sort-controls { gap: 9px; }
 .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.surprise-action { align-self: center; justify-self: end; min-height: 44px; padding: 8px 13px; color: var(--matcha-leaf); background: var(--surface-soft); border-color: var(--line); border-radius: 6px; font-size: .82rem; font-weight: 600; text-decoration: none; }
-.surprise-action.active { color: var(--clay-text); border-color: var(--matcha-leaf); background: var(--surface-soft); }
-.surprise-action:hover { background: var(--white-pure); }
+.clear-collection-filters { justify-self: start; color: var(--muted); }
 @media (max-width: 480px) {
   .collection-search { align-items: center; grid-template-columns: 1fr; }
   .collection-search-input { grid-column: 1; }

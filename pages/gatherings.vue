@@ -2145,7 +2145,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
 .event-card { max-width: 960px; border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
-.page-intro .page-eyebrow { margin-bottom: 10px; letter-spacing: .16em; }
+.page-intro .page-eyebrow { margin-bottom: 10px; }
 .page-intro .stats-container { margin-top: 12px; }
 .gatherings-main > .tabs { margin-top: 0; }
 .page-intro {
@@ -2156,8 +2156,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   padding-bottom: 14px;
 }
 .page-intro .page-eyebrow { justify-content: flex-start; }
-.page-intro .page-eyebrow::after { display: none; }
-.page-intro .page-eyebrow::before { width: 22px; }
 .page-intro .hero-title { text-align: left; }
 .page-intro .stats-container { max-width: 460px; margin: 12px 0 0; }
 .gatherings-main > .tabs {

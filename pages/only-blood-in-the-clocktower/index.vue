@@ -13,7 +13,7 @@
           <svg v-else viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="22" height="21" rx="2"/><path d="M5 13h22M11 4v6m10-6v6m-5 6v8m-4-4h8"/></svg>
         </div>
         <div class="next-copy">
-          <p class="eyebrow">Next Only Blood in the Clocktower gathering</p>
+          <p class="eyebrow">Next Clocktower gathering</p>
           <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
           <p v-if="nextGathering?.time">{{ nextGathering.time }}</p>
           <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions ↗</a></p>

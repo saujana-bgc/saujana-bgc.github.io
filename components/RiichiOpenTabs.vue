@@ -47,7 +47,7 @@ function moveTab(direction) {
 .riichi-tabs {
   display: flex;
   gap: 5px;
-  width: 100%;
+  width: min(100%, 560px);
   margin: 0 auto 18px;
   padding: 5px;
   border: 1px solid var(--line);
@@ -59,7 +59,7 @@ function moveTab(direction) {
 
 .riichi-tabs button {
   position: relative;
-  flex: 1;
+  flex: 1 1 0;
   min-height: 46px;
   padding: 12px 16px;
   border-radius: 0;
@@ -109,5 +109,10 @@ function moveTab(direction) {
   .riichi-tabs button::after {
     transition: none;
   }
+}
+
+@media (max-width: 480px) {
+  .riichi-tabs { margin-bottom: 12px; }
+  .riichi-tabs button { padding-inline: 10px; font-size: .72rem; }
 }
 </style>
