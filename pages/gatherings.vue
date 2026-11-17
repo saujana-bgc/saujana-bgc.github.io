@@ -613,7 +613,8 @@ function hasFlyer(event) {
 
 function getFlyerUrl(event) {
     if (!event?.flyer_path) return ''
-    return supabase.storage.from('event-flyers').getPublicUrl(event.flyer_path).data.publicUrl
+    const encodedPath = event.flyer_path.split('/').map(part => encodeURIComponent(part)).join('/')
+    return `${supabase.baseUrl}/storage/v1/object/public/event-flyers/${encodedPath}`
 }
 
 function markFlyerUnavailable(eventId) {
