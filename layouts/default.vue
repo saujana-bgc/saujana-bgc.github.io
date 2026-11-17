@@ -77,7 +77,7 @@ const navigation = computed(() => [
     type: 'trigger',
     active: ['/board-games', '/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
     children: [
-      { label: 'Overview', to: '/board-games/', prefetch: false },
+      { label: 'Board Games overview', to: '/board-games/', prefetch: false },
       { label: 'Collection', to: '/collection/', prefetch: false },
       { label: 'Play History', to: '/playlog/', prefetch: false },
     ],
