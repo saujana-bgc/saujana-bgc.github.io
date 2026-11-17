@@ -13,7 +13,7 @@
           Upcoming
         </UButton>
         <UButton :class="['tab', activeTab === 'past' ? 'tab-active' : '']" :aria-pressed="activeTab === 'past'" @click="switchTab('past')">
-          Past
+          Recent
         </UButton>
       </div>
 
@@ -58,6 +58,11 @@
 
         <div v-else class="event-heading">
           <h2 class="hero-title">{{ event.name }}</h2>
+        </div>
+
+        <div v-if="hasFlyer(event) && canEditEvent(event) && activeTab !== 'past' && !newRows[event.id]" class="event-flyer-actions">
+          <UButton :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
+          <span>RM10 minimum spend per person. Pay at the counter after ordering.</span>
         </div>
 
         <div class="event-facts">
@@ -107,7 +112,7 @@
                 <p>{{ signupSuccess[event.id] }}</p>
                 <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
               </div>
-              <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
+              <div v-if="!newRows[event.id] && !hasFlyer(event)" class="attendees-actions attendees-actions-primary">
                 <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
                 <p v-if="activeTab === 'present' && !isSpookyGameDay(event) && !hasFlyer(event)" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
               </div>
@@ -1292,17 +1297,27 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 
 .event-flyer-open {
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
+    display: block;
     padding: 8px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    border-radius: 999px;
-    background: rgba(31, 58, 46, 0.9);
-    color: white;
+    color: var(--matcha-leaf);
     font-size: 0.8rem;
     font-weight: 650;
     line-height: 1.2;
+    text-align: right;
+}
+
+.event-flyer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin: 0 0 16px;
+}
+
+.event-flyer-actions > span {
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.5;
 }
 
 .event-flyer-link:focus-visible {
@@ -1475,9 +1490,10 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-description {
     margin-bottom: 18px;
     font-size: 0.98rem;
-    font-weight: 300;
-    line-height: 1.7;
-    opacity: 0.85;
+    font-weight: 400;
+    line-height: 1.75;
+    white-space: pre-line;
+    opacity: 1;
 }
 
 .event-quick-details {
