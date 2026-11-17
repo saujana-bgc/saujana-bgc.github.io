@@ -112,14 +112,6 @@
       </div>
     </section>
 
-    <section class="social-note" aria-label="Follow Saujana on Instagram">
-      <div>
-        <h2 class="story-title">A little look around</h2>
-        <p>Photos and recaps from the community</p>
-      </div>
-      <SocialLink channel="instagram" label="See gathering photos on Instagram" />
-    </section>
-
     <section class="home-section" aria-labelledby="community-values-title">
       <h2 id="community-values-title" class="hero-title story-title">Good company is something we make</h2>
       <p class="section-intro">In Malay, <em>saujana</em> evokes an expanse as far as the eye can see. To us, it’s another game to try, another story to hear, someone new to meet.</p>
@@ -498,24 +490,6 @@ const expectations = [
 }
 
 .community-card .text-link span { flex-shrink: 0; }
-.social-note {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px 16px;
-  margin-top: clamp(28px, 4vw, 48px);
-  padding: 16px 0 4px;
-  border-top: 1px solid var(--line);
-}
-
-.social-note p {
-  margin: 4px 0 0;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.social-note h2 { margin: 0; color: var(--matcha-leaf); font: 400 1.35rem/1.3 var(--font-display); }
 
 .care-guide { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 28px; }
 .pillar {
