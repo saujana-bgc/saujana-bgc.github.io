@@ -36,8 +36,7 @@
           <a v-if="event.venue_url" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
-        <p class="event-games-note">
-          <strong>Games at the table</strong>
+        <p v-if="activeTab !== 'past' || expandedEvents.has(event.id)" class="event-games-note">
           <span>Board games · Riichi mahjong</span>
           <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Blood on the Clocktower</span></template>
         </p>
@@ -2149,6 +2148,55 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .page-intro .page-eyebrow { margin-bottom: 10px; letter-spacing: .16em; }
 .page-intro .stats-container { margin-top: 12px; }
 .gatherings-main > .tabs { margin-top: 0; }
+.page-intro {
+  width: min(calc(100% - 40px), 960px);
+  box-sizing: border-box;
+  text-align: left;
+  padding-inline: 0;
+}
+.page-intro .page-eyebrow { justify-content: flex-start; }
+.page-intro .page-eyebrow::after { display: none; }
+.page-intro .page-eyebrow::before { width: 22px; }
+.page-intro .hero-title { text-align: left; }
+.page-intro .stats-container { max-width: 460px; margin: 12px 0 0; }
+.gatherings-main > .tabs {
+  width: min(calc(100% - 40px), 960px);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-start;
+  gap: 28px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+.gatherings-main > .tabs .tab {
+  position: relative;
+  min-height: 48px;
+  padding: 10px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: .8rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.gatherings-main > .tabs .tab-active {
+  color: var(--matcha-leaf);
+  background: transparent;
+  box-shadow: none;
+}
+.gatherings-main > .tabs .tab-active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--matcha-leaf);
+  content: '';
+}
 .event-card > .event-heading { margin: 0 0 10px; text-align: left; }
 .event-card > .event-heading .hero-title { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); }
 .event-rsvp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 16px; }
@@ -2188,10 +2236,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-card:has(.event-image-wrap) > .event-rsvp-actions { grid-column: 2; grid-row: 4; }
 .event-card .event-games-note {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
   padding: 0;
   background: transparent;
+  color: var(--muted);
+  font-size: .84rem;
+  line-height: 1.55;
 }
 .event-card:has(.event-flyer-image) > .event-description,
 .event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 5; }
@@ -2222,11 +2274,13 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .event-card:has(.event-flyer-image) > .event-games-note,
   .event-card:has(.event-image-wrap) > .event-games-note { order: 4; }
   .event-description { order: 5; }
+  .event-card:has(.event-flyer-image) > .attendees-section,
+  .event-card:has(.event-image-wrap) > .attendees-section { order: 6; }
   .gatherings-main > .tabs { margin-top: 0; }
   .page-intro { padding-bottom: 16px; }
-  .page-intro .stats-container { max-width: 340px; margin-inline: auto; }
+  .page-intro .stats-container { max-width: 340px; margin-inline: 0; }
   .first-time-panel { padding: 14px 18px; }
-  .tabs { margin: 8px auto 18px; }
+  .gatherings-main > .tabs { margin: 0 auto 18px; gap: 24px; }
   .event-card { padding: 18px; }
   .event-image-wrap { margin-bottom: 14px; }
   .event-quick-details { margin-top: 8px; }
