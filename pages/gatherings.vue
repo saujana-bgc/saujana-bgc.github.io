@@ -25,7 +25,32 @@
         tabindex="-1"
         :data-collapsed="activeTab === 'past' && !expandedEvents.has(event.id)"
       >
-        <div v-if="hasFlyer(event)" class="event-flyer-wrap">
+        <div class="event-heading">
+          <h2 class="hero-title">{{ event.name }}</h2>
+        </div>
+
+        <div class="event-facts">
+          <time class="event-fact" :datetime="event.date">{{ formatDate(event.date) }}</time>
+          <span v-if="event.time" class="event-fact">{{ event.time }}</span>
+          <span v-if="event.venue" class="event-fact">{{ event.venue }}</span>
+          <a v-if="event.venue_url" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
+        </div>
+
+        <p class="event-games-note">
+          <strong>At every gathering</strong> Board games and riichi mahjong
+          <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Plus, Blood on the Clocktower</span></template>
+        </p>
+
+        <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-rsvp-actions">
+          <div v-if="signupSuccess[event.id]" class="signup-success" role="status">
+            <p>{{ signupSuccess[event.id] }}</p>
+            <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
+          </div>
+          <UButton v-if="canEditEvent(event) && !newRows[event.id]" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
+          <span class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</span>
+        </div>
+
+        <div v-if="hasFlyer(event) && !newRows[event.id]" class="event-flyer-wrap">
           <a :href="getFlyerUrl(event)" class="event-flyer-link" target="_blank" rel="noopener noreferrer" :aria-label="`Open the full-size flyer for ${event.name}`">
             <img
               :src="getFlyerUrl(event)"
@@ -41,9 +66,6 @@
         </div>
 
         <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
-          <div class="event-image-content">
-            <h2 class="hero-title event-image-title">{{ event.name }}</h2>
-          </div>
           <img
             :src="getEventImage(event)"
             :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
@@ -56,40 +78,13 @@
           />
         </div>
 
-        <div v-else class="event-heading">
-          <h2 class="hero-title">{{ event.name }}</h2>
-        </div>
-
-        <div v-if="hasFlyer(event) && canEditEvent(event) && activeTab !== 'past' && !newRows[event.id]" class="event-flyer-actions">
-          <UButton :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
-          <span>RM10 minimum spend per person. Pay at the counter after ordering.</span>
-        </div>
-
-        <div class="event-facts">
-          <time v-if="!hasFlyer(event)" class="event-fact" :datetime="event.date">{{ formatDate(event.date) }}</time>
-          <span v-if="!hasFlyer(event) && event.time" class="event-fact">{{ event.time }}</span>
-          <span v-if="!hasFlyer(event) && event.venue" class="event-fact">{{ event.venue }}</span>
-          <a v-if="event.venue_url" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
-        </div>
-
-        <div v-if="hasFlyer(event)" class="signup-sr-only">
-          <h2>{{ event.name }}</h2>
-          <p>{{ formatDate(event.date) }}<template v-if="event.time">, {{ event.time }}</template><template v-if="event.venue"> at {{ event.venue }}</template>.</p>
-          <p>Board games and riichi mahjong are included. <template v-if="isClocktowerEvent(event)">Blood on the Clocktower is also played.</template></p>
-        </div>
-
-        <p v-if="!hasFlyer(event)" class="event-games-note">
-          <strong>At every gathering</strong> Board games and riichi mahjong
-          <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Plus, Blood on the Clocktower</span></template>
-        </p>
-
         <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>Look back at this gathering</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
         </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
-          <div v-if="event.description" class="event-description">
+          <div v-if="event.description && !newRows[event.id]" class="event-description">
             {{ event.description }}
           </div>
 
@@ -108,14 +103,6 @@
               <UButton type="button" size="sm" @click="retryAttendees(event)">Try again</UButton>
             </p>
             <div v-if="canEditEvent(event)" class="signup-section">
-              <div v-if="signupSuccess[event.id]" class="signup-success" role="status">
-                <p>{{ signupSuccess[event.id] }}</p>
-                <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
-              </div>
-              <div v-if="!newRows[event.id] && !hasFlyer(event)" class="attendees-actions attendees-actions-primary">
-                <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
-                <p v-if="activeTab === 'present' && !isSpookyGameDay(event) && !hasFlyer(event)" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
-              </div>
               <form
                 v-if="newRows[event.id]"
                 :ref="el => setSignupFormRef(event.id, el)"
@@ -124,6 +111,10 @@
                 :aria-busy="Boolean(savingRows[event.id])"
                 @submit.prevent="saveNewRow(event.id)"
               >
+                <div class="signup-form-heading">
+                  <h4>Sign up for {{ event.name }}</h4>
+                  <p>Your name will appear in the attendee list. {{ activeTab === 'present' ? 'RM10 minimum spend per person, payable at the counter after ordering.' : '' }}</p>
+                </div>
                 <fieldset class="signup-fields" :disabled="savingRows[event.id]">
                   <legend class="signup-sr-only">Your details</legend>
                   <div class="signup-field signup-field-name">
@@ -1060,9 +1051,34 @@ onMounted(async () => {
                     presentPage.value = Math.floor(targetIndex / PAGE_SIZE) + 1
                     await nextTick()
                     target = document.getElementById(targetId)
+                } else {
+                    const eventId = targetId.slice('gathering-'.length)
+                    const { data: matchingEvents, error } = await supabase
+                        .from('events')
+                        .select('id,name,date,description,venue,venue_url,time,flyer_path')
+                        .eq('id', eventId)
+                        .limit(1)
+                    if (error) throw error
+                    const event = matchingEvents?.[0]
+                    if (event) {
+                        const isPastEvent = event.date < todayIso()
+                        activeTab.value = isPastEvent ? 'past' : 'present'
+                        const eventList = isPastEvent ? pastEventsList : presentEventsList
+                        if (isPastEvent && !pastLoaded.value) await loadEventsForTab('past')
+                        if (!eventList.value.some(item => item.id === event.id)) {
+                            eventList.value = [...eventList.value, event]
+                        }
+                        await getAttendeesForEvents([event])
+                        if (isPastEvent) expandedEvents.add(event.id)
+                        await nextTick()
+                        target = document.getElementById(targetId)
+                    }
                 }
             }
-            target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                target.focus({ preventScroll: true })
+            }
         }
     } catch {
         showToast('We couldn’t load the gatherings. Please refresh and try again.')
@@ -2212,6 +2228,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
 .event-card { max-width: 960px; border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
+.event-card > .event-heading { margin: 0 0 10px; text-align: left; }
+.event-card > .event-heading .hero-title { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); }
+.event-rsvp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 16px; }
+.event-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+.event-facts .event-fact { color: var(--clay-text); }
+.event-card .event-flyer-wrap { margin-top: 14px; }
+.event-card .event-games-note { margin: 8px 0; }
+.event-card .signup-form-heading { margin-bottom: 14px; }
 .event-card::before { display: none; }
 .event-card:hover { transform: none; box-shadow: var(--shadow-card); }
 .event-card .hero-title { font-style: normal; }
