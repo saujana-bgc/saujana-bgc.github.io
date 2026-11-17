@@ -9,6 +9,13 @@
     </header>
 
     <main class="birthday-page" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+      <img
+        class="birthday-mika"
+        src="/images/site/mika-birthday-club.webp"
+        alt=""
+        width="140"
+        height="140"
+      >
       <section class="birthday-card fade-up" aria-label="Birthday submission form">
         <div v-if="isSubmitted" class="birthday-success" role="status">
           <div class="success-mark" aria-hidden="true">&#10022;</div>
@@ -192,6 +199,13 @@ function resetForm() {
   min-height: calc(100vh - 190px);
   padding: 0 20px 76px;
   box-sizing: border-box;
+}
+
+.birthday-mika {
+  display: block;
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
 }
 
 .birthday-card {
