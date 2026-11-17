@@ -1,24 +1,25 @@
 <template>
-  <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <header class="page-intro fade-up">
-      <p class="page-eyebrow">A little more to celebrate</p>
-      <h1 class="hero-title">Birthday Club</h1>
-      <div class="stats-container">
-        If you’d like us to remember your birthday, share your name, month and day.
-      </div>
-    </header>
+  <main class="birthday-page">
+    <section class="birthday-card fade-up" aria-labelledby="birthday-title">
+      <header class="birthday-intro">
+        <div class="birthday-heading">
+          <p class="page-eyebrow">A little more to celebrate</p>
+          <h1 id="birthday-title" class="hero-title">Birthday Club</h1>
+        </div>
+        <p class="birthday-intro-copy">
+          If you’d like us to remember your birthday, share your name, month and day.
+        </p>
+        <img
+          class="birthday-mika"
+          src="/images/site/mika-birthday-club.webp"
+          alt=""
+          width="240"
+          height="240"
+        >
+      </header>
 
-    <main class="birthday-page" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-      <img
-        class="birthday-mika"
-        src="/images/site/mika-birthday-club.webp"
-        alt=""
-        width="140"
-        height="140"
-      >
-      <section class="birthday-card fade-up" aria-label="Birthday submission form">
+      <div class="birthday-card-body">
         <div v-if="isSubmitted" class="birthday-success" role="status">
-          <div class="success-mark" aria-hidden="true">&#10022;</div>
           <p class="success-kicker">Birthday saved</p>
           <h2>Thanks, {{ submittedName }}.</h2>
           <p>Your birthday and greeting preference are on our calendar.</p>
@@ -27,7 +28,7 @@
           </UButton>
         </div>
 
-        <form v-else novalidate @submit.prevent="submitBirthday">
+        <form v-else aria-label="Birthday submission form" novalidate @submit.prevent="submitBirthday">
           <p class="privacy-note">Only the organisers can see your birthday. A public greeting is optional.</p>
           <div class="field-group">
             <label for="birthday-name">Name or nickname</label>
@@ -102,9 +103,9 @@
             {{ isSubmitting ? 'Saving your birthday…' : 'Join the Birthday Club' }}
           </UButton>
         </form>
-      </section>
-    </main>
-  </div>
+      </div>
+    </section>
+  </main>
 </template>
 
 <script setup>
@@ -196,59 +197,66 @@ function resetForm() {
 
 <style scoped>
 .birthday-page {
-  min-height: calc(100vh - 190px);
-  padding: 0 20px 76px;
-  box-sizing: border-box;
-}
-
-.birthday-mika {
-  display: block;
-  margin-bottom: var(--space-5);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
+  padding: 0 clamp(14px, 4vw, 20px) 24px;
 }
 
 .birthday-card {
-  width: 90%;
-  max-width: 900px;
-  padding: var(--section-pad);
-  box-sizing: border-box;
+  --birthday-inset: clamp(20px, 5vw, 48px);
+  max-width: 680px;
+  margin-inline: auto;
   background: var(--white-pure);
-  border: 1px solid rgba(201, 190, 239, 0.12);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold-leaf);
   border-radius: var(--radius-card);
-  box-shadow: inset 0 3px 0 var(--lavender-mid), 0 20px 60px rgba(122, 92, 76, 0.1);
+  box-shadow: var(--shadow-card);
 }
 
-.birthday-card form,
-.birthday-success {
-  width: min(620px, 100%);
-  margin: 0 auto;
+.birthday-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(190px, 35vw, 240px);
+  grid-template-rows: auto auto;
+  grid-template-areas: 'heading mika' 'intro mika';
+  align-content: center;
+  gap: 12px 16px;
+  padding: 0 clamp(12px, 4vw, 32px) 0 var(--birthday-inset);
+  background: #fcf6ef;
+  border-bottom: 1px solid var(--line);
+  border-radius: calc(var(--radius-card) - 2px) calc(var(--radius-card) - 2px) 0 0;
 }
 
-.form-heading {
-  margin-bottom: 28px;
-  padding: 22px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, rgba(237, 213, 200, 0.42), rgba(237, 232, 245, 0.62));
-  box-shadow: inset 0 3px 0 var(--gold-leaf);
-  text-align: left;
+.birthday-heading {
+  grid-area: heading;
+  align-self: end;
 }
 
-.form-heading h2 {
-  margin: 0 0 8px;
-  color: var(--matcha-leaf);
-  font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
-  font-style: italic;
-  font-weight: 400;
+.birthday-heading .page-eyebrow {
+  display: block;
+  margin-bottom: 10px;
 }
 
-.form-heading p {
+.birthday-heading .page-eyebrow::before,
+.birthday-heading .page-eyebrow::after { content: none; }
+
+.birthday-heading .hero-title { font-size: clamp(2rem, 6vw, 3.5rem); }
+
+.birthday-intro-copy {
+  grid-area: intro;
+  align-self: start;
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.75;
-  opacity: 0.82;
+  color: var(--muted);
+  font-size: .95rem;
+  text-wrap: pretty;
 }
+
+.birthday-mika {
+  grid-area: mika;
+  align-self: center;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.birthday-card-body { padding: clamp(20px, 4vw, 32px) var(--birthday-inset) var(--birthday-inset); }
 
 .field-group { margin-bottom: 22px; }
 
@@ -433,20 +441,21 @@ function resetForm() {
 .submit-button:disabled { cursor: wait; opacity: 0.62; }
 
 .birthday-success { padding: 18px 0 6px; text-align: center; }
-.success-mark { color: var(--gold-leaf); font-size: 2rem; }
 .success-kicker { margin: 16px 0 8px; color: var(--matcha-leaf); font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 .birthday-success h2 { margin: 0; color: var(--matcha-leaf); font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 6vw, 2.4rem); font-style: italic; font-weight: 400; }
 .birthday-success > p:not(.success-kicker) { max-width: 390px; margin: 18px auto 28px; line-height: 1.7; opacity: 0.72; }
 .secondary-button { width: auto; padding-left: 26px; padding-right: 26px; background: var(--lavender-mist); color: var(--matcha-leaf); box-shadow: none; }
 
-@media (max-width: 520px) {
-  .birthday-page { padding: 0 14px 58px; }
-  .birthday-card { width: 100%; padding: 26px 20px 30px; border-radius: var(--radius-card); }
-  .date-grid { grid-template-columns: 1fr; gap: 0; }
-}
+@media (max-width: 560px) {
+  .birthday-intro {
+    grid-template-columns: minmax(0, 1fr) clamp(132px, 40vw, 176px);
+    grid-template-areas: 'heading mika' 'intro intro';
+    gap: 4px 12px;
+    padding: 0 16px 16px;
+  }
 
-@media (min-width: 768px) {
-  .birthday-card { width: 92%; border-radius: var(--radius-card); }
+  .birthday-heading { align-self: center; }
+  .birthday-heading .hero-title { font-size: clamp(1.7rem, 8.2vw, 2.65rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -456,8 +465,6 @@ function resetForm() {
 
 /* Boutique surfaces and readable controls. */
 
-.birthday-page { min-height: auto; padding-bottom: 24px; }
-.birthday-card { max-width: 680px; border: 1px solid var(--line); border-top: 3px solid var(--gold-leaf); box-shadow: var(--shadow-card); padding: clamp(24px,5vw,48px); }
 .field-group label, .birthday-fields legend { font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 .field-group input, .field-group select { border-radius: 8px; border-color: var(--line); }
 .consent-row { border-radius: 8px; background: var(--surface-soft); }
