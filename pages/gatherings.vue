@@ -47,7 +47,7 @@
             <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
           </div>
           <UButton v-if="canEditEvent(event) && !newRows[event.id]" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
-          <span class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</span>
+          <span v-if="!newRows[event.id]" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</span>
         </div>
 
         <div v-if="hasFlyer(event) && !newRows[event.id]" class="event-flyer-wrap">
@@ -145,6 +145,7 @@
                 <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
                 <div class="signup-form-footer">
                   <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your sign-up…' : '' }}</p>
+                  <p class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
                   <div class="signup-submit-actions">
                     <UButton type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Signing up…' : 'Sign up' }}</UButton>
                     <UButton type="button" class="btn-cancel" :disabled="savingRows[event.id]" @click="cancelNewRow(event.id)">Cancel</UButton>
@@ -2256,6 +2257,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 /* Keep signup separate from the attendee list, with the action after the fields. */
 .signup-section { margin-bottom: 28px; }
 .signup-minimum-note { margin: 4px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
+.signup-form-footer .signup-minimum-note { flex-basis: 100%; margin: -4px 0 2px; }
+.event-rsvp-actions > .btn-add { min-height: 46px; padding-inline: 20px; font-weight: 700; }
 .signup-form {
     padding: 24px;
     border: 1px solid var(--line);

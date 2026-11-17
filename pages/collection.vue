@@ -12,7 +12,7 @@
           :ui="{ base: 'collection-search-field' }"
           v-model="search"
           type="search"
-          placeholder="Search by title, designer, category, or player count"
+          placeholder="Search games by title or designer"
           aria-label="Search the collection by title, category, player count, or designer"
         />
         <div class="collection-search-meta">

@@ -1328,6 +1328,7 @@ onBeforeUnmount(() => {
   .entry-mode strong { font-size: .75rem; }
   .entry-mode small { font-size: .72rem; line-height: 1.35; }
   .player-count-row { margin-block: 2px 7px; }
+  .calculator-form > .checkbox-row { margin-block: 4px 7px; }
   .player-count-row .choice-button { min-height: 40px; padding: 6px 8px; font-size: .68rem; }
   .field-hint, .group-count, .group-row-main > small, .group-option-grid button > span:not(.group-tile-samples), .group-yaku-choice { font-size: .76rem; }
   .calc-section { padding: 15px; }

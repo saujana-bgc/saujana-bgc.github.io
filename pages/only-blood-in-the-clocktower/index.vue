@@ -1,7 +1,7 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <h1 class="page-eyebrow">Clocktower</h1>
+      <h1 class="hero-title">Only Blood in the Clocktower</h1>
       <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
       <p class="activity-welcome">Board games and riichi mahjong are included too. New to Clocktower? The Storyteller will help you get started.</p>
     </header>
@@ -322,6 +322,7 @@ onMounted(() => {
   color: var(--ink);
 }
 .clocktower-page .page-intro { max-width: 960px; margin-inline: auto; padding-inline: 0; }
+.clocktower-page .page-intro h1 { max-width: 820px; margin-inline: auto; font-size: clamp(2.45rem, 7vw, 4.25rem); line-height: 1.08; }
 .clocktower-page .stats-container { max-width: 580px; }
 .activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--wine); color: var(--white-pure); font-weight: 700; text-decoration: none; }
 .activity-welcome { max-width: 580px; margin: 12px auto 0; color: var(--soft-ink); font-size: .9rem; line-height: 1.55; }
