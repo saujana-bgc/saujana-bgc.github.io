@@ -1,14 +1,12 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <p class="page-eyebrow">Only Blood in the Clocktower</p>
       <h1 class="hero-title">Clocktower Recaps</h1>
-      <p class="stats-container">Read stories, game results and approved photos from past Only Blood in the Clocktower gatherings, where we play Blood on the Clocktower.</p>
+      <p class="stats-container">Read stories, game results and approved photos from past Only Blood in the Clocktower gatherings.</p>
       <NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>Only Blood in the Clocktower overview →</NuxtLink>
     </header>
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header class="archive-heading">
-        <p class="eyebrow">Past games</p>
         <h2 id="archive-title" tabindex="-1">Gathering recaps</h2>
       </header>
       <div v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="archive-filters" aria-label="Filter gathering recaps">
@@ -26,7 +24,7 @@
         <p>Gathering stories, game results and approved photos will find their place here as sessions are added.</p>
       </div>
 
-      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. <UButton class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton></p>
+      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. Adjust the year or script above.</p>
       <article v-for="session in paginatedSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id, 'has-cover': session.id === featured?.id && Boolean(coverPhoto(session)) }">
         <div class="session-masthead">
           <div class="session-heading">

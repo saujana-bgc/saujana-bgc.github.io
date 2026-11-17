@@ -27,13 +27,7 @@
       >
         <div v-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
           <div class="event-image-content">
-            <span class="event-image-date">{{ formatDate(event.date) }}</span>
             <h2 class="hero-title event-image-title">{{ event.name }}</h2>
-            <div v-if="event.time || event.venue" class="event-image-details">
-              <span v-if="event.time">{{ event.time }}</span>
-              <span v-if="event.venue" class="event-detail-venue">{{ event.venue }}</span>
-            </div>
-            <a v-if="event.venue_url" class="event-photo-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
           </div>
           <img
             :src="getEventImage(event)"
@@ -48,13 +42,14 @@
         </div>
 
         <div v-else class="event-heading">
-          <span class="date-badge">🌿 {{ formatDate(event.date) }}</span>
           <h2 class="hero-title">{{ event.name }}</h2>
-          <div class="event-heading-details">
-            <span>{{ event.time }}</span>
-            <span>{{ event.venue }}</span>
-            <a v-if="event.venue_url" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions</a>
-          </div>
+        </div>
+
+        <div class="event-facts">
+          <time class="event-fact" :datetime="event.date">{{ formatDate(event.date) }}</time>
+          <span v-if="event.time" class="event-fact">{{ event.time }}</span>
+          <span v-if="event.venue" class="event-fact">{{ event.venue }}</span>
+          <a v-if="event.venue_url" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
         <p class="event-games-note">
@@ -1338,6 +1333,18 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-heading {
     margin-bottom: 8px;
 }
+
+.event-facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+    margin: 8px 0 16px;
+    color: var(--muted);
+    font-size: .84rem;
+    line-height: 1.5;
+}
+.event-directions { color: var(--matcha-leaf); font-weight: 650; text-underline-offset: 3px; }
 
 .event-games-note {
     display: flex;

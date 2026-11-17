@@ -50,7 +50,6 @@
     <section class="content-card standings-card fade-up" aria-labelledby="standings-heading">
       <div class="section-heading">
         <div>
-          <p class="section-kicker">Season table</p>
           <h2 id="standings-heading">Standings</h2>
         </div>
         <details class="league-scoring-details">

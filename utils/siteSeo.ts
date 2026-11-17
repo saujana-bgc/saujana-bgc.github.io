@@ -50,7 +50,7 @@ export const publicPages = {
     description: 'Calculate riichi mahjong scores from tiles or han and fu. Check yaku, dora, ron and tsumo payments for three-player sanma and four-player Japanese mahjong.',
   },
   '/riichi-open': {
-    title: 'Riichi Open | Saujana BGC',
+    title: 'Riichi Open I | Saujana BGC',
     description: 'See the format, schedule and standings for Riichi Open, Saujana’s Japanese mahjong tournament on 14 November 2026 at Boardroom Bandit, Ara Damansara.',
     image: '/images/riichi-open/riichi-open-i-poster.png',
   },

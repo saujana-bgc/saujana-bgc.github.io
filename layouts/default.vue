@@ -75,10 +75,11 @@ const navigation = computed(() => [
     id: 'board-games',
     label: 'Board Games',
     type: 'trigger',
-    active: ['/board-games', '/collection'].includes(route.path.replace(/\/+$/, '')),
+    active: ['/board-games', '/collection', '/playlog'].includes(route.path.replace(/\/+$/, '')),
     children: [
       { label: 'Overview', to: '/board-games/', prefetch: false },
       { label: 'Collection', to: '/collection/', prefetch: false },
+      { label: 'Play History', to: '/playlog/', prefetch: false },
     ],
   },
   {
@@ -87,7 +88,7 @@ const navigation = computed(() => [
     type: 'trigger',
     active: ['/riichi-mahjong', '/riichi-league', '/riichi-calculator', '/riichi-open'].includes(route.path.replace(/\/+$/, '')),
     children: [
-      { label: 'Overview', to: '/riichi-mahjong/', prefetch: false },
+      { label: 'Riichi Mahjong overview', to: '/riichi-mahjong/', prefetch: false },
       { label: 'Riichi League', to: '/riichi-league/', prefetch: false },
       { label: 'Riichi Calculator', to: '/riichi-calculator/', prefetch: false },
       { label: 'Riichi Open', to: '/riichi-open/', prefetch: false },
@@ -99,11 +100,10 @@ const navigation = computed(() => [
     type: 'trigger',
     active: ['/only-blood-in-the-clocktower', '/only-blood-in-the-clocktower/recaps'].includes(route.path.replace(/\/+$/, '')),
     children: [
-      { label: 'Overview', to: '/only-blood-in-the-clocktower/', prefetch: false },
+      { label: 'Clocktower overview', to: '/only-blood-in-the-clocktower/', prefetch: false },
       { label: 'Recaps', to: '/only-blood-in-the-clocktower/recaps/', prefetch: false },
     ],
   },
-  { id: 'play-history', label: 'Play History', to: '/playlog/', prefetch: false },
   { id: 'birthday-club', label: 'Birthday Club', to: '/birthday-club/', prefetch: false },
 ])
 const desktopNavigationUi = {

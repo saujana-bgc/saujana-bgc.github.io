@@ -36,6 +36,7 @@ export const communityPillars = [
     description: 'Everyone gets a secret role. Share clues and work out who the Demon is. You can watch a round first, and the Storyteller will explain your role if you decide to play.',
     links: [
       { label: 'Explore Blood on the Clocktower', to: '/only-blood-in-the-clocktower/' },
+      { label: 'Read gathering recaps', to: '/only-blood-in-the-clocktower/recaps/' },
     ],
   },
 ] as const

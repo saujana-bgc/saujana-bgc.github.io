@@ -3,7 +3,6 @@
     <section class="birthday-card fade-up" aria-labelledby="birthday-title">
       <header class="birthday-intro">
         <div class="birthday-heading">
-          <p class="page-eyebrow">A little more to celebrate</p>
           <h1 id="birthday-title" class="hero-title">Birthday Club</h1>
         </div>
         <p class="birthday-intro-copy">
@@ -20,9 +19,8 @@
 
       <div class="birthday-card-body">
         <div v-if="isSubmitted" class="birthday-success" role="status">
-          <p class="success-kicker">Birthday saved</p>
-          <h2>Thanks, {{ submittedName }}.</h2>
-          <p>Your birthday and greeting preference are on our calendar.</p>
+          <h2>Thanks, {{ submittedName }}. Your birthday is saved.</h2>
+          <p>Your greeting preference has been saved.</p>
           <UButton class="secondary-button" color="neutral" variant="outline" type="button" @click="resetForm">
             Add another birthday
           </UButton>

@@ -4,9 +4,7 @@
       <p class="page-eyebrow">Saujana’s dedicated Clocktower gatherings</p>
       <h1 class="hero-title">Only Blood in the Clocktower</h1>
       <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
-      <a class="activity-primary" href="#next-gathering">See the next gathering <span aria-hidden="true">→</span></a>
-      <p class="activity-welcome">Board games and riichi mahjong are available at this gathering too. New to Blood on the Clocktower? Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
-      <p v-if="nextGathering" class="next-date-teaser"><strong>{{ formatDate(nextGathering.date) }}</strong><span v-if="nextGathering.time"> · {{ nextGathering.time }}</span><span v-if="nextGathering.venue"> · {{ nextGathering.venue }}</span><a href="#next-gathering">Gathering details ↓</a></p>
+      <p class="activity-welcome">Board games and riichi mahjong are included too. Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
     </header>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
@@ -43,16 +41,16 @@
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
           <UButton v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</UButton>
         </div>
-        <a v-if="nextGathering" class="calendar-link" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
+        <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
         <template v-else-if="!eventLoading">
           <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next gathering <span aria-hidden="true">↗</span></a>
           <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>See all gatherings <span aria-hidden="true">↗</span></NuxtLink>
         </template>
       </section>
-      <nav class="hero-actions" aria-label="Clocktower page links">
-        <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">→</span></NuxtLink>
-      </nav>
     </div>
+    <nav class="clocktower-page-links" aria-label="Clocktower page links">
+      <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">→</span></NuxtLink>
+    </nav>
 
     <footer class="art-credit">
       <span>Blood on the Clocktower is published by <a href="https://bloodontheclocktower.com/" target="_blank" rel="noopener noreferrer">The Pandemonium Institute</a>.</span>
@@ -328,8 +326,7 @@ onMounted(() => {
 .clocktower-page .stats-container { max-width: 580px; }
 .activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--wine); color: #fffaf5; font-weight: 700; text-decoration: none; }
 .activity-welcome { max-width: 580px; margin: 12px auto 0; color: var(--soft-ink); font-size: .9rem; line-height: 1.55; }
-.next-date-teaser { max-width: 700px; margin: 14px auto 0; color: var(--soft-ink); font-size: .84rem; line-height: 1.5; }
-.next-date-teaser a { margin-inline-start: 8px; color: var(--wine); font-weight: 700; text-underline-offset: 3px; }
+.clocktower-page-links { max-width: 960px; margin: 0 auto 20px; }
 .activity-primary:hover { background: #5b303a; }
 .activity-primary:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .gathering-banner {
@@ -389,6 +386,7 @@ onMounted(() => {
   z-index: 1;
 }
 .next-night .calendar-link { grid-column: 2; justify-self: start; min-height: 46px; padding: 0 14px; border-radius: 6px; background: var(--wine); color: #fffaf5; white-space: normal; }
+.next-night .calendar-link-primary { background: var(--matcha-leaf); }
 .calendar-mark, .empty-mark {
   display: grid;
   place-items: center;

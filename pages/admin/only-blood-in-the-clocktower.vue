@@ -28,7 +28,6 @@
         </div>
         <div class="editor-heading-actions">
           <UButton v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</UButton>
-          <UButton v-if="draft.id || isDirty" type="button" :disabled="busy" @click="startNew">New gathering</UButton>
         </div>
       </div>
 

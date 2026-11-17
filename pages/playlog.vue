@@ -10,8 +10,9 @@
       <div class="search-wrap fade-up">
         <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
         <NuxtLink v-if="collectionMatch" class="context-link" :to="{ path: '/collection/', query: { game: collectionMatch.name } }" no-prefetch>Back to {{ collectionMatch.name }} in the collection <span aria-hidden="true">→</span></NuxtLink>
-        <p v-if="!isPending && !isError && filteredSessions.length && !matchingGames" class="page-hint">Select a game to see its cover and players.</p>
+        <p v-if="!isPending && !isError && filteredSessions.length && !matchingGames" class="page-hint">Choose a game to reveal its cover and players.</p>
         <p v-if="!isPending && !isError && matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
+        <UButton v-if="search" type="button" class="page-btn" @click="search = ''">Clear search</UButton>
       </div>
       <template v-if="isPending">
         <div class="loading-state loading-copy">Loading play history…</div>
@@ -23,8 +24,8 @@
         </section>
       </template>
 
-      <div v-else-if="isError" class="loading-state" role="alert">
-        <p>We couldn’t load play history. Refresh the page to try again.</p>
+        <div v-else-if="isError" class="loading-state" role="alert">
+        <p>We couldn’t load play history.</p>
         <NuxtLink class="context-link" to="/collection/" no-prefetch>Browse the collection while you’re here <span aria-hidden="true">→</span></NuxtLink>
       </div>
 

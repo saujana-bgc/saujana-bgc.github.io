@@ -3,7 +3,7 @@
     <header class="page-intro">
       <p class="page-eyebrow">Come try a game</p>
       <h1 class="hero-title">Board Games</h1>
-      <p class="stats-container">Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you and the other players write one-word clues to help someone solve it.</p>
+      <p class="stats-container">From quick party games to thoughtful strategy, choose a table that suits you. We’ll help you find a game and learn as you play.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
       <p class="activity-welcome">We play board games and riichi mahjong at the same weekly gathering. Come on your own, watch a round or ask a host to help you join in.</p>
     </header>
@@ -17,14 +17,14 @@
           <p class="page-eyebrow">What playing can look like</p>
           <h2 id="first-game-title">You can join with one good clue.</h2>
           <p>In <em>Just One</em>, everyone writes a one-word clue to help one player guess. Matching clues disappear, so clever clues help your team most.</p>
-          <p>If Monopoly or Uno are your main reference points, there’s a whole world of quick team games, clever word games and thoughtful strategy to discover. Tell a host what sounds fun and they’ll suggest a game and teach you as you go. You can watch a round first, too.</p>
+          <p>Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, everyone writes a one-word clue. Matching clues disappear, so you’ll want to think a little differently from the others.</p>
         </div>
       </ActivityOverviewFeature>
     </section>
 
     <nav class="activity-links" aria-label="Explore board games">
       <NuxtLink to="/collection/" no-prefetch><strong>Browse the collection</strong><span>See the games our hosts can bring to the table.</span><span aria-hidden="true">→</span></NuxtLink>
-      <NuxtLink to="/playlog/" no-prefetch><strong>Explore play history</strong><span>See games played at previous gatherings.</span><span aria-hidden="true">→</span></NuxtLink>
+      <NuxtLink to="/playlog/" no-prefetch><strong>Play History</strong><span>See games played at previous gatherings.</span><span aria-hidden="true">→</span></NuxtLink>
     </nav>
   </main>
 </template>

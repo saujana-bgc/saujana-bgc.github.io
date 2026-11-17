@@ -22,6 +22,8 @@
     .hero { background: var(--deep); color: #fdfcf7; border-bottom: .25rem solid #aa8a58; }
     .hero-inner { padding-block: clamp(2rem, 6vw, 4.5rem) clamp(1.75rem, 4vw, 3rem); }
     .status { margin: 0; color: #e7d6b9; font-size: .9rem; font-weight: 650; }
+    .home-link { display: inline-flex; min-height: 44px; align-items: center; color: #f3f6ef; font-size: .9rem; font-weight: 650; text-underline-offset: .2em; }
+    .home-link:focus-visible { outline-color: #e7d6b9; }
     h1 { font-size: clamp(2rem, 5.5vw, 3.85rem); letter-spacing: -.035em; line-height: 1.08; max-width: 18ch; margin: .45rem 0 1rem; }
     .hero-intro { max-width: 63ch; margin: 0 0 1.75rem; color: #f3f6ef; }
     .dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 2.5rem; max-width: 51rem; margin: 0; }
@@ -97,6 +99,7 @@
 <a class="skip-link" href="#rules-content">Skip to rules</a>
 <header class="hero">
   <div class="page-width hero-inner">
+    <a class="home-link" href="https://saujana-bgc.org/">← Saujana Board Game Community</a>
     <p class="status">Saujana Board Game Community · Review draft</p>
     <h1>Riichi League Season 2 and Riichi Open II</h1>
     <p class="hero-intro">The final league standings help set the opening tables at Open II. <strong>You can enter and win Open II without a league rank.</strong></p>
@@ -215,7 +218,7 @@
     <p>If a withdrawal, venue closure or other disruption stops play, the organiser may resume the game within the season with the same four players and a recoverable game state. Void the result if the game cannot meet those conditions or reach an official finish. A void game contributes neither Elo nor eligibility. A resumed game counts on the original gathering date. Its result is due by 11:59 pm Malaysia time on the third calendar day after the game is completed.</p>
 
     <h3>Submitting and correcting results</h3>
-    <p>The Season 2 standings on the <a href="https://saujana-bgc.github.io/riichi-league/">Riichi League page</a> will show your Elo, the rated games that counted and how many different dates you’ve played. For a missing or incorrect result, contact the league organiser with the date, session and round number, and the score you believe should be recorded.</p>
+    <p>The Season 2 standings on the <a href="https://saujana-bgc.org/riichi-league/">Riichi League page</a> will show your Elo, the rated games that counted and how many different dates you’ve played. For a missing or incorrect result, contact the league organiser with the date, session and round number, and the score you believe should be recorded.</p>
     <ol>
       <li>Use a stable league player ID for each player. Assign each rated hanchan its official gathering date, session and round number when it starts. The recorded round order determines the rating calculation, even if results are submitted in a different order.</li>
       <li>Have all four players check the result. One player submits it by <strong>11:59 pm Malaysia time on the third calendar day after the official gathering</strong>. Submitting soon after the game helps catch errors, but the full three-day window remains available.</li>

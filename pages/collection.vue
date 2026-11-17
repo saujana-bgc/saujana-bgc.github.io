@@ -17,9 +17,9 @@
         />
         <div class="collection-search-meta">
           <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
-          <p class="collection-updated">Shelf updated {{ lastTended }}</p>
         </div>
         <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="collection-search-clear" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
+        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Show all games' : 'Browse games with no plays logged' }}</UButton>
       </div>
 
       <details class="sort-controls collection-filters fade-up">
@@ -32,11 +32,10 @@
           <div class="collection-category-options" role="group" aria-label="Filter by category">
             <UButton v-for="category in ['Card Game', 'Deduction', 'Animals', 'Party Game', 'Bluffing']" :key="category" class="sort-btn category-btn" :class="{ active: selectedCategories.includes(category) }" :aria-pressed="selectedCategories.includes(category)" @click="selectedCategories = selectedCategories.includes(category) ? [] : [category]">{{ category === 'Card Game' ? 'Card games' : category === 'Party Game' ? 'Party games' : category }}</UButton>
           </div>
-          <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'Browse games with no plays logged' }}</UButton>
         </div>
       </details>
 
-      <div v-if="isError" class="page-hint" role="status">We couldn’t load play history. Refresh the page to try again.</div>
+      <div v-if="isError" class="page-hint" role="alert">We couldn’t load play history. <UButton type="button" @click="reloadPlayHistory">Try again</UButton></div>
 
       <div ref="gridRef" class="editorial-grid">
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>
@@ -79,6 +78,7 @@
         <p>Try a shorter search, or give the whole shelf another look.</p>
         <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Show all games</UButton>
       </div>
+      <p class="collection-updated">Shelf updated {{ lastTended }}</p>
     </main>
 
     <UModal :open="Boolean(selectedGame)" :title="selectedGame?.name || 'Game details'" description="Board game details" :close="false" scrollable :ui="{ overlay: 'bg-[rgba(74,68,63,0.65)] !p-0 flex items-end justify-center sm:!p-10 sm:items-center', content: '!w-full sm:!w-[95vw] !max-w-[900px] !max-h-none !overflow-visible !border-0 !bg-transparent !shadow-none !ring-0 !p-0' }" @update:open="onModalOpenChange">
@@ -140,6 +140,10 @@ const viewportHeight = ref(0)
 const viewportWidth = ref(0)
 
 const { data: rawRows, isPending, isError } = usePlaylogData()
+
+function reloadPlayHistory() {
+  window.location.reload()
+}
 
 const stripTrailingEmoji = (str) => {
     if (!str) return str

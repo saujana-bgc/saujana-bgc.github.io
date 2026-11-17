@@ -5,7 +5,7 @@
       <h1 class="hero-title">Riichi Mahjong</h1>
       <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? Riichi is Japanese mahjong for four players, and the fun is spotting which tiles fit.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
-      <p class="activity-welcome">We play riichi mahjong and board games at the same weekly gathering. Ask a host to show you the riichi table. You’re welcome to watch a hand or try a turn with help.</p>
+      <p class="activity-welcome">We play riichi mahjong and board games at the same weekly gathering. Come on your own and ask a host to show you the table. You can watch a hand or try a turn with help.</p>
     </header>
 
     <section class="activity-content" aria-labelledby="first-hand-title">
@@ -17,7 +17,7 @@
           <p class="page-eyebrow">A turn at the table</p>
           <h2 id="first-hand-title">See a hand take shape, one tile at a time.</h2>
           <p>On your turn, draw one tile and discard another. You’re collecting matching sets, number runs and a pair. Complete the pattern and you win the hand.</p>
-          <p>No need to learn the rules first. Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
+          <p>Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
         </div>
       </ActivityOverviewFeature>
     </section>
@@ -28,7 +28,7 @@
       <nav class="activity-links" aria-label="Riichi Mahjong tools and events">
         <NuxtLink to="/riichi-league/" no-prefetch><strong>Riichi League</strong><span>Follow the season standings and weekly results.</span><span aria-hidden="true">→</span></NuxtLink>
         <NuxtLink to="/riichi-calculator/" no-prefetch><strong>Riichi Calculator</strong><span>Check a hand or calculate ron and tsumo payments.</span><span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink to="/riichi-open/" no-prefetch><strong>Riichi Open</strong><span>See tournament information and event updates.</span><span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink to="/riichi-open/" no-prefetch><strong>Riichi Open</strong><span>See tournament standings and event information.</span><span aria-hidden="true">→</span></NuxtLink>
       </nav>
     </section>
   </main>

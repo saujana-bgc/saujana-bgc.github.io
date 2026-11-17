@@ -3,7 +3,7 @@
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
         <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
-        <p>Board games and riichi mahjong are included at every gathering. On Only Blood in the Clocktower dates, we play Blood on the Clocktower too. Coming on your own? You’re welcome to watch a round before joining in.</p>
+        <p>Join us for board games and riichi mahjong at every gathering. Our dedicated Only Blood in the Clocktower events bring a game of hidden roles, secret clues and bold accusations.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
