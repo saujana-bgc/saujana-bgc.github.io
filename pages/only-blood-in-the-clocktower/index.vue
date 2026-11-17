@@ -1,8 +1,7 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <p class="page-eyebrow">Saujana’s dedicated Clocktower gatherings</p>
-      <h1 class="hero-title">Only Blood in the Clocktower</h1>
+      <h1 class="page-eyebrow">Clocktower</h1>
       <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
       <p class="activity-welcome">Board games and riichi mahjong are included too. Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
     </header>

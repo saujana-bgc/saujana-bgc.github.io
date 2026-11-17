@@ -1,7 +1,8 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <h1 class="hero-title">Clocktower Recaps</h1>
+      <p class="page-eyebrow">Clocktower</p>
+      <h1 class="hero-title">Recaps</h1>
       <p class="stats-container">Read stories, game results and approved photos from past Only Blood in the Clocktower gatherings.</p>
       <NuxtLink to="/only-blood-in-the-clocktower/" no-prefetch>Only Blood in the Clocktower overview →</NuxtLink>
     </header>

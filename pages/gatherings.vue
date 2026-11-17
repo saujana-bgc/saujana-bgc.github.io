@@ -790,6 +790,9 @@ async function loadEventsForTab(tab) {
 }
 
 async function retryEvents() {
+    if (activeTab.value === 'present') presentLoaded.value = false
+    else pastLoaded.value = false
+
     try {
         await loadEventsForTab(activeTab.value)
     } catch {

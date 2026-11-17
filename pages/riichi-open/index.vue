@@ -1,8 +1,9 @@
 <template>
   <main class="event-page">
     <header class="page-intro event-page-intro">
-      <p class="page-eyebrow">14 November · Ara Damansara</p>
+      <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi Open I</h1>
+      <p class="stats-container">Saturday, 14 November · Boardroom Bandit, Ara Damansara</p>
     </header>
     <RiichiOpenTabs v-model="activeTab" />
     <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><UButton v-if="standingsError && activeTab !== 'standings'" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>

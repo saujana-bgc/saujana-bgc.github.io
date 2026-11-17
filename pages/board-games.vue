@@ -1,8 +1,7 @@
 <template>
   <main class="activity-page">
     <header class="page-intro">
-      <p class="page-eyebrow">Come try a game</p>
-      <h1 class="hero-title">Board Games</h1>
+      <h1 class="page-eyebrow">Board Games</h1>
       <p class="stats-container">From quick party games to thoughtful strategy, choose a table that suits you. We’ll help you find a game and learn as you play.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
       <p class="activity-welcome">We play board games and riichi mahjong at the same weekly gathering. Come on your own, watch a round or ask a host to help you join in.</p>
