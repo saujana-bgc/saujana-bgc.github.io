@@ -3,7 +3,7 @@
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
         <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
-        <p>Join us for board games and riichi mahjong at every gathering. Our dedicated Only Blood in the Clocktower events bring a game of hidden roles, secret clues and bold accusations.</p>
+        <p>We play board games and riichi mahjong at every gathering. On Only Blood in the Clocktower dates, we play Blood on the Clocktower too. Coming on your own? You can watch a round first, or we’ll help you find a game.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
@@ -51,8 +51,8 @@
       </template>
       <div v-else class="next-gathering-empty" role="status">
         <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
-        <p v-else-if="gatheringStatus === 'unavailable'">The calendar isn’t available just now.</p>
-        <p v-else>No date has been announced yet.</p>
+        <p v-else-if="gatheringStatus === 'unavailable'">We can’t reach the calendar just now.</p>
+        <p v-else>We haven’t announced the next gathering yet. Have a question? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
         <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
       </div>
     </section>

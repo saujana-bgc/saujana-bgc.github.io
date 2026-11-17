@@ -20,7 +20,7 @@
       <div class="birthday-card-body">
         <div v-if="isSubmitted" class="birthday-success" role="status">
           <h2>Thanks, {{ submittedName }}. Your birthday is saved.</h2>
-          <p>Your greeting preference has been saved.</p>
+          <p>We’ve saved your greeting preference.</p>
           <UButton class="secondary-button" color="neutral" variant="outline" type="button" @click="resetForm">
             Add another birthday
           </UButton>

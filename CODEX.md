@@ -2,11 +2,13 @@
 
 ## Site voice
 
-Write like a thoughtful host: warm, specific, and quietly playful. Give each page a distinct purpose, and make the next step easy to recognise. Use British English, sentence case, and natural contractions.
+Write as Saujana, a thoughtful host: warm, specific, and quietly playful. Keep Mika as the invisible voice. Never name her, introduce a narrator or sign public copy on her behalf. Use British English, sentence case, natural contractions, and “we”, “our” and “you” where they sound natural.
 
-Keep invitations short. Save practical details for where people need them. Buttons describe their action; errors say what happened and how to recover. Use personality in introductions and small moments of discovery, with plain language for sign-ups, consent, and scoring rules.
+Make newcomers and regulars feel equally welcome. Offer a simple way to join, watch or ask for help. Keep invitations short and practical details beside the decision they support. Use a light touch of humour or curiosity when it suits the activity. Keep buttons clear. Errors say what happened and how to recover. Use plain language for sign-ups, consent and scoring rules. Avoid corporate clichés, exaggerated enthusiasm, repeated metaphors, childish expressions and excess emojis.
 
-Avoid repeating table and discovery metaphors in every section. Don’t promise a seat, attendance, or a greeting that the data doesn’t establish. A missing logged play means “No plays logged”, not “Never played”; activity counts don’t establish winning skill. Keep game titles, published descriptions, event details, league rules, and consent meanings factual.
+Keep game titles, published descriptions, event details, league rules and consent meanings factual. Don’t promise a seat, attendance or a greeting that the data doesn’t establish. A missing logged play means “No plays logged”, not “Never played”; activity counts don’t establish winning skill. Describe images for what they show without naming Mika. Keep SEO terms natural and navigation and controls direct.
+
+Prefer an invitation over an instruction where it stays clear. For example, “Come watch a hand and ask us how it works” can welcome a new player, while “Save your place” only fits when the action really reserves a place. Say “You’re on the sign-up list” for a saved gathering sign-up. Reserve “Your place is confirmed” for confirmed tournament entries. A quiet playful line belongs in an introduction, while a form label, payment term or rule should be precise.
 
 ## Search indexing
 

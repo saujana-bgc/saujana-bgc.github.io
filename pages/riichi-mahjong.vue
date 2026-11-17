@@ -4,13 +4,13 @@
       <h1 class="page-eyebrow">Riichi Mahjong</h1>
       <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? Riichi is Japanese mahjong for four players, and the fun is spotting which tiles fit.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
-      <p class="activity-welcome">We play riichi mahjong and board games at the same weekly gathering. Come on your own and ask a host to show you the table. You can watch a hand or try a turn with help.</p>
+      <p class="activity-welcome">We play riichi mahjong and board games at the same weekly gathering. Come on your own and ask a host to show you the table.</p>
     </header>
 
     <section class="activity-content" aria-labelledby="first-hand-title">
       <ActivityOverviewFeature
         src="/images/site/overview-mika-riichi.webp"
-        alt="Mika holds up a mahjong tile while Aaran, Bena and Eric look on."
+        alt="A player holds up a mahjong tile while three friends follow the hand."
       >
         <div class="activity-copy">
           <p class="page-eyebrow">A turn at the table</p>

@@ -3,7 +3,7 @@
     <header class="page-intro">
       <h1 class="page-eyebrow">Clocktower</h1>
       <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
-      <p class="activity-welcome">Board games and riichi mahjong are included too. Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
+      <p class="activity-welcome">Board games and riichi mahjong are included too. New to Clocktower? The Storyteller will help you get started.</p>
     </header>
 
     <div class="gathering-banner">
@@ -36,7 +36,7 @@
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
       <ActivityOverviewFeature
         src="/images/site/overview-mika-clocktower.webp"
-        alt="Mika, Nick, Jac and Tom compare stories over a Clocktower town-square mat."
+        alt="Four players compare stories over a Blood on the Clocktower town-square mat."
       >
         <p class="page-eyebrow">Your first game</p>
         <h2 id="welcome-title">A mystery you solve together.</h2>

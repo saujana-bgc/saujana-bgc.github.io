@@ -10,13 +10,12 @@
     <section class="activity-content" aria-labelledby="first-game-title">
       <ActivityOverviewFeature
         src="/images/site/overview-mika-board-games.webp"
-        alt="Mika, Albert, Erin and another player play Just One with word clues on the table."
+        alt="Four players write word clues together during a game of Just One."
       >
         <div class="activity-copy">
           <p class="page-eyebrow">What playing can look like</p>
           <h2 id="first-game-title">You can join with one good clue.</h2>
-          <p>In <em>Just One</em>, everyone writes a one-word clue to help one player guess. Matching clues disappear, so clever clues help your team most.</p>
-          <p>Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, everyone writes a one-word clue. Matching clues disappear, so you’ll want to think a little differently from the others.</p>
+          <p>Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you write one-word clues for a teammate. Matching clues disappear, so it pays to think a little differently.</p>
         </div>
       </ActivityOverviewFeature>
     </section>
