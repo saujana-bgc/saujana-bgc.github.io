@@ -3,7 +3,7 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board game and mahjong meet-ups</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Board games and riichi mahjong are included at every gathering. On Only Blood in the Clocktower dates, we play Blood on the Clocktower too. Find dates, venues and sign-up details below.</div>
+      <div class="stats-container">Find a date, choose a table, and save yourself a seat. Board games and riichi mahjong are part of every gathering, with Clocktower on selected dates.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -50,34 +50,6 @@
           <span v-if="!newRows[event.id]" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</span>
         </div>
 
-        <div v-if="hasFlyer(event) && !newRows[event.id]" class="event-flyer-wrap">
-          <a :href="getFlyerUrl(event)" class="event-flyer-link" target="_blank" rel="noopener noreferrer" :aria-label="`Open the full-size flyer for ${event.name}`">
-            <img
-              :src="getFlyerUrl(event)"
-              :alt="`Event flyer for ${event.name}.`"
-              class="event-flyer-image"
-              :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
-              :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
-              decoding="async"
-              @error="markFlyerUnavailable(event.id)"
-            />
-            <span class="event-flyer-open">View full-size flyer <span aria-hidden="true">↗</span></span>
-          </a>
-        </div>
-
-        <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
-          <img
-            :src="getEventImage(event)"
-            :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
-            class="event-image"
-            :width="isSpookyGameDay(event) ? 768 : 1536"
-            :height="1024"
-            :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
-            :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
-            decoding="async"
-          />
-        </div>
-
         <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>Look back at this gathering</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
@@ -86,6 +58,33 @@
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
           <div v-if="event.description && !newRows[event.id]" class="event-description">
             {{ event.description }}
+          </div>
+
+          <div v-if="hasFlyer(event) && !newRows[event.id]" class="event-flyer-wrap">
+            <a :href="getFlyerUrl(event)" class="event-flyer-link" target="_blank" rel="noopener noreferrer" :aria-label="`Open the full-size flyer for ${event.name}`">
+              <img
+                :src="getFlyerUrl(event)"
+                :alt="`Event flyer for ${event.name}.`"
+                class="event-flyer-image"
+                :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
+                :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
+                decoding="async"
+                @error="markFlyerUnavailable(event.id)"
+              />
+              <span class="event-flyer-open">View full-size flyer <span aria-hidden="true">↗</span></span>
+            </a>
+          </div>
+          <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
+            <img
+              :src="getEventImage(event)"
+              :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
+              class="event-image"
+              :width="isSpookyGameDay(event) ? 768 : 1536"
+              :height="1024"
+              :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
+              :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
+              decoding="async"
+            />
           </div>
 
           <div v-if="isSpookyGameDay(event) && activeTab === 'present'" class="external-rsvp">
@@ -1314,7 +1313,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-flyer-image {
     display: block;
     width: 100%;
-    height: auto;
+    max-height: 440px;
+    object-fit: contain;
+    background: var(--surface-soft);
 }
 
 .event-flyer-open {
@@ -2247,6 +2248,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .btn-add, .btn-save, .btn-cancel, .page-btn { min-height: 44px; border-radius: 6px; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 @media (max-width: 600px) { .first-time-panel { padding: 20px; } }
 @media (max-width: 600px) {
+  .event-flyer-image { max-height: 340px; }
   .first-time-panel { padding: 14px 18px; }
   .tabs { margin: 8px auto 18px; }
   .event-card { padding: 18px; }
