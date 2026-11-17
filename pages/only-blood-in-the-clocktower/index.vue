@@ -7,24 +7,6 @@
       <p class="activity-welcome">Board games and riichi mahjong are included too. Come on your own, watch a round or join in. The Storyteller will help you get started.</p>
     </header>
 
-    <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
-      <ActivityOverviewFeature
-        src="/images/site/overview-mika-clocktower.webp"
-        alt="Mika, Nick, Jac and Tom compare stories over a Clocktower town-square mat."
-      >
-        <p class="page-eyebrow">Your first game</p>
-        <h2 id="welcome-title">A mystery you solve together.</h2>
-        <ul class="welcome-steps">
-          <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
-          <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
-          <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
-          <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
-        </ul>
-        <p class="welcome-joining">You can come on your own or with a friend. Tell the host you’re new; they’ll help you decide whether to watch or play.</p>
-        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
-      </ActivityOverviewFeature>
-    </section>
-
     <div class="gathering-banner">
       <section id="next-gathering" class="next-night" aria-labelledby="next-night-title">
         <div class="calendar-mark" aria-hidden="true">
@@ -51,6 +33,24 @@
     <nav class="clocktower-page-links" aria-label="Clocktower page links">
       <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">→</span></NuxtLink>
     </nav>
+
+    <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
+      <ActivityOverviewFeature
+        src="/images/site/overview-mika-clocktower.webp"
+        alt="Mika, Nick, Jac and Tom compare stories over a Clocktower town-square mat."
+      >
+        <p class="page-eyebrow">Your first game</p>
+        <h2 id="welcome-title">A mystery you solve together.</h2>
+        <ul class="welcome-steps">
+          <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
+          <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
+          <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
+          <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
+        </ul>
+        <p class="welcome-joining">You can come on your own or with a friend. Tell the host you’re new; they’ll help you decide whether to watch or play.</p>
+        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
+      </ActivityOverviewFeature>
+    </section>
 
     <footer class="art-credit">
       <span>Blood on the Clocktower is published by <a href="https://bloodontheclocktower.com/" target="_blank" rel="noopener noreferrer">The Pandemonium Institute</a>.</span>

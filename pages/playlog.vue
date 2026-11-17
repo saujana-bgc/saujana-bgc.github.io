@@ -26,7 +26,10 @@
 
         <div v-else-if="isError" class="loading-state" role="alert">
         <p>We couldn’t load play history.</p>
-        <NuxtLink class="context-link" to="/collection/" no-prefetch>Browse the collection while you’re here <span aria-hidden="true">→</span></NuxtLink>
+        <div class="error-actions">
+          <UButton type="button" class="page-btn" @click="retry">Try again</UButton>
+          <NuxtLink class="context-link" to="/collection/" no-prefetch>Browse the collection <span aria-hidden="true">→</span></NuxtLink>
+        </div>
       </div>
 
       <template v-else>
@@ -188,7 +191,7 @@ const matchingGameCount = computed(() => matchingGames.value
     ? filteredSessions.value.reduce((total, session) => total + session.games.filter(game => game.name.toLocaleLowerCase().includes(matchingGames.value)).length, 0)
     : 0)
 
-const { data: rawRows, isPending, isError } = usePlaylogData()
+const { data: rawRows, isPending, isError, retry } = usePlaylogData()
 
 onMounted(() => {
   if (typeof route.query.game === 'string') search.value = route.query.game
@@ -789,6 +792,7 @@ onUnmounted(() => {
 .game-pill { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 6px; text-transform: none; font-weight: 400; font-size: .85rem; letter-spacing: 0; padding: 8px 14px; }
 .ranking-title { text-align: left; opacity: 1; font-size: .68rem; }
 .page-btn { min-width: 44px; min-height: 44px; border-radius: 6px; }
+.error-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; }
 .pagination { flex-wrap: wrap; justify-content: center; max-width: 92%; }
 @media (max-width: 767px) { .stat-tile:nth-child(3) { grid-column: 1 / -1; } }
 

@@ -19,7 +19,7 @@
           <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
         </div>
         <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="collection-search-clear" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
-        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Show all games' : 'Browse games with no plays logged' }}</UButton>
+        <UButton class="surprise-action" color="neutral" variant="outline" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'Browse games with no plays logged' }}</UButton>
       </div>
 
       <details class="sort-controls collection-filters fade-up">

@@ -23,8 +23,8 @@ function writeCache(rows) {
     } catch {}
 }
 
-async function loadPlaylog() {
-    const cached = readCache()
+async function loadPlaylog(forceRefresh = false) {
+    const cached = forceRefresh ? null : readCache()
     if (cached) {
         data.value = cached
         isPending.value = false
@@ -61,11 +61,19 @@ async function loadPlaylog() {
     }
 }
 
+function retryPlaylog() {
+    if (isPending.value) return loadPromise
+    isPending.value = true
+    isError.value = false
+    loadPromise = loadPlaylog(true)
+    return loadPromise
+}
+
 export function usePlaylogData() {
     // Keep the initial HTML and hydration state identical. Live history is
     // shared between client pages and starts loading only after mounting.
     onMounted(() => {
         if (!loadPromise) loadPromise = loadPlaylog()
     })
-    return { data, isPending, isError }
+    return { data, isPending, isError, retry: retryPlaylog }
 }

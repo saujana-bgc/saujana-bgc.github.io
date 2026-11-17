@@ -91,6 +91,7 @@
               </div>
               <div v-if="!newRows[event.id]" class="attendees-actions attendees-actions-primary">
                 <UButton :id="`signup-trigger-${event.id}`" type="button" @click="addRow(event.id)" class="btn-add">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
+                <p v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
               </div>
               <form
                 v-else
@@ -1879,7 +1880,10 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .attendees-actions-primary {
     margin-top: 0;
     margin-bottom: 22px;
+    flex-wrap: wrap;
+    align-items: center;
 }
+.signup-minimum-note { flex-basis: 100%; margin: -2px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
 
 .btn-add, .btn-save, .btn-cancel {
     font-family: inherit;
@@ -2131,6 +2135,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 /* Keep signup separate from the attendee list, with the action after the fields. */
 .signup-section { margin-bottom: 28px; }
+.signup-minimum-note { margin: 4px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
 .signup-form {
     padding: 24px;
     border: 1px solid var(--line);
