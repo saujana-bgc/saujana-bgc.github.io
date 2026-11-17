@@ -2145,24 +2145,12 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
 .event-card { max-width: 960px; border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
-.page-intro .page-eyebrow { margin-bottom: 10px; }
-.page-intro .stats-container { margin-top: 12px; }
 .gatherings-main > .tabs { margin-top: 0; }
-.page-intro {
-  width: min(calc(100% - 40px), 960px);
-  box-sizing: border-box;
-  text-align: left;
-  padding-inline: 0;
-  padding-bottom: 14px;
-}
-.page-intro .page-eyebrow { justify-content: flex-start; }
-.page-intro .hero-title { text-align: left; }
-.page-intro .stats-container { max-width: 460px; margin: 12px 0 0; }
 .gatherings-main > .tabs {
   width: min(calc(100% - 40px), 960px);
   box-sizing: border-box;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 28px;
   padding: 0;
   border: 0;
@@ -2293,8 +2281,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .event-card:has(.event-flyer-image) > .attendees-section,
   .event-card:has(.event-image-wrap) > .attendees-section { order: 6; }
   .gatherings-main > .tabs { margin-top: 0; }
-  .page-intro { padding-bottom: 16px; }
-  .page-intro .stats-container { max-width: 340px; margin-inline: 0; }
+  .page-intro { padding-bottom: var(--space-5); }
   .first-time-panel { padding: 14px 18px; }
   .gatherings-main > .tabs { margin: 0 auto 18px; gap: 24px; }
   .event-card { padding: 18px; }
