@@ -52,17 +52,17 @@
         </div>
 
         <UButton v-if="activeTab === 'past'" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
-          <span>{{ expandedEvents.has(event.id) ? 'Hide details' : 'Look back at this gathering' }}</span>
+          <span>{{ expandedEvents.has(event.id) ? 'Hide details' : 'View gathering details' }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
         </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
-          <div v-if="event.description && !newRows[event.id]" class="event-description">
+          <div v-if="event.description" class="event-description">
             {{ event.description }}
           </div>
 
           <img
-            v-if="hasFlyer(event) && !newRows[event.id]"
+            v-if="hasFlyer(event)"
             :src="getFlyerUrl(event)"
             :alt="`Event artwork for ${event.name}.`"
             class="event-flyer-image"
@@ -71,7 +71,7 @@
             decoding="async"
             @error="markFlyerUnavailable(event.id)"
           />
-          <div v-else-if="!newRows[event.id] && getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
+          <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
             <img
               :src="getEventImage(event)"
               :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
@@ -2153,6 +2153,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   box-sizing: border-box;
   text-align: left;
   padding-inline: 0;
+  padding-bottom: 14px;
 }
 .page-intro .page-eyebrow { justify-content: flex-start; }
 .page-intro .page-eyebrow::after { display: none; }
@@ -2170,6 +2171,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   border-bottom: 1px solid var(--line);
   border-radius: 0;
   background: transparent;
+  margin-bottom: 18px;
 }
 .gatherings-main > .tabs .tab {
   position: relative;
@@ -2198,6 +2200,18 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   content: '';
 }
 .event-card > .event-heading { margin: 0 0 10px; text-align: left; }
+.event-card > .expand-bar {
+  justify-content: flex-start;
+  min-height: 44px;
+  padding: 8px 2px;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  font-weight: 600;
+  text-align: left;
+}
+.event-card > .expand-bar svg { margin-left: auto; transition: transform .2s ease; }
+.event-card > .expand-bar[aria-expanded="true"] svg { transform: rotate(180deg); }
 .event-card > .event-heading .hero-title { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); }
 .event-rsvp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 16px; }
 .event-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
@@ -2244,6 +2258,10 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   color: var(--muted);
   font-size: .84rem;
   line-height: 1.55;
+}
+.event-card .event-description {
+  margin: 14px 0 18px;
+  line-height: 1.65;
 }
 .event-card:has(.event-flyer-image) > .event-description,
 .event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 5; }
