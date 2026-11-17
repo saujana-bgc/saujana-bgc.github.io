@@ -1,9 +1,9 @@
 <template>
   <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
-      <p class="page-eyebrow">Board game and mahjong meet-ups</p>
+      <p class="page-eyebrow">A seat at the table</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Board games, riichi mahjong and, on selected dates, Blood on the Clocktower. Everyone’s welcome.</div>
+      <div class="stats-container">Join us for board games, riichi mahjong and selected Blood on the Clocktower dates.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -2146,6 +2146,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
 .event-card { max-width: 960px; border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
+.page-intro .page-eyebrow { margin-bottom: 10px; letter-spacing: .16em; }
+.page-intro .stats-container { margin-top: 12px; }
+.gatherings-main > .tabs { margin-top: 0; }
 .event-card > .event-heading { margin: 0 0 10px; text-align: left; }
 .event-card > .event-heading .hero-title { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); }
 .event-rsvp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 16px; }
@@ -2220,6 +2223,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .event-card:has(.event-image-wrap) > .event-games-note { order: 4; }
   .event-description { order: 5; }
   .gatherings-main > .tabs { margin-top: 0; }
+  .page-intro { padding-bottom: 16px; }
   .page-intro .stats-container { max-width: 340px; margin-inline: auto; }
   .first-time-panel { padding: 14px 18px; }
   .tabs { margin: 8px auto 18px; }
