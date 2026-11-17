@@ -3,7 +3,7 @@
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board game and mahjong meet-ups</p>
       <h1 class="hero-title">Gatherings</h1>
-      <div class="stats-container">Find a date, choose a table, and save yourself a seat. Board games and riichi mahjong are part of every gathering, with Clocktower on selected dates.</div>
+      <div class="stats-container">Board games and riichi mahjong at every gathering, with Clocktower on selected dates. Everyone’s welcome.</div>
     </header>
 
     <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -48,10 +48,11 @@
           </div>
           <UButton v-if="canEditEvent(event) && !newRows[event.id]" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
           <span v-if="!newRows[event.id]" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</span>
+          <span v-if="!newRows[event.id] && !signupSuccess[event.id]" class="signup-welcome-note">New to these games? We’ll help you get started.</span>
         </div>
 
-        <UButton v-if="activeTab === 'past' && !expandedEvents.has(event.id)" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
-          <span>Look back at this gathering</span>
+        <UButton v-if="activeTab === 'past'" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
+          <span>{{ expandedEvents.has(event.id) ? 'Hide details' : 'Look back at this gathering' }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
         </UButton>
 
@@ -260,10 +261,6 @@
 
           </div>
 
-          <UButton v-if="activeTab === 'past'" class="collapse-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id, true)">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14.78 11.78a.75.75 0 0 1-1.06 0L10 8.06l-3.72 3.72a.75.75 0 0 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06Z" clip-rule="evenodd"/></svg>
-            <span>Hide details</span>
-          </UButton>
         </template>
       </div>
 
@@ -540,15 +537,9 @@ function switchTab(tab) {
     resizeAllAreas()
 }
 
-async function toggleEvent(eventId, restoreFocus = false) {
+function toggleEvent(eventId) {
     if (expandedEvents.has(eventId)) {
         expandedEvents.delete(eventId)
-        if (restoreFocus) {
-            await nextTick()
-            const trigger = document.querySelector(`#gathering-${CSS.escape(eventId)} .expand-bar`)
-            trigger?.focus({ preventScroll: true })
-            trigger?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        }
     } else {
         expandedEvents.add(eventId)
         resizeAllAreas()
@@ -2164,13 +2155,56 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-card::before { display: none; }
 .event-card:hover { transform: none; box-shadow: var(--shadow-card); }
 .event-card .hero-title { font-style: normal; }
+.event-card:has(.event-flyer-image),
+.event-card:has(.event-image-wrap) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, .9fr);
+  align-items: start;
+  column-gap: 28px;
+}
+.event-card:has(.event-flyer-image) > .event-heading,
+.event-card:has(.event-image-wrap) > .event-heading { grid-column: 1; grid-row: 1; }
+.event-card:has(.event-flyer-image) > .event-facts,
+.event-card:has(.event-image-wrap) > .event-facts { grid-column: 1; grid-row: 2; }
+.event-card:has(.event-flyer-image) > .event-games-note,
+.event-card:has(.event-image-wrap) > .event-games-note { grid-column: 1; grid-row: 3; }
+.event-card:has(.event-flyer-image) > .event-rsvp-actions,
+.event-card:has(.event-image-wrap) > .event-rsvp-actions { grid-column: 1; grid-row: 4; }
+.event-card:has(.event-flyer-image) > .event-flyer-image,
+.event-card:has(.event-image-wrap) > .event-image-wrap {
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  width: 100%;
+  max-width: 100%;
+  max-height: 360px;
+  height: auto;
+  margin: 0;
+  object-fit: contain;
+  align-self: center;
+}
+.event-card:has(.event-flyer-image) > .event-description,
+.event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 5; }
+.event-card:has(.event-flyer-image) > .attendees-section,
+.event-card:has(.event-image-wrap) > .attendees-section { grid-column: 1 / -1; grid-row: 6; }
+.event-card:has(.event-flyer-image) > .expand-bar,
+.event-card:has(.event-image-wrap) > .expand-bar { grid-column: 1 / -1; }
 .attendees-notice { background: var(--surface-soft); border-radius: 8px; }
 .stat-pill { border-radius: 6px; background: var(--surface-soft); }
 .stat-lbl, .attendees-title, .card-label { opacity: 1; color: var(--muted); }
 .btn-add, .btn-save, .btn-cancel, .page-btn { min-height: 44px; border-radius: 6px; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 @media (max-width: 600px) { .first-time-panel { padding: 20px; } }
 @media (max-width: 600px) {
-  .event-flyer-image { max-height: 340px; }
+  .event-card:has(.event-flyer-image),
+  .event-card:has(.event-image-wrap) {
+    display: flex;
+    flex-direction: column;
+  }
+  .event-card:has(.event-flyer-image) > .event-flyer-image,
+  .event-card:has(.event-image-wrap) > .event-image-wrap {
+    order: -1;
+    max-height: 300px;
+    margin: 0 auto 18px;
+  }
   .first-time-panel { padding: 14px 18px; }
   .tabs { margin: 8px auto 18px; }
   .event-card { padding: 18px; }
@@ -2183,6 +2217,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .signup-minimum-note { margin: 4px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
 .signup-form-footer .signup-minimum-note { flex-basis: 100%; margin: -4px 0 2px; }
 .event-rsvp-actions > .btn-add { min-height: 46px; padding-inline: 20px; font-weight: 700; }
+.signup-welcome-note { flex-basis: 100%; color: var(--muted); font-size: .82rem; line-height: 1.5; }
 .signup-form {
     padding: 24px;
     border: 1px solid var(--line);
