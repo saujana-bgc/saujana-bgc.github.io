@@ -70,7 +70,7 @@
         <div v-if="hasFlyer(event)" class="signup-sr-only">
           <h2>{{ event.name }}</h2>
           <p>{{ formatDate(event.date) }}<template v-if="event.time">, {{ event.time }}</template><template v-if="event.venue"> at {{ event.venue }}</template>.</p>
-          <p>{{ getGatheringDescription(event) }}</p>
+          <p v-if="event.description">{{ event.description }}</p>
           <p>Board games and riichi mahjong are included. <template v-if="isClocktowerEvent(event)">Blood on the Clocktower is also played.</template></p>
         </div>
 
@@ -85,11 +85,8 @@
         </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
-          <div v-if="!hasFlyer(event)" class="event-description">
-            <template v-if="isSpookyGameDay(event)">
-              Celebrate Halloween with Pair of Dice × Saujana at Richeese Factory, the Curve. Join us for Blood on the Clocktower, 20+ board games, Riichi Mahjong and Halloween Bingo, plus a lucky draw and a costume contest with prizes. Come dressed in your Halloween best for an afternoon and evening of games and good company. Entry is free with a minimum RM20 food purchase at Richeese Factory.
-            </template>
-            <template v-else>{{ getGatheringDescription(event) }}</template>
+          <div v-if="!hasFlyer(event) && event.description" class="event-description">
+            {{ event.description }}
           </div>
 
           <div v-if="isSpookyGameDay(event) && activeTab === 'present'" class="external-rsvp">
@@ -374,8 +371,6 @@
 </template>
 
 <script setup>
-import { getGatheringDescription } from '~/utils/gatheringDescriptions'
-
 const supabase = useSupabase()
 const route = useRoute()
 const unavailableFlyerIds = ref(new Set())
