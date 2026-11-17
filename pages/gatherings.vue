@@ -117,7 +117,7 @@
                 <p v-if="activeTab === 'present' && !isSpookyGameDay(event) && !hasFlyer(event)" class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
               </div>
               <form
-                v-else
+                v-if="newRows[event.id]"
                 :ref="el => setSignupFormRef(event.id, el)"
                 class="signup-form"
                 :aria-label="`Sign up for ${event.name}`"
