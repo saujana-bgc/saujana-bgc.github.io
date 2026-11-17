@@ -60,21 +60,17 @@
             {{ event.description }}
           </div>
 
-          <div v-if="hasFlyer(event) && !newRows[event.id]" class="event-flyer-wrap">
-            <a :href="getFlyerUrl(event)" class="event-flyer-link" target="_blank" rel="noopener noreferrer" :aria-label="`Open the full-size flyer for ${event.name}`">
-              <img
-                :src="getFlyerUrl(event)"
-                :alt="`Event flyer for ${event.name}.`"
-                class="event-flyer-image"
-                :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
-                :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
-                decoding="async"
-                @error="markFlyerUnavailable(event.id)"
-              />
-              <span class="event-flyer-open">View full-size flyer <span aria-hidden="true">↗</span></span>
-            </a>
-          </div>
-          <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
+          <img
+            v-if="hasFlyer(event) && !newRows[event.id]"
+            :src="getFlyerUrl(event)"
+            :alt="`Event artwork for ${event.name}.`"
+            class="event-flyer-image"
+            :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
+            :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
+            decoding="async"
+            @error="markFlyerUnavailable(event.id)"
+          />
+          <div v-else-if="!newRows[event.id] && getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
             <img
               :src="getEventImage(event)"
               :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
@@ -101,9 +97,8 @@
               Sign-up details couldn’t be loaded.
               <UButton type="button" size="sm" @click="retryAttendees(event)">Try again</UButton>
             </p>
-            <div v-if="canEditEvent(event)" class="signup-section">
+            <div v-if="canEditEvent(event) && newRows[event.id]" class="signup-section">
               <form
-                v-if="newRows[event.id]"
                 :ref="el => setSignupFormRef(event.id, el)"
                 class="signup-form"
                 :aria-label="`Sign up for ${event.name}`"
@@ -156,7 +151,7 @@
             <details class="attendee-list-details">
               <summary class="attendee-list-summary">
                 <span>{{ activeTab === 'past' ? 'Who signed up' : 'Who’s signed up' }}</span>
-                <span class="attendee-list-count">{{ attendeesByEvent[event.id]?.length ?? 0 }} signed up</span>
+                <span v-if="attendeeLoadErrors[event.id] === false" class="attendee-list-count">{{ attendeesByEvent[event.id].length }} signed up</span>
               </summary>
               <div class="attendees-header">
               <div class="attendees-stats">
@@ -1234,51 +1229,28 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     justify-content: center;
     gap: 8px;
     width: 100%;
-    margin-top: 20px;
-    padding: 12px 20px 0;
+    min-height: 44px;
+    margin-top: 12px;
+    padding: 8px 12px;
     border: none;
-    border-top: 1px solid rgba(107, 122, 104, 0.12);
-    border-radius: 0;
+    border-radius: var(--radius-control);
     font-family: inherit;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
+    font-size: .85rem;
+    font-weight: 650;
     cursor: pointer;
-    background: transparent;
+    background: var(--surface-soft);
     color: var(--matcha-leaf);
-    opacity: 0.62;
-    transition: opacity 0.2s, color 0.2s, transform 0.2s;
-}
-
-.expand-bar svg, .collapse-bar svg {
-    color: var(--gold-leaf);
-    transition: transform 0.2s ease;
-}
-
-.expand-bar {
-    position: relative;
-}
-
-.expand-bar::before {
-    content: "";
-    position: absolute;
-    top: -1px;
-    left: 50%;
-    width: 84px;
-    height: 1px;
-    transform: translateX(-50%);
-    background: linear-gradient(to right, transparent, var(--gold-leaf), transparent);
-    opacity: 0.75;
 }
 
 .expand-bar:hover, .collapse-bar:hover {
-    opacity: 0.95;
     color: var(--clay-text);
+    text-decoration: underline;
 }
 
-.expand-bar:hover svg { transform: translateY(1px); }
-.collapse-bar:hover svg { transform: translateY(-1px); }
+.expand-bar:focus-visible, .collapse-bar:focus-visible {
+    outline: 2px solid var(--matcha-leaf);
+    outline-offset: 2px;
+}
 
 .event-image-wrap {
     margin-bottom: 10px;
@@ -1294,61 +1266,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     isolation: isolate;
 }
 
-.event-flyer-wrap {
-    margin-bottom: 10px;
-    overflow: hidden;
-    border: 1px solid rgba(53, 76, 62, 0.2);
-    border-radius: 20px;
-    background: var(--surface-soft);
-    box-shadow: 0 12px 32px rgba(74, 68, 63, 0.12);
-}
-
-.event-flyer-link {
-    display: block;
-    position: relative;
-    color: inherit;
-    line-height: 0;
-}
-
 .event-flyer-image {
     display: block;
-    width: 100%;
-    max-height: 440px;
-    object-fit: contain;
-    background: var(--surface-soft);
-}
-
-.event-flyer-open {
-    display: block;
-    padding: 8px 12px;
-    color: var(--matcha-leaf);
-    font-size: 0.8rem;
-    font-weight: 650;
-    line-height: 1.2;
-    text-align: right;
-}
-
-.event-flyer-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 14px;
-    margin: 0 0 16px;
-}
-
-.event-flyer-actions > span {
-    color: var(--muted);
-    font-size: .82rem;
-    line-height: 1.5;
-}
-
-.event-flyer-link:focus-visible {
-    outline: 3px solid var(--matcha-leaf);
-    outline-offset: -4px;
-}
-
-.event-flyer-link:hover .event-flyer-open {
-    background: #1f3a2e;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 480px;
+    margin: 16px auto 0;
+    border-radius: var(--radius-card);
 }
 
 .event-image-wrap::after {
@@ -1623,9 +1548,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 /* --- ATTENDEES SECTION --- */
 .attendees-section {
-    margin-top: 30px;
-    padding-top: 30px;
-    border-top: 1px solid rgba(107, 122, 104, 0.1);
+    margin-top: 20px;
 }
 
 .external-rsvp {
@@ -1692,7 +1615,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .signup-privacy-note { margin: 0 0 16px; color: var(--muted); font-size: .82rem; line-height: 1.6; }
 .signup-privacy-note a { color: var(--matcha-leaf); text-underline-offset: .18em; }
 
-.attendee-list-details { margin-top: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
+.attendee-list-details { border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
 .attendee-list-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 14px; color: var(--matcha-leaf); font-size: .9rem; font-weight: 700; cursor: pointer; list-style: none; }
 .attendee-list-summary::-webkit-details-marker { display: none; }
 .attendee-list-summary::after { content: '+'; margin-left: auto; font-size: 1.15rem; }
@@ -2236,7 +2159,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-rsvp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 16px; }
 .event-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
 .event-facts .event-fact { color: var(--clay-text); }
-.event-card .event-flyer-wrap { margin-top: 14px; }
 .event-card .event-games-note { margin: 8px 0; }
 .event-card .signup-form-heading { margin-bottom: 14px; }
 .event-card::before { display: none; }
@@ -2257,7 +2179,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 
 /* Keep signup separate from the attendee list, with the action after the fields. */
-.signup-section { margin-bottom: 28px; }
+.signup-section { margin-bottom: 20px; }
 .signup-minimum-note { margin: 4px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
 .signup-form-footer .signup-minimum-note { flex-basis: 100%; margin: -4px 0 2px; }
 .event-rsvp-actions > .btn-add { min-height: 46px; padding-inline: 20px; font-weight: 700; }
