@@ -46,7 +46,7 @@
           </div>
           <UButton v-if="canEditEvent(event) && !newRows[event.id]" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
           <span v-if="!newRows[event.id]" class="signup-minimum-note">RM10 minimum spend per person, paid at the counter after ordering. Ask for Saujana BGC when you arrive.</span>
-          <span v-if="!newRows[event.id] && !signupSuccess[event.id]" class="signup-welcome-note">Coming on your own? We’ll help you find a table.</span>
+          <span v-if="!newRows[event.id] && !signupSuccess[event.id]" class="signup-welcome-note">Coming on your own? We’ll help you find a table. Read <NuxtLink to="/#respect-at-table" no-prefetch>Respect at the table</NuxtLink>.</span>
         </div>
 
         <UButton v-if="activeTab === 'past'" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
@@ -79,13 +79,13 @@
               >
                 <div class="signup-form-heading">
                   <h4>Sign up for {{ event.name }}</h4>
-                  <p>Add your name to the attendee list.</p>
                 </div>
                 <fieldset class="signup-fields" :disabled="savingRows[event.id]">
                   <legend class="signup-sr-only">Your details</legend>
                   <div class="signup-field signup-field-name">
-                    <label :for="`signup-name-${event.id}`">Name <span class="signup-required">(required)</span></label>
-                    <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-error-${event.id}` : undefined" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === newRows[event.id] && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === newRows[event.id] && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @keydown="onNameAutocompleteKeydown($event, newRows[event.id])" @blur="hideNameAutocompleteSoon" />
+                    <label :for="`signup-name-${event.id}`">Name or nickname <span class="signup-required">(required)</span></label>
+                    <p :id="`signup-name-hint-${event.id}`" class="signup-field-hint">A nickname is fine. The name you enter appears on the public attendee list.</p>
+                    <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-hint-${event.id} signup-name-error-${event.id}` : `signup-name-hint-${event.id}`" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === newRows[event.id] && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === newRows[event.id] && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @keydown="onNameAutocompleteKeydown($event, newRows[event.id])" @blur="hideNameAutocompleteSoon" />
                     <p v-if="nameErrors[event.id]" :id="`signup-name-error-${event.id}`" class="signup-error" role="alert">Add the name you’d like us to know you by.</p>
                   </div>
                   <details class="signup-optional-details">
@@ -107,7 +107,7 @@
                     </div>
                   </details>
                 </fieldset>
-                <p class="signup-privacy-note">Your name, arrival time, games and public notes appear in the attendee list. For a private request, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin on WhatsApp</a>.</p>
+                <p class="signup-privacy-note">If you add an arrival time, games or notes, they’ll also appear on the public attendee list. For a private request, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin on WhatsApp</a>.</p>
                 <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
                 <div class="signup-form-footer">
                   <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your sign-up…' : '' }}</p>
@@ -1606,7 +1606,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .signup-intro .signup-minimum-spend { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--clay-text); font-weight: 650; opacity: 1; }
 .signup-intro .signup-care { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 .signup-privacy-note { margin: 0 0 16px; color: var(--muted); font-size: .82rem; line-height: 1.6; }
-.signup-privacy-note a { color: var(--matcha-leaf); text-underline-offset: .18em; }
+.signup-privacy-note a, .signup-welcome-note a { color: var(--matcha-leaf); text-decoration: underline; text-underline-offset: .18em; }
 
 .attendee-list-details { border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
 .attendee-list-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 14px; color: var(--matcha-leaf); font-size: .9rem; font-weight: 700; cursor: pointer; list-style: none; }
@@ -2330,7 +2330,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     scroll-margin-top: 110px;
 }
 .signup-form-heading h4 { margin: 0 0 6px; font-size: 1.05rem; color: var(--matcha-leaf); }
-.signup-form-heading p, .signup-field-hint, .signup-save-hint {
+.signup-field-hint, .signup-save-hint {
     margin: 0;
     color: var(--muted);
     font-size: .82rem;

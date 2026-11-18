@@ -122,7 +122,7 @@
           <p>{{ value.content }}</p>
         </div>
       </div>
-      <p id="respect-at-table" class="respect-note"><strong>Respect at the table.</strong> Everyone should feel welcome and respected. Harassment and disruptive behaviour have no place here. If something feels wrong, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
+      <p id="respect-at-table" class="respect-note" tabindex="-1"><strong>Respect at the table.</strong> We don’t tolerate harassment or disruptive behaviour. That includes sexist jokes or remarks and unwanted attention. If someone isn’t interested in chatting, flirting or exchanging contact details, give them space. We sometimes take photos at gatherings. If you’d rather stay out of photos, would like a photo of you taken down or have another concern, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
     </section>
 
   </main>
@@ -520,6 +520,7 @@ const expectations = [
 
 .respect-note {
   margin-top: 22px;
+  scroll-margin-top: 110px;
 }
 
 .respect-note a { color: var(--matcha-leaf); }
