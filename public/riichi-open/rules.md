@@ -1,11 +1,12 @@
 # Four-player rules
 
-These are Saujana’s four-player riichi settings, based on WRC Rules 2025 and the 29 June 2025 official clarification. We use ordinary fives in every suit. Casual games have no chombo penalties. Formal tournament penalties apply only when the event announces them. The [official references](#official-references) are listed in the Riichi Open I appendix.
+These are Saujana’s shared four-player riichi settings for casual tables and tournaments, based on WRC Rules 2025 and the 29 June 2025 official clarification. Event arrangements and formal penalties are listed separately in the Riichi Open I appendix. The [official references](#official-references) are listed there too.
 
 ## 1. Basic settings
 
-- Each qualifying hanchan and the Final hanchan are four-player East–South games.
+- Play East–South, from East 1 through South 4. A tournament may set its own event format below.
 - Each player starts with 30,000 points.
+- Play continues if a player’s score goes below zero. Bankruptcy does not end a hanchan.
 - Open tanyao is allowed.
 - Atozuke is allowed.
 - Use four ordinary fives in each suit. Red fives are not used.
@@ -121,13 +122,11 @@ The organiser's ruling is final.
 
 ## Mistakes and disputes
 
-Casual games do not use chombo or tournament-point deductions. Pause play when a serious mistake affects the hand and ask the host whether play can continue fairly or whether to correct or redeal it. Do not deduct points from a player's score.
+Casual games do not use formal warnings, dead-hand penalties, chombo or tournament-point deductions. Correct a minor mistake if the table can restore the game state clearly. If a serious mistake affects the hand, pause play and ask the host whether to correct the situation or replay the hand. Do not deduct points from a player’s score.
 
-Formal tournament penalties are set out in the Riichi Open I appendix and apply when announced by the event.
+Formal tournament penalties are explained in [the Riichi Open I appendix](#riichi-open-i-event-appendix) and apply when announced by the event.
 
 ---
-
-## Table conduct
 
 ## 11. Player conduct
 
@@ -167,22 +166,22 @@ Play to win, respect the table, and enjoy the mahjong.
 
 # Three-player rules (sanma)
 
-These settings apply to Saujana’s three-player riichi tables. Follow the four-player rules above wherever they fit, with the changes below.
+These settings apply to Saujana’s three-player riichi tables. Follow the shared rules above wherever they fit, with the changes below. Sanma has its own tile set, draw progression, scoring payments and multiple-ron rule.
 
 ## Sanma table settings
 
 - Use East–South rounds, with East 1–3 and South 1–3.
 - Remove the 2-man through 8-man tiles, leaving 108 tiles.
 - Chi is not allowed. Pon, kan, riichi, tsumo and ron remain available.
-- Keep the four ordinary 5-pin and four ordinary 5-sou. The red 5-man is removed with the middle manzu tiles.
+- Use four ordinary 5-pin and four ordinary 5-sou. Saujana tables do not use red fives.
 - The manzu dora cycle runs directly between 1-man and 9-man: a 1-man indicator points to 9-man, and a 9-man indicator points to 1-man.
 - A valid yaku is required to win. Dora does not count as a yaku by itself.
 
-The earlier published sanma rules do not set starting points. Agree the starting points with the host before the first hand. In casual play, correct minor mistakes when possible without disrupting play. Pause serious mistakes or disputes and ask the host whether play can continue fairly or whether to correct or redeal the hand. Do not apply a chombo or tournament-point penalty.
+Each player starts with 30,000 points. Play continues below zero. In casual play, use the shared mistakes procedure above. Do not apply a chombo or tournament-point penalty.
 
 ## North tiles (nuki-dora)
 
-A player may declare a North tile as nuki-dora and set it aside, then draw a replacement from the dead wall. Each extracted North counts as one dora. A player may keep North in their hand and use it as an ordinary honour tile instead.
+A player may declare a North tile as nuki-dora and set it aside, then draw a replacement from the dead wall. Each extracted North counts as one dora. A player may keep North in their hand and use it as an ordinary honour tile instead. Follow the shared rules for calls and replacement draws. If a North extraction or replacement draw creates a dispute, pause play and ask the host before continuing.
 
 ## Sanma scoring and draws
 
@@ -202,11 +201,11 @@ Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player g
 
 This appendix records the tournament format, formal penalties and arrangements for Riichi Open I. Gameplay follows the four-player rules in the main guide above. Riichi Open I is a tournament, so its announced WRC chombo procedures and tournament-point penalties apply. See [Tournament penalties and irregularities](#tournament-penalties-and-irregularities) for the chombo rules.
 
-Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop without starting another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the WRC additional-hand procedure for these event hanchans.
+Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop without starting another hand. If that hand is voided by chombo after the signal, complete its required replay and stop there. Record the scores even if the South round has not finished. This event-specific procedure replaces the WRC additional-hand procedure for these event hanchans.
 
 Each entrant is scheduled to play exactly **two qualifying East–South (South) hanchans**. After those rounds, the top four entrants play **one final South hanchan**. Finalists do not play additional qualifying hanchans.
 
-The event uses **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025**, and the **29 June 2025 Official Rules Clarification**. The official documents govern gameplay, scoring, conduct and penalties, including details not restated in this participant guide. Where the clarification amends an earlier document, the clarification takes precedence. No WRC optional rules are adopted.
+The event uses **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025**, and the **29 June 2025 Official Rules Clarification**. Saujana’s shared rules above govern table settings. The Open I format, timing, qualification, scoring and announced penalties below supplement those rules. WRC documents govern gameplay, scoring, conduct and penalties where this guide gives no event-specific rule. Where the clarification amends an earlier document, the clarification takes precedence. No WRC optional rules are adopted.
 
 The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open tournament arrangements, not the format of the World Championship itself. If this guide's gameplay summary conflicts with the official documents, use the official documents. Pause play and call the organiser for a disputed ruling.
 
@@ -344,7 +343,7 @@ Final finishing positions are ranked by **Final hanchan score minus Final-stage 
 
 ## Tournament penalties and irregularities
 
-This section applies only to tournaments that announce formal penalties. Casual games do not use chombo or tournament-point deductions. Pause play when a serious mistake affects the hand and ask the host whether play can continue fairly or whether to correct or redeal it. Do not deduct points from a player's score.
+Formal tournament penalties apply only when announced by the event. For Riichi Open I, WRC warnings, dead hands, chombo and tournament-point penalties apply under the official penalty documents and clarification. They do not apply to casual games.
 
 ## 7. Chombo
 
