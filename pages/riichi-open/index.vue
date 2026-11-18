@@ -79,6 +79,7 @@
             <li>Start one shared countdown timer for all tables in the hanchan.</li>
             <li>Announce when 15 minutes remain.</li>
             <li>At 75 minutes, finish the current hand.</li>
+            <li>If chombo voids that hand, complete its replay and stop there.</li>
             <li>Do not start another hand after the timer expires.</li>
             <li>Record the scores even if the South round hasn’t finished.</li>
           </ol>

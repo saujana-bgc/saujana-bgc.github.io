@@ -90,7 +90,7 @@ Standard 3,000-point noten payments apply.
 
 At an exhaustive draw, declarations proceed in current seat order: East, South, West, then North. Reveal tenpai hands and turn noten hands face down. A player who has not declared riichi may choose noten rather than reveal a tenpai hand. A riichi player must reveal their hand; they cannot conceal it by choosing noten. A declaration cannot be changed.
 
-Tenpai does not require a yaku, and a wait remains tenpai even if all completing tiles are unavailable outside the player's hand. A hand requiring a fifth copy of a tile is not tenpai. A dead hand is noten.
+Tenpai does not require a yaku, and a wait remains tenpai even if all completing tiles are unavailable outside the player's hand. A hand requiring a fifth copy of a tile is not tenpai. In tournaments using WRC formal penalties, a dead hand is noten.
 
 The dealer continues only if tenpai.
 
@@ -142,13 +142,13 @@ Players are expected to maintain good tournament etiquette.
 - Players should allow opponents reasonable time to act.
 - Players must not intentionally manipulate, mark or identify tiles.
 - Players should treat opponents and organisers respectfully.
-- Follow WRC's restrictions on electronic devices, foreign objects and table conversation. Permitted reference sheets and simple calculators may be consulted between hands, not during play.
+- Keep phones and reference materials away while a hand is in progress. Check scoring aids between hands.
 
 ---
 
-## 12. Tournament administration
+## 12. Disputes and rulings
 
-Call the organiser for a rules dispute, an illegal action, uncertainty about whether play should continue, a scoring disagreement, a possible chombo, or a significantly disrupted game state. Players should not resolve serious disputes themselves if the outcome could affect tournament standings. The organiser may make rulings necessary to preserve fair play and tournament integrity.
+For a rules dispute, illegal action, scoring disagreement or disrupted game state, pause play and call the host or tournament organiser. The host settles casual games. The tournament organiser applies the announced event rules and penalties.
 
 The organiser acts as the event's referee and applies the official WRC documents consistently. Players may politely request that a ruling be reviewed before play resumes. The organiser's final ruling governs the event.
 
@@ -181,7 +181,7 @@ Each player starts with 30,000 points. Play continues below zero. In casual play
 
 ## North tiles (nuki-dora)
 
-A player may declare a North tile as nuki-dora and set it aside, then draw a replacement from the dead wall. Each extracted North counts as one dora. A player may keep North in their hand and use it as an ordinary honour tile instead. Follow the shared rules for calls and replacement draws. If a North extraction or replacement draw creates a dispute, pause play and ask the host before continuing.
+A player may declare a North tile as nuki-dora during their own turn, set it aside, then draw a replacement from the dead wall. Each extracted North counts as one dora. A player may keep North in their hand and use it as an ordinary honour tile instead. After riichi, a player may extract only a North drawn that turn. North extraction cancels ippatsu. An extracted North cannot be won by ron. Do not extract a North when no live-wall tiles remain.
 
 ## Sanma scoring and draws
 
@@ -192,6 +192,7 @@ A player may declare a North tile as nuki-dora and set it aside, then draw a rep
 - The dealer continues only when tenpai after an exhaustive draw. Matches normally end after South 3. If the dealer repeats in South 3, continue until the dealer stops repeating.
 - The leading dealer may end the match after winning the final scheduled hand.
 - Multiple ron is allowed. Each valid winner receives the normal ron payment and the full honba payment. Award riichi sticks to the valid winner closest to the discarder in turn order.
+- Pao uses the three-player tsumo shares. The absent fourth player’s share is not charged. For a single pao yakuman, the liable player pays the full sanma tsumo amount.
 
 Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player guide unless the difference in player count makes them impossible. For mistakes or disputes, pause play and ask the organiser. Sanma league points are based on finishing place and are described on the Riichi League page.
 
@@ -199,7 +200,7 @@ Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player g
 
 # Riichi Open I event appendix
 
-This appendix records the tournament format, formal penalties and arrangements for Riichi Open I. Gameplay follows the four-player rules in the main guide above. Riichi Open I is a tournament, so its announced WRC chombo procedures and tournament-point penalties apply. See [Tournament penalties and irregularities](#tournament-penalties-and-irregularities) for the chombo rules.
+This appendix records the tournament format, formal penalties and arrangements for Riichi Open I. Gameplay follows the shared four-player rules above, except where an Open I event rule explicitly changes them. See [Tournament penalties and irregularities](#tournament-penalties-and-irregularities) for the chombo rules.
 
 Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop without starting another hand. If that hand is voided by chombo after the signal, complete its required replay and stop there. Record the scores even if the South round has not finished. This event-specific procedure replaces the WRC additional-hand procedure for these event hanchans.
 
@@ -207,7 +208,7 @@ Each entrant is scheduled to play exactly **two qualifying East–South (South) 
 
 The event uses **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025**, and the **29 June 2025 Official Rules Clarification**. Saujana’s shared rules above govern table settings. The Open I format, timing, qualification, scoring and announced penalties below supplement those rules. WRC documents govern gameplay, scoring, conduct and penalties where this guide gives no event-specific rule. Where the clarification amends an earlier document, the clarification takes precedence. No WRC optional rules are adopted.
 
-The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open tournament arrangements, not the format of the World Championship itself. If this guide's gameplay summary conflicts with the official documents, use the official documents. Pause play and call the organiser for a disputed ruling.
+The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open arrangements. Where this appendix gives no event-specific rule, the WRC documents and the 29 June clarification govern gameplay, scoring, conduct and penalties. Pause play and call the organiser for a disputed ruling.
 
 ### Official references
 
@@ -344,6 +345,8 @@ Final finishing positions are ranked by **Final hanchan score minus Final-stage 
 ## Tournament penalties and irregularities
 
 Formal tournament penalties apply only when announced by the event. For Riichi Open I, WRC warnings, dead hands, chombo and tournament-point penalties apply under the official penalty documents and clarification. They do not apply to casual games.
+
+Riichi Open follows WRC restrictions on electronic devices, foreign objects and table conversation. Permitted reference sheets and simple calculators may be consulted between hands, not during play.
 
 ## 7. Chombo
 

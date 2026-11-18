@@ -93,10 +93,15 @@ const html = computed(() => {
   renderer.heading = ({ text, depth }) => {
     const id = slugify(text.replace(/<[^>]*>/g, ''))
     const pageDepth = depth + 1
-    const legacyPenaltyAnchor = id === 'tournament-penalties-and-irregularities'
-      ? '<span id="penalties-and-irregularities" class="legacy-anchor" aria-hidden="true"></span>'
+    const legacyAnchors = {
+      'tournament-penalties-and-irregularities': 'penalties-and-irregularities',
+      '11-player-conduct': 'table-conduct',
+      '12-disputes-and-rulings': '12-tournament-administration',
+    }
+    const legacyAnchor = legacyAnchors[id]
+      ? `<span id="${legacyAnchors[id]}" class="legacy-anchor" aria-hidden="true"></span>`
       : ''
-    const heading = `${legacyPenaltyAnchor}<h${pageDepth} id="${id}" tabindex="-1">${text}</h${pageDepth}>`
+    const heading = `${legacyAnchor}<h${pageDepth} id="${id}" tabindex="-1">${text}</h${pageDepth}>`
     return depth === 1
       ? `${heading}<a class="back-to-contents" href="#rules-contents">Back to contents ↑</a>\n`
       : `${heading}\n`
