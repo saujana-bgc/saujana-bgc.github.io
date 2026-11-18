@@ -1,26 +1,26 @@
 <template>
-  <div class="event-results">
+  <div class="event-results" :class="{ 'event-completed': event?.stage === 'completed' }">
     <header class="results-heading">
-      <div><h2>{{ event?.stage === 'completed' ? 'Final standings' : 'Follow the field' }}</h2><p>{{ event?.stage === 'completed' ? 'See the champion, final table and certified qualification scores.' : 'Find your table, follow the qualifiers and see who makes the final.' }}</p></div>
+      <div><h2>{{ loading && !event ? 'Riichi Open standings' : event?.stage === 'completed' ? 'Final standings' : 'Follow the field' }}</h2><p>{{ loading && !event ? 'Event results and table assignments will appear here.' : event?.stage === 'completed' ? 'See the champion, final table and certified qualification scores.' : 'Find your table, follow the qualifiers and see who makes the final.' }}</p></div>
       <UButton class="refresh-button" variant="outline" color="neutral" :disabled="refreshing" @click="$emit('refresh')">{{ refreshing ? 'Updating…' : '↻ Refresh' }}</UButton>
     </header>
 
-    <ol class="round-progress" aria-label="Tournament progress">
+    <ol v-if="event && event.stage !== 'completed'" class="round-progress" aria-label="Tournament progress">
       <li v-for="(phase, index) in phases" :key="phase.key" :class="{ current: phaseIndex === index, done: phaseIndex > index }" :aria-current="phaseIndex === index ? 'step' : undefined"><span>{{ phaseIndex > index ? '✓' : index + 1 }}</span><strong>{{ phase.label }}</strong><small>{{ phaseIndex > index ? 'Complete' : phaseIndex === index ? (event?.stage === 'completed' ? 'Complete' : 'Current stage') : 'Up next' }}</small></li>
     </ol>
 
     <p v-if="error" class="results-notice" role="status">{{ snapshot ? 'Showing the last available update. ' : '' }}{{ error }}</p>
     <section v-if="loading" class="results-card empty-results" aria-live="polite"><span class="empty-tile" aria-hidden="true">一</span><h2>Loading standings…</h2></section>
     <template v-else-if="snapshot">
-      <div class="results-toolbar">
-        <label class="player-search"><span>Find a player</span><UInput v-model="search" class="w-full" type="search" placeholder="Search by name" autocomplete="off" /></label>
-        <p class="update-note"><span class="live-dot" aria-hidden="true"></span>{{ snapshot.last_certified ? 'Results certified' : 'Latest publication' }}<strong>{{ formattedUpdate }}</strong></p>
-      </div>
-
-      <section v-if="snapshot.final?.length" class="results-card champion-card">
+      <section v-if="event?.stage === 'completed' && snapshot.final?.length" class="results-card champion-card">
         <p class="eyebrow">Riichi Open champion</p><h2>{{ snapshot.final[0].display_name }}</h2><p>One final table. A well-earned win.</p>
         <ol><li v-for="row in snapshot.final" :key="row.participant_id"><strong>{{ ordinal(row.rank) }}</strong><span>{{ row.display_name }}</span><small>{{ score(row.score) }} pts</small></li></ol>
       </section>
+
+      <div v-if="event?.stage !== 'completed'" class="results-toolbar">
+        <label class="player-search"><span>Find a player</span><UInput v-model="search" class="w-full" type="search" placeholder="Search by name" autocomplete="off" /></label>
+        <p class="update-note"><span class="live-dot" aria-hidden="true"></span>{{ snapshot.last_certified ? 'Results certified' : 'Latest publication' }}<strong>{{ formattedUpdate }}</strong></p>
+      </div>
 
       <section v-if="assignments.length" class="results-card">
         <div class="card-heading"><div><p class="eyebrow">Published seating</p><h2>{{ humanize(snapshot.assignment_round || event?.stage) }}</h2></div><span class="soft-badge">{{ assignments.length }} {{ assignments.length === 1 ? 'table' : 'tables' }}</span></div>
@@ -29,8 +29,12 @@
       </section>
       <section v-else-if="seatingPending" class="results-card waiting-scores"><h2>{{ humanize(expectedAssignmentRound) }} seating is being prepared.</h2><p>The organiser has advanced the event. New table assignments will appear here once they are published.</p></section>
 
-      <section v-if="snapshot.standings?.length" class="results-card">
+      <section v-if="snapshot.standings?.length" class="results-card qualification-results">
         <div class="card-heading"><div><p class="eyebrow">Certified results</p><h2>{{ event?.stage === 'completed' ? 'Final qualification standings' : 'Qualification standings' }}</h2></div><span class="soft-badge">Certified only</span></div>
+        <div v-if="event?.stage === 'completed'" class="results-toolbar qualification-toolbar">
+          <label class="player-search"><span>Find a player</span><UInput v-model="search" class="w-full" type="search" placeholder="Search by name" autocomplete="off" /></label>
+          <p class="update-note"><span class="live-dot" aria-hidden="true"></span>{{ snapshot.last_certified ? 'Results certified' : 'Latest publication' }}<strong>{{ formattedUpdate }}</strong></p>
+        </div>
         <p class="table-note">Penalties are already deducted from the total. The top four eligible players advance to the final.</p>
         <div class="desktop-standings table-scroll"><table><caption class="sr-only">Certified qualification scores</caption><thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Q1</th><th scope="col">Q2</th><th scope="col">Penalties</th><th scope="col">Total</th></tr></thead><tbody><tr v-for="row in filteredStandings" :key="row.participant_id" :class="{ finalist: isFinalist(row) }"><td><span class="rank-number">{{ row.rank }}</span></td><th scope="row">{{ row.display_name }}<small v-if="row.is_substitute">Substitute · not eligible for final</small><small v-else-if="isFinalist(row)" class="finalist-label">Finalist</small></th><td>{{ score(row.qualifier_1) }}</td><td>{{ score(row.qualifier_2) }}</td><td>{{ deduction(row.penalties) }}</td><td class="total-score">{{ score(row.total) }}</td></tr></tbody></table></div>
         <ol class="mobile-standings"><li v-for="row in filteredStandings" :key="row.participant_id" :class="{ finalist: isFinalist(row) }"><div class="player-line"><span class="rank-number">{{ row.rank }}</span><div><strong>{{ row.display_name }}</strong><small v-if="row.is_substitute">Substitute</small><small v-else-if="isFinalist(row)" class="finalist-label">Finalist</small></div><strong class="total-score">{{ score(row.total) }}<small>total</small></strong></div><dl><div><dt>Qualifier 1</dt><dd>{{ score(row.qualifier_1) }}</dd></div><div><dt>Qualifier 2</dt><dd>{{ score(row.qualifier_2) }}</dd></div><div><dt>Penalties</dt><dd>{{ deduction(row.penalties) }}</dd></div></dl></li></ol>

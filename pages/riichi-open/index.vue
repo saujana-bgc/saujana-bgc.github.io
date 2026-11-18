@@ -7,7 +7,7 @@
     </header>
     <RiichiOpenTabs v-model="activeTab" />
     <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><UButton v-if="standingsError && activeTab !== 'standings'" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>
-    <div class="event-page-shortcuts">
+    <div v-if="activeTab === 'registration' || (publicLoaded && event?.stage !== 'completed')" class="event-page-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
       <UButton ref="guideTrigger" type="button" class="schedule-jump" @click="openGuide">Tournament rules</UButton>
     </div>
@@ -97,6 +97,7 @@
       </div>
     </section>
 
+    <Teleport to="body">
     <dialog ref="guideDialog" class="guide-dialog" aria-label="Riichi Open tournament rules" @click="closeGuideFromBackdrop" @close="restoreGuideFocus">
       <div class="guide-shell">
         <div class="guide-topbar"><span><i aria-hidden="true"></i> Riichi Open · Tournament rules</span><UButton type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</UButton></div>
@@ -123,6 +124,7 @@
         </div>
       </div>
     </dialog>
+    </Teleport>
     </section>
 
     <dialog v-if="posterOpen" ref="posterDialog" class="poster-dialog" aria-label="Riichi Open event poster" @click="closePosterFromBackdrop" @close="restorePosterFocus">
@@ -133,13 +135,17 @@
     <section v-show="activeTab === 'standings'" id="riichi-standings-panel" role="tabpanel" aria-labelledby="riichi-standings-tab">
       <RiichiOpenStandings :event="event" :snapshot="snapshot" :updated-at="updatedAt" :loading="!publicLoaded && !standingsError" :refreshing="refreshing" :error="standingsError" @refresh="loadPublic" @register="goToRegistration" />
     </section>
+    <div v-if="event?.stage === 'completed' && activeTab === 'standings'" class="event-page-shortcuts completed-results-shortcuts">
+      <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
+      <UButton type="button" class="schedule-jump" @click="openGuide">Tournament rules</UButton>
+    </div>
   </main>
 </template>
 
 <script setup>
 const route = useRoute()
 const router = useRouter()
-const activeTab = ref(route.query.tab === 'standings' ? 'standings' : 'registration')
+const activeTab = ref(route.query.tab === 'registration' ? 'registration' : 'standings')
 let tabWasChosen = typeof route.query.tab === 'string'
 watch(() => route.query.tab, tab => {
   tabWasChosen = typeof tab === 'string'
@@ -245,7 +251,12 @@ watch(receipt, file => {
 })
 function removeReceipt() { receipt.value = null; if (receiptInput.value) receiptInput.value.value = '' }
 async function goToRegistration() { activeTab.value = 'registration'; await nextTick(); registrationPanel.value?.scrollIntoView({behavior:'smooth',block:'start'}); registrationPanel.value?.focus({preventScroll:true}) }
-async function goToSchedule() { await nextTick(); schedulePanel.value?.scrollIntoView({behavior:'smooth',block:'start'}); document.getElementById('schedule-heading')?.focus({preventScroll:true}) }
+async function goToSchedule() {
+  if (activeTab.value !== 'registration') activeTab.value = 'registration'
+  await nextTick()
+  schedulePanel.value?.scrollIntoView({behavior:'smooth',block:'start'})
+  document.getElementById('schedule-heading')?.focus({preventScroll:true})
+}
 
 function openGuide(event) {
   guideReturnFocus = event?.currentTarget ?? guideTrigger.value
@@ -338,7 +349,7 @@ async function loadPublic() {
   try {
     const data = await callPublic('summary')
     event.value = data.event
-    if (!tabWasChosen && data.event?.stage !== 'registration') activeTab.value = 'standings'
+    if (!tabWasChosen) activeTab.value = hold.value || complete.value || data.event?.stage === 'registration' ? 'registration' : 'standings'
     registrations.value = data.registrations ?? []
     activeHolds.value = Number(data.active_holds ?? 0)
     snapshot.value = data.publication?.snapshot ?? null
