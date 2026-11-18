@@ -302,7 +302,6 @@ onMounted(() => {
   max-width: 960px;
   margin: 0 auto clamp(26px, 4vw, 48px);
   padding: clamp(19px, 3vw, 28px) 0;
-  border-block: 1px solid var(--line);
   background: transparent;
 }
 .welcome-note h2 { margin: 0 0 12px; color: var(--ink); font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.2 var(--font-display); }
@@ -384,7 +383,7 @@ onMounted(() => {
 .seat-name { min-width: 0; color: var(--matcha-leaf); font: 400 1.05rem/1.2 var(--font-display); overflow-wrap: anywhere; }
 .seat-character { min-width: 0; overflow-wrap: anywhere; color: var(--muted); font-size: .82rem; }
 .death-mark { padding: 2px 5px; border: 1px solid var(--blush-petal); border-radius: 4px; background: var(--rose-dust); color: var(--clay-text); font-size: .65rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-.art-credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--soft-ink); font-size: .72rem; }
+.art-credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; margin-top: 24px; padding-top: 14px; color: var(--soft-ink); font-size: .72rem; }
 .art-credit a { color: var(--wine); text-underline-offset: 3px; }
 .art-credit a:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .photo-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; margin: 16px 0 0; }

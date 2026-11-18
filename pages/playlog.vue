@@ -794,7 +794,7 @@ onUnmounted(() => {
 .stat-tile { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; box-shadow: none; padding: 20px 16px; }
 .stat-label { font-size: .7rem; letter-spacing: .02em; text-transform: none; opacity: 1; color: var(--muted); }
 .session-date { font-style: normal; font-size: 1.5rem; }
-.session-date::after { background: var(--line); }
+.session-date::after { display: none; }
 .game-pill { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 6px; text-transform: none; font-weight: 400; font-size: .85rem; letter-spacing: 0; padding: 8px 14px; }
 .ranking-title { text-align: left; opacity: 1; font-size: .68rem; }
 .page-btn { min-width: 44px; min-height: 44px; border-radius: 6px; }

@@ -148,7 +148,7 @@ function closeMobileToc() {
 .rules-content { min-width: 0; color: var(--clay-text); font-size: .97rem; line-height: 1.75; overflow-wrap: anywhere; }
 .rules-content > h2 { margin: 2.6em 0 .3em; padding-bottom: .45em; border-bottom: 2px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.8rem,3.5vw,2.35rem)/1.2 var(--font-display); }
 .back-to-contents { display: inline-block; margin-bottom: .8em; color: var(--muted); font-size: .78rem; text-underline-offset: 3px; }
-.rules-content h2 { margin: 2.4em 0 .75em; padding-bottom: .4em; border-bottom: 1px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.5rem,3vw,2rem)/1.25 var(--font-display); }
+.rules-content h2 { margin: 2.4em 0 .75em; padding-bottom: .4em; color: var(--matcha-leaf); font: 400 clamp(1.5rem,3vw,2rem)/1.25 var(--font-display); }
 .rules-content h3 { margin: 1.8em 0 .55em; color: var(--matcha-leaf); font: 500 1.16rem/1.4 var(--font-display); }
 .rules-content h4 { margin: 1.3em 0 .4em; color: var(--clay-text); font: 700 1rem/1.45 var(--font-body); }
 .rules-content p { margin: .8em 0; }
@@ -162,7 +162,7 @@ function closeMobileToc() {
 .rules-content table { display: block; width: 100%; max-width: 100%; margin: 1.2em 0; overflow-x: auto; border-collapse: collapse; font-size: .9rem; }
 .rules-content th,.rules-content td { padding: 9px 12px; border: 1px solid var(--line); text-align: left; }
 .rules-content th { background: var(--surface-soft); color: var(--matcha-leaf); }
-.rules-content hr { margin: 2em 0; border: 0; border-top: 1px solid var(--line); }
+.rules-content hr { display: none; }
 .rules-content :focus-visible,.toc-desktop :focus-visible,.toc-mobile :focus-visible,.rules-back-link:focus-visible,.back-to-contents:focus-visible { outline: 3px solid var(--gold-leaf); outline-offset: 3px; }
 .rules-state { max-width: 760px; margin: 40px auto; padding: 24px; border-radius: 8px; background: var(--surface-soft); color: var(--muted); }
 @media(max-width:800px) { .rules-page { width: min(100% - 32px,1120px); } .rules-layout { display: block; } .toc-desktop { display: none; } .toc-mobile { display: block; margin: 0 0 22px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); } .toc-mobile summary { color: var(--matcha-leaf); font-weight: 700; cursor: pointer; } .toc-mobile nav { max-height: 55vh; overflow: auto; margin-top: 10px; } }

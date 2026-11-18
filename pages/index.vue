@@ -420,9 +420,7 @@ const expectations = [
   padding: 12px 0;
 }
 
-.expect-card + .expect-card {
-  border-top: 1px solid var(--line);
-}
+.expect-card + .expect-card { padding-top: 16px; }
 
 .guide-icon, .pillar-icon { color: var(--gold-leaf); margin-top: 2px; }
 
@@ -497,7 +495,7 @@ const expectations = [
   list-style: none;
 }
 
-.community-card li { border-top: 1px solid var(--line); }
+.community-card li { border-top: 0; }
 
 .community-card .text-link {
   display: flex;
