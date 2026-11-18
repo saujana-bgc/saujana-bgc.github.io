@@ -35,7 +35,7 @@
 
       <label class="standing-search">
         <span class="league-field-label">Find a player</span>
-        <UInput class="league-control" v-model="standingQuery" type="search" placeholder="Search standings" autocomplete="off" />
+        <UInput class="league-control" v-model="standingQuery" type="search" aria-label="Search standings" placeholder="Search standings" autocomplete="off" />
       </label>
       <p v-if="!filteredStandings.length" role="status">No players match “{{ standingQuery }}”.</p>
       <div class="standings-table-wrap">
@@ -2155,6 +2155,9 @@ onBeforeUnmount(() => {
 .standings-table td, .standings-table tbody th, .result-table td, .result-table tbody th { font-size: var(--league-body-size); }
 .standings-table thead th, .result-table thead th, .section-kicker, .table-title h4 { font-size: .75rem; letter-spacing: .06em; }
 .season-switcher .league-control { width: auto; min-width: 120px; }
+.season-switcher :deep(button) { min-width: 150px; padding-right: 38px; }
+.standing-search :deep(.league-control) { padding: 0; border: 0; background: transparent; }
+.standing-search :deep(input) { box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid var(--league-border); border-radius: 10px; background: var(--white-pure); color: var(--clay-text); font: 400 16px/1.5 var(--font-body); }
 .season-switcher { gap: 10px; padding: 0; background: transparent; }
 .standing-player > strong, .result-cards article > strong { font-variant-numeric: tabular-nums; }
 .standing-player small, .result-cards article > strong small { font-size: .75rem; color: var(--league-muted); }

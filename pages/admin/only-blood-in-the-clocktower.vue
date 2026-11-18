@@ -78,6 +78,7 @@
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <span class="seat-number" aria-label="Seat">{{ String(playerIndex + 1).padStart(2, '0') }}</span>
               <label class="player-name-field">Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
+              <label class="public-player-name-field">Public nickname <input v-model="player.public_name" maxlength="80" placeholder="Optional · hidden if blank"></label>
               <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
               <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
@@ -135,7 +136,7 @@
 
         <details class="visitor-preview admin-card">
           <summary>Preview the public recap</summary>
-          <p class="preview-note">Player names appear in the public recap.</p>
+          <p class="preview-note">Only a public nickname appears in the recap. Leave it blank to show a player number.</p>
           <article class="preview-session">
             <header class="preview-masthead">
               <p class="eyebrow">From the storyteller’s desk</p>
@@ -150,7 +151,7 @@
               <h4>{{ game.script || 'Script not recorded' }}</h4>
               <div class="preview-content">
                 <p v-if="game.outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
-                <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ (player.name || player.public_name || '').trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
+                <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
                 <p v-if="game.notes">{{ game.notes }}</p>
               </div>
               <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
@@ -295,7 +296,7 @@ function cleanSession(session) {
 }
 
 function newPlayer() {
-  return { name: '', character: '', alignment: '', died: false, final_status: '' }
+  return { name: '', public_name: '', character: '', alignment: '', died: false, final_status: '' }
 }
 
 function addGame(options = {}) {
@@ -307,7 +308,7 @@ function addGame(options = {}) {
     script_characters: scriptPresets[script],
     outcome: '', notes: '',
     players: previousGame
-      ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name }))
+      ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name, public_name: player.public_name }))
       : [],
     photos: [],
   }
@@ -816,6 +817,7 @@ button:disabled { opacity: .65; cursor: wait; }
 .seat-number { display: grid; place-items: center; align-self: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--matcha-leaf); font-size: .68rem; font-weight: 750; }
 .player-card > label:not(.check-label) { font-size: .8rem; }
 .player-name-field { min-width: 0; font-size: .8rem; }
+.public-player-name-field { min-width: 0; font-size: .8rem; }
 .player-card .check-label { align-self: end; min-height: 44px; padding: 0 3px; font-size: .82rem; }
 .player-card .death-check { white-space: nowrap; }
 .legacy-status { grid-column: 1 / -1; }
@@ -848,6 +850,7 @@ button:disabled { opacity: .65; cursor: wait; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
   .player-card { grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
   .player-card > .player-name-field { grid-column: 2 / -1; }
+  .player-card > .public-player-name-field { grid-column: 2 / -1; }
   .player-card > label:not(.check-label):not(.player-name-field) { grid-column: 2 / -1; }
   .player-card > .seat-number { grid-column: 1; grid-row: 1; }
   .player-card > .death-check { grid-column: 2 / 4; }

@@ -1883,11 +1883,13 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 
 .btn-delete {
+    min-width: 44px;
+    min-height: 44px;
     background: none;
     border: none;
     cursor: pointer;
     color: var(--matcha-leaf);
-    opacity: 0.25;
+    opacity: 0.65;
     font-size: 0.75rem;
     padding: 4px 6px;
     border-radius: 6px;
@@ -2347,7 +2349,10 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 }
 .signup-field-name { grid-column: 1 / -1; }
 .signup-optional-details { grid-column: 1 / -1; }
-.signup-optional-details summary { width: fit-content; min-height: 44px; display: flex; align-items: center; padding: 0 2px; color: var(--matcha-leaf); font-size: .88rem; font-weight: 700; cursor: pointer; }
+.signup-optional-details summary { width: fit-content; min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 2px; color: var(--matcha-leaf); font-size: .88rem; font-weight: 700; cursor: pointer; list-style: none; }
+.signup-optional-details summary::-webkit-details-marker { display: none; }
+.signup-optional-details summary::after { width: 8px; height: 8px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; content: ''; transform: rotate(45deg) translateY(-2px); transition: transform .18s ease; }
+.signup-optional-details[open] summary::after { transform: rotate(225deg) translate(-2px, -1px); }
 .signup-optional-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 20px; padding: 12px 0 4px; }
 .signup-field-notes { grid-column: 1 / -1; }
 .signup-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }

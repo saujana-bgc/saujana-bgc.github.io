@@ -9,6 +9,38 @@
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
         </div>
       </div>
+      <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
+        <template v-if="nextGathering">
+          <time class="next-gathering-date" :datetime="nextGathering.date" aria-label="Gathering date">
+            <strong>{{ nextGatheringDateStamp.day }}</strong>
+            <span>{{ nextGatheringDateStamp.month }}</span>
+          </time>
+          <div class="next-gathering-copy">
+            <p class="next-gathering-label"><span>Next gathering</span><time :datetime="nextGathering.date">{{ nextGatheringDateStamp.weekday }}</time></p>
+            <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
+            <div class="next-gathering-details">
+              <span class="gathering-detail">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>
+                {{ nextGathering.time }}
+              </span>
+              <span class="gathering-detail">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>
+                {{ nextGathering.venue }}
+              </span>
+              <a v-if="nextGathering.venue_url" class="gathering-detail gathering-directions" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+          <NuxtLink class="next-gathering-link" :to="`/gatherings/#gathering-${nextGathering.id}`" no-prefetch>
+            See gathering details <span aria-hidden="true">→</span>
+          </NuxtLink>
+        </template>
+        <div v-else class="next-gathering-empty" role="status">
+          <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
+          <p v-else-if="gatheringStatus === 'unavailable'">We can’t reach the calendar just now.</p>
+          <p v-else>We haven’t announced the next gathering yet. Have a question? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
+          <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
+        </div>
+      </section>
       <figure class="hero-artwork">
         <img
           class="hero-banner"
@@ -22,39 +54,6 @@
           fetchpriority="high"
         >
       </figure>
-    </section>
-
-    <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
-      <template v-if="nextGathering">
-      <time class="next-gathering-date" :datetime="nextGathering.date" aria-label="Gathering date">
-        <strong>{{ nextGatheringDateStamp.day }}</strong>
-        <span>{{ nextGatheringDateStamp.month }}</span>
-      </time>
-      <div class="next-gathering-copy">
-        <p class="next-gathering-label"><span>Next gathering</span><time :datetime="nextGathering.date">{{ nextGatheringDateStamp.weekday }}</time></p>
-        <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
-        <div class="next-gathering-details">
-          <span class="gathering-detail">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>
-            {{ nextGathering.time }}
-          </span>
-          <span class="gathering-detail">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>
-            {{ nextGathering.venue }}
-          </span>
-          <a v-if="nextGathering.venue_url" class="gathering-detail gathering-directions" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
-        </div>
-      </div>
-      <NuxtLink class="next-gathering-link" :to="`/gatherings/#gathering-${nextGathering.id}`" no-prefetch>
-        See gathering details <span aria-hidden="true">→</span>
-      </NuxtLink>
-      </template>
-      <div v-else class="next-gathering-empty" role="status">
-        <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
-        <p v-else-if="gatheringStatus === 'unavailable'">We can’t reach the calendar just now.</p>
-        <p v-else>We haven’t announced the next gathering yet. Have a question? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
-        <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
-      </div>
     </section>
 
     <section id="first-visit" class="home-section" aria-labelledby="first-visit-title" tabindex="-1">
@@ -551,6 +550,12 @@ const expectations = [
 
 @media (max-width: 700px) {
   .hero-section { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .hero-copy { display: contents; }
+  .hero-copy h1 { grid-row: 1; }
+  .hero-copy > p { grid-row: 2; }
+  .hero-actions { grid-row: 3; }
+  .next-gathering { grid-row: 4; }
+  .hero-artwork { grid-row: 5; }
   .hero-artwork { max-width: none; }
 }
 

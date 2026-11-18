@@ -35,7 +35,9 @@
         <section
           v-for="session in pagedSessions"
           :key="session.date"
+          :ref="el => { if (session === pagedSessions[0]) resultsStart = el }"
           class="session-card fade-up"
+          tabindex="-1"
         >
           <div class="session-date">{{ session.displayDate }}</div>
 
@@ -79,6 +81,7 @@
             :key="p"
             class="page-btn"
             :class="{ active: p === currentPage }"
+            :aria-current="p === currentPage ? 'page' : undefined"
             @click="goToPage(p)"
           >{{ p }}</UButton>
           <UButton class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">Next</UButton>
@@ -178,6 +181,7 @@ const PAGE_SIZE = 10
 const HOVER_CARD_HEIGHT = 245
 
 const currentPage = ref(1)
+const resultsStart = ref(null)
 const search = ref('')
 const expandedSessionGames = reactive(new Set())
 const selectedRankedGame = ref(null)
@@ -314,7 +318,10 @@ function toggleSessionGames(date) {
 
 const goToPage = (p) => {
     currentPage.value = p
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    nextTick(() => {
+        resultsStart.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        resultsStart.value?.focus({ preventScroll: true })
+    })
 }
 
 function showGameImageAt(x, y, gameName, showPlayers = true, key = gameName) {

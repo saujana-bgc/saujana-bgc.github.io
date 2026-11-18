@@ -47,6 +47,7 @@
 
           <fieldset class="birthday-fields">
             <legend>Your birthday</legend>
+            <p class="birthday-date-hint">Choose a month, then a day.</p>
             <div class="date-grid">
               <div class="field-group">
                 <label for="birth-month">Month</label>
@@ -305,6 +306,7 @@ function resetForm() {
   padding: 0;
   border: 0;
 }
+.birthday-date-hint { margin: 0 0 8px; color: var(--muted); font-size: .82rem; }
 
 .date-grid {
   display: grid;

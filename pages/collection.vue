@@ -641,6 +641,10 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 /* Keep keyboard and visual order aligned on the collection page. */
 main:has(.collection-search) { gap: 10px; }
 main:has(.collection-search) > .collection-search { margin-bottom: 0; }
+main:has(.collection-search) > .collection-first-pick { order: 1; }
+main:has(.collection-search) > .collection-search { order: 0; }
+main:has(.collection-search) > .sort-controls { order: 2; }
+main:has(.collection-search) > .editorial-grid { order: 3; }
 main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; }
 .collection-search { flex-direction: column; align-items: stretch; gap: 7px; }
 .collection-search {

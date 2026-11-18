@@ -129,7 +129,9 @@ const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 const publicGreetingCount = computed(() => birthdays.value.filter(birthday => birthday.allow_public_greeting).length)
 const isLeapCalendarYear = computed(() => calendarYear.value % 4 === 0 && (calendarYear.value % 100 !== 0 || calendarYear.value % 400 === 0))
 const leapDayBirthdays = computed(() => birthdays.value.filter(birthday => birthday.birth_month === 2 && birthday.birth_day === 29))
-const mobileBirthdayList = computed(() => [...birthdays.value].sort((a,b) => a.birth_month - b.birth_month || a.birth_day - b.birth_day || a.name.localeCompare(b.name)))
+const mobileBirthdayList = computed(() => birthdays.value
+  .filter(birthday => isLeapCalendarYear.value || birthday.birth_month !== 2 || birthday.birth_day !== 29)
+  .sort((a,b) => a.birth_month - b.birth_month || a.birth_day - b.birth_day || a.name.localeCompare(b.name)))
 
 function birthdayDateLabel(birthday) {
   return new Date(2024, birthday.birth_month - 1, birthday.birth_day).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })
