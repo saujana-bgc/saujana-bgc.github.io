@@ -14,23 +14,23 @@
         </div>
         <div class="next-copy">
           <p class="eyebrow">Next Clocktower gathering</p>
-          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendarâ€¦' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
+          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
           <p v-if="nextGathering?.time">{{ nextGathering.time }}</p>
-          <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions â†—</a></p>
+          <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions ↗</a></p>
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
-          <p v-else-if="eventError">We couldnâ€™t load the schedule just now.</p>
+          <p v-else-if="eventError">We couldn’t load the schedule just now.</p>
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
           <UButton v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</UButton>
         </div>
-        <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">â†—</span></a>
+        <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
         <template v-else-if="!eventLoading">
-          <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next gathering <span aria-hidden="true">â†—</span></a>
-          <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>See all gatherings <span aria-hidden="true">â†—</span></NuxtLink>
+          <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next gathering <span aria-hidden="true">↗</span></a>
+          <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>See all gatherings <span aria-hidden="true">↗</span></NuxtLink>
         </template>
       </section>
     </div>
     <nav class="clocktower-page-links" aria-label="Clocktower page links">
-      <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">â†’</span></NuxtLink>
+      <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">→</span></NuxtLink>
     </nav>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
@@ -44,16 +44,16 @@
           <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
           <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
           <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
-          <li><strong>Being out doesnâ€™t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
+          <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
         </ul>
-        <p class="welcome-joining">You can come on your own or with a friend. Tell the host youâ€™re new; theyâ€™ll help you decide whether to watch or play.</p>
-        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">â†—</span></a>
+        <p class="welcome-joining">You can come on your own or with a friend. Tell the host you’re new; they’ll help you decide whether to watch or play.</p>
+        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
       </ActivityOverviewFeature>
     </section>
 
     <footer class="art-credit">
       <span>Blood on the Clocktower is published by <a href="https://bloodontheclocktower.com/" target="_blank" rel="noopener noreferrer">The Pandemonium Institute</a>.</span>
-      <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">Character icon credits <span aria-hidden="true">â†—</span></a>
+      <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">Character icon credits <span aria-hidden="true">↗</span></a>
     </footer>
   </main>
 </template>
@@ -120,6 +120,14 @@ const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGather
 const nextCtaLabel = computed(() => {
   if (nextGathering.value?.signup_url) return 'See details and sign up'
   return nextGathering.value?.href?.endsWith('/') ? 'See all gatherings' : 'See gathering details'
+})
+const nextDateStamp = computed(() => {
+  if (!nextGathering.value) return null
+  const date = new Date(nextGathering.value.date + 'T12:00:00')
+  return {
+    day: date.toLocaleDateString('en-MY', { day: 'numeric' }),
+    month: date.toLocaleDateString('en-MY', { month: 'short' }),
+  }
 })
 function formatDate(value) {
   return value
