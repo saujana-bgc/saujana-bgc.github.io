@@ -14,23 +14,23 @@
         </div>
         <div class="next-copy">
           <p class="eyebrow">Next Clocktower gathering</p>
-          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
+          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendarâ€¦' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
           <p v-if="nextGathering?.time">{{ nextGathering.time }}</p>
-          <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions ↗</a></p>
+          <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions â†—</a></p>
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
-          <p v-else-if="eventError">We couldn’t load the schedule just now.</p>
+          <p v-else-if="eventError">We couldnâ€™t load the schedule just now.</p>
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
           <UButton v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</UButton>
         </div>
-        <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
+        <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">â†—</span></a>
         <template v-else-if="!eventLoading">
-          <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next gathering <span aria-hidden="true">↗</span></a>
-          <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>See all gatherings <span aria-hidden="true">↗</span></NuxtLink>
+          <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next gathering <span aria-hidden="true">â†—</span></a>
+          <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>See all gatherings <span aria-hidden="true">â†—</span></NuxtLink>
         </template>
       </section>
     </div>
     <nav class="clocktower-page-links" aria-label="Clocktower page links">
-      <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">→</span></NuxtLink>
+      <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">â†’</span></NuxtLink>
     </nav>
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
@@ -44,16 +44,16 @@
           <li><strong>At night, get clues</strong><span>Some players close their eyes while the Storyteller wakes others to share information or use an ability.</span></li>
           <li><strong>By day, compare stories</strong><span>Talk with the group, share what you learned and vote on who might be the Demon.</span></li>
           <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
-          <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
+          <li><strong>Being out doesnâ€™t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
         </ul>
-        <p class="welcome-joining">You can come on your own or with a friend. Tell the host you’re new; they’ll help you decide whether to watch or play.</p>
-        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
+        <p class="welcome-joining">You can come on your own or with a friend. Tell the host youâ€™re new; theyâ€™ll help you decide whether to watch or play.</p>
+        <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">â†—</span></a>
       </ActivityOverviewFeature>
     </section>
 
     <footer class="art-credit">
       <span>Blood on the Clocktower is published by <a href="https://bloodontheclocktower.com/" target="_blank" rel="noopener noreferrer">The Pandemonium Institute</a>.</span>
-      <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">Character icon credits <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/tomozbot/botc-icons" target="_blank" rel="noopener noreferrer">Character icon credits <span aria-hidden="true">â†—</span></a>
     </footer>
   </main>
 </template>
@@ -62,20 +62,7 @@
 const config = useRuntimeConfig()
 const route = useRoute()
 
-function publicPlayerName(player, index) {
-  const name = typeof player.public_name === 'string' ? player.public_name.trim() : ''
-  return name && name !== 'Seat ' + (index + 1) ? name : 'Player ' + (index + 1)
-}
-
 const sessions = ref([])
-const photoUrls = ref({})
-const selectedYear = ref('all')
-const selectedScript = ref('all')
-const currentPage = ref(1)
-const shareNotice = ref('')
-const PAGE_SIZE = 3
-const loading = ref(true)
-const error = ref('')
 const eventLoading = ref(true)
 const eventError = ref(false)
 const communityEvents = ref([])
@@ -87,10 +74,12 @@ const localDate = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit',
 }).format(new Date())
 // The archive endpoint already filters to published sessions.
-const recapSessions = computed(() => sessions.value.filter(hasResults).sort((a, b) => String(b.session_date || '').localeCompare(String(a.session_date || ''))))
+const filteredSessions = computed(() => sessions.value
+  .filter(hasResults)
+  .sort((a, b) => String(b.session_date || '').localeCompare(String(a.session_date || ''))))
 const nextNight = computed(() => communityEvents.value
   .filter(event => /clocktower/i.test(event.name) && (
-    event.date > localDate || (event.date === localDate && !recapSessions.value.some(session =>
+    event.date > localDate || (event.date === localDate && !filteredSessions.value.some(session =>
       session.session_date === event.date && (!session.venue || !event.venue || session.venue.trim().toLowerCase() === event.venue.trim().toLowerCase()),
     ))
   ))
@@ -132,31 +121,6 @@ const nextCtaLabel = computed(() => {
   if (nextGathering.value?.signup_url) return 'See details and sign up'
   return nextGathering.value?.href?.endsWith('/') ? 'See all gatherings' : 'See gathering details'
 })
-const featured = computed(() => [...recapSessions.value].sort((a, b) => b.session_date.localeCompare(a.session_date))[0])
-const nextDateStamp = computed(() => {
-  if (!nextGathering.value) return null
-  const date = new Date(nextGathering.value.date + 'T12:00:00')
-  return {
-    day: date.toLocaleDateString('en-MY', { day: 'numeric' }),
-    month: date.toLocaleDateString('en-MY', { month: 'short' }),
-  }
-})
-const archiveYears = computed(() => [...new Set(recapSessions.value.map(session => session.session_date?.slice(0, 4)).filter(Boolean))].sort((a, b) => b.localeCompare(a)))
-const archiveScripts = computed(() => [...new Set(recapSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean))].sort((a, b) => a.localeCompare(b)))
-const filteredSessions = computed(() => recapSessions.value.filter(session =>
-  (selectedYear.value === 'all' || session.session_date?.startsWith(selectedYear.value)) &&
-  (selectedScript.value === 'all' || session.games?.some(game => game.script === selectedScript.value)),
-))
-const pageCount = computed(() => Math.ceil(filteredSessions.value.length / PAGE_SIZE))
-const paginatedSessions = computed(() => filteredSessions.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE))
-const rangeStart = computed(() => filteredSessions.value.length ? (currentPage.value - 1) * PAGE_SIZE + 1 : 0)
-const rangeEnd = computed(() => Math.min(currentPage.value * PAGE_SIZE, filteredSessions.value.length))
-const statistics = computed(() => ({
-  sessions: recapSessions.value.length,
-  games: recapSessions.value.reduce((total, session) => total + (session.games?.length || 0), 0),
-  scripts: new Set(recapSessions.value.flatMap(session => session.games || []).map(game => game.script).filter(Boolean)).size,
-}))
-
 function formatDate(value) {
   return value
     ? new Date(value + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -167,93 +131,7 @@ function hasResults(session) {
   return Boolean(session.recap || session.games?.length)
 }
 
-function sessionPhotos(session) {
-  return (session.games || []).flatMap(game => game.photos || [])
-    .filter(photo => photo.approved && photoUrls.value[photo.path])
-}
-
-function coverPhoto(session) {
-  return sessionPhotos(session).find(photo => photo.cover)
-}
-
-function retellingParagraphs(recap) {
-  return recap.trim().split(/\r?\n(?:[^\S\r\n]*\r?\n)+/)
-}
-
-function visibleGames(session) {
-  return (session.games || [])
-    .map((game, index) => ({ game, number: index + 1 }))
-    .filter(({ game }) => selectedScript.value === 'all' || game.script === selectedScript.value)
-}
-
-function characterIcon(character) {
-  const file = (character || 'custom').toLowerCase().replace(/[^a-z0-9]/g, '')
-  return `/images/clocktower/characters/${file}.webp`
-}
-
-function clearArchiveFilters() {
-  selectedYear.value = 'all'
-  selectedScript.value = 'all'
-}
-
-function setSelectedYear(year) {
-  selectedYear.value = year
-  currentPage.value = 1
-}
-
-function setSelectedScript(script) {
-  selectedScript.value = script
-  currentPage.value = 1
-}
-
-async function changePage(page) {
-  currentPage.value = Math.min(Math.max(1, page), pageCount.value)
-  await nextTick()
-  const heading = document.getElementById('archive-title')
-  heading?.scrollIntoView({ block: 'start' })
-  heading?.focus({ preventScroll: true })
-}
-
-async function focusSharedTarget() {
-  const sharedGameId = route.query.game
-  const sharedSessionId = route.query.session
-  if (typeof sharedGameId !== 'string' && typeof sharedSessionId !== 'string') return
-
-  let session = typeof sharedSessionId === 'string'
-    ? recapSessions.value.find(item => String(item.id) === sharedSessionId)
-    : null
-  let game = null
-  if (typeof sharedGameId === 'string') {
-    if (session) game = (session.games || []).find(item => String(item.id) === sharedGameId)
-    if (!game) {
-      session = recapSessions.value.find(item => (item.games || []).some(candidate => String(candidate.id) === sharedGameId))
-      game = session?.games?.find(item => String(item.id) === sharedGameId)
-    }
-  }
-
-  if (!session) {
-    shareNotice.value = 'This shared gathering or game is no longer available. Browse the recaps below.'
-    return
-  }
-
-  // A shared URL should remain useful even when the target is outside the active filters.
-  selectedYear.value = 'all'
-  selectedScript.value = 'all'
-  currentPage.value = Math.floor(recapSessions.value.findIndex(item => String(item.id) === String(session.id)) / PAGE_SIZE) + 1
-  await nextTick()
-
-  const target = game ? document.getElementById('game-' + game.id) : null
-  const fallback = document.getElementById('session-' + session.id)
-  const element = target || fallback
-  if (element) {
-    element.scrollIntoView({ block: 'start' })
-    element.querySelector(game && target ? '.game-script' : 'h3')?.focus({ preventScroll: true })
-  }
-}
-
 async function loadArchive() {
-  loading.value = true
-  error.value = ''
   try {
     const response = await fetch(config.public.supabaseUrl + '/functions/v1/botc-archive', {
       method: 'POST', headers, body: JSON.stringify({ action: 'public' }),
@@ -261,15 +139,7 @@ async function loadArchive() {
     const body = await response.json()
     if (!response.ok) throw new Error(body.error)
     sessions.value = body.sessions || []
-    photoUrls.value = body.photo_urls || {}
-    loading.value = false
-    await nextTick()
-    await focusSharedTarget()
-  } catch {
-    error.value = 'The recaps aren’t available right now.'
-  } finally {
-    loading.value = false
-  }
+  } catch {}
 }
 
 async function loadCommunityEvents() {
