@@ -23,6 +23,7 @@
         <span class="empty-mark" aria-hidden="true">✧</span>
         <h3>The archive is quiet for now</h3>
         <p>Gathering stories, game results and approved photos will find their place here as sessions are added.</p>
+        <NuxtLink class="recaps-next-gathering" to="/gatherings/" no-prefetch>See upcoming gatherings <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
       <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. Adjust the year or script above.</p>
@@ -470,6 +471,7 @@ onMounted(() => {
 .empty-mark { margin: 0 auto 12px; font-size: 1.7rem; }
 .empty-archive h3, .session-card h3 { margin: 0; color: var(--ink); font: 400 clamp(1.25rem, 3vw, 1.75rem)/1.2 var(--font-display); }
 .empty-archive p { max-width: 60ch; margin: 8px auto 0; }
+.recaps-next-gathering { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 14px; color: var(--matcha-leaf); font-weight: 650; text-underline-offset: 4px; }
 .session-card { margin: 0 0 14px; border-inline-start: 3px solid var(--gold-leaf); box-shadow: var(--shadow-card); }
 .session-card.is-latest-session { border-inline-start-color: var(--matcha-leaf); background: linear-gradient(110deg, var(--lavender-mist), var(--paper) 70%); box-shadow: var(--shadow-card); }
 .session-masthead { display: grid; gap: 16px 28px; align-items: center; }

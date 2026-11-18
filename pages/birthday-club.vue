@@ -27,7 +27,7 @@
         </div>
 
         <form v-else aria-label="Birthday submission form" novalidate @submit.prevent="submitBirthday">
-          <p class="privacy-note">Only the organisers can see your birthday. A public greeting is optional.</p>
+          <p class="privacy-note">Your birthday is visible only to organisers. You can choose separately whether we may share a public greeting.</p>
           <div class="field-group">
             <label for="birthday-name">Name or nickname</label>
             <UInput

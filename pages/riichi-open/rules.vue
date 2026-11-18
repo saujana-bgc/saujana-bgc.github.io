@@ -84,7 +84,7 @@ const html = computed(() => {
 .toc-desktop .toc-subsection,.toc-mobile .toc-subsection { padding-left: 19px; font-size: .78rem; }
 .toc-mobile { display: none; }
 .rules-content { min-width: 0; color: var(--clay-text); font-size: .97rem; line-height: 1.75; overflow-wrap: anywhere; }
-.rules-content > h1 { display: none; }
+.rules-content > h1 { margin: 2.6em 0 .8em; padding-bottom: .45em; border-bottom: 2px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.8rem,3.5vw,2.35rem)/1.2 var(--font-display); scroll-margin-top: 24px; }
 .rules-content h2 { margin: 2.4em 0 .75em; padding-bottom: .4em; border-bottom: 1px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.5rem,3vw,2rem)/1.25 var(--font-display); scroll-margin-top: 24px; }
 .rules-content h3 { margin: 1.8em 0 .55em; color: var(--matcha-leaf); font: 500 1.16rem/1.4 var(--font-display); scroll-margin-top: 24px; }
 .rules-content p { margin: .8em 0; }

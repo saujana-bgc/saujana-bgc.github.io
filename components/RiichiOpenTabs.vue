@@ -1,5 +1,5 @@
 <template>
-  <div class="riichi-tabs" role="tablist" aria-label="Riichi Open sections">
+  <div class="riichi-tabs" role="tablist" :aria-label="completed ? 'Riichi Open event sections' : 'Riichi Open sections'">
     <UButton
       color="neutral"
       variant="ghost"
@@ -18,13 +18,13 @@
       @keydown.home.prevent="focusTab(0)"
       @keydown.end.prevent="focusTab(tabs.length - 1)"
     >
-      {{ tab.label }}
+      {{ completed && tab.id === 'registration' ? 'Event details' : tab.label }}
     </UButton>
   </div>
 </template>
 
 <script setup>
-defineProps({ modelValue: { type: String, default: 'registration' } })
+defineProps({ modelValue: { type: String, default: 'registration' }, completed: { type: Boolean, default: false } })
 const emit = defineEmits(['update:modelValue'])
 const tabs = [
   { label: 'Registration', id: 'registration' },

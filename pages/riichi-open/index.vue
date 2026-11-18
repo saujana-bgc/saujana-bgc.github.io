@@ -5,7 +5,7 @@
       <h1 class="hero-title">Riichi Open I</h1>
       <p class="stats-container">Saturday, 14 November · Boardroom Bandit, Ara Damansara</p>
     </header>
-    <RiichiOpenTabs v-model="activeTab" />
+    <RiichiOpenTabs v-model="activeTab" :completed="event?.stage === 'completed'" />
     <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><UButton v-if="standingsError && activeTab !== 'standings'" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>
     <div v-if="activeTab === 'registration' || (publicLoaded && event?.stage !== 'completed')" class="event-page-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>

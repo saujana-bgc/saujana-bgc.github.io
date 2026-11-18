@@ -43,11 +43,10 @@
 .activity-copy p:not(.page-eyebrow) { max-width: 560px; color: var(--muted); line-height: 1.75; }
 .activity-copy .page-eyebrow,.activity-tools > .page-eyebrow { justify-content: flex-start; margin-bottom: 12px; }
 .activity-tools { margin-bottom: 28px; }
-.activity-tools .activity-links { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.activity-tools .activity-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .activity-links a { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface-soft); color: var(--matcha-leaf); text-decoration: none; }
 .activity-links strong { font: 400 1.25rem/1.3 var(--font-display); }
 .activity-links a > span:nth-child(2) { grid-column: 1; color: var(--muted); font-size: .9rem; line-height: 1.5; }
 .activity-links a > span:last-child { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
-@media (max-width: 760px) { .activity-tools .activity-links { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .activity-content { margin-top: 4px; } .activity-links { grid-template-columns: 1fr; gap: 10px; } }
 </style>
