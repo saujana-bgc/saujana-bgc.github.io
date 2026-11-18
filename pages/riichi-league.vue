@@ -21,31 +21,6 @@
     <p v-else-if="!isLoadingLeague && !selectedSeason && !leagueLoadError" role="status">There are no league seasons to show yet.</p>
 
     <template v-if="selectedSeason">
-    <section class="season-card fade-up" aria-labelledby="season-heading">
-      <div class="season-heading">
-        <div>
-          <span class="status-pill" :class="`status-${seasonStatus}`">{{ statusLabel }}</span>
-          <h2 id="season-heading">{{ selectedSeason.name }}</h2>
-          <p>{{ formatDate(selectedSeason.startDate, true) }} – {{ formatDate(selectedSeason.endDate, true) }}</p>
-        </div>
-        <div class="prize-card">
-          <span>Season prize</span>
-          <strong>{{ selectedSeason.prize.title }}</strong>
-          <small>{{ selectedSeason.prize.description }}</small>
-        </div>
-      </div>
-
-      <div class="season-stats" aria-label="Season format">
-        <div>
-          <strong>{{ completedWeeks.length }}</strong>
-          <span>of {{ selectedSeason.totalWeeks }} weeks played</span>
-        </div>
-        <div>
-          <strong>{{ selectedSeason.supportedTableSizes.join(' or ') }}</strong>
-          <span>players per table</span>
-        </div>
-      </div>
-    </section>
 
     <section class="content-card standings-card fade-up" aria-labelledby="standings-heading">
       <div class="section-heading">
@@ -106,6 +81,32 @@
       <UButton v-if="!standingQuery && filteredStandings.length > 10" type="button" class="standings-toggle league-button" :aria-expanded="showAllStandings" @click="showAllStandings = !showAllStandings">
         {{ showAllStandings ? 'Show top 10' : `Show all ${filteredStandings.length} players` }}
       </UButton>
+    </section>
+
+    <section class="season-card fade-up" aria-labelledby="season-heading">
+      <div class="season-heading">
+        <div>
+          <span class="status-pill" :class="`status-${seasonStatus}`">{{ statusLabel }}</span>
+          <h2 id="season-heading">{{ selectedSeason.name }}</h2>
+          <p>{{ formatDate(selectedSeason.startDate, true) }} – {{ formatDate(selectedSeason.endDate, true) }}</p>
+        </div>
+        <div class="prize-card">
+          <span>Season prize</span>
+          <strong>{{ selectedSeason.prize.title }}</strong>
+          <small>{{ selectedSeason.prize.description }}</small>
+        </div>
+      </div>
+
+      <div class="season-stats" aria-label="Season format">
+        <div>
+          <strong>{{ completedWeeks.length }}</strong>
+          <span>of {{ selectedSeason.totalWeeks }} weeks played</span>
+        </div>
+        <div>
+          <strong>{{ selectedSeason.supportedTableSizes.join(' or ') }}</strong>
+          <span>players per table</span>
+        </div>
+      </div>
     </section>
 
     <p class="league-welcome">New to riichi? <NuxtLink to="/gatherings/" no-prefetch>Come to a gathering</NuxtLink> to watch a hand and meet the players. Ask around for Saujana BGC and let us know you’re new to riichi.</p>

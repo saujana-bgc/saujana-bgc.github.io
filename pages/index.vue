@@ -548,12 +548,12 @@ const expectations = [
 
 @media (max-width: 600px) {
   .home { width: calc(100% - 32px); }
-  .hero-section { padding-top: 12px; border-bottom: 0; }
+  .hero-section { padding-top: 12px; padding-bottom: 4px; border-bottom: 0; }
   .hero-copy,
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .care-guide { grid-template-columns: minmax(0, 1fr); }
-  .next-gathering { grid-template-columns: 54px minmax(0, 1fr); align-items: start; gap: 8px 12px; padding: 16px; }
+  .next-gathering { grid-template-columns: 54px minmax(0, 1fr); align-items: start; gap: 8px 12px; margin-top: 8px; padding: 14px; }
   .next-gathering-date { width: 50px; min-height: 54px; grid-row: 1; }
   .next-gathering-copy { grid-column: 2; grid-row: 1; }
   .next-gathering-link { grid-column: 1 / -1; grid-row: 2; width: 100%; justify-content: center; }

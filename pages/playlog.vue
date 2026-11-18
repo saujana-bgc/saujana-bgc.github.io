@@ -50,6 +50,14 @@
               @click="toggleGameImage($event, game)"
             >{{ game.name }}</UButton>
           </div>
+          <section v-if="hoverImage.visible && session.games.some(game => game.key === hoverImage.key)" class="game-hover-card" aria-label="Selected game details">
+            <img :src="hoverImage.src" :alt="hoverImage.name" width="150" height="130" decoding="async">
+            <div v-if="hoverImage.showPlayers && hoverImage.players.length" class="game-hover-name">PLAYERS</div>
+            <div v-if="hoverImage.showPlayers && hoverImage.players.length" class="game-hover-players" aria-label="Players">
+              <span v-for="player in hoverImage.players" :key="player" class="game-hover-player">{{ player }}</span>
+            </div>
+            <UButton type="button" class="page-btn" @click="hideGameImage">Close details</UButton>
+          </section>
           <UButton
             v-if="matchingGames && session.games.some(game => !game.name.toLocaleLowerCase().includes(matchingGames))"
             class="show-session-games"
@@ -158,16 +166,6 @@
       </template>
       <p class="clocktower-link"><NuxtLink to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps →</NuxtLink></p>
     </main>
-
-    <Teleport to="body">
-      <div v-if="hoverImage.visible" id="game-hover-card" class="game-hover-card" role="status" aria-live="polite" aria-atomic="true" :class="hoverImage.above ? 'hover-above' : 'hover-below'" :style="{ top: hoverImage.y + 'px', left: hoverImage.x + 'px' }">
-        <img :src="hoverImage.src" :alt="hoverImage.name" width="150" height="130" decoding="async" />
-        <div v-if="hoverImage.showPlayers && hoverImage.players.length" class="game-hover-name">PLAYERS</div>
-        <div v-if="hoverImage.showPlayers && hoverImage.players.length" class="game-hover-players" aria-label="Players">
-          <span v-for="player in hoverImage.players" :key="player" class="game-hover-player">{{ player }}</span>
-        </div>
-      </div>
-    </Teleport>
 </template>
 
 <script setup>
@@ -686,24 +684,26 @@ onUnmounted(() => {
 }
 
 .game-hover-card {
-    position: fixed;
-    z-index: 9999;
-    pointer-events: none;
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+    width: min(100%, 320px);
+    max-width: 100%;
+    max-height: none;
+    margin: 14px 0 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow-card);
+    text-align: left;
     background: var(--white-pure);
-    border-radius: 18px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-    padding: 10px;
-    width: 190px;
-    max-width: min(190px, calc(100vw - 28px));
-    max-height: calc(100vh - 28px);
-    overflow-y: auto;
-    text-align: center;
+    padding: 14px;
+    overflow: visible;
     animation: hoverCardIn 0.15s ease;
 }
 
 .game-hover-card img {
     width: 100%;
-    height: 130px;
+    height: 180px;
     object-fit: contain;
     border-radius: 10px;
     display: block;

@@ -128,42 +128,6 @@ Formal tournament penalties are explained in [Riichi Open tournament rules](#rii
 
 ---
 
-## 11. Player conduct
-
-Players are expected to maintain good tournament etiquette.
-
-- Calls and win declarations should be made clearly.
-- Discards should remain arranged in order.
-- Players must not reveal concealed information.
-- Players must not intentionally give information about another player's hand.
-- Spectators must not comment on active hands.
-- No collusion or signalling is permitted.
-- Intentional stalling is prohibited.
-- Players should allow opponents reasonable time to act.
-- Players must not intentionally manipulate, mark or identify tiles.
-- Players should treat opponents and organisers respectfully.
-- Keep phones and reference materials away while a hand is in progress. Check scoring aids between hands.
-
----
-
-## 12. Disputes and rulings
-
-For a rules dispute, illegal action, scoring disagreement or disrupted game state, pause play and call the host or tournament organiser. The host settles casual games. The tournament organiser applies the announced event rules and penalties.
-
-The organiser acts as the event's referee and applies the official WRC documents consistently. Players may politely request that a ruling be reviewed before play resumes. The organiser's final ruling governs the event.
-
----
-
-## 13. Spirit of the event
-
-Riichi Open is a Saujana Board Game Community event.
-
-Players are expected to compete seriously while maintaining a friendly and welcoming atmosphere.
-
-Play to win, respect the table, and enjoy the mahjong.
-
----
-
 # Three-player rules (sanma)
 
 These settings apply to Saujana’s three-player riichi tables. Follow the shared rules above wherever they fit, with the changes below. Sanma has its own tile set, draw progression, scoring payments and multiple-ron rule.
@@ -314,5 +278,41 @@ Examples of issues the organiser should assess include:
 - procedural mistakes that have not materially affected play.
 
 Players should immediately inform the table or organiser when an irregularity occurs rather than attempting to conceal it.
+
+---
+
+## 11. Player conduct
+
+Players are expected to maintain good tournament etiquette.
+
+- Calls and win declarations should be made clearly.
+- Discards should remain arranged in order.
+- Players must not reveal concealed information.
+- Players must not intentionally give information about another player's hand.
+- Spectators must not comment on active hands.
+- No collusion or signalling is permitted.
+- Intentional stalling is prohibited.
+- Players should allow opponents reasonable time to act.
+- Players must not intentionally manipulate, mark or identify tiles.
+- Players should treat opponents and organisers respectfully.
+- Keep phones and reference materials away while a hand is in progress. Check scoring aids between hands.
+
+---
+
+## 12. Disputes and rulings
+
+For a rules dispute, illegal action, scoring disagreement or disrupted game state, pause play and call the host or tournament organiser. The host settles casual games. The tournament organiser applies the announced event rules and penalties.
+
+The organiser acts as the event's referee and applies the official WRC documents consistently. Players may politely request that a ruling be reviewed before play resumes. The organiser's final ruling governs the event.
+
+---
+
+## 13. Spirit of the event
+
+Riichi Open is a Saujana Board Game Community event.
+
+Players are expected to compete seriously while maintaining a friendly and welcoming atmosphere.
+
+Play to win, respect the table, and enjoy the mahjong.
 
 ---

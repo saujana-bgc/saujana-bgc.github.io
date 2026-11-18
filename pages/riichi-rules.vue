@@ -21,7 +21,6 @@
           <div><dt>Red fives</dt><dd>None</dd></div>
         </dl>
         <a class="beginner-guide-link" href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Read the beginner guide (PDF, 11 MB) ↗</a>
-        <a href="#1-basic-settings">Four-player settings ↓</a>
       </article>
       <article class="table-summary sanma-summary" aria-labelledby="three-player-title">
         <h2 id="three-player-title">Three players · sanma</h2>
@@ -30,18 +29,12 @@
           <div><dt>Starting points</dt><dd>40,000</dd></div>
           <div><dt>Tiles</dt><dd>108 · no chi</dd></div>
         </dl>
-        <a href="#three-player-rules-sanma">Three-player rules ↓</a>
       </article>
     </section>
 
     <div v-if="sections.length" id="rules-contents" class="rules-layout">
       <aside class="toc-desktop" aria-label="Rules contents">
         <p>In this guide</p>
-        <div class="rules-shortcuts" aria-label="Key sections">
-          <a href="#four-player-rules">Four players</a>
-          <a href="#three-player-rules-sanma">Three-player rules</a>
-          <a href="#riichi-open-tournament-rules">Riichi Open rules</a>
-        </div>
         <nav>
           <a v-for="section in sections" :key="section.id" :class="{ 'toc-topic': section.depth === 1, 'toc-subsection': section.depth === 3 }" :href="`#${section.id}`">{{ section.title }}</a>
         </nav>

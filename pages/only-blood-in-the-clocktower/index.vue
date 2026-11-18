@@ -3,7 +3,6 @@
     <header class="page-intro">
       <h1 class="hero-title">Only Blood in the Clocktower</h1>
       <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
-      <p class="activity-welcome">Board games and riichi mahjong are included too. New to Clocktower? The Storyteller will help you get started.</p>
     </header>
 
     <div class="gathering-banner">
@@ -29,6 +28,7 @@
         </template>
       </section>
     </div>
+    <p class="activity-welcome clocktower-event-welcome">Board games and riichi mahjong are included too. New to Clocktower? The Storyteller will help you get started.</p>
     <nav class="clocktower-page-links" aria-label="Clocktower page links">
       <NuxtLink class="hero-tertiary" to="/only-blood-in-the-clocktower/recaps/" no-prefetch>Browse Clocktower recaps <span aria-hidden="true">→</span></NuxtLink>
     </nav>

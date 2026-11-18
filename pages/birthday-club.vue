@@ -27,7 +27,6 @@
         </div>
 
         <form v-else aria-label="Birthday submission form" novalidate @submit.prevent="submitBirthday">
-          <p class="privacy-note">Your birthday is visible only to organisers. You can choose separately whether we may share a public greeting.</p>
           <div class="field-group">
             <label for="birthday-name">Name or nickname</label>
             <UInput
@@ -91,7 +90,7 @@
             <span class="check-box" aria-hidden="true"></span>
             <span>
               <strong>Allow a public birthday greeting</strong>
-              <small>Otherwise, your birthday stays in the organisers’ private calendar.</small>
+              <small>Your birthday is visible only to organisers unless you allow a public greeting.</small>
             </span>
           </label>
 
@@ -460,7 +459,7 @@ function resetForm() {
 .consent-row { border-radius: 8px; background: var(--surface-soft); }
 .consent-row small, .privacy-note { opacity: 1; color: var(--muted); font-size: .8rem; }
 @media (max-width: 767px) {
-  .date-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .date-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; }
   .field-group { margin-bottom: 17px; }
   .birthday-control { min-width: 0; }
   .field-group :deep(.birthday-control input) { border: 0; box-shadow: none; }

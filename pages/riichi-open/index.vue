@@ -5,12 +5,12 @@
       <h1 class="hero-title">Riichi Open I</h1>
       <p class="stats-container">Saturday, 14 November · Boardroom Bandit, Ara Damansara</p>
     </header>
-    <RiichiOpenTabs v-model="activeTab" :completed="event?.stage === 'completed'" />
+    <RiichiOpenTabs v-model="activeTab" :completed="event?.stage === 'completed' || !publicLoaded" />
     <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><UButton v-if="standingsError && activeTab !== 'standings'" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>
     <div v-if="activeTab === 'registration' || (publicLoaded && event?.stage !== 'completed')" class="event-page-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
       <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-tournament-rules" no-prefetch>Riichi Open rules <span aria-hidden="true">↗</span></NuxtLink>
-      <a class="schedule-jump rules-page-link" href="/riichi-open/rules/riichi-open-i.md">Open I arrangements archive <span aria-hidden="true">↗</span></a>
+      <a class="schedule-jump rules-page-link" href="#event-schedule">Open I format and schedule <span aria-hidden="true">↓</span></a>
     </div>
     <section v-show="activeTab === 'registration'" id="riichi-registration-panel" role="tabpanel" aria-labelledby="riichi-registration-tab">
     <section class="event-hero">
@@ -64,7 +64,7 @@
       </div>
     </section>
 
-    <section v-if="publicLoaded" class="registrant-section"><div><p class="eyebrow">The field</p><h2>Registration list</h2><p>Payment status appears beside each name.</p></div><div class="registrant-counts"><span><strong>{{ verifiedCount }}</strong> verified</span><span><strong>{{ pendingCount }}</strong> awaiting verification</span></div>
+    <section v-if="publicLoaded && event?.stage !== 'completed'" class="registrant-section"><div><p class="eyebrow">The field</p><h2>Registration list</h2><p>Payment status appears beside each name.</p></div><div class="registrant-counts"><span><strong>{{ verifiedCount }}</strong> verified</span><span><strong>{{ pendingCount }}</strong> awaiting verification</span></div>
       <p v-if="!registrations.length" class="empty-list">No registrations yet.</p>
       <ul v-else class="registrant-list"><li v-for="player in registrations" :key="player.id"><strong>{{ player.display_name }}</strong><span :class="player.status==='verified'?'verified-badge':'pending-badge'">{{ player.status==='verified'?'Verified':'Awaiting verification' }}</span></li></ul>
     </section>
@@ -113,7 +113,7 @@
     <div v-if="event?.stage === 'completed' && activeTab === 'standings'" class="event-page-shortcuts completed-results-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
       <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-tournament-rules" no-prefetch>Riichi Open rules <span aria-hidden="true">↗</span></NuxtLink>
-      <a class="schedule-jump rules-page-link" href="/riichi-open/rules/riichi-open-i.md">Open I arrangements archive <span aria-hidden="true">↗</span></a>
+      <a class="schedule-jump rules-page-link" href="#event-schedule">Open I format and schedule <span aria-hidden="true">↓</span></a>
     </div>
   </main>
 </template>
