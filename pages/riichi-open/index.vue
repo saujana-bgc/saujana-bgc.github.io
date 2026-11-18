@@ -10,7 +10,7 @@
     <div v-if="activeTab === 'registration' || (publicLoaded && event?.stage !== 'completed')" class="event-page-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
       <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-tournament-rules" no-prefetch>Riichi Open rules <span aria-hidden="true">↗</span></NuxtLink>
-      <a class="schedule-jump rules-page-link" href="#event-schedule">Open I format and schedule <span aria-hidden="true">↓</span></a>
+      <UButton type="button" class="schedule-jump rules-page-link" aria-controls="schedule-heading" @click="goToSchedule">Open I format and schedule <span aria-hidden="true">↓</span></UButton>
     </div>
     <section v-show="activeTab === 'registration'" id="riichi-registration-panel" role="tabpanel" aria-labelledby="riichi-registration-tab">
     <section class="event-hero">
@@ -113,7 +113,7 @@
     <div v-if="event?.stage === 'completed' && activeTab === 'standings'" class="event-page-shortcuts completed-results-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
       <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-tournament-rules" no-prefetch>Riichi Open rules <span aria-hidden="true">↗</span></NuxtLink>
-      <a class="schedule-jump rules-page-link" href="#event-schedule">Open I format and schedule <span aria-hidden="true">↓</span></a>
+      <UButton type="button" class="schedule-jump rules-page-link" aria-controls="schedule-heading" @click="goToSchedule">Open I format and schedule <span aria-hidden="true">↓</span></UButton>
     </div>
   </main>
 </template>

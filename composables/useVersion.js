@@ -17,8 +17,7 @@ async function fetchVersion() {
         if (v && v !== 'dev') {
             const d = new Date(Number(v))
             const date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-            const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true })
-            lastUpdated.value = `${date}, ${time}`
+            lastUpdated.value = date
         }
 
         const stored = localStorage.getItem('saujana_version')

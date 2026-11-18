@@ -114,11 +114,8 @@
               <UButton
                 class="featured-game-button"
                 type="button"
-                @mouseenter="showGameImageFromPointer($event, topPlayedGames[0].label, false)"
-                @mouseleave="hideGameImage"
-                @focus="showGameImageFromPointer($event, topPlayedGames[0].label, false)"
-                @blur="hideGameImage"
-                @click="showGameImageFromPointer($event, topPlayedGames[0].label, false)"
+                :aria-expanded="selectedRankedGame?.label === topPlayedGames[0].label"
+                @click="toggleRankedGame(topPlayedGames[0])"
               >
                 <img :src="topPlayedGames[0].cover" :alt="topPlayedGames[0].label + ' cover'" loading="lazy" decoding="async" @error="hideBrokenCover">
                 <span class="featured-game-copy"><strong>{{ topPlayedGames[0].label }}</strong><span>{{ topPlayedGames[0].value }} {{ topPlayedGames[0].value === 1 ? 'play' : 'plays' }}</span></span>
@@ -132,11 +129,8 @@
                 class="ranking-item"
                 type="button"
                 :aria-label="`${game.label}, ${game.value} ${game.value === 1 ? 'play' : 'plays'}`"
-                @mouseenter="showGameImageFromPointer($event, game.label, false)"
-                @mouseleave="hideGameImage"
-                @focus="showGameImageFromPointer($event, game.label, false)"
-                @blur="hideGameImage"
-                @click="showGameImageFromPointer($event, game.label, false)"
+                :aria-expanded="selectedRankedGame?.label === game.label"
+                @click="toggleRankedGame(game)"
               >
                 <span class="ranking-position">{{ String(index + 2).padStart(2, '0') }}</span>
                 <span class="ranking-label">{{ game.label }}</span>
@@ -145,6 +139,15 @@
               </UButton>
             </section>
           </div>
+
+          <section v-if="selectedRankedGame" class="ranked-game-detail" aria-label="Selected most played game">
+            <img :src="selectedRankedGame.cover" :alt="selectedRankedGame.label + ' cover'" loading="lazy" decoding="async" @error="hideBrokenCover">
+            <div class="ranked-game-copy">
+              <h4>{{ selectedRankedGame.label }}</h4>
+              <p>{{ selectedRankedGame.value }} {{ selectedRankedGame.value === 1 ? 'play' : 'plays' }}</p>
+            </div>
+            <UButton type="button" class="page-btn" @click="selectedRankedGame = null">Close details</UButton>
+          </section>
 
           <div class="stats-moments">
             <article class="moment-card">
@@ -177,6 +180,7 @@ const HOVER_CARD_HEIGHT = 245
 const currentPage = ref(1)
 const search = ref('')
 const expandedSessionGames = reactive(new Set())
+const selectedRankedGame = ref(null)
 const hoverImage = reactive({ visible: false, src: '', name: '', key: '', showPlayers: true, players: [], x: 0, y: 0, above: true })
 const matchingGames = computed(() => search.value.trim().toLocaleLowerCase())
 const collectionMatch = computed(() => {
@@ -249,6 +253,10 @@ const topPlayedGames = computed(() => {
         .slice(0, 5)
         .map(([label, value]) => ({ label, value, cover: gameCoverPath(label) }))
 })
+
+function toggleRankedGame(game) {
+    selectedRankedGame.value = selectedRankedGame.value?.label === game.label ? null : game
+}
 
 function gameCoverPath(gameName) {
     const filename = gameName
@@ -829,6 +837,11 @@ main > .pagination { order: 3; }
 .featured-game-copy strong { font: 400 1.14rem/1.3 var(--font-display); overflow-wrap: anywhere; }
 .featured-game-copy span { color: var(--muted); font-size: .8rem; }
 .game-ranking { display: grid; align-content: center; gap: 3px; }
+.ranked-game-detail { display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }
+.ranked-game-detail img { width: 62px; height: 70px; flex: 0 0 auto; border-radius: 5px; background: var(--white-pure); object-fit: contain; }
+.ranked-game-copy { display: grid; gap: 4px; min-width: 0; margin-right: auto; }
+.ranked-game-copy h4 { margin: 0; color: var(--clay-text); font: 400 1.02rem/1.3 var(--font-display); overflow-wrap: anywhere; }
+.ranked-game-copy p { margin: 0; color: var(--muted); font-size: .78rem; }
 .ranking-item { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 6px 10px; padding: 10px 4px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; font-size: .82rem; }
 .ranking-item:hover { background: transparent; }
 .ranking-position { grid-row: span 2; align-self: center; color: var(--muted); font: .75rem var(--font-display); }
@@ -853,6 +866,8 @@ main > .pagination { order: 3; }
   .stats-feature-grid { grid-template-columns: 1fr; gap: 12px; }
   .featured-game { padding: 16px; }
   .game-ranking { padding-inline: 4px; }
+  .ranked-game-detail { flex-wrap: wrap; }
+  .ranked-game-detail .page-btn { margin-left: auto; }
   .stats-moments { grid-template-columns: 1fr; }
 }
 
