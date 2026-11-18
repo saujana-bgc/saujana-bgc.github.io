@@ -2199,6 +2199,18 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-card > .expand-bar svg { margin-left: auto; transition: transform .2s ease; }
 .event-card > .expand-bar[aria-expanded="true"] svg { transform: rotate(180deg); }
 .event-card > .event-heading .hero-title { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); }
+.event-card[data-collapsed="true"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 20px;
+  padding: 18px 22px;
+  box-shadow: var(--shadow-card);
+}
+.event-card[data-collapsed="true"] > .event-heading { grid-column: 1; grid-row: 1; margin: 0; }
+.event-card[data-collapsed="true"] > .event-heading .hero-title { font-size: clamp(1.2rem, 2.4vw, 1.55rem); }
+.event-card[data-collapsed="true"] > .event-facts { grid-column: 1; grid-row: 2; gap: 2px 14px; color: var(--muted); font-size: .84rem; }
+.event-card[data-collapsed="true"] > .expand-bar { grid-column: 2; grid-row: 1 / span 2; min-width: 170px; border-top: 0; }
 .event-rsvp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 16px; }
 .event-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
 .event-facts .event-fact { color: var(--clay-text); }
@@ -2265,6 +2277,10 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .btn-add, .btn-save, .btn-cancel, .page-btn { min-height: 44px; border-radius: 6px; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 @media (max-width: 600px) { .first-time-panel { padding: 20px; } }
 @media (max-width: 600px) {
+  .event-card[data-collapsed="true"] { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 8px; padding: 16px; }
+  .event-card[data-collapsed="true"] > .event-facts { max-width: 100%; }
+  .event-card[data-collapsed="true"] > .expand-bar { grid-column: 2; grid-row: 1 / span 2; min-width: 108px; width: 108px; padding-inline: 8px; font-size: .72rem; }
+  .event-card[data-collapsed="true"] > .expand-bar svg { width: 18px; height: 18px; }
   .event-card:has(.event-flyer-image),
   .event-card:has(.event-image-wrap) {
     display: flex;

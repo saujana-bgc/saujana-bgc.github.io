@@ -26,14 +26,14 @@
 
     <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
       <template v-if="nextGathering">
-      <div>
+      <div class="next-gathering-date" aria-label="Gathering date">
+        <strong>{{ formatGatheringDateStamp(nextGathering.date).day }}</strong>
+        <span>{{ formatGatheringDateStamp(nextGathering.date).month }}</span>
+      </div>
+      <div class="next-gathering-copy">
         <p class="next-gathering-label">Next gathering</p>
         <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
         <div class="next-gathering-details">
-          <span class="gathering-detail">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg>
-            {{ formatGatheringDate(nextGathering.date) }}
-          </span>
           <span class="gathering-detail">
             <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>
             {{ nextGathering.time }}
@@ -156,14 +156,13 @@ onMounted(async () => {
   }
 })
 
-function formatGatheringDate(dateValue) {
-  const [year, month, day] = dateValue.split('-').map(Number)
-  return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+function formatGatheringDateStamp(dateValue) {
+  const [, month, day] = dateValue.split('-')
+  const date = new Date(2000, Number(month) - 1, Number(day))
+  return {
+    day: date.getDate(),
+    month: date.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase(),
+  }
 }
 
 const communityValues = [
@@ -284,9 +283,9 @@ const expectations = [
 
 .next-gathering {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px 24px;
+  gap: 12px 20px;
   margin-top: clamp(24px, 4vw, 40px);
   padding: clamp(18px, 2.5vw, 26px);
   border: 1px solid var(--line);
@@ -296,7 +295,10 @@ const expectations = [
 }
 
 .next-gathering { min-height: 124px; }
-.next-gathering > div:first-child { min-width: 0; }
+.next-gathering-copy { min-width: 0; grid-column: 2; grid-row: 1; }
+.next-gathering-date { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 58px; min-height: 58px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-silk); color: var(--matcha-leaf); grid-column: 1; grid-row: 1; }
+.next-gathering-date strong { font: 400 1.45rem/1.1 var(--font-display); }
+.next-gathering-date span { font-size: .62rem; font-weight: 700; letter-spacing: .12em; }
 .next-gathering-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
 .next-gathering-empty p { margin: 0; color: var(--muted); }
 
@@ -352,7 +354,7 @@ const expectations = [
   color: var(--white-pure);
   font-weight: 700;
   text-decoration: none;
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
 }
 
@@ -545,8 +547,10 @@ const expectations = [
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .care-guide { grid-template-columns: minmax(0, 1fr); }
-  .next-gathering { align-items: start; padding: 18px; }
-  .next-gathering-link { grid-column: 1; grid-row: 2; width: 100%; justify-content: center; }
+  .next-gathering { grid-template-columns: 54px minmax(0, 1fr); align-items: start; gap: 8px 12px; padding: 16px; }
+  .next-gathering-date { width: 50px; min-height: 54px; grid-row: 1; }
+  .next-gathering-copy { grid-column: 2; grid-row: 1; }
+  .next-gathering-link { grid-column: 1 / -1; grid-row: 2; width: 100%; justify-content: center; }
   .next-gathering-details { gap: 5px 12px; font-size: .87rem; }
   .hero-artwork { max-width: 420px; margin-inline: auto; }
 }
