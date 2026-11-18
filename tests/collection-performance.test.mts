@@ -37,17 +37,17 @@ function collection(t: { after: (callback: () => void) => void }) {
 
 test('pixel scrolling within a virtual window leaves the rendered card list unchanged', t => {
   const { state, scope } = collection(t)
-  state.scrollY.value = 4000
+  state.scrollY.value = 4030
   const initial = state.virtualGames.value
-  assert.equal(initial[0].name, 'Game 012')
+  assert.equal(initial[0].name, 'Game 024')
   let updates = 0
   scope.run(() => watch(state.virtualGames, () => { updates++ }, { flush: 'sync' }))
-  for (let pixel = 1; pixel <= 100; pixel++) state.scrollY.value = 4000 + pixel
+  for (let pixel = 1; pixel <= 100; pixel++) state.scrollY.value = 4030 + pixel
   assert.equal(updates, 0, 'unchanged row boundaries should not update the card list')
   assert.equal(state.virtualGames.value, initial)
-  state.scrollY.value = 4550
+  state.scrollY.value = 4400
   assert.equal(updates, 1)
-  assert.equal(state.virtualGames.value[0].name, 'Game 016')
+  assert.equal(state.virtualGames.value[0].name, 'Game 028')
 })
 
 test('search and category filters retain cached sort orders and return matching games', t => {
@@ -86,11 +86,11 @@ test('resizing and scrolling to the end preserves bounded rendering and spacer g
   const { state } = collection(t)
   state.viewportWidth.value = 600
   state.scrollY.value = 100000
-  assert.equal(state.virtualGames.value.length, 16)
+  assert.equal(state.virtualGames.value.length, 18)
   assert.equal(state.virtualGames.value.at(-1).name, 'Game 119')
   assert.equal(state.bottomSpacerHeight.value, 0)
-  assert.equal(state.topSpacerHeight.value, 52 * 446)
+  assert.equal(state.topSpacerHeight.value, 51 * 306)
   state.viewportHeight.value = 1200
-  assert.equal(state.virtualGames.value.length, 18)
+  assert.equal(state.virtualGames.value.length, 20)
   assert.equal(state.virtualGames.value.at(-1).name, 'Game 119')
 })
