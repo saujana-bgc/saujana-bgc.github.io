@@ -114,7 +114,7 @@ Use the WRC yaku list, fu rules and scoring table.
 - Pao covers only the yakuman fed. On ron, the liable player and the winning-tile discarder split that yakuman's payment equally; if they are the same player, that player pays the full amount. On tsumo, the liable player pays that yakuman's full value. Other yakuman are paid normally.
 - Apply WRC Section 11.2.1 for honba: on ron, the winning-tile discarder pays all honba. On tsumo with one yakuman, the liable player pays all honba; with multiple yakuman, each opponent pays their usual 100 points per honba. Rinshan kaihou alone does not create pao.
 
-Keep the winning tile separate so waits, yaku and fu can be verified. When unsure about scoring, consult the official WRC scoring table between hands or call the organiser. Phones and other electronic devices must not be used at the table under WRC's conduct rules.
+Keep the winning tile separate so waits, yaku and fu can be verified. When unsure about scoring, consult the official WRC scoring table between hands or call the organiser.
 
 The organiser's ruling is final.
 
@@ -177,11 +177,11 @@ These settings apply to Saujana’s three-player riichi tables. Follow the share
 - The manzu dora cycle runs directly between 1-man and 9-man: a 1-man indicator points to 9-man, and a 9-man indicator points to 1-man.
 - A valid yaku is required to win. Dora does not count as a yaku by itself.
 
-Each player starts with 30,000 points. Play continues below zero. In casual play, use the shared mistakes procedure above. Do not apply a chombo or tournament-point penalty.
+Each player starts with 40,000 points. Play continues below zero. In casual play, use the shared mistakes procedure above. Do not apply a chombo or tournament-point penalty.
 
 ## North tiles (nuki-dora)
 
-A player may declare a North tile as nuki-dora during their own turn, set it aside, then draw a replacement from the dead wall. Each extracted North counts as one dora. A player may keep North in their hand and use it as an ordinary honour tile instead. After riichi, a player may extract only a North drawn that turn. North extraction cancels ippatsu. An extracted North cannot be won by ron. Do not extract a North when no live-wall tiles remain.
+A player may declare a North tile as nuki-dora during their own turn and set it aside. Draw the replacement from the dead wall, then move the next live-wall tile to the dead wall so it remains at 14 tiles. Extracted North tiles each count as one dora. A player may keep North in their hand as an ordinary honour tile. After riichi, extract only a North drawn that turn. North extraction cancels ippatsu. No player may win by ron on an extracted North. Do not extract North when no live-wall tile remains for replenishing the dead wall.
 
 ## Sanma scoring and draws
 
@@ -190,8 +190,9 @@ A player may declare a North tile as nuki-dora during their own turn, set it asi
 - Honba payments are 300 points on ron and 100 points from each opponent on tsumo.
 - Use the standard 3,000-point noten pool at an exhaustive draw. With one tenpai player, each noten player pays 1,500 points. With two tenpai players, each receives 1,500 points from the sole noten player.
 - The dealer continues only when tenpai after an exhaustive draw. Matches normally end after South 3. If the dealer repeats in South 3, continue until the dealer stops repeating.
-- The leading dealer may end the match after winning the final scheduled hand.
 - Multiple ron is allowed. Each valid winner receives the normal ron payment and the full honba payment. Award riichi sticks to the valid winner closest to the discarder in turn order.
+- If the dealer is one of the valid ron winners, the dealer continues and one honba is added. If the dealer does not win, the dealer rotates as usual.
+- The leading dealer may end the match after winning the final scheduled South 3 hand, including a hand with multiple valid ron winners.
 - Pao uses the three-player tsumo shares. The absent fourth player’s share is not charged. For a single pao yakuman, the liable player pays the full sanma tsumo amount.
 
 Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player guide unless the difference in player count makes them impossible. For mistakes or disputes, pause play and ask the organiser. Sanma league points are based on finishing place and are described on the Riichi League page.
@@ -206,9 +207,9 @@ Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one share
 
 Each entrant is scheduled to play exactly **two qualifying East–South (South) hanchans**. After those rounds, the top four entrants play **one final South hanchan**. Finalists do not play additional qualifying hanchans.
 
-The event uses **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025**, and the **29 June 2025 Official Rules Clarification**. Saujana’s shared rules above govern table settings. The Open I format, timing, qualification, scoring and announced penalties below supplement those rules. WRC documents govern gameplay, scoring, conduct and penalties where this guide gives no event-specific rule. Where the clarification amends an earlier document, the clarification takes precedence. No WRC optional rules are adopted.
+The event uses **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025**, and the **29 June 2025 Official Rules Clarification**. Apply an explicit Open I arrangement first, then Saujana’s shared rules. For details neither covers, use the WRC documents with the clarification taking precedence where it amends them. WRC penalties apply only as announced for the event. No WRC optional rules are adopted.
 
-The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open arrangements. Where this appendix gives no event-specific rule, the WRC documents and the 29 June clarification govern gameplay, scoring, conduct and penalties. Pause play and call the organiser for a disputed ruling.
+The two-qualifier format, table assignments, qualification tie-breakers and Final ranking procedure below are Riichi Open arrangements. Pause play and call the organiser for a disputed ruling.
 
 ### Official references
 

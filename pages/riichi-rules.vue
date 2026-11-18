@@ -21,8 +21,8 @@
         <h2 id="three-player-title">Three players · sanma</h2>
         <dl>
           <div><dt>Rounds</dt><dd>East 1–3, South 1–3</dd></div>
+          <div><dt>Starting points</dt><dd>40,000</dd></div>
           <div><dt>Tiles</dt><dd>108 · no chi</dd></div>
-          <div><dt>Red fives</dt><dd>None</dd></div>
         </dl>
         <a href="#three-player-rules-sanma">Three-player rules ↓</a>
       </article>
@@ -124,7 +124,7 @@ function closeMobileToc() {
 .table-summary { min-width: 0; padding: 20px 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
 .sanma-summary { background: linear-gradient(145deg,#f4f1e8 0%,var(--surface-soft) 75%); }
 .table-summary h2 { margin: 0 0 12px; color: var(--matcha-leaf); font: 400 1.25rem/1.3 var(--font-display); }
-.table-summary dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 12px; }
+.table-summary dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 12px; }
 .table-summary dt { color: var(--muted); font-size: .78rem; }
 .table-summary dd { margin: 3px 0 0; color: var(--clay-text); font-weight: 700; }
 .table-summary > a { color: var(--matcha-leaf); font-size: .85rem; font-weight: 700; text-underline-offset: 3px; }

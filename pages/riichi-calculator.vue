@@ -141,7 +141,7 @@
               <div class="choice-row" role="group" aria-label="Riichi declaration">
                 <UButton v-for="option in tileRiichiOptions" :key="'context-' + option.id" type="button" class="choice-button" :class="{ selected: form.tileSituation.riichi === option.id }" :aria-pressed="form.tileSituation.riichi === option.id" :disabled="option.id !== 'none' && tileHasOpenMeld" @click="setTileRiichi(option.id)">{{ option.label }}</UButton>
               </div>
-              <label v-if="form.tileSituation.riichi !== 'none'" class="checkbox-row"><input v-model="form.tileSituation.ippatsu" type="checkbox" :disabled="form.tileSituation.rinshan" @change="markTileContextChanged" /><span>Ippatsu · win before your next discard, with no intervening calls or kans</span></label>
+              <label v-if="form.tileSituation.riichi !== 'none'" class="checkbox-row"><input v-model="form.tileSituation.ippatsu" type="checkbox" :disabled="form.tileSituation.rinshan" @change="markTileContextChanged" /><span>Ippatsu · win before your next discard, with no intervening calls, kans or North extraction</span></label>
               <p v-if="tileHasOpenMeld" class="field-hint">Riichi needs a closed hand. A concealed kan is allowed.</p>
             </section>
           </template>
