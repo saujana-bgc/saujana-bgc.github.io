@@ -62,7 +62,10 @@
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
           <p class="section-intro">Coming on your own? Ask for Saujana BGC when you arrive. You’re welcome to watch a round first, and we can help you find a game when you’re ready.</p>
-          <p class="first-visit-links"><a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message an admin on WhatsApp</a> · <a href="#respect-at-table">Respect at the table</a></p>
+          <p class="first-visit-links">
+            <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message an admin on WhatsApp</a>
+            <a href="#respect-at-table">Respect at the table</a>
+          </p>
         </div>
         <img
           class="first-visit-photo"
@@ -125,8 +128,8 @@
       </div>
       <div id="respect-at-table" class="respect-note" tabindex="-1" aria-labelledby="respect-at-table-title">
         <h3 id="respect-at-table-title">Respect at the table</h3>
-        <p>We don’t tolerate harassment or disruptive behaviour, including sexist jokes or remarks and unwanted attention. If someone isn’t interested in chatting, flirting or exchanging contact details, give them space.</p>
-        <p>We sometimes take photos at gatherings. If you’d rather stay out of photos, would like a photo of you taken down or have another concern, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
+        <p>Everyone deserves to feel comfortable and welcome at our gatherings. We have no tolerance for harassment, sexist jokes or remarks, unwanted attention or disruptive behaviour. Please respect personal boundaries and give others space when they need it.</p>
+        <p>We sometimes take photos to capture memories from our gatherings. If you’d prefer not to be photographed, would like a photo removed or have any concerns, you’re always welcome to <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message an admin privately on WhatsApp</a>.</p>
       </div>
     </section>
 
@@ -410,7 +413,7 @@ const expectations = [
 }
 
 .section-intro a { color: var(--matcha-leaf); }
-.first-visit-links { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 10px 0 0; font-size: .87rem; line-height: 1.55; }
+.first-visit-links { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 10px 0 0; font-size: .87rem; line-height: 1.55; }
 .first-visit-links a { color: var(--matcha-leaf); text-underline-offset: .18em; }
 
 .expect-guide,
@@ -533,7 +536,7 @@ const expectations = [
 }
 
 .respect-note h3 { margin: 0; color: var(--matcha-leaf); font: 400 1.25rem/1.3 var(--font-display); }
-.respect-note p { margin: 0; max-width: 80ch; color: var(--muted); font-size: .9rem; line-height: 1.65; }
+.respect-note p { margin: 0; max-width: 60rem; color: var(--muted); font-size: .9rem; line-height: 1.65; text-wrap: pretty; }
 .respect-note a { color: var(--matcha-leaf); text-underline-offset: .18em; }
 
 @media (min-width: 901px) {
