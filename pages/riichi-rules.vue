@@ -20,6 +20,7 @@
           <div><dt>Starting points</dt><dd>30,000</dd></div>
           <div><dt>Red fives</dt><dd>None</dd></div>
         </dl>
+        <a class="beginner-guide-link" href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Read the beginner guide (PDF, 11 MB) ↗</a>
         <a href="#1-basic-settings">Four-player settings ↓</a>
       </article>
       <article class="table-summary sanma-summary" aria-labelledby="three-player-title">
@@ -138,6 +139,7 @@ function closeMobileToc() {
 .table-summary dt { color: var(--muted); font-size: .78rem; }
 .table-summary dd { margin: 3px 0 0; color: var(--clay-text); font-weight: 700; }
 .table-summary > a { color: var(--matcha-leaf); font-size: .85rem; font-weight: 700; text-underline-offset: 3px; }
+.table-summary > .beginner-guide-link { display: block; margin-bottom: 9px; }
 .rules-layout { display: grid; grid-template-columns: 250px minmax(0,1fr); gap: clamp(28px,5vw,54px); align-items: start; }
 .toc-desktop { position: sticky; top: 112px; max-height: calc(100vh - 136px); overflow: auto; padding: 18px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
 .toc-desktop > p { margin: 0 0 12px; color: var(--matcha-leaf); font-size: .75rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }

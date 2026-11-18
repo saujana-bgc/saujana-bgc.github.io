@@ -14,7 +14,8 @@
         <div class="activity-copy">
           <p class="page-eyebrow">A turn at the table</p>
           <h2 id="first-hand-title">See a hand take shape, one tile at a time.</h2>
-          <p>On your turn, draw one tile and discard another. You’re collecting matching sets, number runs and a pair. Complete the pattern and you win the hand. We play both four-player riichi and three-player sanma.</p>
+          <p>On your turn, draw one tile and discard another. You’re collecting matching sets, number runs and a pair. To win, your complete hand also needs at least one yaku, a recognised pattern or winning condition. We play both four-player riichi and three-player sanma.</p>
+          <p><a href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Open our two-page beginner guide (PDF, 11 MB) <span aria-hidden="true">↗</span></a></p>
           <p><NuxtLink to="/riichi-rules/" no-prefetch>Read the four-player and sanma rules <span aria-hidden="true">→</span></NuxtLink></p>
           <p>Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
         </div>
