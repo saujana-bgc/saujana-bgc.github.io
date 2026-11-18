@@ -194,7 +194,7 @@ onMounted(() => {
   --soft-ink: var(--muted);
   --rule: var(--line);
   --panel-pad: clamp(15px, 2.6vw, 34px);
-  width: min(1320px, calc(100% - clamp(28px, 6vw, 88px)));
+  width: min(1160px, calc(100% - 40px));
   margin-inline: auto;
   padding-bottom: 24px;
   color: var(--ink);

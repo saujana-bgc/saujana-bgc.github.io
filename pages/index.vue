@@ -226,9 +226,14 @@ const expectations = [
   border-bottom: 1px solid var(--line);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
+  grid-template-areas:
+    'copy artwork'
+    'gathering gathering';
   align-items: center;
   gap: clamp(24px, 3vw, 36px);
 }
+
+.hero-copy { grid-area: copy; }
 
 .hero-copy h1 {
   max-width: 15ch;
@@ -277,6 +282,7 @@ const expectations = [
 .hero-gatherings-link:hover { background: #293d31; }
 
 .hero-artwork {
+  grid-area: artwork;
   position: relative;
   width: 100%;
   min-width: 0;
@@ -291,6 +297,7 @@ const expectations = [
 }
 
 .next-gathering {
+  grid-area: gathering;
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
@@ -544,18 +551,16 @@ const expectations = [
 }
 
 @media (max-width: 900px) {
-  .hero-section { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 20px; }
+  .hero-section { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
   .hero-artwork { max-width: 100%; }
 }
 
 @media (max-width: 700px) {
-  .hero-section { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .hero-copy { display: contents; }
-  .hero-copy h1 { grid-row: 1; }
-  .hero-copy > p { grid-row: 2; }
-  .hero-actions { grid-row: 3; }
-  .next-gathering { grid-row: 4; }
-  .hero-artwork { grid-row: 5; }
+  .hero-section {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'copy' 'gathering' 'artwork';
+    gap: 16px;
+  }
   .hero-artwork { max-width: none; }
 }
 

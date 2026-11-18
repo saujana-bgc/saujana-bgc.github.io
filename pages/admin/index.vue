@@ -19,7 +19,7 @@
         </UButton>
       </header>
 
-      <ul class="dashboard-grid" :class="{ 'dashboard-grid-wide': !group.overview }">
+      <ul class="dashboard-grid" :class="{ 'dashboard-grid-wide': group.id === 'riichi-open' }">
         <li v-for="item in group.links" :key="item.to">
           <NuxtLink class="admin-card dashboard-link" :to="item.to">
             <div>

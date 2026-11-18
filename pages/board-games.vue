@@ -4,10 +4,6 @@
       <h1 class="hero-title">Board Games</h1>
       <p class="stats-container">From quick party games to thoughtful strategy, choose a table that suits you. We’ll help you find a game and learn as you play.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
-      <nav class="quick-destinations" aria-label="Board game pages">
-        <NuxtLink to="/collection/" no-prefetch>Browse the collection <span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink to="/playlog/" no-prefetch>See play history <span aria-hidden="true">→</span></NuxtLink>
-      </nav>
     </header>
 
     <section class="activity-content" aria-labelledby="first-game-title">
