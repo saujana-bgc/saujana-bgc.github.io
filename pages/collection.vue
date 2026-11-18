@@ -43,8 +43,6 @@
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>
 
         <article v-for="game in virtualGames" :key="game.name" class="editorial-card">
-          <div class="card-game-title">{{ game.name }}</div>
-
           <UButton type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game)">
             <img
               :src="'/' + game.img"
@@ -57,19 +55,12 @@
             >
           </UButton>
 
-          <div class="card-meta">
-            {{ game.categories ? game.categories.join(' • ') : 'BOARD GAME' }}
-          </div>
+          <h2 class="card-game-title">{{ game.name }}</h2>
 
           <div class="card-players">
             {{ game.players }} • <span title="Complexity is rated out of 5. Higher ratings mean a more involved game.">Complexity: {{ game.weight ? `${game.weight}/5` : 'not rated' }}</span>
           </div>
 
-          <div class="last-played">
-            <NuxtLink v-if="game.stats.date" :to="{ path: '/playlog/', query: { game: game.name } }">Last played {{ formatDate(game.stats.date) }} · {{ game.stats.count }} {{ game.stats.count === 1 ? 'play' : 'plays' }}</NuxtLink>
-            <span v-else-if="!isPending && !isError">No plays logged</span>
-            <span v-else aria-hidden="true"></span>
-          </div>
         </article>
 
         <div v-if="bottomSpacerHeight > 0" class="grid-spacer" :style="{ height: bottomSpacerHeight + 'px' }"></div>
@@ -108,6 +99,16 @@
             <h2 id="game-detail-title" class="hero-title" style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 5px;">{{ selectedGame.name }}</h2>
             <div v-if="selectedGame.designers && selectedGame.designers.length" style="font-style: italic; opacity: 0.6; margin: 10px 0 25px; font-family: 'Playfair Display', serif; font-size: 1.1rem;">
               Designed by {{ selectedGame.designers.join(', ') }}
+            </div>
+            <div class="game-detail-meta">
+              <div v-if="selectedGame.categories?.length" class="game-detail-categories" aria-label="Categories">
+                <span v-for="category in selectedGame.categories" :key="category">{{ category }}</span>
+              </div>
+              <p v-if="selectedGame.stats?.date && !isError" class="game-detail-play-history">
+                <NuxtLink :to="{ path: '/playlog/', query: { game: selectedGame.name } }">Last played {{ formatDate(selectedGame.stats.date) }} · {{ selectedGame.stats.count }} {{ selectedGame.stats.count === 1 ? 'play' : 'plays' }}</NuxtLink>
+              </p>
+              <p v-else-if="!isPending && !isError" class="game-detail-play-history">No plays logged</p>
+              <p v-else-if="isError" class="game-detail-play-history">Play history is unavailable just now.</p>
             </div>
             <div style="font-size: 0.95rem; line-height: 1.8; font-weight: 300; opacity: 0.9; white-space: pre-wrap;" v-html="selectedGame.description"></div>
             <NuxtLink class="context-link" to="/gatherings/" no-prefetch>Want to try this one? Find a gathering <span aria-hidden="true">→</span></NuxtLink>
@@ -207,7 +208,7 @@ const displayedGames = computed(() => {
 })
 
 const gridGap = computed(() => viewportWidth.value >= 768 ? 30 : 16)
-const virtualCardHeight = computed(() => viewportWidth.value >= 768 ? 520 : 430)
+const virtualCardHeight = computed(() => viewportWidth.value >= 768 ? 330 : 290)
 const virtualRowHeight = computed(() => virtualCardHeight.value + gridGap.value)
 const virtualColumns = computed(() => {
     if (viewportWidth.value < 768) return 2
@@ -491,14 +492,6 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
     line-height: 1.3;
 }
 
-.card-meta {
-    font-size: 0.68rem;
-    opacity: 0.45;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
 .card-players {
     font-size: 0.72rem;
     font-weight: 700;
@@ -528,12 +521,6 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 }
 
 .editorial-card:hover .pebble-container img { transform: scale(1.03); }
-
-.last-played {
-    font-size: 0.65rem; color: var(--matcha-leaf); text-transform: uppercase;
-    letter-spacing: 1.5px; margin-top: auto; border-top: 1px solid rgba(107, 122, 104, 0.1);
-    padding-top: 18px; font-weight: 700;
-}
 
 /* --- MODAL --- */
 .modal {
@@ -603,15 +590,41 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 .sort-btn { padding: 10px 12px; min-height: 44px; border-radius: 6px; text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
 .category-btn { flex: 0 0 auto; }
 .sort-btn:hover { transform: none; box-shadow: none; }
-.editorial-card { border: 1px solid var(--line); border-radius: 10px; padding: 18px; box-shadow: var(--shadow-card); text-align: left; }
+.editorial-card { border: 1px solid var(--line); border-radius: 10px; padding: 18px; box-shadow: var(--shadow-card); text-align: left; height: 290px; }
 .editorial-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(44,55,40,.08); }
-.card-game-title { justify-content: flex-start; font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--matcha-leaf); }
-.pebble-container { flex-shrink: 0; border-radius: 6px; background: #f6f5f0; border: 0; margin: 16px 0; }
-.card-meta { font-size: .72rem; opacity: 1; color: var(--muted); letter-spacing: 0; text-transform: none; }
-.card-players { font-size: .73rem; letter-spacing: 0; text-transform: none; }
-.last-played { min-height: 2.8em; box-sizing: border-box; font-size: .7rem; letter-spacing: 0; text-transform: none; font-weight: 400; padding-top: 12px; }
+.card-game-title {
+  display: -webkit-box;
+  min-height: 2.7em;
+  margin: 2px 0 8px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  justify-content: flex-start;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--matcha-leaf);
+}
+.pebble-container {
+  flex: 0 0 auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: #f6f5f0;
+  border: 1px solid var(--line);
+  margin: 0 0 10px;
+  padding: 6px;
+}
+.pebble-container:focus-visible { outline: 2px solid var(--matcha-leaf); outline-offset: 3px; }
+.pebble-container img { border-radius: 4px; }
+.card-players { margin: 0; font-size: .7rem; font-weight: 500; line-height: 1.5; color: var(--muted); letter-spacing: 0; text-transform: none; }
+.game-detail-meta { display: grid; gap: 12px; margin: 20px 0; }
+.game-detail-categories { display: flex; flex-wrap: wrap; gap: 6px; }
+.game-detail-categories span { padding: 5px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: .72rem; line-height: 1.3; }
+.game-detail-play-history { margin: 0; color: var(--muted); font-size: .82rem; }
+.game-detail-play-history a { color: var(--matcha-leaf); text-decoration: underline; text-underline-offset: 3px; }
 .modal-container { border-radius: 16px 16px 0 0; }
-@media (min-width: 768px) { .collection-category-options { flex-wrap: wrap; overflow-x: visible; } .editorial-card { padding: 22px; border-radius: 10px; } .modal-container { border-radius: 16px; } }
+@media (min-width: 768px) { .collection-category-options { flex-wrap: wrap; overflow-x: visible; } .editorial-card { padding: 22px; border-radius: 10px; height: 330px; } .modal-container { border-radius: 16px; } }
 @media (max-width: 400px) { .editorial-card { padding: 12px; } .card-game-title { font-size: 1.05rem; } .sort-btn { font-size: .75rem; } }
 @media (max-width: 480px) {
     .collection-search { flex-wrap: wrap; }

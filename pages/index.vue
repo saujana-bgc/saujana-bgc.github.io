@@ -27,11 +27,11 @@
     <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
       <template v-if="nextGathering">
       <time class="next-gathering-date" :datetime="nextGathering.date" aria-label="Gathering date">
-        <strong>{{ formatGatheringDateStamp(nextGathering.date).day }}</strong>
-        <span>{{ formatGatheringDateStamp(nextGathering.date).month }}</span>
+        <strong>{{ nextGatheringDateStamp.day }}</strong>
+        <span>{{ nextGatheringDateStamp.month }}</span>
       </time>
       <div class="next-gathering-copy">
-        <p class="next-gathering-label"><span>Next gathering</span><time :datetime="nextGathering.date">{{ formatGatheringDateStamp(nextGathering.date).weekday }}</time></p>
+        <p class="next-gathering-label"><span>Next gathering</span><time :datetime="nextGathering.date">{{ nextGatheringDateStamp.weekday }}</time></p>
         <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
         <div class="next-gathering-details">
           <span class="gathering-detail">
@@ -133,6 +133,7 @@ import { communityPillars } from '~/utils/communityPillars'
 
 const nextGathering = ref(null)
 const gatheringStatus = ref('loading')
+const nextGatheringDateStamp = computed(() => nextGathering.value ? formatGatheringDateStamp(nextGathering.value.date) : null)
 
 onMounted(async () => {
   try {
@@ -157,12 +158,12 @@ onMounted(async () => {
 })
 
 function formatGatheringDateStamp(dateValue) {
-  const [, month, day] = dateValue.split('-')
-  const date = new Date(2000, Number(month) - 1, Number(day))
+  const [year, month, day] = dateValue.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
   return {
     day: date.getDate(),
-    month: date.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase(),
-    weekday: date.toLocaleDateString('en-GB', { weekday: 'long' }),
+    month: date.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
+    weekday: date.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }),
   }
 }
 
