@@ -86,12 +86,16 @@ const navigation = computed(() => [
     id: 'riichi',
     label: 'Riichi Mahjong',
     type: 'trigger',
-    active: ['/riichi-mahjong', '/riichi-league', '/riichi-calculator', '/riichi-open'].includes(route.path.replace(/\/+$/, '')),
+    active: ['/riichi-mahjong', '/riichi-league', '/riichi-calculator', '/riichi-open', '/riichi-rules'].some(path => {
+      const currentPath = route.path.replace(/\/+$/, '')
+      return currentPath === path || currentPath.startsWith(`${path}/`)
+    }),
     children: [
       { label: 'Riichi Mahjong overview', to: '/riichi-mahjong/', prefetch: false },
       { label: 'Riichi League', to: '/riichi-league/', prefetch: false },
       { label: 'Riichi Calculator', to: '/riichi-calculator/', prefetch: false },
       { label: 'Riichi Open', to: '/riichi-open/', prefetch: false },
+      { label: 'Riichi Rules', to: '/riichi-rules/', prefetch: false },
     ],
   },
   {

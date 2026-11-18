@@ -23,6 +23,10 @@ export const publicPages = {
     title: 'Riichi Mahjong | Saujana BGC',
     description: 'Learn riichi mahjong at Saujana’s weekly board games and riichi meetup. Find gathering dates, league results, scoring tools and tournament details.',
   },
+  '/riichi-rules': {
+    title: 'Riichi House Rules | Saujana BGC',
+    description: 'Compare the riichi mahjong settings used at Saujana, including Riichi League and Riichi Open I, and find the full event rules.',
+  },
   '/playlog': {
     title: 'Play History | Saujana BGC',
     description: 'Explore the board games played at Saujana gatherings. Look back at past gatherings and discover the games our community keeps coming back to.',
@@ -52,6 +56,11 @@ export const publicPages = {
   '/riichi-open': {
     title: 'Riichi Open I | Saujana BGC',
     description: 'See the format, schedule and standings for Riichi Open, Saujana’s Japanese mahjong tournament on 14 November 2026 at Boardroom Bandit, Ara Damansara.',
+    image: '/images/riichi-open/riichi-open-i-poster.png',
+  },
+  '/riichi-open/rules': {
+    title: 'Riichi Open I Rules | Saujana BGC',
+    description: 'Read the complete Riichi Open I participant guide, including WRC 2025 gameplay, tournament format, scoring, penalties and event arrangements.',
     image: '/images/riichi-open/riichi-open-i-poster.png',
   },
 } satisfies Record<string, { title: string; description: string; image?: string }>

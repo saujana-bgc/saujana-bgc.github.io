@@ -287,6 +287,7 @@
           View full table rules
           <span aria-hidden="true">→</span>
         </UButton>
+        <NuxtLink class="league-house-rules-link" to="/riichi-rules/" no-prefetch>Compare the League and Open rules <span aria-hidden="true">↗</span></NuxtLink>
       </div>
       <div class="placement-scoring">
         <div>
@@ -1814,6 +1815,19 @@ onBeforeUnmount(() => {
   box-shadow: 0 7px 18px rgba(101, 119, 99, .2);
   transition: transform .2s, box-shadow .2s;
 }
+
+.league-house-rules-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 12px 0 0 4px;
+  color: var(--matcha-leaf);
+  font-size: .8rem;
+  font-weight: 650;
+  text-underline-offset: 3px;
+}
+
+.league-house-rules-link:focus-visible { outline: 3px solid var(--gold-leaf); outline-offset: 3px; }
 
 .rules-button:hover {
   transform: translateY(-2px);
