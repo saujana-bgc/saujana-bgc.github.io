@@ -61,7 +61,7 @@
       <div class="first-visit-layout">
         <div class="first-visit-copy">
           <h2 id="first-visit-title" class="hero-title story-title">Your first gathering</h2>
-          <p class="section-intro">Your first game or your hundredth, you’re welcome here. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>. <NuxtLink to="/gatherings/" no-prefetch>See dates, venues and sign-up details</NuxtLink>.</p>
+          <p class="section-intro">Your first game or your hundredth, you’re welcome here. Questions before you come? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
         </div>
         <img
           class="first-visit-photo"
@@ -346,10 +346,15 @@ const expectations = [
   min-height: 44px;
   align-items: center;
   gap: 8px;
-  color: var(--matcha-leaf);
+  padding: 0 16px;
+  border-radius: var(--radius-control);
+  background: var(--matcha-leaf);
+  color: var(--white-pure);
   font-weight: 700;
-  text-underline-offset: .2em;
+  text-decoration: none;
 }
+
+.next-gathering-link:hover { background: #293d31; }
 
 .home-section {
   margin-top: clamp(48px, 7vw, 80px);
@@ -358,18 +363,16 @@ const expectations = [
 }
 
 #first-visit {
-  padding: clamp(20px, 3vw, 32px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--surface-soft);
+  padding: 0;
+  border-top: 0;
 }
 
 .first-visit-layout {
   display: grid;
-  grid-template-areas: "copy copy" "photo steps";
-  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  grid-template-areas: "photo copy" "photo steps";
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: 20px 28px;
+  gap: 12px clamp(24px, 4vw, 48px);
 }
 .first-visit-copy { grid-area: copy; }
 .first-visit-photo {
@@ -538,10 +541,10 @@ const expectations = [
   .hero-section { padding-top: 12px; border-bottom: 0; }
   .hero-copy,
   .hero-copy h1 { min-width: 0; max-width: 100%; }
-  .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .care-guide { grid-template-columns: minmax(0, 1fr); }
   .next-gathering { align-items: flex-start; padding: 18px; }
-  .next-gathering-link { width: 100%; }
+  .next-gathering-link { width: 100%; justify-content: center; }
   .hero-artwork { max-width: 420px; margin-inline: auto; }
 }
 </style>
