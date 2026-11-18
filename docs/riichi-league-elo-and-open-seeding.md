@@ -33,11 +33,11 @@ Immediate entry helps catch scoring errors while players are together, but it is
 
 ### Shared gameplay rules
 
-Use the **World Riichi Championship (WRC) Rules 2025**, **WRC Penalties 2025** and the **29 June 2025 Official Rules Clarification** as adopted by Riichi Open I. Use ordinary fives in every suit and follow Open I's choice to play without optional WRC variants. Both events calculate an official hanchan score from final table points, placement uma and tournament-point penalties. Keep table points, unclaimed riichi sticks, shared uma where applicable, and penalties in the result record. [Open I rules and official references](../public/riichi-open/rules.md#L5) · [Open I tournament scoring](../public/riichi-open/rules.md#L69)
+Use the **World Riichi Championship (WRC) Rules 2025** and the **29 June 2025 Official Rules Clarification** for gameplay. Use ordinary fives in every suit. Apply **WRC Penalties 2025 only at Riichi Open II**, where formal tournament penalties are announced. Season 2 league games use table points and placement uma without chombo or tournament-point deductions. [Open I rules and official references](../public/riichi-open/rules.md#L5) · [Open I tournament scoring](../public/riichi-open/rules.md#L69)
 
 ### Rated game completion
 
-Season 2 league games have **no time limit**. Rated games run to their normal conclusion under WRC gameplay rules. Apply the WRC replay procedure if chombo resets a hand.
+Season 2 league games have **no time limit**. Rated games run to their normal conclusion under WRC gameplay rules. If a serious mistake makes the hand unplayable, pause and ask the host how to continue fairly. League games do not apply chombo or tournament-point penalties.
 
 Before each session, the organiser announces the latest rated start based on the venue closing time and the time a hanchan typically takes. The cutoff applies to new rated games. Tables already playing can continue to a normal finish while the venue is open.
 
@@ -45,7 +45,7 @@ If play stops for a withdrawal, venue closure or other disruption, the organiser
 
 ### How Elo is calculated
 
-Compare each player's **official hanchan score after tournament-point penalties** with each opponent's. Calculate it as `(final table points − 30,000) / 1,000 + placement uma − tournament-point penalties`. Determine placement uma from table points and split it equally among tied players before applying penalties. For example, a score of +12.4 becomes −17.6 after a 30-point chombo penalty. [Open I scoring and shared uma](../public/riichi-open/rules.md#L69) · [Open I chombo penalty](../public/riichi-open/rules.md#L264)
+Compare each player's **hanchan score** with each opponent's. Calculate it as `(final table points − 30,000) / 1,000 + placement uma`. Determine placement uma from table points and split it equally among tied players. Tournament penalties do not apply to Season 2 league games. [Open I scoring and shared uma](../public/riichi-open/rules.md#L69)
 
 A higher official score earns 1, a tie earns 0.5, and a lower score earns 0. Calculate the expected result for each opponent as `1 / (1 + 10^((opponent rating − player rating) / 400))`. Subtract the expected result from the actual result, average the three differences, then multiply by **24**. Use the pre-game ratings for all four players, apply the adjustments together, and round only for display. Games played while provisional affect ratings from the first game.
 
@@ -180,5 +180,5 @@ Before registration, rehearse the 90-minute clock, the four-round rotation, and 
 - **Elo:** a rating that rises or falls based on a player's result compared with the ratings of their opponents.
 - **Hanchan:** one full four-player East–South game.
 - **Uma:** the bonus or deduction for finishing position, added to table-point changes to produce the tournament score.
-- **Chombo:** a serious play error handled under WRC penalty rules. The Open I rules apply a 30-tournament-point penalty.
+- **Chombo:** a serious play error that may receive a formal penalty at a tournament. Casual league games do not apply chombo penalties.
 - **K-factor:** the multiplier controlling how quickly Elo changes. Season 2 uses 24.

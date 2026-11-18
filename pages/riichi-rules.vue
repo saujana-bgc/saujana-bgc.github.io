@@ -4,7 +4,7 @@
       <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi Rules</h1>
       <p class="rules-deck">Table settings for four-player riichi and three-player sanma at Saujana, with the Riichi Open I event arrangements below.</p>
-      <p class="source-note">Four-player play follows WRC Rules 2025 and its official clarification. Sanma uses the shared rules where they fit, with the three-player changes set out here.</p>
+      <p class="source-note">Both formats use ordinary fives. Casual games have no chombo penalties. The tournament appendix explains when formal penalties apply.</p>
     </header>
 
     <section class="table-summaries" aria-label="Riichi formats at a glance">
@@ -22,7 +22,7 @@
         <dl>
           <div><dt>Rounds</dt><dd>East 1–3, South 1–3</dd></div>
           <div><dt>Tiles</dt><dd>108 · no chi</dd></div>
-          <div><dt>Red fives</dt><dd>5-pin and 5-sou</dd></div>
+          <div><dt>Red fives</dt><dd>None</dd></div>
         </dl>
         <a href="#three-player-rules-sanma">Three-player rules ↓</a>
       </article>

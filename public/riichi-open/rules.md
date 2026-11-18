@@ -1,6 +1,6 @@
 # Four-player rules
 
-These are Saujana’s four-player riichi settings, based on WRC Rules 2025, WRC Penalties 2025, and the 29 June 2025 official clarification. The [official references](#official-references) are listed in the Riichi Open I appendix.
+These are Saujana’s four-player riichi settings, based on WRC Rules 2025 and the 29 June 2025 official clarification. We use ordinary fives in every suit. Casual games have no chombo penalties. Formal tournament penalties apply only when the event announces them. The [official references](#official-references) are listed in the Riichi Open I appendix.
 
 ## 1. Basic settings
 
@@ -8,7 +8,7 @@ These are Saujana’s four-player riichi settings, based on WRC Rules 2025, WRC 
 - Each player starts with 30,000 points.
 - Open tanyao is allowed.
 - Atozuke is allowed.
-- **No red fives are used.** Use four ordinary fives in each suit.
+- Use four ordinary fives in each suit. Red fives are not used.
 - Dora, ura-dora, kan-dora and kan-ura-dora are used.
 - Ippatsu is used.
 - Kuikae (swap-calling) is forbidden, including discarding the same tile as the called tile or the tile at the other end of a called sequence.
@@ -68,9 +68,9 @@ There is therefore no double ron or triple ron.
 
 - The dealer continues after winning a hand.
 - The dealer continues after an exhaustive draw when tenpai.
-- One honba is added after every dealer win or exhaustive draw. Honba resets to zero after a non-dealer win. Each honba adds 300 points to a ron payment or 100 points from each opponent on tsumo. A chombo replay does not change honba.
+- One honba is added after every dealer win or exhaustive draw. Honba resets to zero after a non-dealer win. Each honba adds 300 points to a ron payment or 100 points from each opponent on tsumo. If a tournament chombo requires a replay, retain the honba.
 - Riichi sticks remain on the table until collected by the next winner.
-- An untimed hanchan ends after South 4 when the dealer does not repeat. If the dealer repeats in South 4, play continues in South 4 until the dealer stops repeating. For a timed hanchan, the WRC Section 10.1 ending procedure below can end play even if the dealer would otherwise repeat. There is no West round.
+- An untimed hanchan ends after South 4 when the dealer does not repeat. If the dealer repeats in South 4, play continues in South 4 until the dealer stops repeating. For a timed tournament hanchan, the WRC Section 10.1 ending procedure below can end play even if the dealer would otherwise repeat. There is no West round.
 - Any riichi sticks still on the table when the hanchan ends remain unclaimed. Record them separately; no player receives them.
 
 ### Agari-yame
@@ -79,7 +79,7 @@ There is therefore no double ron or triple ron.
 
 ### Time limits
 
-**WRC Section 10.1 procedure for other timed hanchans:** unless the event announces a different procedure, at the signal finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. A chombo after the signal still requires the affected hand to be replayed.
+**WRC Section 10.1 procedure for other timed tournament hanchans:** unless the event announces a different procedure, at the signal finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. If a tournament chombo is called after the signal, replay the affected hand. For casual timed games, agree a finish procedure before play and ask the host how to handle a serious mistake.
 
 ---
 
@@ -119,7 +119,9 @@ The organiser's ruling is final.
 
 ---
 
-## Penalties and irregularities
+## Tournament penalties and irregularities
+
+This section applies only to tournaments that announce formal penalties. Casual games do not use chombo or tournament-point deductions. Pause play when a serious mistake affects the hand and ask the host whether play can continue fairly or whether to correct or redeal it. Do not deduct points from a player's score.
 
 ## 7. Chombo
 
@@ -255,11 +257,11 @@ These settings apply to Saujana’s three-player riichi tables. Follow the four-
 - Use East–South rounds, with East 1–3 and South 1–3.
 - Remove the 2-man through 8-man tiles, leaving 108 tiles.
 - Chi is not allowed. Pon, kan, riichi, tsumo and ron remain available.
-- Use two red fives: one red 5-pin and one red 5-sou. There is no red 5-man because the middle manzu tiles are removed.
+- Keep the four ordinary 5-pin and four ordinary 5-sou. The red 5-man is removed with the middle manzu tiles.
 - The manzu dora cycle runs directly between 1-man and 9-man: a 1-man indicator points to 9-man, and a 9-man indicator points to 1-man.
-- A valid yaku is required to win. Dora and red fives do not count as yaku by themselves.
+- A valid yaku is required to win. Dora does not count as a yaku by itself.
 
-The earlier published sanma rules do not set starting points or a separate penalty schedule. Agree the starting points with the host before the first hand. Correct minor mistakes when possible without disrupting play. Pause for serious mistakes or disputes and ask the organiser to decide whether to correct the hand, declare a dead hand or replay it.
+The earlier published sanma rules do not set starting points. Agree the starting points with the host before the first hand. In casual play, correct minor mistakes when possible without disrupting play. Pause serious mistakes or disputes and ask the host whether play can continue fairly or whether to correct or redeal the hand. Do not apply a chombo or tournament-point penalty.
 
 ## North tiles (nuki-dora)
 
@@ -281,7 +283,7 @@ Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player g
 
 # Riichi Open I event appendix
 
-This appendix records the tournament format and arrangements for Riichi Open I. Gameplay follows the four-player rules in the main guide above.
+This appendix records the tournament format, formal penalties and arrangements for Riichi Open I. Gameplay follows the four-player rules in the main guide above. Riichi Open I is a tournament, so its announced WRC chombo procedures and tournament-point penalties apply. See [Tournament penalties and irregularities](#tournament-penalties-and-irregularities) for the chombo rules.
 
 Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop without starting another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the WRC additional-hand procedure for these event hanchans.
 

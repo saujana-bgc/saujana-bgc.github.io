@@ -75,7 +75,7 @@
             <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three players</UButton>
           </div>
         </div>
-        <label class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Optional · check your table’s rules</small></label>
+        <label class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Other tables only · Saujana uses ordinary fives</small></label>
 
         <section v-if="entryMode === 'hanfu'" class="calc-section direct-entry" aria-labelledby="direct-heading">
           <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect the score at 5 han or more.</p></div></div>
@@ -183,7 +183,7 @@
             </UButton>
           </div>
 
-          <details class="hand-help"><summary>Table scoring rules</summary><p>Saujana’s four-player rules use kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. The calculator also supports three-player sanma and red fives.</p><NuxtLink to="/riichi-rules/" no-prefetch>Four-player rules</NuxtLink><span aria-hidden="true"> · </span><NuxtLink to="/riichi-rules/#three-player-rules-sanma" no-prefetch>Sanma rules</NuxtLink></details>
+          <details class="hand-help"><summary>Table scoring rules</summary><p>Saujana’s four-player rules use kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. The calculator’s red-five option is for other tables.</p><NuxtLink to="/riichi-rules/" no-prefetch>Four-player rules</NuxtLink><span aria-hidden="true"> · </span><NuxtLink to="/riichi-rules/#three-player-rules-sanma" no-prefetch>Sanma rules</NuxtLink></details>
           </details>
 
           <div ref="honbaSection" class="bonus-control honba-control" tabindex="-1" aria-labelledby="honba-count-label">
