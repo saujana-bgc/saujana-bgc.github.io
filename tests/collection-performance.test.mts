@@ -37,15 +37,16 @@ function collection(t: { after: (callback: () => void) => void }) {
 
 test('pixel scrolling within a virtual window leaves the rendered card list unchanged', t => {
   const { state, scope } = collection(t)
-  state.scrollY.value = 4030
+  const rowHeight = state.virtualRowHeight.value
+  state.scrollY.value = state.gridTop.value + rowHeight * 9 + rowHeight / 4
   const initial = state.virtualGames.value
   assert.equal(initial[0].name, 'Game 024')
   let updates = 0
   scope.run(() => watch(state.virtualGames, () => { updates++ }, { flush: 'sync' }))
-  for (let pixel = 1; pixel <= 100; pixel++) state.scrollY.value = 4030 + pixel
+  for (let pixel = 1; pixel <= 100; pixel++) state.scrollY.value = state.gridTop.value + rowHeight * 9 + rowHeight / 4 + pixel
   assert.equal(updates, 0, 'unchanged row boundaries should not update the card list')
   assert.equal(state.virtualGames.value, initial)
-  state.scrollY.value = 4400
+  state.scrollY.value = state.gridTop.value + rowHeight * 10
   assert.equal(updates, 1)
   assert.equal(state.virtualGames.value[0].name, 'Game 028')
 })
