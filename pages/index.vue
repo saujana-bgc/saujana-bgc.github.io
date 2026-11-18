@@ -26,12 +26,12 @@
 
     <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
       <template v-if="nextGathering">
-      <div class="next-gathering-date" aria-label="Gathering date">
+      <time class="next-gathering-date" :datetime="nextGathering.date" aria-label="Gathering date">
         <strong>{{ formatGatheringDateStamp(nextGathering.date).day }}</strong>
         <span>{{ formatGatheringDateStamp(nextGathering.date).month }}</span>
-      </div>
+      </time>
       <div class="next-gathering-copy">
-        <p class="next-gathering-label">Next gathering</p>
+        <p class="next-gathering-label"><span>Next gathering</span><time :datetime="nextGathering.date">{{ formatGatheringDateStamp(nextGathering.date).weekday }}</time></p>
         <h2 id="next-gathering-title" class="next-gathering-title">{{ nextGathering.name }}</h2>
         <div class="next-gathering-details">
           <span class="gathering-detail">
@@ -162,6 +162,7 @@ function formatGatheringDateStamp(dateValue) {
   return {
     day: date.getDate(),
     month: date.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase(),
+    weekday: date.toLocaleDateString('en-GB', { weekday: 'long' }),
   }
 }
 
@@ -286,7 +287,7 @@ const expectations = [
   grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px 20px;
-  margin-top: clamp(24px, 4vw, 40px);
+  margin-top: clamp(12px, 2vw, 24px);
   padding: clamp(18px, 2.5vw, 26px);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -303,6 +304,9 @@ const expectations = [
 .next-gathering-empty p { margin: 0; color: var(--muted); }
 
 .next-gathering-label {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
   margin: 0 0 4px;
   color: var(--matcha-leaf);
   font-size: .78rem;
@@ -310,6 +314,7 @@ const expectations = [
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+.next-gathering-label time { color: var(--muted); font-size: .72rem; font-weight: 500; letter-spacing: .02em; text-transform: none; }
 
 .next-gathering-title {
   margin: 0;

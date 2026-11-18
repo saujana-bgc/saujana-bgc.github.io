@@ -30,10 +30,10 @@
         </div>
 
         <div class="event-facts">
-          <time class="event-fact" :datetime="event.date">{{ formatDate(event.date) }}</time>
-          <span v-if="event.time" class="event-fact">{{ event.time }}</span>
+          <time class="event-fact" :datetime="event.date">{{ activeTab === 'past' && !expandedEvents.has(event.id) ? formatArchiveDate(event.date) : formatDate(event.date) }}</time>
+          <span v-if="event.time && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact">{{ event.time }}</span>
           <span v-if="event.venue" class="event-fact">{{ event.venue }}</span>
-          <a v-if="event.venue_url" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
+          <a v-if="event.venue_url && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
         </div>
 
         <p v-if="activeTab !== 'past' || expandedEvents.has(event.id)" class="event-games-note">
@@ -52,7 +52,7 @@
         </div>
 
         <UButton v-if="activeTab === 'past'" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
-          <span>{{ expandedEvents.has(event.id) ? 'Hide details' : 'View gathering details' }}</span>
+          <span>{{ expandedEvents.has(event.id) ? 'Hide' : 'Details' }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg>
         </UButton>
 
@@ -558,6 +558,11 @@ function formatDate(dateStr) {
     const [year, month, day] = dateStr.split('-')
     const date = new Date(year, month - 1, day)
     return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function formatArchiveDate(dateStr) {
+    const [year, month, day] = dateStr.split('-').map(Number)
+    return new Date(year, month - 1, day).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 function getVenueImage(venue) {
@@ -2201,16 +2206,16 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-card > .event-heading .hero-title { margin: 0; font-size: clamp(1.45rem, 3vw, 2rem); }
 .event-card[data-collapsed="true"] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 82px;
   align-items: center;
-  gap: 4px 20px;
-  padding: 18px 22px;
+  gap: 3px 16px;
+  padding: 14px 18px;
   box-shadow: var(--shadow-card);
 }
 .event-card[data-collapsed="true"] > .event-heading { grid-column: 1; grid-row: 1; margin: 0; }
 .event-card[data-collapsed="true"] > .event-heading .hero-title { font-size: clamp(1.2rem, 2.4vw, 1.55rem); }
 .event-card[data-collapsed="true"] > .event-facts { grid-column: 1; grid-row: 2; gap: 2px 14px; color: var(--muted); font-size: .84rem; }
-.event-card[data-collapsed="true"] > .expand-bar { grid-column: 2; grid-row: 1 / span 2; min-width: 170px; border-top: 0; }
+.event-card[data-collapsed="true"] > .expand-bar { grid-column: 2; grid-row: 1 / span 2; min-width: 82px; padding: 6px; border: 1px solid var(--line); border-radius: 7px; background: transparent; }
 .event-rsvp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 12px 0 16px; }
 .event-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
 .event-facts .event-fact { color: var(--clay-text); }
@@ -2277,9 +2282,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .btn-add, .btn-save, .btn-cancel, .page-btn { min-height: 44px; border-radius: 6px; font-size: .78rem; letter-spacing: .02em; text-transform: none; }
 @media (max-width: 600px) { .first-time-panel { padding: 20px; } }
 @media (max-width: 600px) {
-  .event-card[data-collapsed="true"] { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 8px; padding: 16px; }
+  .event-card[data-collapsed="true"] { grid-template-columns: minmax(0, 1fr) 76px; gap: 5px 8px; padding: 12px 14px; }
   .event-card[data-collapsed="true"] > .event-facts { max-width: 100%; }
-  .event-card[data-collapsed="true"] > .expand-bar { grid-column: 2; grid-row: 1 / span 2; min-width: 108px; width: 108px; padding-inline: 8px; font-size: .72rem; }
+  .event-card[data-collapsed="true"] > .expand-bar { grid-column: 2; grid-row: 1 / span 2; min-width: 76px; width: 76px; padding-inline: 6px; font-size: .72rem; }
   .event-card[data-collapsed="true"] > .expand-bar svg { width: 18px; height: 18px; }
   .event-card:has(.event-flyer-image),
   .event-card:has(.event-image-wrap) {
