@@ -57,33 +57,6 @@
         </UButton>
 
         <template v-if="activeTab !== 'past' || expandedEvents.has(event.id)">
-          <div v-if="event.description" class="event-description">
-            {{ event.description }}
-          </div>
-
-          <img
-            v-if="hasFlyer(event)"
-            :src="getFlyerUrl(event)"
-            :alt="`Event artwork for ${event.name}.`"
-            class="event-flyer-image"
-            :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
-            :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
-            decoding="async"
-            @error="markFlyerUnavailable(event.id)"
-          />
-          <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
-            <img
-              :src="getEventImage(event)"
-              :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
-              class="event-image"
-              :width="isSpookyGameDay(event) ? 768 : 1536"
-              :height="1024"
-              :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
-              :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
-              decoding="async"
-            />
-          </div>
-
           <div v-if="isSpookyGameDay(event) && activeTab === 'present'" class="external-rsvp">
             <h3>Sign up for Spooky Game Day</h3>
             <p>Sign up with Pair of Dice BGC to save your spot.</p>
@@ -259,6 +232,33 @@
             </div>
             </details>
 
+          </div>
+
+          <div v-if="event.description" class="event-description">
+            {{ event.description }}
+          </div>
+
+          <img
+            v-if="hasFlyer(event)"
+            :src="getFlyerUrl(event)"
+            :alt="`Event artwork for ${event.name}.`"
+            class="event-flyer-image"
+            :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
+            :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
+            decoding="async"
+            @error="markFlyerUnavailable(event.id)"
+          />
+          <div v-else-if="getEventImage(event)" class="event-image-wrap" :style="{ '--event-image-aspect': getEventImageAspectRatio(event) }">
+            <img
+              :src="getEventImage(event)"
+              :alt="isSpookyGameDay(event) ? `${event.name} at RicHeese` : event.venue"
+              class="event-image"
+              :width="isSpookyGameDay(event) ? 768 : 1536"
+              :height="1024"
+              :loading="index === 0 && activeTab === 'present' ? 'eager' : 'lazy'"
+              :fetchpriority="index === 0 && activeTab === 'present' ? 'high' : 'auto'"
+              decoding="async"
+            />
           </div>
 
         </template>
@@ -2250,9 +2250,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   line-height: 1.65;
 }
 .event-card:has(.event-flyer-image) > .event-description,
-.event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 5; }
+.event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 6; }
 .event-card:has(.event-flyer-image) > .attendees-section,
-.event-card:has(.event-image-wrap) > .attendees-section { grid-column: 1 / -1; grid-row: 6; }
+.event-card:has(.event-image-wrap) > .attendees-section { grid-column: 1 / -1; grid-row: 5; }
 .event-card:has(.event-flyer-image) > .expand-bar,
 .event-card:has(.event-image-wrap) > .expand-bar { grid-column: 1 / -1; }
 .attendees-notice { background: var(--surface-soft); border-radius: 8px; }
@@ -2268,7 +2268,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   }
   .event-card:has(.event-flyer-image) > .event-flyer-image,
   .event-card:has(.event-image-wrap) > .event-image-wrap {
-    order: -1;
+    order: 7;
     width: 100%;
     max-height: none;
     margin: 0 auto 18px;
@@ -2277,9 +2277,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .event-card:has(.event-image-wrap) > .event-rsvp-actions { order: 3; }
   .event-card:has(.event-flyer-image) > .event-games-note,
   .event-card:has(.event-image-wrap) > .event-games-note { order: 4; }
-  .event-description { order: 5; }
+  .event-description { order: 6; }
   .event-card:has(.event-flyer-image) > .attendees-section,
-  .event-card:has(.event-image-wrap) > .attendees-section { order: 6; }
+  .event-card:has(.event-image-wrap) > .attendees-section { order: 5; }
   .gatherings-main > .tabs { margin-top: 0; }
   .page-intro { padding-bottom: var(--space-5); }
   .first-time-panel { padding: 14px 18px; }

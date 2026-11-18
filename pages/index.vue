@@ -289,8 +289,11 @@ const expectations = [
   justify-content: space-between;
   gap: 12px 24px;
   margin-top: clamp(24px, 4vw, 40px);
-  padding: 20px 0;
-  border-bottom: 1px solid var(--line);
+  padding: clamp(18px, 2.5vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--white-pure);
+  box-shadow: var(--shadow-card);
 }
 
 .next-gathering { min-height: 124px; }
