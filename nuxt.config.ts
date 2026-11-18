@@ -14,6 +14,7 @@ export default defineNuxtConfig({
       ignore: [path => path !== '/' && publicRoutes.includes(path)],
       routes: [
         ...publicRoutes.map(path => new URL(getPublicPage(path)!.canonical).pathname),
+        '/riichi-open/rules/',
         '/sitemap.xml',
         '/admin',
         '/admin/birthday-club',

@@ -1,6 +1,256 @@
-# Riichi Open — Tournament rules
+# Saujana Riichi Rules
 
-Riichi Open is a four-player Japanese riichi mahjong tournament organised by Saujana Board Game Community.
+These are Saujana’s four-player riichi rules, based on WRC Rules 2025, WRC Penalties 2025, and the 29 June 2025 official clarification. The Riichi Open I event appendix follows the gameplay rules.
+
+## 1. Basic settings
+
+- Each qualifying hanchan and the Final hanchan are four-player East–South games.
+- Each player starts with 30,000 points.
+- Open tanyao is allowed.
+- Atozuke is allowed.
+- **No red fives are used.** Use four ordinary fives in each suit.
+- Dora, ura-dora, kan-dora and kan-ura-dora are used.
+- Ippatsu is used.
+- Kuikae (swap-calling) is forbidden, including discarding the same tile as the called tile or the tile at the other end of a called sequence.
+- A valid yaku is required to win.
+- Dora does not count as a yaku by itself.
+
+---
+
+## 2. Calls and draws
+
+WRC chi, pon, kan, riichi, tsumo and ron procedures apply. A discard can be claimed until the next player draws. Once the next player touches the wall, that player can no longer claim the discard, even before drawing. Another player's meld call does not remove the opportunity to declare ron with precedence. When the table is unsure whether an action was timely, stop play and call the organiser.
+
+Under WRC Section 8.2, call precedence is **tsumo → ron (resolved by turn order) → first meld caller → pon/kan over chi when simultaneous or timing is unclear**. When two meld calls are clearly separated in time, the first call wins, including when that first call is chi. If the calls are approximately simultaneous, or the table cannot establish which was first, pon or kan takes precedence over chi. Ron takes precedence over either meld call regardless of the meld callers' timing.
+
+Riichi is permitted with fewer than four tiles remaining in the live wall, including no tiles remaining, and with fewer than 1,000 points. **Riichi with no live-wall tiles remaining is expressly permitted by the 29 June 2025 Official Rules Clarification**, which corrects the conflicting printed wording in WRC Section 8.4. Furiten riichi is permitted. A concealed kan after riichi must use the tile just drawn and must not change the hand's structure or waits; a change to yaku alone is permitted.
+
+Only an added kan can be robbed. A concealed kan cannot be robbed, including for kokushi musou.
+
+### Kan dora
+
+Kan-dora is used.
+
+- For every completed kan, draw the replacement tile and reveal the new kan-dora indicator before discarding. Reveal it even if the replacement tile wins by rinshan kaihou.
+- Do not reveal a kan-dora indicator for an added kan that is robbed; turn it face down again if it was revealed prematurely.
+- A maximum of four kans may be made in a hand. After the fourth kan the hand continues, but a fifth kan is forbidden.
+
+### Abortive draws
+
+Abortive draws are not used. None of the following automatically ends the hand:
+
+- Nine terminals and honours
+- Four first-turn wind discards
+- Four riichi declarations
+- Four kans by more than one player
+
+The last discard of the live wall may be won by ron, but cannot be called for chi, pon or kan. If no one wins by ron, the hand ends in an exhaustive draw.
+
+---
+
+## 3. Head bump
+
+**Head bump (atama hane) applies.**
+
+This is the WRC single-winner rule.
+
+If more than one player declares ron on the same discard, only one player wins.
+
+The winner is the eligible ron declarer encountered first when proceeding from the discarder in normal turn order. Skip the discarder and any players who did not declare a valid ron.
+
+Any other ron declarations on the same discard are disregarded.
+
+There is therefore no double ron or triple ron.
+
+---
+
+## 4. Dealer and match progression
+
+- The dealer continues after winning a hand.
+- The dealer continues after an exhaustive draw when tenpai.
+- One honba is added after every dealer win or exhaustive draw. Honba resets to zero after a non-dealer win. Each honba adds 300 points to a ron payment or 100 points from each opponent on tsumo. A chombo replay does not change honba.
+- Riichi sticks remain on the table until collected by the next winner.
+- An untimed hanchan ends after South 4 when the dealer does not repeat. If the dealer repeats in South 4, play continues in South 4 until the dealer stops repeating. For a timed hanchan, the WRC Section 10.1 ending procedure below can end play even if the dealer would otherwise repeat. There is no West round.
+- Any riichi sticks still on the table when the hanchan ends remain unclaimed. Record them separately; no player receives them.
+
+### Agari-yame
+
+**Agari-yame is not used.** A dealer who wins South 4 must continue even when in 1st place. Normal tenpai continuation also applies after a South 4 exhaustive draw.
+
+### Time limits
+
+**WRC Section 10.1 procedure for other timed hanchans:** unless the event announces a different procedure, at the signal finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. A chombo after the signal still requires the affected hand to be replayed.
+
+---
+
+## 5. Exhaustive draws
+
+Standard 3,000-point noten payments apply.
+
+At an exhaustive draw, declarations proceed in current seat order: East, South, West, then North. Reveal tenpai hands and turn noten hands face down. A player who has not declared riichi may choose noten rather than reveal a tenpai hand. A riichi player must reveal their hand; they cannot conceal it by choosing noten. A declaration cannot be changed.
+
+Tenpai does not require a yaku, and a wait remains tenpai even if all completing tiles are unavailable outside the player's hand. A hand requiring a fifth copy of a tile is not tenpai. A dead hand is noten.
+
+The dealer continues only if tenpai.
+
+---
+
+## 6. Hand scoring
+
+Use the WRC yaku list, fu rules and scoring table.
+
+- **Kiriage mangan is used:** 4 han 30 fu and 3 han 60 fu are rounded up to mangan.
+- **Nagashi mangan is not used.**
+- Thirteen or more han without a yakuman yaku scores **yonbaiman**, equal in points to a single yakuman. It is not an actual yakuman and does not stack with yakuman yaku.
+- Multiple distinct yakuman yaku stack. A special wait does not double a yakuman.
+- A double-wind pair is worth 2 fu, not 4 fu. Chiitoitsu is always 25 fu.
+- Renhou is mangan and does not combine with other yaku or dora; use another scoring interpretation if it pays more.
+- Pao applies to:
+  - Daisangen
+  - Daisuushii
+  - Suukantsu
+- Under WRC Section 9.1.1, pao applies only when a player feeds the final required triplet/kan for one of these yakuman, **the recipient's other required sets are already visible**, and the recipient subsequently wins with that yakuman. Visible means melded sets or declared concealed kans; triplets concealed in the hand do not count as visible. If the other required sets are still hidden, feeding the final set does not create pao.
+- Pao covers only the yakuman fed. On ron, the liable player and the winning-tile discarder split that yakuman's payment equally; if they are the same player, that player pays the full amount. On tsumo, the liable player pays that yakuman's full value. Other yakuman are paid normally.
+- Apply WRC Section 11.2.1 for honba: on ron, the winning-tile discarder pays all honba. On tsumo with one yakuman, the liable player pays all honba; with multiple yakuman, each opponent pays their usual 100 points per honba. Rinshan kaihou alone does not create pao.
+
+Keep the winning tile separate so waits, yaku and fu can be verified. When unsure about scoring, consult the official WRC scoring table between hands or call the organiser. Phones and other electronic devices must not be used at the table under WRC's conduct rules.
+
+The organiser's ruling is final.
+
+---
+
+# Penalties and irregularities
+
+## 7. Chombo
+
+A serious rules violation may result in a **chombo**.
+
+A chombo carries a penalty of:
+
+**−30.0 tournament points**
+
+Record each chombo separately under WRC Penalties 2025. Penalties stack, are deducted from the offending player's tournament score, and are not transferred to other players. Table points and placement uma are unchanged. Record qualifying penalties before ranking players for the next stage.
+
+For the Final, deduct 30.0 points per chombo from the player's Final hanchan score under Section 5. Do not deduct 30,000 from table points or recalculate uma. Other WRC tournament-point penalties are applied in the same way to the relevant stage.
+
+### Example
+
+A player finishes with a hanchan score of **+12.4** and receives one chombo penalty:
+
+`+12.4 − 30.0 = −17.6`
+
+Their recorded score for that hanchan after the penalty is **−17.6**.
+
+Chombo penalties do not award additional tournament points to the other players.
+
+---
+
+## 8. Situations that may result in chombo
+
+Use the official WRC penalties document, as amended by the 29 June clarification, to determine the penalty for each incident. Examples of chombo include:
+
+- Declaring an invalid win, including an empty winning declaration.
+- Declaring riichi while not in tenpai, discovered at a win declaration or exhaustive draw.
+- Making an invalid meld or false concealed kan and then discarding, under the June clarification.
+- Committing an illegal action that makes continuation of the hand impossible.
+- Seriously disrupting the wall or game state such that the hand cannot reasonably continue.
+- Other incidents for which WRC specifies chombo, such as an incorrect tile count or sufficiently serious tile exposure.
+
+Not every mistake results in chombo.
+
+An incorrect tenpai declaration alone normally receives a warning, with a 5-point tournament penalty for repeated offences under WRC; do not automatically treat it as chombo. An invalid meld or false concealed kan before discarding receives a dead hand under the June clarification. Intentional rule violations are cheating. A player caught cheating is immediately disqualified.
+
+The tournament organiser determines whether an incident warrants:
+
+- no penalty,
+- a warning,
+- a tournament-point penalty,
+- a dead hand,
+- a replayed hand,
+- chombo, or
+- disqualification.
+
+A chombo normally cancels and replays the current hand under Section 14. If it occurs simultaneously with a valid win, WRC voids the chombo penalty: score the win normally and warn the offending player. If it occurs simultaneously with an exhaustive draw, apply the chombo and replay without noten payments. Apply the WRC penalty appropriate to the facts; do not replace prescribed penalties with a general exemption for honest mistakes.
+
+The organiser's decision is final.
+
+---
+
+## 9. Procedure after chombo
+
+When a chombo is applied (subject to the simultaneous-win exception in Section 13):
+
+- The hand is void.
+- The hand is replayed.
+- The dealer does not advance.
+- Any honba already in play is retained, and no additional honba is added because of the chombo.
+- Riichi sticks declared during the voided hand are returned to their owners; sticks already on the table before that hand remain there.
+- Record the offending player's **−30.0 tournament-point penalty**, applied to the qualification total or Final score as described in Sections 4, 5 and 12.
+- If several players commit chombo simultaneously, each receives the penalty; replay the hand once.
+
+---
+
+## 10. Minor mistakes
+
+Use WRC's warning, point-penalty, dead-hand, chombo and disqualification procedures. Correct mistakes only where those procedures permit a correction. A dead hand cannot chi, pon, kan, declare riichi or win, and is noten at an exhaustive draw.
+
+Players should point out errors politely. Whether a mistake was accidental does not remove a penalty prescribed by WRC.
+
+Examples of issues the organiser should assess include:
+
+- accidentally exposing a tile,
+- making an incorrect or cancelled call,
+- accidentally disturbing tiles without destroying the game state,
+- scoring calculation mistakes,
+- procedural mistakes that have not materially affected play.
+
+Players should immediately inform the table or organiser when an irregularity occurs rather than attempting to conceal it.
+
+---
+
+# Table conduct
+
+## 11. Player conduct
+
+Players are expected to maintain good tournament etiquette.
+
+- Calls and win declarations should be made clearly.
+- Discards should remain arranged in order.
+- Players must not reveal concealed information.
+- Players must not intentionally give information about another player's hand.
+- Spectators must not comment on active hands.
+- No collusion or signalling is permitted.
+- Intentional stalling is prohibited.
+- Players should allow opponents reasonable time to act.
+- Players must not intentionally manipulate, mark or identify tiles.
+- Players should treat opponents and organisers respectfully.
+- Follow WRC's restrictions on electronic devices, foreign objects and table conversation. Permitted reference sheets and simple calculators may be consulted between hands, not during play.
+
+---
+
+## 12. Tournament administration
+
+Call the organiser for a rules dispute, an illegal action, uncertainty about whether play should continue, a scoring disagreement, a possible chombo, or a significantly disrupted game state. Players should not resolve serious disputes themselves if the outcome could affect tournament standings. The organiser may make rulings necessary to preserve fair play and tournament integrity.
+
+The organiser acts as the event's referee and applies the official WRC documents consistently. Players may politely request that a ruling be reviewed before play resumes. The organiser's final ruling governs the event.
+
+---
+
+## 13. Spirit of the event
+
+Riichi Open is a competitive tournament, but it remains a Saujana Board Game Community event.
+
+Players are expected to compete seriously while maintaining a friendly and welcoming atmosphere.
+
+Play to win, respect the table, and enjoy the mahjong.
+
+---
+
+# Riichi Open I event appendix
+
+This appendix records the tournament format and arrangements for Riichi Open I. Gameplay follows Saujana Riichi Rules in the main guide above.
+
+Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop without starting another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the WRC additional-hand procedure for these event hanchans.
 
 Each entrant is scheduled to play exactly **two qualifying East–South (South) hanchans**. After those rounds, the top four entrants play **one final South hanchan**. Finalists do not play additional qualifying hanchans.
 
@@ -137,249 +387,3 @@ The Final is the event's one East–South (South) hanchan for the top four quali
 Final finishing positions are ranked by **Final hanchan score minus Final-stage tournament-point penalties**. With no penalties, this gives the same order as final mahjong points. If two or more finalists tie on this Final score, the player with the better qualification rank (the higher seed, with seed 1 being the highest) ranks higher. Apply this event tie-breaker only after calculating shared WRC uma; it does not change table points or uma. This rule applies to every finishing place, including a tie involving three or four finalists. Qualifying penalties do not carry into the Final; Final-stage penalties do not change qualification scores or seeds.
 
 ---
-
-# Table rules
-
-## 6. Basic settings
-
-- Each qualifying hanchan and the Final hanchan are four-player East–South games.
-- Each player starts with 30,000 points.
-- Open tanyao is allowed.
-- Atozuke is allowed.
-- **No red fives are used.** Use four ordinary fives in each suit.
-- Dora, ura-dora, kan-dora and kan-ura-dora are used.
-- Ippatsu is used.
-- Kuikae (swap-calling) is forbidden, including discarding the same tile as the called tile or the tile at the other end of a called sequence.
-- A valid yaku is required to win.
-- Dora does not count as a yaku by itself.
-
----
-
-## 7. Calls and draws
-
-WRC chi, pon, kan, riichi, tsumo and ron procedures apply. A discard can be claimed until the next player draws. Once the next player touches the wall, that player can no longer claim the discard, even before drawing. Another player's meld call does not remove the opportunity to declare ron with precedence. When the table is unsure whether an action was timely, stop play and call the organiser.
-
-Under WRC Section 8.2, call precedence is **tsumo → ron (resolved by turn order) → first meld caller → pon/kan over chi when simultaneous or timing is unclear**. When two meld calls are clearly separated in time, the first call wins, including when that first call is chi. If the calls are approximately simultaneous, or the table cannot establish which was first, pon or kan takes precedence over chi. Ron takes precedence over either meld call regardless of the meld callers' timing.
-
-Riichi is permitted with fewer than four tiles remaining in the live wall, including no tiles remaining, and with fewer than 1,000 points. **Riichi with no live-wall tiles remaining is expressly permitted by the 29 June 2025 Official Rules Clarification**, which corrects the conflicting printed wording in WRC Section 8.4. Furiten riichi is permitted. A concealed kan after riichi must use the tile just drawn and must not change the hand's structure or waits; a change to yaku alone is permitted.
-
-Only an added kan can be robbed. A concealed kan cannot be robbed, including for kokushi musou.
-
-### Kan dora
-
-Kan-dora is used.
-
-- For every completed kan, draw the replacement tile and reveal the new kan-dora indicator before discarding. Reveal it even if the replacement tile wins by rinshan kaihou.
-- Do not reveal a kan-dora indicator for an added kan that is robbed; turn it face down again if it was revealed prematurely.
-- A maximum of four kans may be made in a hand. After the fourth kan the hand continues, but a fifth kan is forbidden.
-
-### Abortive draws
-
-Abortive draws are not used. None of the following automatically ends the hand:
-
-- Nine terminals and honours
-- Four first-turn wind discards
-- Four riichi declarations
-- Four kans by more than one player
-
-The last discard of the live wall may be won by ron, but cannot be called for chi, pon or kan. If no one wins by ron, the hand ends in an exhaustive draw.
-
----
-
-## 8. Head bump
-
-**Head bump (atama hane) applies.**
-
-This is the WRC single-winner rule.
-
-If more than one player declares ron on the same discard, only one player wins.
-
-The winner is the eligible ron declarer encountered first when proceeding from the discarder in normal turn order. Skip the discarder and any players who did not declare a valid ron.
-
-Any other ron declarations on the same discard are disregarded.
-
-There is therefore no double ron or triple ron.
-
----
-
-## 9. Dealer and match progression
-
-- The dealer continues after winning a hand.
-- The dealer continues after an exhaustive draw when tenpai.
-- One honba is added after every dealer win or exhaustive draw. Honba resets to zero after a non-dealer win. Each honba adds 300 points to a ron payment or 100 points from each opponent on tsumo. A chombo replay does not change honba.
-- Riichi sticks remain on the table until collected by the next winner.
-- An untimed hanchan ends after South 4 when the dealer does not repeat. If the dealer repeats in South 4, play continues in South 4 until the dealer stops repeating. For a timed hanchan, the WRC Section 10.1 ending procedure below can end play even if the dealer would otherwise repeat. There is no West round.
-- Any riichi sticks still on the table when the hanchan ends remain unclaimed. Record them separately; no player receives them.
-
-### Agari-yame
-
-**Agari-yame is not used.** A dealer who wins South 4 must continue even when in 1st place. Normal tenpai continuation also applies after a South 4 exhaustive draw.
-
-### Time limits
-
-**Riichi Open setting:** each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop: do not start another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the additional-hand procedure below for all event hanchans.
-
-**WRC Section 10.1 procedure for other timed hanchans:** unless the event announces a different procedure, at the signal finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. A chombo after the signal still requires the affected hand to be replayed.
-
----
-
-## 10. Exhaustive draws
-
-Standard 3,000-point noten payments apply.
-
-At an exhaustive draw, declarations proceed in current seat order: East, South, West, then North. Reveal tenpai hands and turn noten hands face down. A player who has not declared riichi may choose noten rather than reveal a tenpai hand. A riichi player must reveal their hand; they cannot conceal it by choosing noten. A declaration cannot be changed.
-
-Tenpai does not require a yaku, and a wait remains tenpai even if all completing tiles are unavailable outside the player's hand. A hand requiring a fifth copy of a tile is not tenpai. A dead hand is noten.
-
-The dealer continues only if tenpai.
-
----
-
-## 11. Hand scoring
-
-Use the WRC yaku list, fu rules and scoring table.
-
-- **Kiriage mangan is used:** 4 han 30 fu and 3 han 60 fu are rounded up to mangan.
-- **Nagashi mangan is not used.**
-- Thirteen or more han without a yakuman yaku scores **yonbaiman**, equal in points to a single yakuman. It is not an actual yakuman and does not stack with yakuman yaku.
-- Multiple distinct yakuman yaku stack. A special wait does not double a yakuman.
-- A double-wind pair is worth 2 fu, not 4 fu. Chiitoitsu is always 25 fu.
-- Renhou is mangan and does not combine with other yaku or dora; use another scoring interpretation if it pays more.
-- Pao applies to:
-  - Daisangen
-  - Daisuushii
-  - Suukantsu
-- Under WRC Section 9.1.1, pao applies only when a player feeds the final required triplet/kan for one of these yakuman, **the recipient's other required sets are already visible**, and the recipient subsequently wins with that yakuman. Visible means melded sets or declared concealed kans; triplets concealed in the hand do not count as visible. If the other required sets are still hidden, feeding the final set does not create pao.
-- Pao covers only the yakuman fed. On ron, the liable player and the winning-tile discarder split that yakuman's payment equally; if they are the same player, that player pays the full amount. On tsumo, the liable player pays that yakuman's full value. Other yakuman are paid normally.
-- Apply WRC Section 11.2.1 for honba: on ron, the winning-tile discarder pays all honba. On tsumo with one yakuman, the liable player pays all honba; with multiple yakuman, each opponent pays their usual 100 points per honba. Rinshan kaihou alone does not create pao.
-
-Keep the winning tile separate so waits, yaku and fu can be verified. When unsure about scoring, consult the official WRC scoring table between hands or call the organiser. Phones and other electronic devices must not be used at the table under WRC's conduct rules.
-
-The organiser's ruling is final.
-
----
-
-# Penalties and irregularities
-
-## 12. Chombo
-
-A serious rules violation may result in a **chombo**.
-
-A chombo carries a penalty of:
-
-**−30.0 tournament points**
-
-Record each chombo separately under WRC Penalties 2025. Penalties stack, are deducted from the offending player's tournament score, and are not transferred to other players. Table points and placement uma are unchanged. Record qualifying penalties before ranking players for the next stage.
-
-For the Final, deduct 30.0 points per chombo from the player's Final hanchan score under Section 5. Do not deduct 30,000 from table points or recalculate uma. Other WRC tournament-point penalties are applied in the same way to the relevant stage.
-
-### Example
-
-A player finishes with a hanchan score of **+12.4** and receives one chombo penalty:
-
-`+12.4 − 30.0 = −17.6`
-
-Their recorded score for that hanchan after the penalty is **−17.6**.
-
-Chombo penalties do not award additional tournament points to the other players.
-
----
-
-## 13. Situations that may result in chombo
-
-Use the official WRC penalties document, as amended by the 29 June clarification, to determine the penalty for each incident. Examples of chombo include:
-
-- Declaring an invalid win, including an empty winning declaration.
-- Declaring riichi while not in tenpai, discovered at a win declaration or exhaustive draw.
-- Making an invalid meld or false concealed kan and then discarding, under the June clarification.
-- Committing an illegal action that makes continuation of the hand impossible.
-- Seriously disrupting the wall or game state such that the hand cannot reasonably continue.
-- Other incidents for which WRC specifies chombo, such as an incorrect tile count or sufficiently serious tile exposure.
-
-Not every mistake results in chombo.
-
-An incorrect tenpai declaration alone normally receives a warning, with a 5-point tournament penalty for repeated offences under WRC; do not automatically treat it as chombo. An invalid meld or false concealed kan before discarding receives a dead hand under the June clarification. Intentional rule violations are cheating. A player caught cheating is immediately disqualified.
-
-The tournament organiser determines whether an incident warrants:
-
-- no penalty,
-- a warning,
-- a tournament-point penalty,
-- a dead hand,
-- a replayed hand,
-- chombo, or
-- disqualification.
-
-A chombo normally cancels and replays the current hand under Section 14. If it occurs simultaneously with a valid win, WRC voids the chombo penalty: score the win normally and warn the offending player. If it occurs simultaneously with an exhaustive draw, apply the chombo and replay without noten payments. Apply the WRC penalty appropriate to the facts; do not replace prescribed penalties with a general exemption for honest mistakes.
-
-The organiser's decision is final.
-
----
-
-## 14. Procedure after chombo
-
-When a chombo is applied (subject to the simultaneous-win exception in Section 13):
-
-- The hand is void.
-- The hand is replayed.
-- The dealer does not advance.
-- Any honba already in play is retained, and no additional honba is added because of the chombo.
-- Riichi sticks declared during the voided hand are returned to their owners; sticks already on the table before that hand remain there.
-- Record the offending player's **−30.0 tournament-point penalty**, applied to the qualification total or Final score as described in Sections 4, 5 and 12.
-- If several players commit chombo simultaneously, each receives the penalty; replay the hand once.
-
----
-
-## 15. Minor mistakes
-
-Use WRC's warning, point-penalty, dead-hand, chombo and disqualification procedures. Correct mistakes only where those procedures permit a correction. A dead hand cannot chi, pon, kan, declare riichi or win, and is noten at an exhaustive draw.
-
-Players should point out errors politely. Whether a mistake was accidental does not remove a penalty prescribed by WRC.
-
-Examples of issues the organiser should assess include:
-
-- accidentally exposing a tile,
-- making an incorrect or cancelled call,
-- accidentally disturbing tiles without destroying the game state,
-- scoring calculation mistakes,
-- procedural mistakes that have not materially affected play.
-
-Players should immediately inform the table or organiser when an irregularity occurs rather than attempting to conceal it.
-
----
-
-# Table conduct
-
-## 16. Player conduct
-
-Players are expected to maintain good tournament etiquette.
-
-- Calls and win declarations should be made clearly.
-- Discards should remain arranged in order.
-- Players must not reveal concealed information.
-- Players must not intentionally give information about another player's hand.
-- Spectators must not comment on active hands.
-- No collusion or signalling is permitted.
-- Intentional stalling is prohibited.
-- Players should allow opponents reasonable time to act.
-- Players must not intentionally manipulate, mark or identify tiles.
-- Players should treat opponents and organisers respectfully.
-- Follow WRC's restrictions on electronic devices, foreign objects and table conversation. Permitted reference sheets and simple calculators may be consulted between hands, not during play.
-
----
-
-## 17. Tournament administration
-
-Call the organiser for a rules dispute, an illegal action, uncertainty about whether play should continue, a scoring disagreement, a possible chombo, or a significantly disrupted game state. Players should not resolve serious disputes themselves if the outcome could affect tournament standings. The organiser may make rulings necessary to preserve fair play and tournament integrity.
-
-The organiser acts as the event's referee and applies the official WRC documents consistently. Players may politely request that a ruling be reviewed before play resumes. The organiser's final ruling governs the event.
-
----
-
-## 18. Spirit of the event
-
-Riichi Open is a competitive tournament, but it remains a Saujana Board Game Community event.
-
-Players are expected to compete seriously while maintaining a friendly and welcoming atmosphere.
-
-Play to win, respect the table, and enjoy the mahjong.

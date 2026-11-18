@@ -27,7 +27,7 @@
         <NuxtLink to="/riichi-league/" no-prefetch><strong>Riichi League</strong><span>Follow the season standings and weekly results.</span><span aria-hidden="true">→</span></NuxtLink>
         <NuxtLink to="/riichi-calculator/" no-prefetch><strong>Riichi Calculator</strong><span>Check a hand or calculate ron and tsumo payments.</span><span aria-hidden="true">→</span></NuxtLink>
         <NuxtLink to="/riichi-open/" no-prefetch><strong>Riichi Open</strong><span>See tournament standings and event information.</span><span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink to="/riichi-rules/" no-prefetch><strong>Riichi Rules</strong><span>Compare table settings and read the full Open I guide.</span><span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink to="/riichi-rules/" no-prefetch><strong>Saujana Riichi Rules</strong><span>Read the rules used at Saujana, with a separate Open I event appendix.</span><span aria-hidden="true">→</span></NuxtLink>
       </nav>
     </section>
   </main>

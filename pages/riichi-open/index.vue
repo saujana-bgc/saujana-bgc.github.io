@@ -9,8 +9,8 @@
     <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><UButton v-if="standingsError && activeTab !== 'standings'" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>
     <div v-if="activeTab === 'registration' || (publicLoaded && event?.stage !== 'completed')" class="event-page-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
-      <UButton ref="guideTrigger" type="button" class="schedule-jump" @click="openGuide">Tournament rules</UButton>
-      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-open/rules/" no-prefetch>Read full rules <span aria-hidden="true">↗</span></NuxtLink>
+      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules</NuxtLink>
+      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules <span aria-hidden="true">↗</span></NuxtLink>
     </div>
     <section v-show="activeTab === 'registration'" id="riichi-registration-panel" role="tabpanel" aria-labelledby="riichi-registration-tab">
     <section class="event-hero">
@@ -98,34 +98,7 @@
       </div>
     </section>
 
-    <Teleport to="body">
-    <dialog ref="guideDialog" class="guide-dialog" aria-label="Riichi Open tournament rules" @click="closeGuideFromBackdrop" @close="restoreGuideFocus">
-      <div class="guide-shell">
-        <div class="guide-topbar"><span><i aria-hidden="true"></i> Riichi Open · Tournament rules</span><UButton type="button" class="guide-close" aria-label="Close tournament rules" @click="closeGuide">×</UButton></div>
-        <div class="guide-body">
-          <aside class="guide-toc-desktop" aria-label="Rules sections">
-            <nav aria-label="Jump to a rules section">
-              <UButton v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</UButton>
-            </nav>
-          </aside>
-          <div class="guide-toc-mobile">
-            <details ref="guideMobileToc">
-              <summary>Jump to section</summary>
-              <nav aria-label="Jump to a rules section">
-                <UButton v-for="section in guideSections" :key="section.id" type="button" @click="jumpToGuideSection(section.id)">{{ section.title }}</UButton>
-              </nav>
-            </details>
-          </div>
-          <div ref="guideReader" class="guide-reader" tabindex="-1" aria-live="polite">
-            <p v-if="guideLoading" class="guide-state">Loading tournament rules…</p>
-            <div v-else-if="guideError" class="guide-state guide-error"><p>{{ guideError }}</p><UButton type="button" class="guide-retry" @click="loadGuide">Try again</UButton></div>
-            <article v-else class="guide-content" v-html="guideHtml"></article>
-            <footer v-if="!guideLoading && !guideError && guideMarkdown" class="guide-footer"><span>Gameplay follows WRC Rules 2025 and its official clarification.</span><UButton type="button" @click="closeGuide">Back to event</UButton></footer>
-          </div>
-        </div>
-      </div>
-    </dialog>
-    </Teleport>
+
     </section>
 
     <dialog v-if="posterOpen" ref="posterDialog" class="poster-dialog" aria-label="Riichi Open event poster" @click="closePosterFromBackdrop" @close="restorePosterFocus">
@@ -138,8 +111,8 @@
     </section>
     <div v-if="event?.stage === 'completed' && activeTab === 'standings'" class="event-page-shortcuts completed-results-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
-      <UButton type="button" class="schedule-jump" @click="openGuide">Tournament rules</UButton>
-      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-open/rules/" no-prefetch>Read full rules <span aria-hidden="true">↗</span></NuxtLink>
+      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules</NuxtLink>
+      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules <span aria-hidden="true">↗</span></NuxtLink>
     </div>
   </main>
 </template>
@@ -161,40 +134,8 @@ watch(activeTab, tab => {
   if (route.path.replace(/\/+$/, '') === '/riichi-open' && route.query.tab !== query.tab) router.replace({ path: route.path, query })
 })
 const { callPublic } = useRiichiOpen()
-const guideDialog = ref(null)
-const guideTrigger = ref(null)
-const guideReader = ref(null)
-const guideMobileToc = ref(null)
-const guideScrollTop = ref(0)
 const posterDialog = ref(null)
 const posterOpen = ref(false)
-const guideMarkdown = ref('')
-const guideLibraries = shallowRef(null)
-const guideLoading = ref(false)
-const guideError = ref('')
-const guideHtml = computed(() => {
-  if (!guideMarkdown.value || !guideLibraries.value) return ''
-  const { marked, DOMPurify } = guideLibraries.value
-  const parsed = DOMPurify.sanitize(marked.parse(guideMarkdown.value, { async: false, gfm: true }))
-  const document = new DOMParser().parseFromString(parsed, 'text/html')
-  for (const heading of document.body.querySelectorAll('h2')) {
-    heading.id = `guide-${heading.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
-    heading.tabIndex = -1
-  }
-  for (const link of document.body.querySelectorAll('a')) {
-    link.target = '_blank'
-    link.rel = 'noopener noreferrer'
-  }
-  return DOMPurify.sanitize(document.body.innerHTML)
-})
-const guideSections = computed(() => {
-  if (!guideMarkdown.value) return []
-  return [...guideMarkdown.value.matchAll(/^##\s+(.+)$/gm)].map((match) => {
-    const title = match[1].replace(/\s+#+\s*$/, '').replace(/\*\*/g, '').trim()
-    const id = `guide-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
-    return { id, title }
-  })
-})
 const event = ref(null)
 const registrations = ref([])
 const snapshot = ref(null)
@@ -243,7 +184,7 @@ const holdCountdown = computed(() => `${Math.floor(holdSeconds.value / 60)}:${St
 const holdExpired = computed(() => Boolean(hold.value) && holdSeconds.value === 0)
 const confirmationTitle = computed(() => ({pending:'Receipt received',verified:'Your place is confirmed',needs_clarification:'The organiser needs a clearer receipt',rejected:'This registration was not accepted',cancelled:'This registration was cancelled',payment_exception:'Receipt received'}[registrationStatus.value] ?? 'Receipt received'))
 const confirmationMessage = computed(() => ({pending:'The organiser will check your payment and confirm your place.',verified:'Your payment has been checked and your place is confirmed. Join us at Boardroom Bandit, Ara Damansara, from 2:30 pm. Check Standings for table assignments and event updates.',needs_clarification:'Please contact the organiser to clarify your payment before the event.',rejected:'Please contact the organiser if you think this decision was made by mistake.',cancelled:'This registration no longer holds a place. You can start a new registration while places remain.',payment_exception:'Your reservation expired before we received the receipt. The organiser will review it, and your place is not yet confirmed.'}[registrationStatus.value] ?? 'The organiser will check your payment and confirm your place.'))
-let refreshTimer, clockTimer, guideReturnFocus
+let refreshTimer, clockTimer
 let posterReturnFocus
 let disposed = false
 
@@ -260,47 +201,6 @@ async function goToSchedule() {
   document.getElementById('schedule-heading')?.focus({preventScroll:true})
 }
 
-function openGuide(event) {
-  guideReturnFocus = event?.currentTarget ?? guideTrigger.value
-  if (!guideDialog.value?.open) guideDialog.value?.showModal()
-  nextTick(() => { if (guideReader.value) guideReader.value.scrollTop = guideScrollTop.value })
-  if (!guideMarkdown.value) loadGuide()
-}
-
-async function loadGuide() {
-  if (guideLoading.value) return
-  guideLoading.value = true
-  guideError.value = ''
-  try {
-    const [response, markdown, sanitizer] = await Promise.all([
-      fetch('/riichi-open/rules.md'),
-      import('marked'),
-      import('dompurify'),
-    ])
-    if (!response.ok) throw new Error('We couldn’t load the tournament rules. Try again.')
-    guideLibraries.value = { marked: markdown.marked, DOMPurify: sanitizer.default }
-    guideMarkdown.value = await response.text()
-  } catch (cause) {
-    guideError.value = cause.message || 'We couldn’t load the tournament rules. Try again.'
-  } finally {
-    guideLoading.value = false
-  }
-}
-
-function closeGuide() { guideDialog.value?.close() }
-function closeGuideFromBackdrop(event) { if (event.target === guideDialog.value) closeGuide() }
-function restoreGuideFocus() { guideScrollTop.value = guideReader.value?.scrollTop ?? guideScrollTop.value; guideReturnFocus?.focus() }
-async function jumpToGuideSection(id) {
-  if (guideMobileToc.value) guideMobileToc.value.open = false
-  await nextTick()
-  const heading = guideReader.value?.querySelector(`#${CSS.escape(id)}`)
-  if (!heading || !guideReader.value) return
-  const reader = guideReader.value
-  const top = reader.scrollTop + heading.getBoundingClientRect().top - reader.getBoundingClientRect().top - 12
-  reader.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
-  guideScrollTop.value = top
-  heading.focus({ preventScroll: true })
-}
 async function openPoster(event) {
   posterReturnFocus = event.currentTarget
   posterOpen.value = true

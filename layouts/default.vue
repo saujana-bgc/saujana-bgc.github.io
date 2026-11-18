@@ -95,7 +95,7 @@ const navigation = computed(() => [
       { label: 'Riichi League', to: '/riichi-league/', prefetch: false },
       { label: 'Riichi Calculator', to: '/riichi-calculator/', prefetch: false },
       { label: 'Riichi Open', to: '/riichi-open/', prefetch: false },
-      { label: 'Riichi Rules', to: '/riichi-rules/', prefetch: false },
+      { label: 'Saujana Riichi Rules', to: '/riichi-rules/', prefetch: false },
     ],
   },
   {

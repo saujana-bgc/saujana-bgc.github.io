@@ -283,11 +283,10 @@
           Scores are based only on finishing position. Final mahjong points are recorded for the match result,
           but no uma or oka is added to the league standings.
         </p>
-        <UButton type="button" class="rules-button league-button league-button-primary" @click="openRules">
-          View full table rules
+        <NuxtLink class="rules-button league-button league-button-primary" to="/riichi-rules/" no-prefetch>
+          Saujana Riichi Rules
           <span aria-hidden="true">→</span>
-        </UButton>
-        <NuxtLink class="league-house-rules-link" to="/riichi-rules/" no-prefetch>Compare the League and Open rules <span aria-hidden="true">↗</span></NuxtLink>
+        </NuxtLink>
       </div>
       <div class="placement-scoring">
         <div>
@@ -301,228 +300,7 @@
       </div>
     </section>
 
-    <dialog
-      ref="rulesDialog"
-      class="rules-dialog"
-      aria-labelledby="rules-dialog-title"
-      @click="closeRulesFromBackdrop"
-      @close="onRulesClosed"
-    >
-      <div class="rules-dialog-shell">
-        <header class="rules-dialog-header">
-          <div>
-            <p class="section-kicker">Saujana Riichi League</p>
-            <h2 id="rules-dialog-title">League rules</h2>
-            <p>
-              We want everyone to feel comfortable playing and learning. These are the Japanese riichi
-              mahjong rules and table settings used in our league.
-            </p>
-          </div>
-          <UButton type="button" class="rules-close" aria-label="Close table rules" @click="closeRules">×</UButton>
-        </header>
 
-        <div class="rules-dialog-content">
-          <section>
-            <h3>Basic settings</h3>
-            <ul>
-              <li>Four-player matches are played as East–South games.</li>
-              <li>Each player starts with 25,000 points.</li>
-              <li>Open tanyao is allowed.</li>
-              <li>Atozuke is allowed.</li>
-              <li>
-                Four-player matches use three red fives:
-                <ul>
-                  <li>One red 5-man</li>
-                  <li>One red 5-pin</li>
-                  <li>One red 5-sou</li>
-                </ul>
-              </li>
-              <li>A valid yaku is required to win.</li>
-              <li>Dora and red fives do not count as yaku by themselves.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h3>Three-player matches</h3>
-            <p>
-              Three-player matches use the same rules as four-player matches wherever possible, with these
-              differences:
-            </p>
-            <ul>
-              <li>The 2-man through 8-man tiles are removed, leaving 108 tiles.</li>
-              <li>Chi is not allowed.</li>
-              <li>
-                Nuki-dora is allowed. A North tile may be declared and set aside as one dora, then replaced with
-                a draw from the dead wall. North may also be kept and used as an ordinary honour tile.
-              </li>
-              <li>Two red fives are used: one red 5-pin and one red 5-sou.</li>
-              <li>
-                The manzu dora cycle runs directly between 1-man and 9-man: 1-man indicates 9-man, and 9-man
-                indicates 1-man.
-              </li>
-              <li>Matches are East–South games consisting of East 1–3 and South 1–3.</li>
-              <li>Ron scoring uses the normal four-player formulas.</li>
-              <li>
-                For tsumo, each opponent makes their normal four-player payment. The absent fourth player’s share
-                is not compensated.
-              </li>
-              <li>Honba payments remain 300 points for ron and 100 points from each opponent for tsumo.</li>
-              <li>
-                Standard 3,000-point noten payments apply:
-                <ul>
-                  <li>One tenpai player receives 1,500 points from each opponent.</li>
-                  <li>Two tenpai players each receive 1,500 points from the noten player.</li>
-                </ul>
-              </li>
-              <li>
-                All yaku, fu, limits, riichi rules, dealer repeats and other table rules remain unchanged unless
-                physically impossible with three players.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h3>Draws and calls</h3>
-            <ul>
-              <li>Subject to the three-player differences above, standard chi, pon, kan, riichi, tsumo and ron rules apply.</li>
-              <li>
-                Kan-dora is used. After an open kan, the new dora indicator is revealed after the kan declarer
-                draws their replacement tile and discards. If the replacement tile wins by rinshan kaihou, the
-                new indicator is not revealed. After a concealed or added kan, the new indicator is revealed
-                immediately.
-              </li>
-              <li>Abortive draws are not used.</li>
-              <li>Nine terminals and honours does not end the hand.</li>
-              <li>Four first-turn wind discards do not end the hand.</li>
-              <li>Four riichi declarations do not end the hand.</li>
-              <li>The final discard may be won by ron, but cannot be called for chi, pon or kan.</li>
-              <li>
-                Multiple ron is allowed. Each valid winner receives the normal ron payment from the discarder,
-                and each receives the full honba payment. Riichi sticks go to the valid winner closest to the
-                discarder in turn order.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h3>Dealer and match progression</h3>
-            <ul>
-              <li>The dealer continues after winning a hand.</li>
-              <li>The dealer continues after an exhaustive draw when tenpai.</li>
-              <li>One honba is added after each dealer repeat or exhaustive draw.</li>
-              <li>Riichi sticks remain on the table until collected by the next winner.</li>
-              <li>Four-player matches normally end after South 4.</li>
-              <li>Three-player matches normally end after South 3.</li>
-              <li>The leading dealer may choose to end the match after winning the final scheduled hand.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h3>Exhaustive draws</h3>
-            <ul>
-              <li>Standard 3,000-point noten payments apply.</li>
-              <li>Players may choose whether to reveal a tenpai hand.</li>
-              <li>A player who declares tenpai must show a valid tenpai hand.</li>
-              <li>The dealer continues only if tenpai.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h3>Scoring</h3>
-            <ul>
-              <li>Standard Japanese hand scoring is used.</li>
-              <li>Kiriage mangan is not used.</li>
-              <li>Thirteen or more han counts as one yakuman.</li>
-              <li>Nagashi mangan is allowed.</li>
-              <li>Pao applies to Daisangen and Daisuushii.</li>
-            </ul>
-            <p class="rules-note">
-              When players are unsure about scoring, the table may use a trusted scoring app or ask the organiser
-              for help.
-            </p>
-          </section>
-
-          <section class="league-points-section">
-            <h3>League points</h3>
-            <p>Final mahjong points determine finishing position.</p>
-            <p>No uma or oka is added to league standings. League points are awarded only according to placement.</p>
-            <p>
-              For each calendar day, the game awarding a player their highest league-point score becomes that
-              player’s daily result. Playing additional games cannot reduce a daily result already earned.
-            </p>
-            <p>
-              A player’s season total is the sum of their eight highest-scoring daily results. If they have played
-              on fewer than eight league days, every daily result earned so far is included.
-            </p>
-            <div class="league-points-tables">
-              <table>
-                <caption>Four-player matches</caption>
-                <thead>
-                  <tr><th scope="col">Placement</th><th scope="col">League points</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>1st</td><td>10</td></tr>
-                  <tr><td>2nd</td><td>6</td></tr>
-                  <tr><td>3rd</td><td>3</td></tr>
-                  <tr><td>4th</td><td>0</td></tr>
-                </tbody>
-              </table>
-              <table>
-                <caption>Three-player matches</caption>
-                <thead>
-                  <tr><th scope="col">Placement</th><th scope="col">League points</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>1st</td><td>9</td></tr>
-                  <tr><td>2nd</td><td>5</td></tr>
-                  <tr><td>3rd</td><td>0</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="rules-note">
-              Final mahjong scores are still recorded for match records and standings tie-breaks.
-            </p>
-            <div class="tie-break-rules">
-              <h4>Tied league points</h4>
-              <ol>
-                <li>The player who attended more league sessions ranks higher.</li>
-                <li>If still tied, the player with more 1st-place finishes ranks higher.</li>
-                <li>If still tied, the player with more 2nd-place finishes ranks higher.</li>
-                <li>If still tied, the higher single-game final score achieved during the season ranks higher.</li>
-                <li>
-                  If players remain tied, they share the position or may play a deciding playoff game if both agree.
-                </li>
-              </ol>
-            </div>
-          </section>
-
-          <section>
-            <h3>Mistakes and disputes</h3>
-            <p>This is a friendly community league, and many players are still learning.</p>
-            <ul>
-              <li>Minor mistakes should be corrected where possible without disrupting the hand.</li>
-              <li>Players should point out errors politely.</li>
-              <li>Serious errors may result in a dead hand or a replay of the hand.</li>
-              <li>The organiser may decide the fairest solution based on the situation.</li>
-              <li>Where the rules are unclear, the organiser’s decision is final.</li>
-              <li>Honest mistakes should be treated as learning opportunities, not reasons for arguments.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h3>Table conduct</h3>
-            <ul>
-              <li>Calls and win declarations should be made clearly.</li>
-              <li>Discards should remain in order.</li>
-              <li>Players should not reveal concealed information.</li>
-              <li>Spectators should not comment on active hands.</li>
-              <li>No collusion, signalling or intentional stalling.</li>
-              <li>Please be patient with newer players.</li>
-            </ul>
-          </section>
-        </div>
-      </div>
-    </dialog>
   </main>
 </template>
 
@@ -532,7 +310,6 @@ import { onMounted } from 'vue'
 const seasons = ref([])
 const selectedSeasonId = ref('')
 const selectedWeekId = ref('')
-const rulesDialog = ref(null)
 
 const selectedSeason = computed(() => seasons.value.find(item => item.id === selectedSeasonId.value) ?? seasons.value[0])
 const selectedWeeks = computed(() => [...(selectedSeason.value?.weeks ?? [])].sort((a, b) => a.weekNumber - b.weekNumber))
@@ -1067,23 +844,6 @@ function numberFormat(value) {
 function ordinal(value) {
   const suffix = value === 1 ? 'st' : value === 2 ? 'nd' : value === 3 ? 'rd' : 'th'
   return `${value}${suffix}`
-}
-
-function openRules() {
-  rulesDialog.value?.showModal()
-  document.body.style.overflow = 'hidden'
-}
-
-function closeRules() {
-  rulesDialog.value?.close()
-}
-
-function closeRulesFromBackdrop(event) {
-  if (event.target === rulesDialog.value) closeRules()
-}
-
-function onRulesClosed() {
-  document.body.style.overflow = ''
 }
 
 onBeforeUnmount(() => {
