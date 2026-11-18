@@ -5,6 +5,11 @@
       <h1 class="hero-title">Riichi Rules</h1>
       <p class="rules-deck">Table settings for four-player riichi and three-player sanma at Saujana, with rules for the Riichi Open tournament series.</p>
       <p class="source-note">Both formats use ordinary fives. Casual games have no chombo penalties. The tournament appendix explains when formal penalties apply.</p>
+      <nav class="rules-top-shortcuts" aria-label="Jump to a rules section">
+        <a href="#four-player-rules">Four-player rules <span aria-hidden="true">↓</span></a>
+        <a href="#three-player-rules-sanma">Sanma rules <span aria-hidden="true">↓</span></a>
+        <a href="#riichi-open-tournament-rules">Tournament rules <span aria-hidden="true">↓</span></a>
+      </nav>
     </header>
 
     <section class="table-summaries" aria-label="Riichi formats at a glance">
@@ -122,6 +127,9 @@ function closeMobileToc() {
 .rules-back-link { margin: 0 auto 14px; }
 .rules-deck { max-width: 650px; margin: 18px auto 0; color: var(--muted); font-size: 1.02rem; line-height: 1.7; }
 .source-note { max-width: 690px; margin: 18px auto 0; padding: 13px 16px; border-left: 3px solid var(--gold-leaf); background: var(--surface-soft); color: var(--clay-text); font-size: .9rem; line-height: 1.55; text-align: left; }
+.rules-top-shortcuts { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 20px auto 0; }
+.rules-top-shortcuts a { display: inline-flex; align-items: center; gap: 7px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-soft); color: var(--matcha-leaf); font-size: .83rem; font-weight: 650; text-decoration: none; }
+.rules-top-shortcuts a:hover { border-color: var(--gold-leaf); background: var(--white-pure); }
 .table-summaries { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; max-width: 900px; margin: 0 auto 30px; }
 .table-summary { min-width: 0; padding: 20px 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
 .sanma-summary { background: linear-gradient(145deg,#f4f1e8 0%,var(--surface-soft) 75%); }
