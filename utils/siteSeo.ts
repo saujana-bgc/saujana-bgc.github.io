@@ -25,7 +25,7 @@ export const publicPages = {
   },
   '/riichi-rules': {
     title: 'Riichi Rules | Saujana BGC',
-    description: 'Read Saujana riichi rules for four-player mahjong and three-player sanma, with Riichi Open I event arrangements.',
+    description: 'Read Saujana rules for four-player riichi, three-player sanma and the Riichi Open tournament series.',
   },
   '/playlog': {
     title: 'Play History | Saujana BGC',

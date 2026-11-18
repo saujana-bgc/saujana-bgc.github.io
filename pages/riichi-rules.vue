@@ -3,7 +3,7 @@
     <header class="page-intro rules-intro">
       <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi Rules</h1>
-      <p class="rules-deck">Table settings for four-player riichi and three-player sanma at Saujana, with the Riichi Open I event arrangements below.</p>
+      <p class="rules-deck">Table settings for four-player riichi and three-player sanma at Saujana, with rules for the Riichi Open tournament series.</p>
       <p class="source-note">Both formats use ordinary fives. Casual games have no chombo penalties. The tournament appendix explains when formal penalties apply.</p>
     </header>
 
@@ -34,7 +34,7 @@
         <div class="rules-shortcuts" aria-label="Key sections">
           <a href="#four-player-rules">Four players</a>
           <a href="#three-player-rules-sanma">Three-player rules</a>
-          <a href="#riichi-open-i-event-appendix">Open I appendix</a>
+          <a href="#riichi-open-tournament-rules">Riichi Open rules</a>
         </div>
         <nav>
           <a v-for="section in sections" :key="section.id" :class="{ 'toc-topic': section.depth === 1, 'toc-subsection': section.depth === 3 }" :href="`#${section.id}`">{{ section.title }}</a>
@@ -45,7 +45,7 @@
         <div class="rules-shortcuts" aria-label="Key sections">
           <a href="#four-player-rules" @click="closeMobileToc">Four players</a>
           <a href="#three-player-rules-sanma" @click="closeMobileToc">Three-player rules</a>
-          <a href="#riichi-open-i-event-appendix" @click="closeMobileToc">Open I appendix</a>
+          <a href="#riichi-open-tournament-rules" @click="closeMobileToc">Riichi Open rules</a>
         </div>
         <nav aria-label="Rules contents"><a v-for="section in sections" :key="section.id" :class="{ 'toc-topic': section.depth === 1, 'toc-subsection': section.depth === 3 }" :href="`#${section.id}`" @click="closeMobileToc">{{ section.title }}</a></nav>
       </details>
@@ -63,9 +63,9 @@ import { marked } from 'marked'
 
 useSeoMeta({
   title: 'Riichi Rules | Saujana BGC',
-  description: 'Read Saujana riichi rules for four-player mahjong and three-player sanma, with Riichi Open I event arrangements.',
+  description: 'Read Saujana rules for four-player riichi, three-player sanma and the Riichi Open tournament series.',
   ogTitle: 'Riichi Rules',
-  ogDescription: 'Four-player riichi rules, three-player sanma settings and Riichi Open I event arrangements at Saujana.',
+  ogDescription: 'Four-player riichi rules, three-player sanma settings and rules for the Riichi Open tournament series.',
 })
 
 const { data: markdown, error } = await useAsyncData('riichi-open-rules-markdown', () => $fetch('/api/riichi-open-rules'))
@@ -95,8 +95,10 @@ const html = computed(() => {
     const pageDepth = depth + 1
     const legacyAnchors = {
       'tournament-penalties-and-irregularities': 'penalties-and-irregularities',
+      'formal-tournament-penalties': 'penalties-and-irregularities',
       '11-player-conduct': 'table-conduct',
       '12-disputes-and-rulings': '12-tournament-administration',
+      'riichi-open-tournament-rules': 'riichi-open-i-event-appendix',
     }
     const legacyAnchor = legacyAnchors[id]
       ? `<span id="${legacyAnchors[id]}" class="legacy-anchor" aria-hidden="true"></span>`
