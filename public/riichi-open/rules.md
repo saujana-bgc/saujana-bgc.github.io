@@ -119,94 +119,11 @@ The organiser's ruling is final.
 
 ---
 
-## Tournament penalties and irregularities
+## Mistakes and disputes
 
-This section applies only to tournaments that announce formal penalties. Casual games do not use chombo or tournament-point deductions. Pause play when a serious mistake affects the hand and ask the host whether play can continue fairly or whether to correct or redeal it. Do not deduct points from a player's score.
+Casual games do not use chombo or tournament-point deductions. Pause play when a serious mistake affects the hand and ask the host whether play can continue fairly or whether to correct or redeal it. Do not deduct points from a player's score.
 
-## 7. Chombo
-
-A serious rules violation may result in a **chombo**.
-
-A chombo carries a penalty of:
-
-**−30.0 tournament points**
-
-Record each chombo separately under WRC Penalties 2025. Penalties stack, are deducted from the offending player's tournament score, and are not transferred to other players. Table points and placement uma are unchanged. Record qualifying penalties before ranking players for the next stage.
-
-For the Final, deduct 30.0 points per chombo from the player's Final hanchan score under [Final hanchan](#5-final-hanchan-event-rules). Do not deduct 30,000 from table points or recalculate uma. Other WRC tournament-point penalties are applied in the same way to the relevant stage.
-
-### Example
-
-A player finishes with a hanchan score of **+12.4** and receives one chombo penalty:
-
-`+12.4 − 30.0 = −17.6`
-
-Their recorded score for that hanchan after the penalty is **−17.6**.
-
-Chombo penalties do not award additional tournament points to the other players.
-
----
-
-## 8. Situations that may result in chombo
-
-Use the official WRC penalties document, as amended by the 29 June clarification, to determine the penalty for each incident. Examples of chombo include:
-
-- Declaring an invalid win, including an empty winning declaration.
-- Declaring riichi while not in tenpai, discovered at a win declaration or exhaustive draw.
-- Making an invalid meld or false concealed kan and then discarding, under the June clarification.
-- Committing an illegal action that makes continuation of the hand impossible.
-- Seriously disrupting the wall or game state such that the hand cannot reasonably continue.
-- Other incidents for which WRC specifies chombo, such as an incorrect tile count or sufficiently serious tile exposure.
-
-Not every mistake results in chombo.
-
-An incorrect tenpai declaration alone normally receives a warning, with a 5-point tournament penalty for repeated offences under WRC; do not automatically treat it as chombo. An invalid meld or false concealed kan before discarding receives a dead hand under the June clarification. Intentional rule violations are cheating. A player caught cheating is immediately disqualified.
-
-The tournament organiser determines whether an incident warrants:
-
-- no penalty,
-- a warning,
-- a tournament-point penalty,
-- a dead hand,
-- a replayed hand,
-- chombo, or
-- disqualification.
-
-A chombo normally cancels and replays the current hand under [Procedure after chombo](#9-procedure-after-chombo). If it occurs simultaneously with a valid win, WRC voids the chombo penalty: score the win normally and warn the offending player. If it occurs simultaneously with an exhaustive draw, apply the chombo and replay without noten payments. Apply the WRC penalty appropriate to the facts; do not replace prescribed penalties with a general exemption for honest mistakes.
-
-The organiser's decision is final.
-
----
-
-## 9. Procedure after chombo
-
-When a chombo is applied (subject to the simultaneous-win exception under [Situations that may result in chombo](#8-situations-that-may-result-in-chombo)):
-
-- The hand is void.
-- The hand is replayed.
-- The dealer does not advance.
-- Any honba already in play is retained, and no additional honba is added because of the chombo.
-- Riichi sticks declared during the voided hand are returned to their owners; sticks already on the table before that hand remain there.
-- Record the offending player's **−30.0 tournament-point penalty**, applied to the qualification total or Final score as described under [Qualification](#4-qualification-event-rules), [Final hanchan](#5-final-hanchan-event-rules) and [Tournament scoring](#3-tournament-scoring).
-- If several players commit chombo simultaneously, each receives the penalty; replay the hand once.
-
----
-
-## 10. Minor mistakes
-
-Use WRC's warning, point-penalty, dead-hand, chombo and disqualification procedures. Correct mistakes only where those procedures permit a correction. A dead hand cannot chi, pon, kan, declare riichi or win, and is noten at an exhaustive draw.
-
-Players should point out errors politely. Whether a mistake was accidental does not remove a penalty prescribed by WRC.
-
-Examples of issues the organiser should assess include:
-
-- accidentally exposing a tile,
-- making an incorrect or cancelled call,
-- accidentally disturbing tiles without destroying the game state,
-- scoring calculation mistakes,
-- procedural mistakes that have not materially affected play.
-
-Players should immediately inform the table or organiser when an irregularity occurs rather than attempting to conceal it.
+Formal tournament penalties are set out in the Riichi Open I appendix and apply when announced by the event.
 
 ---
 
@@ -420,5 +337,98 @@ The Final is the event's one East–South (South) hanchan for the top four quali
 - The player with the highest resulting Final score becomes the **Riichi Open champion**.
 
 Final finishing positions are ranked by **Final hanchan score minus Final-stage tournament-point penalties**. With no penalties, this gives the same order as final mahjong points. If two or more finalists tie on this Final score, the player with the better qualification rank (the higher seed, with seed 1 being the highest) ranks higher. Apply this event tie-breaker only after calculating shared WRC uma; it does not change table points or uma. This rule applies to every finishing place, including a tie involving three or four finalists. Qualifying penalties do not carry into the Final; Final-stage penalties do not change qualification scores or seeds.
+
+---
+
+---
+
+## Tournament penalties and irregularities
+
+This section applies only to tournaments that announce formal penalties. Casual games do not use chombo or tournament-point deductions. Pause play when a serious mistake affects the hand and ask the host whether play can continue fairly or whether to correct or redeal it. Do not deduct points from a player's score.
+
+## 7. Chombo
+
+A serious rules violation may result in a **chombo**.
+
+A chombo carries a penalty of:
+
+**−30.0 tournament points**
+
+Record each chombo separately under WRC Penalties 2025. Penalties stack, are deducted from the offending player's tournament score, and are not transferred to other players. Table points and placement uma are unchanged. Record qualifying penalties before ranking players for the next stage.
+
+For the Final, deduct 30.0 points per chombo from the player's Final hanchan score under [Final hanchan](#5-final-hanchan-event-rules). Do not deduct 30,000 from table points or recalculate uma. Other WRC tournament-point penalties are applied in the same way to the relevant stage.
+
+### Example
+
+A player finishes with a hanchan score of **+12.4** and receives one chombo penalty:
+
+`+12.4 − 30.0 = −17.6`
+
+Their recorded score for that hanchan after the penalty is **−17.6**.
+
+Chombo penalties do not award additional tournament points to the other players.
+
+---
+
+## 8. Situations that may result in chombo
+
+Use the official WRC penalties document, as amended by the 29 June clarification, to determine the penalty for each incident. Examples of chombo include:
+
+- Declaring an invalid win, including an empty winning declaration.
+- Declaring riichi while not in tenpai, discovered at a win declaration or exhaustive draw.
+- Making an invalid meld or false concealed kan and then discarding, under the June clarification.
+- Committing an illegal action that makes continuation of the hand impossible.
+- Seriously disrupting the wall or game state such that the hand cannot reasonably continue.
+- Other incidents for which WRC specifies chombo, such as an incorrect tile count or sufficiently serious tile exposure.
+
+Not every mistake results in chombo.
+
+An incorrect tenpai declaration alone normally receives a warning, with a 5-point tournament penalty for repeated offences under WRC; do not automatically treat it as chombo. An invalid meld or false concealed kan before discarding receives a dead hand under the June clarification. Intentional rule violations are cheating. A player caught cheating is immediately disqualified.
+
+The tournament organiser determines whether an incident warrants:
+
+- no penalty,
+- a warning,
+- a tournament-point penalty,
+- a dead hand,
+- a replayed hand,
+- chombo, or
+- disqualification.
+
+A chombo normally cancels and replays the current hand under [Procedure after chombo](#9-procedure-after-chombo). If it occurs simultaneously with a valid win, WRC voids the chombo penalty: score the win normally and warn the offending player. If it occurs simultaneously with an exhaustive draw, apply the chombo and replay without noten payments. Apply the WRC penalty appropriate to the facts; do not replace prescribed penalties with a general exemption for honest mistakes.
+
+The organiser's decision is final.
+
+---
+
+## 9. Procedure after chombo
+
+When a chombo is applied (subject to the simultaneous-win exception under [Situations that may result in chombo](#8-situations-that-may-result-in-chombo)):
+
+- The hand is void.
+- The hand is replayed.
+- The dealer does not advance.
+- Any honba already in play is retained, and no additional honba is added because of the chombo.
+- Riichi sticks declared during the voided hand are returned to their owners; sticks already on the table before that hand remain there.
+- Record the offending player's **−30.0 tournament-point penalty**, applied to the qualification total or Final score as described under [Qualification](#4-qualification-event-rules), [Final hanchan](#5-final-hanchan-event-rules) and [Tournament scoring](#3-tournament-scoring).
+- If several players commit chombo simultaneously, each receives the penalty; replay the hand once.
+
+---
+
+## 10. Minor mistakes
+
+Use WRC's warning, point-penalty, dead-hand, chombo and disqualification procedures. Correct mistakes only where those procedures permit a correction. A dead hand cannot chi, pon, kan, declare riichi or win, and is noten at an exhaustive draw.
+
+Players should point out errors politely. Whether a mistake was accidental does not remove a penalty prescribed by WRC.
+
+Examples of issues the organiser should assess include:
+
+- accidentally exposing a tile,
+- making an incorrect or cancelled call,
+- accidentally disturbing tiles without destroying the game state,
+- scoring calculation mistakes,
+- procedural mistakes that have not materially affected play.
+
+Players should immediately inform the table or organiser when an irregularity occurs rather than attempting to conceal it.
 
 ---

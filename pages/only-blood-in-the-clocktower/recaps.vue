@@ -468,6 +468,7 @@ onMounted(() => {
 .archive-filters select { min-height: 42px; padding: 7px 32px 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: inherit; }
 .archive-state { margin: 0; color: var(--soft-ink); }
 .empty-archive { text-align: center; background: linear-gradient(var(--paper), var(--surface-soft)); }
+.empty-archive { padding-block: clamp(28px, 4vw, 46px); }
 .empty-mark { margin: 0 auto 12px; font-size: 1.7rem; }
 .empty-archive h3, .session-card h3 { margin: 0; color: var(--ink); font: 400 clamp(1.25rem, 3vw, 1.75rem)/1.2 var(--font-display); }
 .empty-archive p { max-width: 60ch; margin: 8px auto 0; }

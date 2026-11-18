@@ -5,6 +5,15 @@
       <h1 class="hero-title">Collection</h1>
     </header>
 
+      <section class="collection-first-pick fade-up" aria-labelledby="first-pick-title">
+        <div>
+          <p class="eyebrow">An easy place to start</p>
+          <h2 id="first-pick-title">Try a round of Just One</h2>
+          <p>Give one-word clues, then see if your team thinks alike. It’s a gentle way into the collection.</p>
+        </div>
+        <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
+      </section>
+
       <div class="collection-search fade-up">
         <UInput
           class="collection-search-input w-full"
@@ -649,10 +658,15 @@ main:has(.collection-search) > .sort-controls { width: 90%; margin: 0 auto 8px; 
 .sort-controls { gap: 9px; }
 .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .clear-collection-filters { justify-self: start; color: var(--muted); }
+.collection-first-pick { width: min(90%,960px); display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 8px 0 10px; padding: 18px 22px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }
+.collection-first-pick h2 { margin: 0 0 4px; color: var(--matcha-leaf); font: 400 1.3rem/1.3 var(--font-display); }
+.collection-first-pick p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.55; }
+.collection-first-pick .eyebrow { margin-bottom: 4px; color: var(--gold-leaf); font-size: .68rem; font-weight: 750; letter-spacing: .11em; text-transform: uppercase; }
 @media (max-width: 480px) {
   .collection-search { align-items: center; grid-template-columns: 1fr; }
   .collection-search-input { grid-column: 1; }
   .collection-search-meta { width: 100%; }
+  .collection-first-pick { width: 90%; align-items: flex-start; flex-direction: column; gap: 12px; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-category-options { gap: 6px; flex-wrap: wrap; padding: 2px 0 8px; }

@@ -2,7 +2,7 @@
   <div class="event-results" :class="{ 'event-completed': event?.stage === 'completed' }">
     <header class="results-heading">
       <div><h2>{{ loading && !event ? 'Riichi Open standings' : event?.stage === 'completed' ? 'Final standings' : 'Follow the field' }}</h2><p>{{ loading && !event ? 'Event results and table assignments will appear here.' : event?.stage === 'completed' ? 'See the champion, final table and certified qualification scores.' : 'Find your table, follow the qualifiers and see who makes the final.' }}</p></div>
-      <UButton class="refresh-button" variant="outline" color="neutral" :disabled="refreshing" @click="$emit('refresh')">{{ refreshing ? 'Updating…' : '↻ Refresh' }}</UButton>
+      <UButton v-if="event?.stage !== 'completed'" class="refresh-button" variant="outline" color="neutral" :disabled="refreshing" @click="$emit('refresh')">{{ refreshing ? 'Updating…' : '↻ Refresh' }}</UButton>
     </header>
 
     <ol v-if="event && event.stage !== 'completed'" class="round-progress" aria-label="Tournament progress">
@@ -45,7 +45,7 @@
       <p v-if="snapshot.message" class="table-note">{{ snapshot.message }}</p>
     </template>
     <section v-else class="results-card empty-results"><span class="empty-tile" aria-hidden="true">一</span><p class="eyebrow">The field is taking shape</p><h2>{{ error ? 'Updates are temporarily unavailable' : 'The first draw is still to come.' }}</h2><p>{{ error ? 'Use Refresh above to try again.' : 'Table assignments will appear here when the organiser publishes the draw. Scores follow after each round is certified.' }}</p><UButton v-if="!error" class="refresh-button" @click="$emit('register')">Back to registration →</UButton></section>
-    <p class="auto-update-note">Updates automatically every 30 seconds. Draft scores stay private.</p>
+    <p v-if="event?.stage !== 'completed'" class="auto-update-note">Updates automatically every 30 seconds. Draft scores stay private.</p>
   </div>
 </template>
 
