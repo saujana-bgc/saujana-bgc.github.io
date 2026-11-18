@@ -25,7 +25,7 @@
         />
         <div class="collection-search-meta">
           <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
-          <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="sort-btn clear-collection-filters" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
+          <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="sort-btn clear-collection-filters" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">{{ search.trim() && !selectedCategories.length && !unplayedOnly && currentSort === 'name' ? 'Clear search' : 'Reset filters' }}</UButton>
         </div>
       </div>
 

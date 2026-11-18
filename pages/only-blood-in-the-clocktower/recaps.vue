@@ -23,7 +23,7 @@
         <span class="empty-mark" aria-hidden="true">✧</span>
         <h3>The archive is quiet for now</h3>
         <p>Gathering stories, game results and approved photos will find their place here as sessions are added.</p>
-        <NuxtLink class="recaps-next-gathering" to="/gatherings/" no-prefetch>See upcoming gatherings <span aria-hidden="true">→</span></NuxtLink>
+        <NuxtLink class="recaps-next-gathering" to="/only-blood-in-the-clocktower/" no-prefetch>See the next Clocktower event <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
       <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. Adjust the year or script above.</p>

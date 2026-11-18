@@ -75,7 +75,7 @@
             <UButton type="button" class="choice-button" :class="{ selected: form.playerCount === 3 }" :aria-pressed="form.playerCount === 3" @click="form.playerCount = 3">Three players</UButton>
           </div>
         </div>
-        <label class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Other tables only · Saujana uses ordinary fives</small></label>
+        <label v-if="entryMode === 'tiles'" class="checkbox-row"><input v-model="form.redFives" type="checkbox" /> Use red fives <small>Other tables only · Saujana uses ordinary fives</small></label>
 
         <section v-if="entryMode === 'hanfu'" class="calc-section direct-entry" aria-labelledby="direct-heading">
           <div class="section-heading"><span class="step-number">1</span><div><h2 id="direct-heading">Enter the hand value</h2><p>Enter total han, including yaku and dora. Fu does not affect the score at 5 han or more.</p></div></div>
