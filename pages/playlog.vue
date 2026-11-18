@@ -193,9 +193,9 @@ const matchingGameCount = computed(() => matchingGames.value
 
 const { data: rawRows, isPending, isError, retry } = usePlaylogData()
 
-onMounted(() => {
-  if (typeof route.query.game === 'string') search.value = route.query.game
-})
+watch(() => route.query.game, (game) => {
+  search.value = typeof game === 'string' ? game : ''
+}, { immediate: true })
 
 const processedData = computed(() => {
     const rows = rawRows.value ?? []

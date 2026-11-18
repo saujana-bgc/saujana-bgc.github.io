@@ -1,11 +1,8 @@
-const lastUpdated = ref('')
-const lastChecked = ref(0)
-const versionUpdateAvailable = ref(false)
 const THROTTLE_MS = 5 * 60 * 1000
 let listenerAttached = false
 let pendingVersion = ''
 
-async function fetchVersion() {
+async function fetchVersion({ lastUpdated, lastChecked, versionUpdateAvailable }) {
     const now = Date.now()
     if (lastChecked.value > 0 && now - lastChecked.value < THROTTLE_MS) return
     lastChecked.value = now
@@ -48,11 +45,15 @@ function refreshToLatest() {
 }
 
 export function useVersion() {
+    const lastUpdated = useState('saujana-last-updated', () => '')
+    const lastChecked = useState('saujana-version-last-checked', () => 0)
+    const versionUpdateAvailable = useState('saujana-version-update-available', () => false)
+    const state = { lastUpdated, lastChecked, versionUpdateAvailable }
     if (!listenerAttached && typeof document !== 'undefined') {
         listenerAttached = true
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') fetchVersion()
+            if (document.visibilityState === 'visible') fetchVersion(state)
         })
     }
-    return { lastUpdated, fetchVersion, versionUpdateAvailable, refreshToLatest }
+    return { lastUpdated, fetchVersion: () => fetchVersion(state), versionUpdateAvailable, refreshToLatest }
 }

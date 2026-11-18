@@ -110,7 +110,7 @@ const config = useRuntimeConfig()
 const route = useRoute()
 
 function publicPlayerName(player, index) {
-  const name = typeof player.public_name === 'string' ? player.public_name.trim() : ''
+  const name = typeof player.name === 'string' ? player.name.trim() : ''
   return name && name !== 'Seat ' + (index + 1) ? name : 'Player ' + (index + 1)
 }
 

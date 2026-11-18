@@ -1,4 +1,5 @@
-import { calculatePoints, handName, type HandName } from "./points";
+import { calculatePoints, handName } from "./points";
+import type { HandName } from "./types";
 
 export type ManualWait = "ryanmen" | "penchan" | "kanchan" | "tanki" | "shanpon" | "kokushi-thirteen" | "chuuren-nine";
 export type ManualGroupType = "triplet" | "kan";
@@ -698,7 +699,7 @@ export function calculateManualScore(input: ManualScoreInput): ManualScoreResult
     if (input.winType === "tsumo") {
       const otherUnits = Math.max(0, units - 1);
       const otherPayments = otherUnits
-        ? calculatePoints(13, 30, input.isDealer, "tsumo", otherUnits, input.kiriageMangan ?? false, 0, input.playerCount).tsumo
+        ? calculatePoints(13, 30, input.isDealer, "tsumo", otherUnits, input.kiriageMangan ?? false, 0, input.playerCount).tsumo!
         : { dealerPays: 0, nonDealerPays: 0 };
       const responsibleIsDealer = input.paoResponsibleIsDealer === true;
       const responsibleShare = input.isDealer

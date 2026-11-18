@@ -7,7 +7,7 @@ export type GroupType = "sequence" | "triplet" | "pair";
 
 export interface TileGroup {
   type: GroupType;
-  tiles: Tile[];
+  tiles: [Tile, Tile, Tile];
 }
 
 export interface HandInterpretation {
@@ -65,6 +65,7 @@ function findGroupings(tiles: Tile[]): TileGroup[][] {
   const results: TileGroup[][] = [];
   const sorted = sortTiles(tiles);
   const first = sorted[0];
+  if (!first) return [];
 
   // Try triplet
   const afterTriplet = removeTriplet(sorted, first);
@@ -162,7 +163,9 @@ function buildInterpretations(
   // Try each unique tile as the pair
   for (let i = 0; i < sorted.length; i++) {
     const pairTile = sorted[i];
-    if (i > 0 && tilesEqual(sorted[i - 1], pairTile)) continue; // deduplicate
+    if (!pairTile) continue;
+    const previousTile = sorted[i - 1];
+    if (previousTile && tilesEqual(previousTile, pairTile)) continue; // deduplicate
 
     const afterPair = removeTile(sorted, pairTile);
     if (!afterPair) continue;

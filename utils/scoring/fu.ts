@@ -12,7 +12,7 @@ function meldFu(meld: Meld): number {
   const isClosed = meld.type === "kan-closed";
   const isKan = meld.type === "kan-open" || meld.type === "kan-closed" || meld.type === "kan-added";
 
-  const representative = meld.tiles[0];
+  const representative = meld.tiles[0]!;
   const isYaochuu = isTerminalOrHonor(representative);
 
   if (!isKan) {
@@ -32,7 +32,9 @@ function meldFu(meld: Meld): number {
 // an open one (minko). 2/4 open, 4/8 concealed - the higher value in each pair
 // is for a terminal/honor triplet.
 function tripletFu(tiles: Tile[], concealed: boolean): number {
-  const isYaochuu = isTerminalOrHonor(tiles[0]);
+  const first = tiles[0];
+  if (!first) return 0;
+  const isYaochuu = isTerminalOrHonor(first);
   if (concealed) return isYaochuu ? 8 : 4;
   return isYaochuu ? 4 : 2;
 }

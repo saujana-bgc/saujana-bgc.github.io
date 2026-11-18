@@ -200,10 +200,17 @@ export function detectYaku(
     const seqs = [...interp.groups.filter((g) => g.type === "sequence"), ...melds.filter((m) => m.type === "chi").map((m) => ({ type: "sequence" as const, tiles: m.tiles }))];
     let iipeiko = false;
     for (let i = 0; i < seqs.length; i++) {
+      const current = seqs[i];
+      if (!current) continue;
       for (let j = i + 1; j < seqs.length; j++) {
-        const a = sortTiles(seqs[i].tiles);
-        const b = sortTiles(seqs[j].tiles);
-        if (a.every((t, k) => tilesEqual(t, b[k]))) {
+        const next = seqs[j];
+        if (!next) continue;
+        const a = sortTiles(current.tiles);
+        const b = sortTiles(next.tiles);
+        if (a.every((tile, index) => {
+          const otherTile = b[index];
+          return otherTile !== undefined && tilesEqual(tile, otherTile);
+        })) {
           iipeiko = true;
           break;
         }
@@ -215,7 +222,7 @@ export function detectYaku(
   }
 
   // Yakuhai (value tiles): dragons + seat/round winds as triplets
-  const allTriplets: Tile[][] = [];
+  const allTriplets: [Tile, Tile, Tile, ...Tile[]][] = [];
   for (const g of interp.groups) {
     if (g.type === "triplet") allTriplets.push(g.tiles);
   }
@@ -272,7 +279,8 @@ export function detectYaku(
   for (const s of allSeqs) {
     if (!isSuited(s.tiles[0])) continue;
     const sorted = sortTiles(s.tiles).filter(isSuited) as SuitedTile[];
-    seqsByStart.set(`${sorted[0].suit}:${sorted[0].value}`, true);
+    const first = sorted[0];
+    if (first) seqsByStart.set(`${first.suit}:${first.value}`, true);
   }
   for (const suit of ["man", "pin", "sou"] as const) {
     if (seqsByStart.has(`${suit}:1`) && seqsByStart.has(`${suit}:4`) && seqsByStart.has(`${suit}:7`)) {
@@ -433,7 +441,7 @@ export function detectYaku(
           .map((t) => (t[0] as SuitedTile).value as number)
           .sort((a, b) => a - b);
         for (let i = 0; i <= vals.length - 3; i++) {
-          if (vals[i + 1] === vals[i] + 1 && vals[i + 2] === vals[i] + 2) {
+          if (vals[i + 1]! === vals[i]! + 1 && vals[i + 2]! === vals[i]! + 2) {
             yaku.push({ name: "sanrenkou", nameJa: "三連刻", han: 2, isYakuman: false });
             break outer;
           }
@@ -447,7 +455,9 @@ export function detectYaku(
       for (const s of allSeqs) {
         if (!isSuited(s.tiles[0])) continue;
         const sorted = sortTiles(s.tiles).filter(isSuited) as SuitedTile[];
-        const key = `${sorted[0].suit}:${sorted[0].value}`;
+        const first = sorted[0];
+        if (!first) continue;
+        const key = `${first.suit}:${first.value}`;
         seqKeyCounts.set(key, (seqKeyCounts.get(key) ?? 0) + 1);
       }
       for (const count of seqKeyCounts.values()) {
@@ -613,9 +623,9 @@ export function detectYakuman(
         .sort((a, b) => a - b);
       for (let i = 0; i <= vals.length - 4; i++) {
         if (
-          vals[i + 1] === vals[i] + 1 &&
-          vals[i + 2] === vals[i] + 2 &&
-          vals[i + 3] === vals[i] + 3
+          vals[i + 1]! === vals[i]! + 1 &&
+          vals[i + 2]! === vals[i]! + 2 &&
+          vals[i + 3]! === vals[i]! + 3
         ) {
           foundSuurenkou = true;
           break;

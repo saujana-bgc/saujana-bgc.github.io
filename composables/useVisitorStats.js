@@ -2,9 +2,6 @@ const ONE_HOUR = 60 * 60 * 1000
 const CACHE_KEY = 'saujana-visitor-stats'
 const SKIP_KEY = 'saujana_skip_visitor_stats'
 
-const data = ref(null)
-let loadPromise = null
-
 function getOrCreateVisitorId() {
     let id = localStorage.getItem('saujana_visitor_id')
     if (!id) {
@@ -60,7 +57,7 @@ function shouldSkipVisitorStats() {
     }
 }
 
-async function loadVisitorStats() {
+async function loadVisitorStats(data) {
     if (!import.meta.client) return
     if (shouldSkipVisitorStats()) return
 
@@ -99,6 +96,10 @@ async function loadVisitorStats() {
 }
 
 export function useVisitorStats() {
-    if (!loadPromise) loadPromise = loadVisitorStats()
+    const data = useState('saujana-visitor-stats', () => null)
+    const nuxtApp = useNuxtApp()
+    if (import.meta.client && !data.value) {
+        nuxtApp._saujanaVisitorStatsPromise ??= loadVisitorStats(data)
+    }
     return { data }
 }

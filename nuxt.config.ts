@@ -41,6 +41,11 @@ export default defineNuxtConfig({
       supabaseKey: process.env.SUPABASE_KEY ?? 'sb_publishable_xq0Pgq5GqlL_aLyObEf4kg_4xX9xSMZ',
     },
   },
+  typescript: {
+    appTsConfig: {
+      exclude: ['../scripts/**/*', '../supabase/**/*', '../tests/**/*'],
+    },
+  },
   css: ['~/assets/css/main.css'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },

@@ -1,12 +1,8 @@
 const TTL = 24 * 60 * 60 * 1000
 const CACHE_KEY = 'saujana-playlog-cache-v3'
+const loadPromises = new WeakMap()
 
 // Rows are replaced as a snapshot, never edited in place by consumers.
-const data = shallowRef([])
-const isPending = ref(true)
-const isError = ref(false)
-let loadPromise = null
-
 function readCache() {
     try {
         const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null')
@@ -23,10 +19,11 @@ function writeCache(rows) {
     } catch {}
 }
 
-async function loadPlaylog(forceRefresh = false) {
+async function loadPlaylog({ data, isPending, isError }, forceRefresh = false) {
     const cached = forceRefresh ? null : readCache()
     if (cached) {
         data.value = cached
+        isError.value = false
         isPending.value = false
         return
     }
@@ -55,25 +52,39 @@ async function loadPlaylog(forceRefresh = false) {
         isError.value = false
     } catch {
         isError.value = true
-        loadPromise = null
+        return
     } finally {
         isPending.value = false
     }
 }
 
-function retryPlaylog() {
-    if (isPending.value) return loadPromise
-    isPending.value = true
-    isError.value = false
-    loadPromise = loadPlaylog(true)
-    return loadPromise
-}
-
 export function usePlaylogData() {
+    const nuxtApp = useNuxtApp()
+    const data = useState('saujana-playlog-data', () => [])
+    const isPending = useState('saujana-playlog-pending', () => true)
+    const isError = useState('saujana-playlog-error', () => false)
+    const state = { data, isPending, isError }
+
+    function startLoad(forceRefresh = false) {
+        const existing = loadPromises.get(nuxtApp)
+        if (existing && !forceRefresh) return existing
+        const promise = loadPlaylog(state, forceRefresh)
+        loadPromises.set(nuxtApp, promise)
+        return promise
+    }
+
     // Keep the initial HTML and hydration state identical. Live history is
     // shared between client pages and starts loading only after mounting.
     onMounted(() => {
-        if (!loadPromise) loadPromise = loadPlaylog()
+        startLoad()
     })
-    return { data, isPending, isError, retry: retryPlaylog }
+
+    function retry() {
+        if (isPending.value) return loadPromises.get(nuxtApp) ?? startLoad(true)
+        isPending.value = true
+        isError.value = false
+        return startLoad(true)
+    }
+
+    return { data, isPending, isError, retry }
 }

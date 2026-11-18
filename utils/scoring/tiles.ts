@@ -46,10 +46,10 @@ export function doraFromIndicator(indicator: Tile, playerCount: 3 | 4 = 4): Tile
   if (isHonor(indicator)) {
     if (isWind(indicator)) {
       const idx = WIND_DORA_ORDER.indexOf(indicator.value as WindValue);
-      return { suit: "honor", value: WIND_DORA_ORDER[(idx + 1) % 4] };
+      return { suit: "honor", value: WIND_DORA_ORDER[(idx + 1) % 4]! };
     } else {
       const idx = DRAGON_DORA_ORDER.indexOf(indicator.value as DragonValue);
-      return { suit: "honor", value: DRAGON_DORA_ORDER[(idx + 1) % 3] };
+      return { suit: "honor", value: DRAGON_DORA_ORDER[(idx + 1) % 3]! };
     }
   }
   const s = indicator as SuitedTile;

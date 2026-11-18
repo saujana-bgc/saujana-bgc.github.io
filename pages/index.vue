@@ -169,7 +169,7 @@ function formatGatheringDateStamp(dateValue) {
   const [year, month, day] = dateValue.split('-').map(Number)
   const date = new Date(Date.UTC(year, month - 1, day))
   return {
-    day: date.getDate(),
+    day,
     month: date.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
     weekday: date.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }),
   }

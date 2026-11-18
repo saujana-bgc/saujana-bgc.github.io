@@ -21,9 +21,9 @@ export type Tile = SuitedTile | HonorTile;
 
 // Dora indicator → dora resolution order (single source of truth)
 // Wind: east→south→west→north→east (wraps)
-export const WIND_DORA_ORDER: WindValue[] = ["east", "south", "west", "north"];
+export const WIND_DORA_ORDER: [WindValue, WindValue, WindValue, WindValue] = ["east", "south", "west", "north"];
 // Dragon: haku→hatsu→chun→haku (wraps)
-export const DRAGON_DORA_ORDER: DragonValue[] = ["haku", "hatsu", "chun"];
+export const DRAGON_DORA_ORDER: [DragonValue, DragonValue, DragonValue] = ["haku", "hatsu", "chun"];
 
 // ─── Melds ────────────────────────────────────────────────────────────────────
 
