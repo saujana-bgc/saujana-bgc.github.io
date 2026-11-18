@@ -1,12 +1,11 @@
 <template>
-  <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+  <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Play History</h1>
       <div class="stats-container">Search game titles from past gatherings. Open a game to see its cover and the players who joined in.</div>
     </header>
 
-    <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <div class="search-wrap fade-up">
         <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
         <NuxtLink v-if="collectionMatch" class="context-link" :to="{ path: '/collection/', query: { game: collectionMatch.name } }" no-prefetch>Back to {{ collectionMatch.name }} in the collection <span aria-hidden="true">→</span></NuxtLink>
@@ -168,7 +167,6 @@
         </div>
       </div>
     </Teleport>
-  </div>
 </template>
 
 <script setup>

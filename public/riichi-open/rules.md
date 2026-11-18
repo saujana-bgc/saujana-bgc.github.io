@@ -1,4 +1,6 @@
-These are Saujana’s four-player riichi rules, based on WRC Rules 2025, WRC Penalties 2025, and the 29 June 2025 official clarification. The Riichi Open I event appendix follows the gameplay rules.
+# Four-player rules
+
+These are Saujana’s four-player riichi settings, based on WRC Rules 2025, WRC Penalties 2025, and the 29 June 2025 official clarification. The [official references](#official-references) are listed in the Riichi Open I appendix.
 
 ## 1. Basic settings
 
@@ -117,7 +119,7 @@ The organiser's ruling is final.
 
 ---
 
-# Penalties and irregularities
+## Penalties and irregularities
 
 ## 7. Chombo
 
@@ -129,7 +131,7 @@ A chombo carries a penalty of:
 
 Record each chombo separately under WRC Penalties 2025. Penalties stack, are deducted from the offending player's tournament score, and are not transferred to other players. Table points and placement uma are unchanged. Record qualifying penalties before ranking players for the next stage.
 
-For the Final, deduct 30.0 points per chombo from the player's Final hanchan score under Section 5. Do not deduct 30,000 from table points or recalculate uma. Other WRC tournament-point penalties are applied in the same way to the relevant stage.
+For the Final, deduct 30.0 points per chombo from the player's Final hanchan score under [Final hanchan](#5-final-hanchan-event-rules). Do not deduct 30,000 from table points or recalculate uma. Other WRC tournament-point penalties are applied in the same way to the relevant stage.
 
 ### Example
 
@@ -168,7 +170,7 @@ The tournament organiser determines whether an incident warrants:
 - chombo, or
 - disqualification.
 
-A chombo normally cancels and replays the current hand under Section 14. If it occurs simultaneously with a valid win, WRC voids the chombo penalty: score the win normally and warn the offending player. If it occurs simultaneously with an exhaustive draw, apply the chombo and replay without noten payments. Apply the WRC penalty appropriate to the facts; do not replace prescribed penalties with a general exemption for honest mistakes.
+A chombo normally cancels and replays the current hand under [Procedure after chombo](#9-procedure-after-chombo). If it occurs simultaneously with a valid win, WRC voids the chombo penalty: score the win normally and warn the offending player. If it occurs simultaneously with an exhaustive draw, apply the chombo and replay without noten payments. Apply the WRC penalty appropriate to the facts; do not replace prescribed penalties with a general exemption for honest mistakes.
 
 The organiser's decision is final.
 
@@ -176,14 +178,14 @@ The organiser's decision is final.
 
 ## 9. Procedure after chombo
 
-When a chombo is applied (subject to the simultaneous-win exception in Section 13):
+When a chombo is applied (subject to the simultaneous-win exception under [Situations that may result in chombo](#8-situations-that-may-result-in-chombo)):
 
 - The hand is void.
 - The hand is replayed.
 - The dealer does not advance.
 - Any honba already in play is retained, and no additional honba is added because of the chombo.
 - Riichi sticks declared during the voided hand are returned to their owners; sticks already on the table before that hand remain there.
-- Record the offending player's **−30.0 tournament-point penalty**, applied to the qualification total or Final score as described in Sections 4, 5 and 12.
+- Record the offending player's **−30.0 tournament-point penalty**, applied to the qualification total or Final score as described under [Qualification](#4-qualification-event-rules), [Final hanchan](#5-final-hanchan-event-rules) and [Tournament scoring](#3-tournament-scoring).
 - If several players commit chombo simultaneously, each receives the penalty; replay the hand once.
 
 ---
@@ -206,7 +208,7 @@ Players should immediately inform the table or organiser when an irregularity oc
 
 ---
 
-# Table conduct
+## Table conduct
 
 ## 11. Player conduct
 
@@ -279,7 +281,7 @@ Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player g
 
 # Riichi Open I event appendix
 
-This appendix records the tournament format and arrangements for Riichi Open I. Gameplay follows Saujana Riichi Rules in the main guide above.
+This appendix records the tournament format and arrangements for Riichi Open I. Gameplay follows the four-player rules in the main guide above.
 
 Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop without starting another hand. Record the scores even if the South round has not finished. This event-specific procedure replaces the WRC additional-hand procedure for these event hanchans.
 
@@ -304,10 +306,10 @@ The main rulebook and penalties document are published under [CC BY-NC-SA 4.0](h
 
 - The tournament is played using **four-player riichi mahjong only**.
 - Each entrant plays exactly **two qualifying South hanchans**. The top four each play in the event's one **final South hanchan**.
-- Each hanchan is an East–South game, beginning at East 1 and normally ending after South 4 under Section 9.
+- Each hanchan is an East–South game, beginning at East 1 and normally ending after South 4 under [Dealer and match progression](#4-dealer-and-match-progression).
 - The event has no additional qualifying rounds or playoff hanchans.
 - **First qualifying hanchan:** at the start of the event, randomly assign entrants to tables of four and randomly assign the initial East, South, West and North seats at each table. There is no seeding for this round.
-- **Second qualifying hanchan:** after all first-hanchan results and penalties are verified, rank all entrants by their first-hanchan tournament score, with rank 1 being highest. Resolve equal scores using the shared standings tie-breakers in Section 4. **Assign players individually, one at a time in rank order**, using these four passes:
+- **Second qualifying hanchan:** after all first-hanchan results and penalties are verified, rank all entrants by their first-hanchan tournament score, with rank 1 being highest. Resolve equal scores using the shared [standings tie-breakers](#standings-tie-breakers-event-rule). **Assign players individually, one at a time in rank order**, using these four passes:
 
 1. **First pass:** starting with rank 1, assign the next player to each table from Table 1 through the last table.
 2. **Second pass:** continue with the next unassigned rank. Start at the last table again and assign one player to each table in reverse order, ending at Table 1.
@@ -325,7 +327,7 @@ This is the **snake assignment pattern**. The last table receives consecutive ra
 | Table 3 | 3, 6, 11, 14 |
 | Table 4 | 4, 5, 12, 13 |
 
-- For equal first-hanchan tournament scores, apply the standings tie-breakers in Section 4 using the first qualifier only. After both qualifiers, use the same order with both qualifying hanchans included. Table assignment and qualification are event arrangements; WRC does not prescribe this event's snake seating or top four format.
+- For equal first-hanchan tournament scores, apply the [standings tie-breakers](#standings-tie-breakers-event-rule) using the first qualifier only. After both qualifiers, use the same order with both qualifying hanchans included. Table assignment and qualification are event arrangements; WRC does not prescribe this event's snake seating or top four format.
 - The organiser publishes table and seat assignments before each hanchan. The playing field must fill tables of four; any required substitutes must be announced before the first draw. Substitutes play normally, are included when forming qualifying tables, and are excluded from qualification for the Final.
 - **Final:** the top four eligible entrants after both qualifiers play together. Final seats are assigned by random draw; qualification seed is used only for Final tie-breaking.
 - Tournament scores from both qualifying hanchans are added together.
@@ -359,7 +361,7 @@ Use the WRC hanchan score formula and uma below. Placement and uma are determine
 
 Tournament scores may contain one decimal place.
 
-Calculate scores without rounding. If players tie on final points in a hanchan, they share the places they occupy and split the uma for those places equally, as in WRC Section 10.3. For example, two players tied for 1st each receive **(+15 + 5) ÷ 2 = +10 uma**; the next player is 3rd. Shared uma must be calculated before any event tie-breaker. The event's first- and fourth-place counts for standings ties are defined in Section 4.
+Calculate scores without rounding. If players tie on final points in a hanchan, they share the places they occupy and split the uma for those places equally, as in WRC Section 10.3. For example, two players tied for 1st each receive **(+15 + 5) ÷ 2 = +10 uma**; the next player is 3rd. Shared uma must be calculated before any event tie-breaker. The event's first- and fourth-place counts for standings ties are defined under [Qualification](#4-qualification-event-rules).
 
 ### Uma
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://saujana-bgc.org/riichi-rules/">
+  <title>Riichi Rules | Saujana BGC</title>
+  <script>
+    const legacySectionIds = {
+      '6-basic-settings': '1-basic-settings',
+      '7-calls-and-draws': '2-calls-and-draws',
+      '8-head-bump': '3-head-bump',
+      '9-dealer-and-match-progression': '4-dealer-and-match-progression',
+      '10-exhaustive-draws': '5-exhaustive-draws',
+      '11-hand-scoring': '6-hand-scoring',
+      '12-chombo': '7-chombo',
+      '13-situations-that-may-result-in-chombo': '8-situations-that-may-result-in-chombo',
+      '14-procedure-after-chombo': '9-procedure-after-chombo',
+      '15-minor-mistakes': '10-minor-mistakes',
+      '16-player-conduct': '11-player-conduct',
+      '17-tournament-administration': '12-tournament-administration',
+      '18-spirit-of-the-event': '13-spirit-of-the-event',
+      'table-rules': 'four-player-rules',
+      'riichi-open-tournament-rules': 'riichi-open-i-event-appendix',
+      'example': 'example-1',
+      'example-1': 'example',
+    }
+    const destination = new URL('/riichi-rules/', window.location.origin)
+    destination.search = window.location.search
+    const legacyId = decodeURIComponent(window.location.hash.slice(1))
+    destination.hash = legacySectionIds[legacyId] || legacyId
+    window.location.replace(destination.href)
+  </script>
+</head>
+<body>
+  <main>
+    <p>These rules have moved. <a href="/riichi-rules/">Open Riichi Rules</a>.</p>
+  </main>
+</body>
+</html>

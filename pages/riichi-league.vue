@@ -296,6 +296,7 @@
         <div>
           <span>Three-player</span>
           <strong>1st 9 · 2nd 5 · 3rd 0</strong>
+          <NuxtLink class="sanma-rules-link" to="/riichi-rules/#three-player-rules-sanma" no-prefetch>Three-player rules <span aria-hidden="true">→</span></NuxtLink>
         </div>
       </div>
     </section>

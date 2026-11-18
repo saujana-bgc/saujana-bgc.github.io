@@ -1,11 +1,10 @@
 <template>
-  <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+  <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
       <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Collection</h1>
     </header>
 
-    <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
       <div class="collection-search fade-up">
         <UInput
           class="collection-search-input w-full"
@@ -17,6 +16,7 @@
         />
         <div class="collection-search-meta">
           <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
+          <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="sort-btn clear-collection-filters" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
         </div>
       </div>
 
@@ -33,7 +33,6 @@
           <div class="collection-category-options" role="group" aria-label="Filter by play history">
             <UButton class="sort-btn category-btn" :class="{ active: unplayedOnly }" :aria-pressed="unplayedOnly" :disabled="isPending || isError" @click="toggleUnplayed">{{ unplayedOnly ? 'Clear no-plays filter' : 'No plays logged' }}</UButton>
           </div>
-          <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="sort-btn clear-collection-filters" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Clear filters</UButton>
         </div>
       </details>
 
@@ -72,8 +71,6 @@
         <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Show all games</UButton>
       </div>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>
-    </main>
-
     <UModal :open="Boolean(selectedGame)" :title="selectedGame?.name || 'Game details'" description="Board game details" :close="false" scrollable :ui="{ overlay: 'bg-[rgba(74,68,63,0.65)] !p-0 flex items-end justify-center sm:!p-10 sm:items-center', content: '!w-full sm:!w-[95vw] !max-w-[900px] !max-h-none !overflow-visible !border-0 !bg-transparent !shadow-none !ring-0 !p-0' }" @update:open="onModalOpenChange">
       <template #content>
       <div v-if="selectedGame" class="modal-container">
@@ -117,7 +114,7 @@
       </div>
       </template>
     </UModal>
-  </div>
+  </main>
 </template>
 
 <script setup>

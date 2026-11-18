@@ -183,7 +183,7 @@
             </UButton>
           </div>
 
-          <details class="hand-help"><summary>Table scoring rules</summary><p>Riichi Rules use kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. Red fives and three-player scoring are optional calculator settings for other tables.</p><NuxtLink to="/riichi-rules/" no-prefetch>Read Riichi Rules</NuxtLink></details>
+          <details class="hand-help"><summary>Table scoring rules</summary><p>Saujana’s four-player rules use kiriage mangan and 2 fu for a double-wind pair. Ordinary 13+ han scores yonbaiman. Special waits do not double yakuman; distinct yakuman stack. The calculator also supports three-player sanma and red fives.</p><NuxtLink to="/riichi-rules/" no-prefetch>Four-player rules</NuxtLink><span aria-hidden="true"> · </span><NuxtLink to="/riichi-rules/#three-player-rules-sanma" no-prefetch>Sanma rules</NuxtLink></details>
           </details>
 
           <div ref="honbaSection" class="bonus-control honba-control" tabindex="-1" aria-labelledby="honba-count-label">

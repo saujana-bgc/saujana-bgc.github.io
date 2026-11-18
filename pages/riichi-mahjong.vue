@@ -2,7 +2,7 @@
   <main class="activity-page">
     <header class="page-intro">
       <h1 class="hero-title">Riichi Mahjong</h1>
-      <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? Riichi is Japanese mahjong for four players, and the fun is spotting which tiles fit.</p>
+      <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? In four-player riichi and three-player sanma, the fun is spotting which tiles fit.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
     </header>
 
@@ -14,7 +14,8 @@
         <div class="activity-copy">
           <p class="page-eyebrow">A turn at the table</p>
           <h2 id="first-hand-title">See a hand take shape, one tile at a time.</h2>
-          <p>On your turn, draw one tile and discard another. You’re collecting matching sets, number runs and a pair. Complete the pattern and you win the hand.</p>
+          <p>On your turn, draw one tile and discard another. You’re collecting matching sets, number runs and a pair. Complete the pattern and you win the hand. We play both four-player riichi and three-player sanma.</p>
+          <p><NuxtLink to="/riichi-rules/" no-prefetch>Read the four-player and sanma rules <span aria-hidden="true">→</span></NuxtLink></p>
           <p>Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
         </div>
       </ActivityOverviewFeature>

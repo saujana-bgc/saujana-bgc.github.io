@@ -1,12 +1,10 @@
 <template>
-  <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+  <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
       <p class="page-eyebrow">A seat at the table</p>
       <h1 class="hero-title">Gatherings</h1>
       <div class="stats-container">Join us for board games, riichi mahjong and selected Blood on the Clocktower dates.</div>
     </header>
-
-    <main class="gatherings-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
 
       <div class="tabs fade-up">
         <UButton :class="['tab', activeTab === 'present' ? 'tab-active' : '']" :aria-pressed="activeTab === 'present'" @click="switchTab('present')">
@@ -354,8 +352,7 @@
         <SocialLink channel="whatsapp" label="Message us on WhatsApp" />
       </div>
 
-    </main>
-  </div>
+  </main>
 </template>
 
 <script setup>

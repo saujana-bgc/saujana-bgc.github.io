@@ -32,10 +32,8 @@
       <aside class="toc-desktop" aria-label="Rules contents">
         <p>In this guide</p>
         <div class="rules-shortcuts" aria-label="Key sections">
-          <a href="#1-basic-settings">Table settings</a>
+          <a href="#four-player-rules">Four players</a>
           <a href="#three-player-rules-sanma">Three-player rules</a>
-          <a href="#6-hand-scoring">Scoring</a>
-          <a href="#penalties-and-irregularities">Penalties</a>
           <a href="#riichi-open-i-event-appendix">Open I appendix</a>
         </div>
         <nav>
@@ -45,10 +43,8 @@
       <details ref="mobileToc" class="toc-mobile">
         <summary>Jump to section</summary>
         <div class="rules-shortcuts" aria-label="Key sections">
-          <a href="#1-basic-settings" @click="closeMobileToc">Table settings</a>
+          <a href="#four-player-rules" @click="closeMobileToc">Four players</a>
           <a href="#three-player-rules-sanma" @click="closeMobileToc">Three-player rules</a>
-          <a href="#6-hand-scoring" @click="closeMobileToc">Scoring</a>
-          <a href="#penalties-and-irregularities" @click="closeMobileToc">Penalties</a>
           <a href="#riichi-open-i-event-appendix" @click="closeMobileToc">Open I appendix</a>
         </div>
         <nav aria-label="Rules contents"><a v-for="section in sections" :key="section.id" :class="{ 'toc-topic': section.depth === 1, 'toc-subsection': section.depth === 3 }" :href="`#${section.id}`" @click="closeMobileToc">{{ section.title }}</a></nav>
@@ -125,7 +121,7 @@ function closeMobileToc() {
 .table-summary dd { margin: 3px 0 0; color: var(--clay-text); font-weight: 700; }
 .table-summary > a { color: var(--matcha-leaf); font-size: .85rem; font-weight: 700; text-underline-offset: 3px; }
 .rules-layout { display: grid; grid-template-columns: 250px minmax(0,1fr); gap: clamp(28px,5vw,54px); align-items: start; }
-.toc-desktop { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow: auto; padding: 18px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
+.toc-desktop { position: sticky; top: 112px; max-height: calc(100vh - 136px); overflow: auto; padding: 18px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
 .toc-desktop > p { margin: 0 0 12px; color: var(--matcha-leaf); font-size: .75rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
 .rules-shortcuts { display: grid; gap: 2px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 .rules-shortcuts a { color: var(--matcha-leaf); font-weight: 700; }
@@ -137,11 +133,11 @@ function closeMobileToc() {
 .toc-desktop .toc-topic,.toc-mobile .toc-topic { margin-top: 8px; color: var(--matcha-leaf); font-weight: 750; }
 .toc-mobile { display: none; }
 .rules-content { min-width: 0; color: var(--clay-text); font-size: .97rem; line-height: 1.75; overflow-wrap: anywhere; }
-.rules-content > h2 { margin: 2.6em 0 .3em; padding-bottom: .45em; border-bottom: 2px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.8rem,3.5vw,2.35rem)/1.2 var(--font-display); scroll-margin-top: 24px; }
+.rules-content > h2 { margin: 2.6em 0 .3em; padding-bottom: .45em; border-bottom: 2px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.8rem,3.5vw,2.35rem)/1.2 var(--font-display); }
 .back-to-contents { display: inline-block; margin-bottom: .8em; color: var(--muted); font-size: .78rem; text-underline-offset: 3px; }
-.rules-content h2 { margin: 2.4em 0 .75em; padding-bottom: .4em; border-bottom: 1px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.5rem,3vw,2rem)/1.25 var(--font-display); scroll-margin-top: 24px; }
-.rules-content h3 { margin: 1.8em 0 .55em; color: var(--matcha-leaf); font: 500 1.16rem/1.4 var(--font-display); scroll-margin-top: 24px; }
-.rules-content h4 { margin: 1.3em 0 .4em; color: var(--clay-text); font: 700 1rem/1.45 var(--font-body); scroll-margin-top: 24px; }
+.rules-content h2 { margin: 2.4em 0 .75em; padding-bottom: .4em; border-bottom: 1px solid var(--line); color: var(--matcha-leaf); font: 400 clamp(1.5rem,3vw,2rem)/1.25 var(--font-display); }
+.rules-content h3 { margin: 1.8em 0 .55em; color: var(--matcha-leaf); font: 500 1.16rem/1.4 var(--font-display); }
+.rules-content h4 { margin: 1.3em 0 .4em; color: var(--clay-text); font: 700 1rem/1.45 var(--font-body); }
 .rules-content p { margin: .8em 0; }
 .rules-content ul,.rules-content ol { padding-left: 1.45em; }
 .rules-content li { margin: .42em 0; padding-left: .12em; }
