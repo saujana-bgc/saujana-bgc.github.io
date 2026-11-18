@@ -1,21 +1,31 @@
 <template>
   <main class="rules-page">
     <header class="page-intro rules-intro">
-      <NuxtLink class="context-link rules-back-link" to="/riichi-mahjong/" no-prefetch>← Riichi Mahjong</NuxtLink>
-      <p class="page-eyebrow">WRC Rules 2025 · Four-player play</p>
+      <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi Rules</h1>
-      <p class="rules-deck">The four-player rules used at Saujana, based on WRC Rules 2025 and its official clarification.</p>
-      <p class="source-note">WRC Rules 2025, its penalties and official clarification govern gameplay, scoring, conduct and penalties. Riichi Open I arrangements appear in the appendix.</p>
+      <p class="rules-deck">Table settings for four-player riichi and three-player sanma at Saujana, with the Riichi Open I event arrangements below.</p>
+      <p class="source-note">Four-player play follows WRC Rules 2025 and its official clarification. Sanma uses the shared rules where they fit, with the three-player changes set out here.</p>
     </header>
 
-    <section class="table-summary" aria-labelledby="table-summary-title">
-      <h2 id="table-summary-title">Table at a glance</h2>
-      <dl>
-        <div><dt>Players</dt><dd>Four</dd></div>
-        <div><dt>Rounds</dt><dd>East–South</dd></div>
-        <div><dt>Starting points</dt><dd>30,000</dd></div>
-        <div><dt>Red fives</dt><dd>None</dd></div>
-      </dl>
+    <section class="table-summaries" aria-label="Riichi formats at a glance">
+      <article class="table-summary" aria-labelledby="four-player-title">
+        <h2 id="four-player-title">Four players</h2>
+        <dl>
+          <div><dt>Rounds</dt><dd>East–South</dd></div>
+          <div><dt>Starting points</dt><dd>30,000</dd></div>
+          <div><dt>Red fives</dt><dd>None</dd></div>
+        </dl>
+        <a href="#1-basic-settings">Four-player settings ↓</a>
+      </article>
+      <article class="table-summary sanma-summary" aria-labelledby="three-player-title">
+        <h2 id="three-player-title">Three players · sanma</h2>
+        <dl>
+          <div><dt>Rounds</dt><dd>East 1–3, South 1–3</dd></div>
+          <div><dt>Tiles</dt><dd>108 · no chi</dd></div>
+          <div><dt>Red fives</dt><dd>5-pin and 5-sou</dd></div>
+        </dl>
+        <a href="#three-player-rules-sanma">Three-player rules ↓</a>
+      </article>
     </section>
 
     <div v-if="sections.length" id="rules-contents" class="rules-layout">
@@ -23,6 +33,7 @@
         <p>In this guide</p>
         <div class="rules-shortcuts" aria-label="Key sections">
           <a href="#1-basic-settings">Table settings</a>
+          <a href="#three-player-rules-sanma">Three-player rules</a>
           <a href="#6-hand-scoring">Scoring</a>
           <a href="#penalties-and-irregularities">Penalties</a>
           <a href="#riichi-open-i-event-appendix">Open I appendix</a>
@@ -35,6 +46,7 @@
         <summary>Jump to section</summary>
         <div class="rules-shortcuts" aria-label="Key sections">
           <a href="#1-basic-settings" @click="closeMobileToc">Table settings</a>
+          <a href="#three-player-rules-sanma" @click="closeMobileToc">Three-player rules</a>
           <a href="#6-hand-scoring" @click="closeMobileToc">Scoring</a>
           <a href="#penalties-and-irregularities" @click="closeMobileToc">Penalties</a>
           <a href="#riichi-open-i-event-appendix" @click="closeMobileToc">Open I appendix</a>
@@ -55,9 +67,9 @@ import { marked } from 'marked'
 
 useSeoMeta({
   title: 'Riichi Rules | Saujana BGC',
-  description: 'Read Saujana’s four-player riichi rules, based on WRC Rules 2025, with tournament arrangements in a Riichi Open I appendix.',
+  description: 'Read Saujana riichi rules for four-player mahjong and three-player sanma, with Riichi Open I event arrangements.',
   ogTitle: 'Riichi Rules',
-  ogDescription: 'The riichi rules used at Saujana, based on WRC Rules 2025.',
+  ogDescription: 'Four-player riichi rules, three-player sanma settings and Riichi Open I event arrangements at Saujana.',
 })
 
 const { data: markdown, error } = await useAsyncData('riichi-open-rules-markdown', () => $fetch('/api/riichi-open-rules'))
@@ -104,11 +116,14 @@ function closeMobileToc() {
 .rules-back-link { margin: 0 auto 14px; }
 .rules-deck { max-width: 650px; margin: 18px auto 0; color: var(--muted); font-size: 1.02rem; line-height: 1.7; }
 .source-note { max-width: 690px; margin: 18px auto 0; padding: 13px 16px; border-left: 3px solid var(--gold-leaf); background: var(--surface-soft); color: var(--clay-text); font-size: .9rem; line-height: 1.55; text-align: left; }
-.table-summary { max-width: 760px; margin: 0 auto 30px; padding: 20px 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.table-summaries { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; max-width: 900px; margin: 0 auto 30px; }
+.table-summary { min-width: 0; padding: 20px 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.sanma-summary { background: linear-gradient(145deg,#f4f1e8 0%,var(--surface-soft) 75%); }
 .table-summary h2 { margin: 0 0 12px; color: var(--matcha-leaf); font: 400 1.25rem/1.3 var(--font-display); }
-.table-summary dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.table-summary dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 12px; }
 .table-summary dt { color: var(--muted); font-size: .78rem; }
 .table-summary dd { margin: 3px 0 0; color: var(--clay-text); font-weight: 700; }
+.table-summary > a { color: var(--matcha-leaf); font-size: .85rem; font-weight: 700; text-underline-offset: 3px; }
 .rules-layout { display: grid; grid-template-columns: 250px minmax(0,1fr); gap: clamp(28px,5vw,54px); align-items: start; }
 .toc-desktop { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow: auto; padding: 18px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
 .toc-desktop > p { margin: 0 0 12px; color: var(--matcha-leaf); font-size: .75rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
@@ -141,6 +156,6 @@ function closeMobileToc() {
 .rules-content hr { margin: 2em 0; border: 0; border-top: 1px solid var(--line); }
 .rules-content :focus-visible,.toc-desktop :focus-visible,.toc-mobile :focus-visible,.rules-back-link:focus-visible,.back-to-contents:focus-visible { outline: 3px solid var(--gold-leaf); outline-offset: 3px; }
 .rules-state { max-width: 760px; margin: 40px auto; padding: 24px; border-radius: 8px; background: var(--surface-soft); color: var(--muted); }
-@media(max-width:800px) { .rules-page { width: min(100% - 32px,1120px); } .rules-layout { display: block; } .toc-desktop { display: none; } .toc-mobile { display: block; margin: 0 0 22px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); } .toc-mobile summary { color: var(--matcha-leaf); font-weight: 700; cursor: pointer; } .toc-mobile nav { max-height: 55vh; overflow: auto; margin-top: 10px; } .table-summary dl { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@media(max-width:600px) { .rules-page { width: min(100% - 28px,1120px); } .rules-content { font-size: .93rem; } .rules-content th,.rules-content td { padding: 7px 8px; } .source-note { padding: 11px 13px; } }
+@media(max-width:800px) { .rules-page { width: min(100% - 32px,1120px); } .rules-layout { display: block; } .toc-desktop { display: none; } .toc-mobile { display: block; margin: 0 0 22px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); } .toc-mobile summary { color: var(--matcha-leaf); font-weight: 700; cursor: pointer; } .toc-mobile nav { max-height: 55vh; overflow: auto; margin-top: 10px; } }
+@media(max-width:600px) { .rules-page { width: min(100% - 28px,1120px); } .rules-content { font-size: .93rem; } .rules-content th,.rules-content td { padding: 7px 8px; } .source-note { padding: 11px 13px; } .table-summaries { grid-template-columns: 1fr; } .table-summary { padding: 17px; } .table-summary dl { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 </style>

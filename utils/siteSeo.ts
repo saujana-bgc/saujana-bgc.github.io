@@ -25,7 +25,7 @@ export const publicPages = {
   },
   '/riichi-rules': {
     title: 'Riichi Rules | Saujana BGC',
-    description: 'Read Saujana’s four-player riichi rules, based on WRC Rules 2025, with tournament arrangements in a Riichi Open I appendix.',
+    description: 'Read Saujana riichi rules for four-player mahjong and three-player sanma, with Riichi Open I event arrangements.',
   },
   '/playlog': {
     title: 'Play History | Saujana BGC',

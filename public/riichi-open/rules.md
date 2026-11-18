@@ -244,6 +244,39 @@ Play to win, respect the table, and enjoy the mahjong.
 
 ---
 
+# Three-player rules (sanma)
+
+These settings apply to Saujana’s three-player riichi tables. Follow the four-player rules above wherever they fit, with the changes below.
+
+## Sanma table settings
+
+- Use East–South rounds, with East 1–3 and South 1–3.
+- Remove the 2-man through 8-man tiles, leaving 108 tiles.
+- Chi is not allowed. Pon, kan, riichi, tsumo and ron remain available.
+- Use two red fives: one red 5-pin and one red 5-sou. There is no red 5-man because the middle manzu tiles are removed.
+- The manzu dora cycle runs directly between 1-man and 9-man: a 1-man indicator points to 9-man, and a 9-man indicator points to 1-man.
+- A valid yaku is required to win. Dora and red fives do not count as yaku by themselves.
+
+The earlier published sanma rules do not set starting points or a separate penalty schedule. Agree the starting points with the host before the first hand. Correct minor mistakes when possible without disrupting play. Pause for serious mistakes or disputes and ask the organiser to decide whether to correct the hand, declare a dead hand or replay it.
+
+## North tiles (nuki-dora)
+
+A player may declare a North tile as nuki-dora and set it aside, then draw a replacement from the dead wall. Each extracted North counts as one dora. A player may keep North in their hand and use it as an ordinary honour tile instead.
+
+## Sanma scoring and draws
+
+- Ron uses the normal four-player point formula. The discarder pays the normal ron amount.
+- On tsumo, each of the two opponents pays their normal four-player share. The absent fourth player’s share is not compensated.
+- Honba payments are 300 points on ron and 100 points from each opponent on tsumo.
+- Use the standard 3,000-point noten pool at an exhaustive draw. With one tenpai player, each noten player pays 1,500 points. With two tenpai players, each receives 1,500 points from the sole noten player.
+- The dealer continues only when tenpai after an exhaustive draw. Matches normally end after South 3. If the dealer repeats in South 3, continue until the dealer stops repeating.
+- The leading dealer may end the match after winning the final scheduled hand.
+- Multiple ron is allowed. Each valid winner receives the normal ron payment and the full honba payment. Award riichi sticks to the valid winner closest to the discarder in turn order.
+
+Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player guide unless the difference in player count makes them impossible. For mistakes or disputes, pause play and ask the organiser. Sanma league points are based on finishing place and are described on the Riichi League page.
+
+---
+
 # Riichi Open I event appendix
 
 This appendix records the tournament format and arrangements for Riichi Open I. Gameplay follows Saujana Riichi Rules in the main guide above.
