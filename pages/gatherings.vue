@@ -2252,7 +2252,11 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-card:has(.event-flyer-image) > .event-description,
 .event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 6; }
 .event-card:has(.event-flyer-image) > .attendees-section,
-.event-card:has(.event-image-wrap) > .attendees-section { grid-column: 1 / -1; grid-row: 5; }
+.event-card:has(.event-image-wrap) > .attendees-section { display: contents; }
+.event-card:has(.event-flyer-image) > .attendees-section > .signup-section,
+.event-card:has(.event-image-wrap) > .attendees-section > .signup-section { grid-column: 1 / -1; grid-row: 5; }
+.event-card:has(.event-flyer-image) .attendee-list-details,
+.event-card:has(.event-image-wrap) .attendee-list-details { grid-column: 1 / -1; grid-row: 7; margin-top: 12px; }
 .event-card:has(.event-flyer-image) > .expand-bar,
 .event-card:has(.event-image-wrap) > .expand-bar { grid-column: 1 / -1; }
 .attendees-notice { background: var(--surface-soft); border-radius: 8px; }
@@ -2279,7 +2283,11 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   .event-card:has(.event-image-wrap) > .event-games-note { order: 4; }
   .event-description { order: 6; }
   .event-card:has(.event-flyer-image) > .attendees-section,
-  .event-card:has(.event-image-wrap) > .attendees-section { order: 5; }
+  .event-card:has(.event-image-wrap) > .attendees-section { display: contents; }
+  .event-card:has(.event-flyer-image) > .attendees-section > .signup-section,
+  .event-card:has(.event-image-wrap) > .attendees-section > .signup-section { order: 5; }
+  .event-card:has(.event-flyer-image) .attendee-list-details,
+  .event-card:has(.event-image-wrap) .attendee-list-details { order: 8; margin-top: 10px; }
   .gatherings-main > .tabs { margin-top: 0; }
   .page-intro { padding-bottom: var(--space-5); }
   .first-time-panel { padding: 14px 18px; }

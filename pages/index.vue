@@ -283,10 +283,9 @@ const expectations = [
 }
 
 .next-gathering {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px 24px;
   margin-top: clamp(24px, 4vw, 40px);
   padding: clamp(18px, 2.5vw, 26px);
@@ -297,6 +296,7 @@ const expectations = [
 }
 
 .next-gathering { min-height: 124px; }
+.next-gathering > div:first-child { min-width: 0; }
 .next-gathering-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
 .next-gathering-empty p { margin: 0; color: var(--muted); }
 
@@ -352,6 +352,8 @@ const expectations = [
   color: var(--white-pure);
   font-weight: 700;
   text-decoration: none;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .next-gathering-link:hover { background: #293d31; }
@@ -371,7 +373,7 @@ const expectations = [
   display: grid;
   grid-template-areas: "photo copy" "photo steps";
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
   gap: 12px clamp(24px, 4vw, 48px);
 }
 .first-visit-copy { grid-area: copy; }
@@ -543,8 +545,9 @@ const expectations = [
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .care-guide { grid-template-columns: minmax(0, 1fr); }
-  .next-gathering { align-items: flex-start; padding: 18px; }
-  .next-gathering-link { width: 100%; justify-content: center; }
+  .next-gathering { align-items: start; padding: 18px; }
+  .next-gathering-link { grid-column: 1; grid-row: 2; width: 100%; justify-content: center; }
+  .next-gathering-details { gap: 5px 12px; font-size: .87rem; }
   .hero-artwork { max-width: 420px; margin-inline: auto; }
 }
 </style>
