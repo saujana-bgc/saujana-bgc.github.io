@@ -284,7 +284,7 @@
           but no uma or oka is added to the league standings.
         </p>
         <NuxtLink class="rules-button league-button league-button-primary" to="/riichi-rules/" no-prefetch>
-          Saujana Riichi Rules
+          Riichi Rules
           <span aria-hidden="true">→</span>
         </NuxtLink>
       </div>

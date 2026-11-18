@@ -24,7 +24,7 @@ export const publicPages = {
     description: 'Learn riichi mahjong at Saujana’s weekly board games and riichi meetup. Find gathering dates, league results, scoring tools and tournament details.',
   },
   '/riichi-rules': {
-    title: 'Saujana Riichi Rules | Saujana BGC',
+    title: 'Riichi Rules | Saujana BGC',
     description: 'Read Saujana’s four-player riichi rules, based on WRC Rules 2025, with tournament arrangements in a Riichi Open I appendix.',
   },
   '/playlog': {

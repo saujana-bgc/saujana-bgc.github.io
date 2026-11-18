@@ -1,5 +1,3 @@
-# Saujana Riichi Rules
-
 These are Saujana’s four-player riichi rules, based on WRC Rules 2025, WRC Penalties 2025, and the 29 June 2025 official clarification. The Riichi Open I event appendix follows the gameplay rules.
 
 ## 1. Basic settings

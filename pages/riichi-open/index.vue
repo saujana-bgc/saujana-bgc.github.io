@@ -9,8 +9,7 @@
     <div class="event-status-bar" :class="{ unavailable: standingsError }" aria-live="polite"><span><i aria-hidden="true"></i>{{ publicLoaded ? eventStatus : standingsError ? 'Live details unavailable' : 'Loading event details…' }}</span><UButton v-if="standingsError && activeTab !== 'standings'" class="status-retry" size="xs" variant="outline" color="neutral" @click="loadPublic">Try again</UButton></div>
     <div v-if="activeTab === 'registration' || (publicLoaded && event?.stage !== 'completed')" class="event-page-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
-      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules</NuxtLink>
-      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules <span aria-hidden="true">↗</span></NuxtLink>
+      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Riichi Rules <span aria-hidden="true">↗</span></NuxtLink>
     </div>
     <section v-show="activeTab === 'registration'" id="riichi-registration-panel" role="tabpanel" aria-labelledby="riichi-registration-tab">
     <section class="event-hero">
@@ -111,8 +110,7 @@
     </section>
     <div v-if="event?.stage === 'completed' && activeTab === 'standings'" class="event-page-shortcuts completed-results-shortcuts">
       <UButton type="button" class="schedule-jump" aria-controls="schedule-heading" @click="goToSchedule">View schedule <span aria-hidden="true">↓</span></UButton>
-      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules</NuxtLink>
-      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Saujana Riichi Rules <span aria-hidden="true">↗</span></NuxtLink>
+      <NuxtLink class="schedule-jump rules-page-link" to="/riichi-rules/#riichi-open-i-event-appendix" no-prefetch>Riichi Rules <span aria-hidden="true">↗</span></NuxtLink>
     </div>
   </main>
 </template>
