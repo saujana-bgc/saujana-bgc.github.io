@@ -44,7 +44,7 @@ export const MANUAL_YAKU: ManualYakuOption[] = [
   { id: "yakuhai-seat", name: "Seat-wind set", detail: "Your seat-wind triplet or kan", category: "yakuhai", closedHan: 1, openHan: 1 },
   { id: "yakuhai-round", name: "Round-wind set", detail: "The round-wind triplet or kan", category: "yakuhai", closedHan: 1, openHan: 1 },
   { id: "chankan", name: "Chankan", detail: "Robbed an added kan", category: "situational", closedHan: 1, openHan: 1, winMethod: "ron", incompatible: ["houtei"] },
-  { id: "rinshan", name: "Rinshan", detail: "Won on the replacement tile after a kan", category: "situational", closedHan: 1, openHan: 1, winMethod: "tsumo", incompatible: ["haitei", "ippatsu"] },
+  { id: "rinshan", name: "Rinshan", detail: "Won on a kan or sanma North replacement draw", category: "situational", closedHan: 1, openHan: 1, winMethod: "tsumo", incompatible: ["haitei", "ippatsu"] },
   { id: "haitei", name: "Haitei", detail: "Won by tsumo on the final live-wall tile", category: "situational", closedHan: 1, openHan: 1, winMethod: "tsumo", incompatible: ["rinshan"] },
   { id: "houtei", name: "Houtei", detail: "Won by ron on the final discard", category: "situational", closedHan: 1, openHan: 1, winMethod: "ron", incompatible: ["chankan"] },
 
@@ -308,6 +308,8 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   const selectedYakuman = input.selectedYaku.filter((id) => selectedOption(id)?.yakuman);
   const needsGroupFu = selectedYakuman.length === 0 && manualHandValue(input).han < 5;
   const isSevenPairs = input.handShape === "chiitoitsu" || selected.has("chiitoitsu");
+  const northCanSupplyRinshan = input.playerCount === 3 && input.bonusHan.nuki > 0;
+  const rinshanNeedsKan = selected.has("rinshan") && !northCanSupplyRinshan;
   const allGroupsKnown = input.groups.length === 4 || input.groupsConfirmed === true;
   const requiresCompleteGroups = input.handShape === "standard"
     && STRUCTURAL_GROUP_YAKU.some(id => selected.has(id));
@@ -345,11 +347,11 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
   if (selected.has("double-riichi") && !input.isClosed) issues.push("Double riichi requires a closed hand.");
   if ((selected.has("tenhou") || selected.has("chiihou") || selected.has("renhou")) && input.groups.some((group) => group.type === "kan")) issues.push("A first-draw win cannot include a kan. Remove the kan or deselect the first-draw yaku.");
   if ((selected.has("tenhou") || selected.has("chiihou") || selected.has("renhou")) && input.groups.some((group) => !group.concealed)) issues.push("A first-draw win cannot include a call. Remove the called group or deselect the first-draw yaku.");
-  if (selected.has("rinshan") && input.handShape !== "standard") issues.push("Rinshan requires a standard hand; Seven Pairs and Thirteen Orphans cannot contain a kan.");
+  if (rinshanNeedsKan && input.handShape !== "standard") issues.push("Rinshan after a kan requires a standard hand; Seven Pairs and Thirteen Orphans cannot contain a kan.");
   if ((selected.has("kokushi") || selected.has("chiitoitsu") || selected.has("chuuren")) && input.groups.some((group) => group.type === "kan")) {
     issues.push("This hand shape cannot contain a kan. Remove the kan or change the selected hand shape or yaku.");
   }
-  if (selected.has("chuuren") && selected.has("rinshan")) issues.push("Nine Gates cannot include a kan or a Rinshan win.");
+  if (selected.has("chuuren") && rinshanNeedsKan) issues.push("Nine Gates cannot include a kan.");
   if (selected.has("chankan")) {
     const ordinaryKokushiMissingOrphanWait = selected.has("kokushi") && !input.doubleYakumanWaits.kokushi && input.waitType === null;
     if (input.waitType === null && !ordinaryKokushiMissingOrphanWait) issues.push("Choose the winning wait to check whether Chankan could use a fifth copy of the robbed tile.");
@@ -357,7 +359,7 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
       issues.push("This Chankan wait already holds a copy of the robbed tile, so the added kan would require a fifth copy. Use a wait where your hand holds none of that tile.");
     }
   }
-  if (needsGroupFu && selected.has("rinshan") && input.groups.every((group) => group.type !== "kan")) issues.push("Rinshan requires a kan in the winning hand.");
+  if (needsGroupFu && rinshanNeedsKan && input.groups.every((group) => group.type !== "kan")) issues.push("Rinshan requires a kan in the winning hand or an extracted North at a three-player table.");
   if (selected.has("renhou") && input.winType !== "ron") issues.push("Renhou requires a ron win before your first draw.");
   if (selected.has("renhou") && input.bonusHan.nuki > 0) issues.push("Renhou happens before North extraction; remove the nuki bonuses.");
   if (input.paoApplies && !["daisangen", "daisuushi"].some((id) => selected.has(id))) issues.push("Pao only applies to Daisangen or Daisuushi.");
@@ -572,7 +574,7 @@ export function manualScoringIssues(input: ManualScoreInput): string[] {
     const requiredYakuhaiCount = yakuhai.length - (doubleWind ? 1 : 0);
     const unresolvedYakuhai = requiredYakuhaiCount - input.groups.filter((group) => group.yakuId).length;
     if (unresolvedYakuhai > remainingGroups) issues.push("The listed groups leave too few sets for the selected dragon or wind yaku.");
-    if (selected.has("rinshan") && kans + remainingGroups < 1) issues.push("Rinshan needs a kan. Correct the listed groups or deselect Rinshan.");
+    if (rinshanNeedsKan && kans + remainingGroups < 1) issues.push("Rinshan needs a kan. Correct the listed groups or deselect Rinshan.");
     if (selected.has("sankantsu") && kans + remainingGroups < 3) issues.push("Sankantsu needs three kans. Correct the listed groups or deselect Sankantsu.");
     if (selected.has("suuankantsu") && kans + remainingGroups < 4) issues.push("Suukantsu needs four kans. Correct the listed groups or deselect Suukantsu.");
     if (selected.has("sanankou") && concealed + remainingGroups < 3) issues.push("Sanankou needs three concealed groups. Correct the listed groups or deselect Sanankou.");

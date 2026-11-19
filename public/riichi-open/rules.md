@@ -1,6 +1,6 @@
 # Four-player rules
 
-These are Saujana’s shared four-player riichi settings for casual tables and tournaments, based on WRC Rules 2025 and the 29 June 2025 official clarification. Riichi Open tournament rules and formal penalties are listed below.
+These are Saujana’s shared four-player riichi rules for casual tables and tournaments. Apply the relevant Saujana rules on this page first. For gameplay and scoring details the page does not cover, use [WRC Rules 2025](https://www.worldriichi.org/s/WRC-Rules-2025-42fx.pdf) as amended by the [29 June 2025 official clarification](https://www.worldriichi.org/s/WRC_2025_Rules_Clarification.pdf). At Riichi Open, also apply the announced rules for that edition and the [tournament rules below](#riichi-open-tournament-rules).
 
 ## 1. Basic settings
 
@@ -12,7 +12,7 @@ These are Saujana’s shared four-player riichi settings for casual tables and t
 - Use four ordinary fives in each suit. Red fives are not used.
 - Dora, ura-dora, kan-dora and kan-ura-dora are used.
 - Ippatsu is used.
-- Kuikae (swap-calling) is forbidden, including discarding the same tile as the called tile or the tile at the other end of a called sequence.
+- Kuikae (swap-calling) is forbidden. Immediately after a meld call, you cannot discard a tile identical to the called tile. If you called a tile at one end of a sequence, you also cannot discard the tile that would have completed the sequence using the two tiles from your hand. For example, if you call 1-pin with 2-pin and 3-pin, you cannot immediately discard 1-pin or 4-pin. If you call 2-pin with 1-pin and 3-pin, only 2-pin is forbidden by kuikae.
 - A valid yaku is required to win.
 - Dora does not count as a yaku by itself.
 
@@ -22,9 +22,15 @@ These are Saujana’s shared four-player riichi settings for casual tables and t
 
 WRC chi, pon, kan, riichi, tsumo and ron procedures apply. A discard can be claimed until the next player draws. Once the next player touches the wall, that player can no longer claim the discard, even before drawing. Another player's meld call does not remove the opportunity to declare ron with precedence. When the table is unsure whether an action was timely, stop play and call the organiser.
 
-Under WRC Section 8.2, call precedence is **tsumo → ron (resolved by turn order) → first meld caller → pon/kan over chi when simultaneous or timing is unclear**. When two meld calls are clearly separated in time, the first call wins, including when that first call is chi. If the calls are approximately simultaneous, or the table cannot establish which was first, pon or kan takes precedence over chi. Ron takes precedence over either meld call regardless of the meld callers' timing.
+Under WRC Section 8.2, a valid tsumo has precedence over all other declarations, and a timely valid ron has precedence over any meld call. In four-player play, resolve competing ron declarations by [head bump](#3-head-bump). When two meld calls are clearly separated in time, the first call wins, including when that first call is chi. If the calls are approximately simultaneous, or the table cannot establish which was first, pon or kan takes precedence over chi. If a player could not see the discard, allow a late call in accordance with WRC’s fair-play rule and call the organiser if there is a dispute.
 
-Riichi is permitted with fewer than four tiles remaining in the live wall, including no tiles remaining, and with fewer than 1,000 points. **Riichi with no live-wall tiles remaining is expressly permitted by the 29 June 2025 Official Rules Clarification**, which corrects the conflicting printed wording in WRC Section 8.4. Furiten riichi is permitted. A concealed kan after riichi must use the tile just drawn and must not change the hand's structure or waits; a change to yaku alone is permitted.
+Riichi is permitted with fewer than four tiles remaining in the live wall, including no tiles remaining, and with fewer than 1,000 points. **Riichi with no live-wall tiles remaining is expressly permitted by the 29 June 2025 Official Rules Clarification**, which corrects the conflicting printed wording in WRC Section 8.4. Furiten riichi is permitted.
+
+To declare riichi, you must have a closed hand in tenpai after your discard. Say “riichi”, place that discard sideways and put down the 1,000-point deposit. If the declaring discard is won by ron, the riichi is void and the deposit returns to you. If it is called for a meld, the riichi stands. Turn your next discard sideways, repeating as needed until a discard stays in your row.
+
+Furiten blocks ron on every wait, including ron on an added kan. It applies when a tile in your own discard history completes your current hand, or when you pass a discard or an added kan that completes your hand. A qualifying tile can cause furiten even if the completed hand has no yaku. After passing, temporary furiten lasts until your own next draw or call. If you pass after declaring riichi, it lasts for the rest of the hand. You can still win by tsumo.
+
+After riichi, a concealed kan must use the tile just drawn. The other three tiles must form a triplet in every interpretation of the original riichi hand, including lower-scoring interpretations and structures that would require a fifth copy of a tile. The waits must stay the same. The yaku may change.
 
 Only an added kan can be robbed. A concealed kan cannot be robbed, including for kokushi musou.
 
@@ -55,9 +61,9 @@ The last discard of the live wall may be won by ron, but cannot be called for ch
 
 This is the WRC single-winner rule.
 
-If more than one player declares ron on the same discard, only one player wins.
+If more than one player declares a valid ron on the same discard or added kan, only one player wins.
 
-The winner is the eligible ron declarer encountered first when proceeding from the discarder in normal turn order. Skip the discarder and any players who did not declare a valid ron.
+Start with the next seat after the discarder or the player adding to the kan. Proceed in normal turn order and award the win to the first valid ron declarer.
 
 Any other ron declarations on the same discard are disregarded.
 
@@ -80,7 +86,7 @@ There is therefore no double ron or triple ron.
 
 ### Time limits
 
-**WRC Section 10.1 procedure for other timed tournament hanchans:** unless the event announces a different procedure, at the signal finish the current hand and play one more; if the hand has just ended, play two more hands. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer won or was tenpai and would normally repeat. If a tournament chombo is called after the signal, replay the affected hand. For casual timed games, agree a finish procedure before play and ask the host how to handle a serious mistake.
+**WRC Section 10.1 procedure for timed tournament hanchans:** unless the event announces a different procedure, finish the hand in progress at the signal and play one more. If the hand has just ended when the signal sounds, play two more. A hand ends at a valid win or when the final discard goes unclaimed, before scoring or draw payments. Do not play beyond the natural end of the South round. After the required final hand, end the hanchan even if the dealer would normally repeat. A hand voided by chombo must be replayed and does not count towards the hands remaining. For casual timed games, agree a finish procedure before play and ask the host how to handle a serious mistake.
 
 ---
 
@@ -88,11 +94,19 @@ There is therefore no double ron or triple ron.
 
 Standard 3,000-point noten payments apply.
 
-At an exhaustive draw, declarations proceed in current seat order: East, South, West, then North. Reveal tenpai hands and turn noten hands face down. A player who has not declared riichi may choose noten rather than reveal a tenpai hand. A riichi player must reveal their hand; they cannot conceal it by choosing noten. A declaration cannot be changed.
+At an exhaustive draw, declarations proceed in current seat order: East, South, West, then North. Reveal tenpai hands and turn noten hands face down. A player who has not declared riichi may choose noten and keep a tenpai hand concealed. That player counts as noten for payments and dealer rotation. A riichi player must reveal their hand. A declaration cannot be changed.
 
-Tenpai does not require a yaku, and a wait remains tenpai even if all completing tiles are unavailable outside the player's hand. A hand requiring a fifth copy of a tile is not tenpai. In tournaments using WRC formal penalties, a dead hand is noten.
+Tenpai requires at least one tile that can complete the hand. A yaku is unnecessary. A wait still counts if its completing tiles are unavailable outside the hand. A completion requiring five copies of the same tile in the hand cannot count as a wait. In tournaments using WRC formal penalties, a dead hand is noten.
 
-The dealer continues only if tenpai.
+If one or more players are tenpai and one or more are noten, the noten players pay the tenpai players as follows.
+
+| Tenpai players | Each noten player pays | Each tenpai player receives |
+| ---: | ---: | ---: |
+| 1 | 1,000 | 3,000 |
+| 2 | 1,500 | 1,500 |
+| 3 | 3,000 | 1,000 |
+
+No points are exchanged if all players are tenpai or all are noten. Honba does not change these payments. The dealer continues only if tenpai.
 
 ---
 
@@ -105,7 +119,7 @@ Use the WRC yaku list, fu rules and scoring table.
 - Thirteen or more han without a yakuman yaku scores **yonbaiman**, equal in points to a single yakuman. It is not an actual yakuman and does not stack with yakuman yaku.
 - Multiple distinct yakuman yaku stack. A special wait does not double a yakuman.
 - A double-wind pair is worth 2 fu, not 4 fu. Chiitoitsu is always 25 fu.
-- Renhou is mangan and does not combine with other yaku or dora; use another scoring interpretation if it pays more.
+- Renhou is a closed-hand ron before your first draw, with no earlier meld calls or concealed kans at the table. An opponent’s riichi declaration does not prevent renhou. Score renhou as mangan on its own. If the hand pays more without renhou, use that higher score.
 - Pao applies to:
   - Daisangen
   - Daisuushii
@@ -114,7 +128,7 @@ Use the WRC yaku list, fu rules and scoring table.
 - Pao covers only the yakuman fed. On ron, the liable player and the winning-tile discarder split that yakuman's payment equally; if they are the same player, that player pays the full amount. On tsumo, the liable player pays that yakuman's full value. Other yakuman are paid normally.
 - Apply WRC Section 11.2.1 for honba: on ron, the winning-tile discarder pays all honba. On tsumo with one yakuman, the liable player pays all honba; with multiple yakuman, each opponent pays their usual 100 points per honba. Rinshan kaihou alone does not create pao.
 
-Keep the winning tile separate so waits, yaku and fu can be verified. When unsure about scoring, consult the official WRC scoring table between hands or call the organiser.
+On tsumo, keep the winning tile separate from your hand. On ron, leave the tile in the discarder’s row. When robbing an added kan, leave the tile with the player who declared the kan. When unsure about scoring, consult the official WRC scoring table between hands or call the organiser.
 
 The organiser's ruling is final.
 
@@ -130,11 +144,12 @@ Formal tournament penalties are explained in [Riichi Open tournament rules](#rii
 
 # Three-player rules (sanma)
 
-These settings apply to Saujana’s three-player riichi tables. Follow the shared rules above wherever they fit, with the changes below. Sanma has its own tile set, draw progression, scoring payments and multiple-ron rule.
+These settings apply to Saujana’s three-player riichi tables. They override the shared four-player rules wherever they differ. Saujana’s wall layout, North extraction and scoring rules are stated below. The [WRC Online Team League sanma rules](https://www.worldriichi.org/teamrules3p) are the reference for agari-yame.
 
 ## Sanma table settings
 
 - Use East–South rounds, with East 1–3 and South 1–3.
+- The only seats are East, South and West. When the deal rotates, South becomes East, West becomes South and East becomes West.
 - Remove the 2-man through 8-man tiles, leaving 108 tiles.
 - Chi is not allowed. Pon, kan, riichi, tsumo and ron remain available.
 - Use four ordinary 5-pin and four ordinary 5-sou. Saujana tables do not use red fives.
@@ -143,9 +158,22 @@ These settings apply to Saujana’s three-player riichi tables. Follow the share
 
 Each player starts with 40,000 points. Play continues below zero. In casual play, use the shared mistakes procedure above. Do not apply a chombo or tournament-point penalty.
 
+## Sanma dead wall
+
+- Set aside the last 14 tiles of the wall, or seven stacks, as the dead wall. Count from the end used for replacement draws. The first four stacks provide eight replacement tiles. Turn the top tile of the fifth stack face up as the initial dora indicator.
+- Kans and North extractions share the same eight replacement tiles. Take them in order from the replacement end, top tile then bottom tile of each stack. After every replacement draw, move the last tile of the live wall to the far end of the dead wall, preserving its position in the wall sequence. The dead wall always returns to 14 tiles.
+- After a completed kan, reveal the next top tile in the indicator row, moving one stack farther from the replacement end for each kan. A replenished tile may become a dora or ura-dora indicator. A robbed kan consumes no replacement tile and adds no indicator. North extraction never adds an indicator.
+- A hand allows up to four kans and four North extractions in total across the table. Neither action is allowed once the live wall is empty or all eight replacement tiles are used.
+
 ## North tiles (nuki-dora)
 
-A player may declare a North tile as nuki-dora during their own turn and set it aside. Draw the replacement from the dead wall, then move the next live-wall tile to the dead wall so it remains at 14 tiles. Extracted North tiles each count as one dora. A player may keep North in their hand as an ordinary honour tile. After riichi, extract only a North drawn that turn. North extraction cancels ippatsu. No player may win by ron on an extracted North. Do not extract North when no live-wall tile remains for replenishing the dead wall.
+After drawing, including on East’s first turn, you may say “kita”, place one North from your hand face up beside it, then draw a replacement. You can extract another North after that draw or declare a kan if the usual kan conditions are met. An extracted North stays outside your hand. You may instead keep North in your hand as an ordinary honour tile.
+
+- North extraction keeps a closed hand closed. After riichi, you may extract only the North you just drew, leaving the rest of the hand unchanged. This also applies to a North drawn as a replacement.
+- North extraction cancels every player’s ippatsu and interrupts the uninterrupted first turn used for double riichi and first-draw or first-turn yaku.
+- An extracted North is outside the discard row and does not count as a discard for furiten. Opponents cannot claim it for ron or a meld. An ordinary North discard follows the normal rules for discards.
+- Each extracted North gives one bonus han. It also counts for each dora or ura-dora indicator that makes North dora, if that indicator applies to the winning hand. These bonuses cannot supply the yaku required to win.
+- Winning by tsumo on the replacement tile drawn immediately after kita scores **rinshan kaihou**, worth one han. A replacement draw never scores haitei. The final discard can still score houtei if a replacement draw used up the last live-wall tile.
 
 ## Sanma scoring and draws
 
@@ -153,10 +181,11 @@ A player may declare a North tile as nuki-dora during their own turn and set it 
 - On tsumo, each of the two opponents pays their normal four-player share. The absent fourth player’s share is not compensated.
 - Honba payments are 300 points on ron and 100 points from each opponent on tsumo.
 - Use the standard 3,000-point noten pool at an exhaustive draw. With one tenpai player, each noten player pays 1,500 points. With two tenpai players, each receives 1,500 points from the sole noten player.
-- The dealer continues only when tenpai after an exhaustive draw. Matches normally end after South 3. If the dealer repeats in South 3, continue until the dealer stops repeating.
-- Multiple ron is allowed. Each valid winner receives the normal ron payment and the full honba payment. Award riichi sticks to the valid winner closest to the discarder in turn order.
+- At an exhaustive draw, declare in current seat order: East, South, then West. If everyone is tenpai or everyone is noten, no points are exchanged.
+- Multiple ron is allowed on a discard or an added kan. Settle every valid win separately, including its full honba payment. Award the existing riichi deposits to the valid winner nearest in turn order after the discarder or the player adding to the kan. Return the deposit for a riichi declaration if its declaring discard is won by ron.
 - If the dealer is one of the valid ron winners, the dealer continues and one honba is added. If the dealer does not win, the dealer rotates as usual.
-- The leading dealer may end the match after winning the final scheduled South 3 hand, including a hand with multiple valid ron winners.
+- **Agari-yame.** If the dealer wins any South 3 hand, including a repeat or a hand with two ron winners, settle all payments and riichi deposits first. If the dealer then has strictly more points than both opponents, the match ends automatically. A tie for the lead does not trigger agari-yame.
+- On an exhaustive draw, the dealer repeats if tenpai, including in South 3 and even if they are in first place. If the deal rotates after South 3, the match ends. There is no West round.
 - Pao uses the three-player tsumo shares. The absent fourth player’s share is not charged. For a single pao yakuman, the liable player pays the full sanma tsumo amount.
 
 Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player guide unless the difference in player count makes them impossible. For mistakes or disputes, pause play and ask the organiser. Sanma league points are based on finishing place and are described on the Riichi League page.
@@ -165,7 +194,9 @@ Yaku, fu, limits, riichi rules and other gameplay rules follow the four-player g
 
 # Riichi Open tournament rules
 
-These rules apply across the Riichi Open series. An event notice may set the format, schedule, seating and qualification procedures for that edition. Those announced arrangements take precedence over series defaults, followed by Saujana’s shared riichi rules and then the cited WRC documents for details not covered here. Formal penalties apply only when announced by the event.
+Apply the announced rules for the edition first, then the Riichi Open series rules below, then Saujana’s shared four-player rules above. For details remaining, apply the cited WRC documents with the June clarification taking precedence where it amends them. Formal penalties apply only when announced by the event.
+
+[Riichi Open I’s event arrangements](/riichi-open/rules/riichi-open-i.md) record that edition’s 75-minute limit, seating, qualification and final tie-breaks.
 
 ## Starting points and match scoring
 
@@ -223,7 +254,7 @@ Chombo penalties do not award additional tournament points to the other players.
 Use the official WRC penalties document, as amended by the 29 June clarification, to determine the penalty for each incident. Examples of chombo include:
 
 - Declaring an invalid win, including an empty winning declaration.
-- Declaring riichi while not in tenpai, discovered at a win declaration or exhaustive draw.
+- Declaring riichi while not in tenpai, discovered when that player declares a win or at an exhaustive draw. If a dead-hand penalty imposed after riichi is the sole reason the hand is noten, the player may show that it was tenpai before the penalty. The hand still counts as noten for draw settlement and dealer rotation.
 - Making an invalid meld or false concealed kan and then discarding, under the June clarification.
 - Committing an illegal action that makes continuation of the hand impossible.
 - Seriously disrupting the wall or game state such that the hand cannot reasonably continue.

@@ -1,8 +1,8 @@
-This archive records the format, seating, qualification and schedule published for Riichi Open I. It is retained as the record for that edition. For current Saujana table rules and the Riichi Open series rules, see the Riichi Rules page.
+This archive records the format, seating, qualification and schedule published for Riichi Open I. It is retained as the record for that edition. For current Saujana table rules and the Riichi Open series rules, see [Riichi Rules](/riichi-rules/).
 
 # Riichi Open I event arrangements
 
-This appendix records the tournament format, formal penalties and arrangements for Riichi Open I. Gameplay follows the shared four-player rules above, except where an Open I event rule explicitly changes them. See [Tournament penalties and irregularities](#tournament-penalties-and-irregularities) for the chombo rules.
+Apply the Open I arrangements in this archive and the [shared four-player rules](/riichi-rules/#four-player-rules) for gameplay. The [formal tournament penalties](/riichi-rules/#formal-tournament-penalties) explain chombo.
 
 Each qualifying hanchan and the Grand Final has a 75-minute limit. Use one shared countdown timer for all tables in that hanchan and announce when 15 minutes remain. At 75 minutes, finish the current hand, then stop without starting another hand. If that hand is voided by chombo after the signal, complete its required replay and stop there. Record the scores even if the South round has not finished. This event-specific procedure replaces the WRC additional-hand procedure for these event hanchans.
 
@@ -27,7 +27,7 @@ The main rulebook and penalties document are published under [CC BY-NC-SA 4.0](h
 
 - The tournament is played using **four-player riichi mahjong only**.
 - Each entrant plays exactly **two qualifying South hanchans**. The top four each play in the event's one **final South hanchan**.
-- Each hanchan is an East–South game, beginning at East 1 and normally ending after South 4 under [Dealer and match progression](#4-dealer-and-match-progression).
+- Each hanchan is an East–South game, beginning at East 1 and normally ending after South 4 under [Dealer and match progression](/riichi-rules/#4-dealer-and-match-progression).
 - The event has no additional qualifying rounds or playoff hanchans.
 - **First qualifying hanchan:** at the start of the event, randomly assign entrants to tables of four and randomly assign the initial East, South, West and North seats at each table. There is no seeding for this round.
 - **Second qualifying hanchan:** after all first-hanchan results and penalties are verified, rank all entrants by their first-hanchan tournament score, with rank 1 being highest. Resolve equal scores using the shared [standings tie-breakers](#standings-tie-breakers-event-rule). **Assign players individually, one at a time in rank order**, using these four passes:

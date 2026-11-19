@@ -22,6 +22,7 @@
           <div><dt>Red fives</dt><dd>None</dd></div>
         </dl>
         <a class="beginner-guide-link" href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Read the beginner guide (PDF, 11 MB) ↗</a>
+        <p class="beginner-guide-note">Guide correction. Temporary furiten ends on your next draw or your own tile call. If you pass after declaring riichi, it lasts for the rest of the hand.</p>
       </article>
       <article class="table-summary sanma-summary" aria-labelledby="three-player-title">
         <h2 id="three-player-title">Three players · sanma</h2>
@@ -116,6 +117,7 @@ function closeMobileToc() {
 </script>
 
 <style>
+.beginner-guide-note { margin: .5rem 0 0; color: var(--muted); font-size: .875rem; }
 .rules-page { width: min(100% - 40px, var(--content-page)); margin: 0 auto; padding-bottom: 50px; }
 .rules-intro { max-width: 760px; margin-inline: auto; }
 .rules-intro .hero-title { margin-inline: auto; }

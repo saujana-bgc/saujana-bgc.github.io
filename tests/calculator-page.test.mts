@@ -66,6 +66,29 @@ test('Suukantsu pao requires a called kan and selects its available liability ya
   assert.equal(state.result.pao.otherTsumo, undefined)
 })
 
+test('sanma North extraction enables rinshan in tile mode until the North is removed', t => {
+  const { state } = page(t)
+  state.form.playerCount = 3
+  state.form.winType = 'tsumo'
+  assert.equal(state.canHaveRinshan, false)
+
+  state.form.tileEntry = {
+    ...state.form.tileEntry,
+    tiles: ['p2', 'p3', 'p4', 'p2', 'p3', 'p4', 's2', 's3', 's4', 's2', 's3', 's4', 's2', 's2'],
+    winningIndex: 13,
+    totalBonusHan: 1,
+  }
+  state.form.bonusHan.nuki = 1
+  assert.equal(state.canHaveRinshan, true)
+  state.form.tileSituation.rinshan = true
+  assert.equal(state.resultReady, true)
+  assert.equal(state.result.yaku.find(yaku => yaku.id === 'rinshan')?.han, 1)
+
+  state.form.bonusHan.nuki = 0
+  assert.equal(state.canHaveRinshan, false)
+  assert.equal(state.form.tileSituation.rinshan, false)
+})
+
 test('tile fu disappears at 5 total han including dora and returns below the limit', async t => {
   const { state, html } = page(t)
   state.form.tileEntry = {

@@ -82,6 +82,27 @@ test('rinshan without any kan is rejected by the scoring engine', () => {
   assert.match(result.error ?? '', /Rinshan requires a declared kan/)
 })
 
+test('sanma rinshan scores on a North replacement draw without a kan', () => {
+  const hand = baseHand({
+    closedTiles: [
+      suited('pin', 2), suited('pin', 3), suited('pin', 4),
+      suited('pin', 2), suited('pin', 3), suited('pin', 4),
+      suited('sou', 2), suited('sou', 3), suited('sou', 4),
+      suited('sou', 2), suited('sou', 3), suited('sou', 4), suited('sou', 2),
+    ],
+    winningTile: suited('sou', 2),
+    nukiDoraCount: 1,
+    rinshan: true,
+  })
+
+  const sanma = score(hand, { playerCount: 3 })
+  assert.equal(sanma.valid, true)
+  assert.equal(sanma.yaku.find((yaku) => yaku.name === 'rinshan')?.han, 1)
+  assert.equal(sanma.nukiDoraCount, 1)
+  assert.equal(score(hand, { playerCount: 4 }).valid, false)
+  assert.equal(score({ ...hand, riichi: true, ippatsu: true }, { playerCount: 3 }).valid, false)
+})
+
 test('ron with rinshan stays invalid even when a kan exists', () => {
   const closed = [
     suited('pin', 2), suited('pin', 3), suited('pin', 4),

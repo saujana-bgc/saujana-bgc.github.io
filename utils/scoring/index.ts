@@ -100,12 +100,13 @@ function applyPao(
   };
 }
 
-function specialWinProblem(hand: Hand): string | null {
+function specialWinProblem(hand: Hand, nukiDoraCount: number): string | null {
   if (hand.haitei && hand.winType !== "tsumo") return "Haitei requires tsumo";
   if (hand.rinshan && hand.winType !== "tsumo") return "Rinshan requires tsumo";
   if (hand.houtei && hand.winType !== "ron") return "Houtei requires ron";
   if (hand.chankan && hand.winType !== "ron") return "Chankan requires ron";
   if (hand.haitei && hand.rinshan) return "Haitei and Rinshan cannot apply together";
+  if (hand.ippatsu && hand.rinshan) return "Ippatsu and Rinshan cannot apply together";
   if (hand.houtei && hand.chankan) return "Houtei and Chankan cannot apply together";
   if (hand.openingWin && hand.winType !== "tsumo") return "Tenhou and Chiihou require tsumo";
   if (hand.openingWin === "tenhou" && hand.seatWind !== "east") return "Tenhou requires the dealer";
@@ -114,7 +115,7 @@ function specialWinProblem(hand: Hand): string | null {
     return "Tenhou and Chiihou require the first draw before any player calls or declares a kan";
   }
   if (hand.renho && (hand.winType !== "ron" || hand.seatWind === "east" || hand.melds.length > 0 || hand.opponentKanCount || hand.nukiDoraCount || hand.riichi || hand.doubleRiichi || hand.ippatsu || hand.haitei || hand.houtei || hand.rinshan || hand.chankan)) {
-    return "Renhou requires a non-dealer ron before your first draw, with no calls or kans by any player, North extraction, or riichi";
+    return "Renhou requires a non-dealer ron before your first draw or riichi, without any intervening calls, kans or North extractions";
   }
   if (hand.chankan) {
     const heldBeforeWin = [
@@ -127,9 +128,9 @@ function specialWinProblem(hand: Hand): string | null {
       return "Chankan is impossible when you already hold a copy of the tile; the opponent's added kan uses all four copies";
     }
   }
-  // Rinshan kaihou is a win on the kan replacement draw, so a declared kan
-  // must exist even when the caller bypasses the UI.
-  if (hand.rinshan && !hasDeclaredKan(hand.melds)) return "Rinshan requires a declared kan";
+  if (hand.rinshan && !hasDeclaredKan(hand.melds) && nukiDoraCount === 0) {
+    return "Rinshan requires a declared kan or an extracted North at a three-player table";
+  }
   return null;
 }
 
@@ -272,7 +273,7 @@ export function score(hand: Hand, rulesOverride?: Partial<RulesConfig>): ScoreRe
       ? Math.min(99, Math.max(0, Math.trunc(hand.bonusHanOverride)))
       : 0;
 
-  const specialProblem = specialWinProblem(hand) ?? paoProblem(hand);
+  const specialProblem = specialWinProblem(hand, nukiDoraCount) ?? paoProblem(hand);
   if (specialProblem) {
     return {
       valid: false, error: specialProblem, yaku: [], totalHan: 0, fu: 0,

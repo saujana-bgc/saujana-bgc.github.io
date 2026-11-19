@@ -86,7 +86,7 @@ export interface Hand {
   ippatsu: boolean;
   haitei: boolean;   // tsumo on the last draw
   houtei: boolean;   // ron on the last discard
-  rinshan: boolean;  // win after kan supplemental draw
+  rinshan: boolean;  // win on a kan or sanma North replacement draw
   chankan: boolean;  // win by stealing a pon→kan extension
   renho?: boolean;   // non-dealer wins on first round of discards (Hand of Man)
   openingWin?: "tenhou" | "chiihou"; // first-draw self-draw before any call or kan

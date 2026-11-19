@@ -205,7 +205,7 @@
           <details ref="specialWinDetails" class="tile-situation-details"><summary>Win circumstances</summary><div class="tile-situation-grid">
             <label class="checkbox-row"><input v-model="form.tileSituation.haitei" type="checkbox" :disabled="form.winType !== 'tsumo' || form.tileSituation.rinshan" @change="markTileContextChanged" /><span>Haitei · last draw</span></label>
             <label class="checkbox-row"><input v-model="form.tileSituation.houtei" type="checkbox" :disabled="form.winType !== 'ron' || form.tileSituation.chankan" @change="markTileContextChanged" /><span>Houtei · last discard</span></label>
-            <label class="checkbox-row"><input v-model="form.tileSituation.rinshan" type="checkbox" :disabled="form.winType !== 'tsumo' || !tileHasKan || form.tileSituation.haitei" @change="markTileContextChanged" /><span>Rinshan · after a kan</span></label>
+            <label class="checkbox-row"><input v-model="form.tileSituation.rinshan" type="checkbox" :disabled="form.winType !== 'tsumo' || !canHaveRinshan || form.tileSituation.haitei" @change="markTileContextChanged" /><span>{{ form.playerCount === 3 ? 'Rinshan · won on a kan or North replacement draw' : 'Rinshan · won on a kan replacement draw' }}</span></label>
             <label class="checkbox-row"><input v-model="form.tileSituation.chankan" type="checkbox" :disabled="form.winType !== 'ron' || form.tileSituation.houtei" @change="markTileContextChanged" /><span>Chankan · robbed an opponent's added kan</span></label>
             <label class="checkbox-row"><input v-model="form.tileSituation.renhou" type="checkbox" :disabled="form.winType !== 'ron' || isDealer || form.tileSituation.riichi !== 'none' || tileHasOpenMeld || tileHasKan || form.tileEntry.otherKanCount > 0 || form.bonusHan.nuki > 0 || form.tileSituation.houtei || form.tileSituation.chankan" @change="markTileContextChanged" /><span>Renhou · non-dealer ron before your first draw</span></label>
             <label v-if="form.winType === 'tsumo'" class="checkbox-row"><input v-model="form.tileSituation.openingWin" type="checkbox" true-value="opening" false-value="" :disabled="form.tileSituation.riichi !== 'none' || tileHasOpenMeld || tileHasKan || form.tileEntry.otherKanCount > 0 || form.bonusHan.nuki > 0 || form.tileSituation.haitei || form.tileSituation.rinshan" @change="markTileContextChanged" /><span>{{ isDealer ? 'Tenhou · dealer’s first draw' : 'Chiihou · non-dealer’s first draw' }}</span></label>
@@ -453,6 +453,7 @@ const tileWindsNeeded = computed(() => {
   return parsed.type !== 'chiitoitsu' || Boolean(parsed.standardAlt?.length)
 })
 const tileHasKan = computed(() => tileKanCount.value > 0)
+const canHaveRinshan = computed(() => tileHasKan.value || (form.playerCount === 3 && form.bonusHan.nuki > 0))
 const tileHasOpenMeld = computed(() => form.tileEntry.melds.some(meld => meld.type !== 'kan-closed'))
 const openDragonSetCount = computed(() => form.tileEntry.melds.filter(meld => ['pon', 'kan-open', 'kan-added'].includes(meld.type) && /^h[4-6]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length)
 const openWindSetCount = computed(() => form.tileEntry.melds.filter(meld => ['pon', 'kan-open', 'kan-added'].includes(meld.type) && /^h[0-3]$/.test(meld.tokens[0]) && meld.tokens.every(token => token === meld.tokens[0])).length)
@@ -1033,7 +1034,7 @@ watch(() => [tileHasOpenMeld.value, tileHasKan.value, form.tileEntry.otherKanCou
   }
   if (hasOpenMeld || hasKan || hasOpponentKan || hasNuki) form.tileSituation.openingWin = false
 }, { flush: 'sync' })
-watch(() => tileHasKan.value, value => { if (!value) form.tileSituation.rinshan = false }, { flush: 'sync' })
+watch(canHaveRinshan, value => { if (!value) form.tileSituation.rinshan = false }, { flush: 'sync' })
 
 watch(() => [form.winType, form.isClosed], () => { hasInteracted.value = true }, { flush: 'sync' })
 watch([form, entryMode, tileStep, hasInteracted, showYakuKanji], scheduleSessionPersist, { deep: true, flush: 'post' })
