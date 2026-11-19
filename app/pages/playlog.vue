@@ -7,7 +7,11 @@
     </header>
 
       <div class="search-wrap fade-up">
-        <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played" />
+        <UInput v-model="search" type="search" aria-label="Search play history" class="search-input w-full" :ui="{ base: 'search-field' }" placeholder="Find a game we’ve played">
+          <template #leading>
+            <UIcon name="i-lucide-search" class="search-icon" aria-hidden="true" />
+          </template>
+        </UInput>
         <NuxtLink v-if="collectionMatch" class="context-link" :to="{ path: '/collection/', query: { game: collectionMatch.name } }" no-prefetch>Back to {{ collectionMatch.name }} in the collection <span aria-hidden="true">→</span></NuxtLink>
         <p v-if="!isPending && !isError && matchingGames" class="page-hint" role="status">{{ matchingGameCount }} matching {{ matchingGameCount === 1 ? 'game' : 'games' }} across {{ filteredSessions.length }} {{ filteredSessions.length === 1 ? 'gathering' : 'gatherings' }}.</p>
         <NuxtLink v-if="!isPending && !isError && !matchingGames && topPlayedGames.length" class="context-link" to="#most-played-title" no-prefetch>Jump to our most-played games <span aria-hidden="true">↓</span></NuxtLink>
@@ -436,11 +440,15 @@ onUnmounted(() => {
     font-family: inherit;
     font-size: 0.88rem;
     color: inherit;
-    padding: 13px 18px;
+    padding: 13px 18px 13px 44px;
     border-radius: 40px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
+}
+
+.search-input :deep(.search-icon) {
+    color: var(--muted);
 }
 
 .search-input :deep(.search-field:focus) {

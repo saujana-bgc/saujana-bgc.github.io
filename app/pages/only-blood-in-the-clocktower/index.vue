@@ -15,7 +15,7 @@
           <p class="eyebrow">Next Clocktower gathering</p>
           <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError || archiveError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
           <p v-if="nextGathering?.time">{{ nextGathering.time }}</p>
-          <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions ↗</a></p>
+          <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <UIcon name="i-lucide-map-pin" aria-hidden="true" /></a></p>
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
           <p v-else-if="eventError || archiveError">We couldn’t confirm the schedule just now.</p>
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>

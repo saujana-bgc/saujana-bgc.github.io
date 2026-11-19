@@ -13,7 +13,11 @@
           type="search"
           placeholder="Search games by title or designer"
           aria-label="Search the collection by title, category, player count, or designer"
-        />
+        >
+          <template #leading>
+            <UIcon name="i-lucide-search" class="search-icon" aria-hidden="true" />
+          </template>
+        </UInput>
         <div class="collection-search-meta">
           <p class="collection-result-count" role="status" aria-live="polite">{{ displayedGames.length }} {{ displayedGames.length === 1 ? 'game' : 'games' }} found</p>
           <UButton v-if="search || selectedCategories.length || unplayedOnly || currentSort !== 'name'" class="sort-btn clear-collection-filters" type="button" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">{{ search.trim() && !selectedCategories.length && !unplayedOnly && currentSort === 'name' ? 'Clear search' : 'Reset filters' }}</UButton>
@@ -426,11 +430,15 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
     color: inherit;
     font-family: inherit;
     font-size: 0.88rem;
-    padding: 12px 14px;
+    padding: 12px 14px 12px 40px;
     border-radius: var(--radius-control);
     outline: none;
     box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.collection-search-input :deep(.search-icon) {
+    color: var(--muted);
 }
 
 .collection-search-input :deep(.collection-search-field:focus) {

@@ -31,7 +31,7 @@
           <time class="event-fact" :datetime="event.date">{{ activeTab === 'past' && !expandedEvents.has(event.id) ? formatArchiveDate(event.date) : formatDate(event.date) }}</time>
           <span v-if="event.time && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact">{{ event.time }}</span>
           <span v-if="event.venue" class="event-fact">{{ event.venue }}</span>
-          <a v-if="event.venue_url && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <span aria-hidden="true">↗</span></a>
+          <a v-if="event.venue_url && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <UIcon name="i-lucide-map-pin" aria-hidden="true" /></a>
         </div>
 
         <p v-if="activeTab !== 'past' || expandedEvents.has(event.id)" class="event-games-note">
