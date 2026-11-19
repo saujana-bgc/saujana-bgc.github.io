@@ -1,6 +1,6 @@
 <template>
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <header class="page-intro fade-up">
+    <header class="page-intro collection-intro fade-up">
       <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Collection</h1>
     </header>

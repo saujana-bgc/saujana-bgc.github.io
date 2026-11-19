@@ -6,7 +6,7 @@ export default defineAppConfig({
     },
     button: {
       slots: {
-        base: 'font-semibold rounded-[var(--radius-control)]',
+        base: 'min-h-11 font-semibold rounded-[var(--radius-control)]',
       },
       defaultVariants: {
         color: 'primary',
