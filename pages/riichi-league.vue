@@ -2,7 +2,6 @@
   <main class="league-page">
     <header class="page-intro league-hero fade-up">
       <NuxtLink class="activity-parent-link" to="/riichi-mahjong/" no-prefetch>Riichi Mahjong</NuxtLink>
-      <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi League</h1>
       <p class="league-intro">{{ seasonStatus === 'completed' ? 'View the final standings or revisit a week.' : 'Follow the standings, revisit a week, or add your latest result.' }}</p>
       <div class="season-switcher">

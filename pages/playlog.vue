@@ -2,7 +2,6 @@
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro fade-up">
       <NuxtLink class="activity-parent-link" to="/board-games/" no-prefetch>Board Games</NuxtLink>
-      <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Play History</h1>
       <div class="stats-container">Search game titles from past gatherings. Open a game to see its cover and the players who joined in.</div>
     </header>

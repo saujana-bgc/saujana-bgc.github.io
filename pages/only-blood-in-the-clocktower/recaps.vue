@@ -1,10 +1,9 @@
 <template>
   <main class="clocktower-page">
     <header class="page-intro">
-      <p class="page-eyebrow">Clocktower</p>
+      <NuxtLink class="activity-parent-link" to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower overview</NuxtLink>
       <h1 class="hero-title">Recaps</h1>
       <p class="stats-container">Stories, results and approved photos from our Blood on the Clocktower gatherings.</p>
-      <NuxtLink class="recaps-overview-link" to="/only-blood-in-the-clocktower/" no-prefetch>Clocktower overview <span aria-hidden="true">→</span></NuxtLink>
     </header>
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
       <header v-if="loading || error || recapSessions.length" class="archive-heading">
@@ -102,7 +101,6 @@
 </template>
 
 <style scoped>
-.recaps-overview-link { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--matcha-leaf); font-weight: 650; text-underline-offset: 4px; }
 </style>
 
 <script setup>

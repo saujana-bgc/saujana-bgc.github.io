@@ -36,10 +36,10 @@
         </template>
         <div v-else class="next-gathering-empty" role="status">
           <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
-          <p v-else-if="gatheringStatus === 'unavailable'">We can’t reach the calendar just now.</p>
+          <p v-else-if="gatheringStatus === 'unavailable'">We couldn’t load the calendar just now.</p>
           <p v-else>We haven’t announced the next gathering yet. Have a question? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
           <UButton v-if="gatheringStatus === 'unavailable'" type="button" variant="outline" color="neutral" @click="loadNextGathering">Try again</UButton>
-          <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
+          <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
         </div>
       </section>
       <figure class="hero-artwork">
@@ -138,10 +138,11 @@
 
 <script setup>
 import { communityPillars } from '~/utils/communityPillars'
+import { getGatheringDateStamp, getKualaLumpurDate } from '~/utils/gatheringDates'
 
 const nextGathering = ref(null)
 const gatheringStatus = ref('loading')
-const nextGatheringDateStamp = computed(() => nextGathering.value ? formatGatheringDateStamp(nextGathering.value.date) : null)
+const nextGatheringDateStamp = computed(() => nextGathering.value ? getGatheringDateStamp(nextGathering.value.date) : null)
 
 async function loadNextGathering() {
   gatheringStatus.value = 'loading'
@@ -149,12 +150,7 @@ async function loadNextGathering() {
     const { data, error } = await useSupabase()
       .from('events')
       .select('id,name,date,time,venue,venue_url')
-      .gte('date', new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Kuala_Lumpur',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(new Date()))
+      .gte('date', getKualaLumpurDate())
       .order('date', { ascending: true })
       .limit(1)
 
@@ -170,15 +166,6 @@ onMounted(async () => {
   await loadNextGathering()
 })
 
-function formatGatheringDateStamp(dateValue) {
-  const [year, month, day] = dateValue.split('-').map(Number)
-  const date = new Date(Date.UTC(year, month - 1, day))
-  return {
-    day,
-    month: date.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
-    weekday: date.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }),
-  }
-}
 
 const communityValues = [
   {

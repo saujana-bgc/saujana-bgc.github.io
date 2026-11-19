@@ -2,7 +2,6 @@
   <main class="event-page">
     <header class="page-intro event-page-intro">
       <NuxtLink class="activity-parent-link" to="/riichi-mahjong/" no-prefetch>Riichi Mahjong</NuxtLink>
-      <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi Open I</h1>
       <p class="stats-container">Saturday, 14 November · Boardroom Bandit, Ara Damansara</p>
     </header>

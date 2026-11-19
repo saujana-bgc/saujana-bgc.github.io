@@ -2,7 +2,6 @@
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro collection-intro fade-up">
       <NuxtLink class="activity-parent-link" to="/board-games/" no-prefetch>Board Games</NuxtLink>
-      <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Collection</h1>
     </header>
 
@@ -46,7 +45,7 @@
         <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
       </section>
 
-      <div v-if="isError" class="page-hint" role="alert">We couldn’t load play history. <UButton type="button" @click="reloadPlayHistory">Try again</UButton></div>
+      <div v-if="isError" class="page-hint action-status action-status--error" role="alert">We couldn’t load play history. Your search and filters are still here. <UButton type="button" @click="retry">Try again</UButton></div>
 
       <div ref="gridRef" class="editorial-grid">
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>
@@ -149,11 +148,7 @@ const scrollY = ref(0)
 const viewportHeight = ref(0)
 const viewportWidth = ref(0)
 
-const { data: rawRows, isPending, isError } = usePlaylogData()
-
-function reloadPlayHistory() {
-  window.location.reload()
-}
+const { data: rawRows, isPending, isError, retry } = usePlaylogData()
 
 const stripTrailingEmoji = (str) => {
     if (!str) return str

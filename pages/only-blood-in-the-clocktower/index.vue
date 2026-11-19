@@ -24,7 +24,7 @@
         <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
         <template v-else-if="!eventLoading">
           <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next gathering <span aria-hidden="true">↗</span></a>
-          <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>See all gatherings <span aria-hidden="true">↗</span></NuxtLink>
+          <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
         </template>
       </section>
     </div>
@@ -59,6 +59,8 @@
 </template>
 
 <script setup>
+import { formatGatheringDate, getGatheringDateStamp, getKualaLumpurDate } from '~/utils/gatheringDates'
+
 const config = useRuntimeConfig()
 const route = useRoute()
 
@@ -71,9 +73,7 @@ const headers = {
   apikey: config.public.supabaseKey,
   'Content-Type': 'application/json',
 }
-const localDate = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit',
-}).format(new Date())
+const localDate = getKualaLumpurDate()
 // The archive endpoint already filters to published sessions.
 const filteredSessions = computed(() => sessions.value
   .filter(hasResults)
@@ -119,21 +119,15 @@ const nextGathering = computed(() => {
 })
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
 const nextCtaLabel = computed(() => {
-  if (nextGathering.value?.signup_url) return 'See details and sign up'
-  return nextGathering.value?.href?.endsWith('/') ? 'See all gatherings' : 'See gathering details'
+  if (nextGathering.value?.signup_url) return 'Sign up with the organiser'
+  return nextGathering.value?.href?.endsWith('/') ? 'Find a gathering' : 'See gathering details'
 })
 const nextDateStamp = computed(() => {
   if (!nextGathering.value) return null
-  const date = new Date(nextGathering.value.date + 'T12:00:00')
-  return {
-    day: date.toLocaleDateString('en-MY', { day: 'numeric' }),
-    month: date.toLocaleDateString('en-MY', { month: 'short' }),
-  }
+  return getGatheringDateStamp(nextGathering.value.date)
 })
 function formatDate(value) {
-  return value
-    ? new Date(value + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-    : 'Date to be announced'
+  return formatGatheringDate(value, { weekday: true })
 }
 
 function hasResults(session) {

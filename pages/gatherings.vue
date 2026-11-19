@@ -356,6 +356,8 @@
 </template>
 
 <script setup>
+import { formatGatheringDate } from '~/utils/gatheringDates'
+
 const supabase = useSupabase()
 const route = useRoute()
 const unavailableFlyerIds = ref(new Set())
@@ -552,14 +554,11 @@ function nextPage() {
 }
 
 function formatDate(dateStr) {
-    const [year, month, day] = dateStr.split('-')
-    const date = new Date(year, month - 1, day)
-    return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    return formatGatheringDate(dateStr, { weekday: true })
 }
 
 function formatArchiveDate(dateStr) {
-    const [year, month, day] = dateStr.split('-').map(Number)
-    return new Date(year, month - 1, day).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    return formatGatheringDate(dateStr, { month: 'short' })
 }
 
 function getVenueImage(venue) {
