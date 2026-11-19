@@ -1,12 +1,12 @@
 <template>
   <div class="overview-feature">
     <div class="overview-copy"><slot /></div>
-    <img class="overview-art" :src="src" :alt="alt" width="1200" height="800" loading="lazy" decoding="async">
+    <img class="overview-art" :src="src" :srcset="srcSet" :sizes="sizes" :alt="alt" width="1200" height="800" loading="lazy" decoding="async">
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{ src: string; alt: string }>()
+defineProps<{ src: string; srcSet: string; sizes: string; alt: string }>()
 </script>
 
 <style scoped>

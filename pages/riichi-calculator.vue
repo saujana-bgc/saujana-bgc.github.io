@@ -244,14 +244,6 @@ useHead({
   bodyAttrs: { class: 'riichi-calculator-body' },
 })
 
-const tileArtworkPaths = [
-  ...['Man', 'Pin', 'Sou'].flatMap(suit => [
-    ...Array.from({ length: 9 }, (_, index) => `/tiles/${suit}${index + 1}.svg`),
-    `/tiles/${suit}5-Dora.svg`,
-  ]),
-  ...['Ton', 'Nan', 'Shaa', 'Pei', 'Haku', 'Hatsu', 'Chun'].map(tile => `/tiles/${tile}.svg`),
-]
-const tileArtworkPreloads = []
 const yakuKanjiNames = {
   riichi: '立直', 'double-riichi': 'ダブル立直', ippatsu: '一発', pinfu: '平和', iipeiko: '一盃口', tanyao: '断么九', 'menzen-tsumo': '門前清自摸和',
   'yakuhai-haku': '白', 'yakuhai-hatsu': '發', 'yakuhai-chun': '中', 'yakuhai-seat': '自風牌', 'yakuhai-round': '場風牌',
@@ -1039,13 +1031,6 @@ watch(() => [form.winType, form.isClosed], () => { hasInteracted.value = true },
 watch([form, entryMode, tileStep, hasInteracted, showYakuKanji], scheduleSessionPersist, { deep: true, flush: 'post' })
 
 onMounted(() => {
-  for (const src of tileArtworkPaths) {
-    const image = new Image()
-    image.decoding = 'async'
-    image.fetchPriority = 'low'
-    image.src = src
-    tileArtworkPreloads.push(image)
-  }
   restoreSessionState()
   tileEntryMounted.value = entryMode.value === 'tiles'
   nextTick(updateMobileResultPanelHeight)

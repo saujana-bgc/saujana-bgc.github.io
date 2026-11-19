@@ -1,0 +1,36 @@
+# Saujana performance refinement plan
+
+19 November 2026 · Baseline `8c87e92`
+
+Improve mobile loading with changes that can ship and be measured independently. Keep the current page layouts, artwork, URLs, and data behaviour. Start with a confirmed early download in Collection, then tune image loading on the Calculator and activity pages.
+
+## What the site loads today
+
+I inspected the generated site in Chromium at 390 × 750 CSS px with device pixel ratio 3, a fresh browser context per route, and no user interaction. Home and Gatherings used a sample event, and other external requests were blocked. Image figures are emitted file sizes for resources the browser requested. JavaScript figures are gzip estimates for the requested files. This inventory establishes what loaded in the preview. Mobile network timings and real visitor performance need separate measurements.
+
+| Page | JS, estimated gzip | Image files requested | What stands out |
+| --- | ---: | ---: | --- |
+| Home | 206 KiB | 115 KiB | The browser chose the 112 KiB hero variant. |
+| Gatherings | 214 KiB | 3 KiB | The fixture had no flyer or venue artwork. Measure event information and rosters separately. |
+| Board Games | 203 KiB | 257 KiB | The feature illustration accounts for 254 KiB. |
+| Collection | 378 KiB | 483 KiB | The browser fetched the full description chunk and 18 covers before any interaction. |
+| Play History | 220 KiB | 3 KiB | The preview blocked live history, so these figures exclude its data and covers. |
+| Riichi Mahjong | 203 KiB | 282 KiB | The feature illustration accounts for 279 KiB. |
+| Riichi Calculator | 239 KiB | 301 KiB | The route requested 37 SVG tile files plus the brand mark. |
+| Riichi Open | 215 KiB | 153 KiB | The browser fetched the compressed poster preview. The original opens on demand. |
+
+Several earlier changes are already in production code. Pages are prerendered, Home and Riichi Open have compressed image variants, and Collection has virtual scrolling and a cached search index. The first event facts can already render without waiting for the roster. Work from those baselines. [Earlier plan](site-performance-plan.md) · [Performance review](performance-review.md)
+
+## Implementation order
+
+1. **Keep full game descriptions out of Collection’s startup download.** The source imports descriptions when a game opens, but the generated Collection HTML emits a prefetch for that chunk. Chromium downloaded it without an interaction. It was 437 KiB raw, about 156 KiB gzip. First, look for a targeted way to omit that one hint while keeping the lazy import. If it cannot be scoped reliably, serve the descriptions as a versioned static asset fetched on the first game open, and share the in-flight request across subsequent opens. Keep the selected game’s existing details visible while its description arrives. Verify that a failure allows recovery and a late response cannot overwrite another game’s details. Check direct links, search, keyboard focus return and first-open latency. [Collection source](../pages/collection.vue)
+2. **Prioritise the Calculator’s visible tiles.** The Calculator preloads all 37 tile SVGs when the page mounts. Let the visible suit load with the picker, then compare prewarming other suits during idle time with fetching them when selected. Choose the option that reduces startup work without noticeably slowing the first suit switch. Keep the same tile assets, dimensions and scoring interactions. Check a fresh visit, a restored session in han/fu mode, suit switching on a slow connection and completed hand entry. [Calculator source](../pages/riichi-calculator.vue)
+3. **Serve smaller versions of the existing activity illustrations.** Use build-time responsive variants and accurate `sizes` in the shared feature component on Board Games, Riichi Mahjong and Clocktower. Keep the current artwork, crop and aspect ratio. Compare at 320, 390 and 430 px, including a high-density screen, and at desktop width. Choose eager or lazy loading based on the illustration’s position and whether the trace identifies it as the largest visible element. On Home, retain the original collage and measure which current variants are selected before adjusting its `sizes` or adding a variant. Keep the existing Riichi Open poster behaviour as a regression check. [Activity feature](../components/ActivityOverviewFeature.vue) · [Home](../pages/index.vue) · [Riichi Open](../pages/riichi-open/index.vue)
+4. **Check Collection cover traffic and Gatherings data after the first changes.** Collection’s first view requested 18 covers. Measure whether smaller thumbnails or a tighter initial image request window would save enough to justify a second change. Keep the current virtual row geometry and check fast scrolling, filtering and keyboard navigation before changing overscan. On Gatherings, time when the date, venue and Directions appear separately from the roster. If roster traffic is material, examine requests for collapsed past events while preserving displayed attendee counts, expansion, retries and direct links. Keep the current play-history cache and review the cost of its repeated count queries only if cold history still shows up as a bottleneck. [Collection](../pages/collection.vue) · [Gatherings](../pages/gatherings.vue) · [History loader](../composables/usePlaylogData.js)
+5. **Treat shared JavaScript and CSS as a follow-up backed by a trace.** Home requested about 36 KiB of estimated gzip CSS. Use coverage and request timing to identify route-only code in the shared startup files before moving any of it. Try one optional dialog or route-only style at a time and check the first Menu tap and first use of the affected control. Leave framework, hosting, scoring, payments and backend data changes outside this pass.
+
+## How to decide whether to keep a change
+
+- Record five cold runs and a warm navigation run using the same build settings, mobile viewport, device pixel ratio, throttling and fixtures. Measure median largest contentful paint (LCP), layout shift (CLS), transferred bytes and request count. Also time the actions that matter on each route, including event details becoming readable, opening a game and switching tile suits. Use production read-only checks with the visitor counter opt-out described in the site guidance. [Site guidance](../CODEX.md)
+- For Collection, require zero requests for the full description asset before the first game open, with the description available on open and the search position retained on close. For Calculator, require fewer tile image requests before use and no material slowdown on the first suit change. For activity artwork, aim for at least 25% fewer image bytes on the 390 px profile and compare legibility and crop visually. Treat each improvement as a separate commit so it can be reverted independently.
+- Keep the existing responsive checks and verify prerendered HTML and SEO. Exercise Home to Gatherings, Collection search and game detail, Calculator tile and han/fu paths, and the Riichi Open poster. When timings fluctuate, use the repeatable byte and request counts for regression checks and keep timing results for review. [Responsive checks](../scripts/verify-responsive.mjs) · [CI workflow](../.github/workflows/ci.yml)

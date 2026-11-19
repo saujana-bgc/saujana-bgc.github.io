@@ -116,7 +116,9 @@
               <p v-else-if="!isPending && !isError" class="game-detail-play-history">No plays logged</p>
               <p v-else-if="isError" class="game-detail-play-history">Play history is unavailable just now.</p>
             </div>
-            <div style="font-size: 0.95rem; line-height: 1.8; font-weight: 300; opacity: 0.9; white-space: pre-wrap;" v-html="selectedGame.description"></div>
+            <div v-if="descriptionStatus === 'loading'" class="game-description-status" role="status" aria-live="polite">A moment while we bring up the full details…</div>
+            <div v-else-if="descriptionStatus === 'error'" class="game-description-status" role="alert">We couldn’t load the full description just now. <UButton type="button" class="sort-btn" @click="loadGameDescription(selectedGame)">Try again</UButton></div>
+            <div v-else style="font-size: 0.95rem; line-height: 1.8; font-weight: 300; opacity: 0.9; white-space: pre-wrap;" v-html="selectedGame.description"></div>
             <NuxtLink class="context-link" to="/gatherings/" no-prefetch>Want to try this one? Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           </div>
         </div>
@@ -141,6 +143,7 @@ const unplayedOnly = ref(false)
 function resetSort() { currentSort.value = null }
 function resetCategories() { selectedCategories.value = [] }
 const selectedGame = ref(null)
+const descriptionStatus = ref('idle')
 let modalTrigger = null
 const gridRef = ref(null)
 const gridTop = ref(0)
@@ -263,32 +266,52 @@ const toggleUnplayed = () => {
 const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23f7e9e6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='13' fill='%236b7a68' opacity='0.5'%3EAwaiting Visual%3C/text%3E%3C/svg%3E"
 
 let fullCollectionData = null
+let fullCollectionDataPromise = null
 
 async function getFullGame(gameName) {
     if (!fullCollectionData) {
-        const module = await import('~/assets/data/game_data.js')
-        fullCollectionData = module.collectionData
+        if (!fullCollectionDataPromise) {
+            fullCollectionDataPromise = fetch('/game-descriptions-2026-11-16.json')
+                .then(response => {
+                    if (!response.ok) throw new Error(`Game descriptions returned ${response.status}`)
+                    return response.json()
+                })
+                .then(data => {
+                    fullCollectionData = data
+                    return data
+                })
+                .finally(() => { fullCollectionDataPromise = null })
+        }
+        fullCollectionData = await fullCollectionDataPromise
     }
     return fullCollectionData.games.find(game => game.name === gameName)
 }
 
-const openModal = async (game) => {
+async function loadGameDescription(game) {
+    descriptionStatus.value = 'loading'
+    try {
+        const fullGame = await getFullGame(game.name)
+        if (!fullGame) throw new Error(`No full details found for ${game.name}`)
+        if (selectedGame.value?.name === game.name) {
+            selectedGame.value = { ...game, ...fullGame, stats: game.stats }
+            descriptionStatus.value = 'ready'
+        }
+    } catch {
+        if (selectedGame.value?.name === game.name) descriptionStatus.value = 'error'
+    }
+}
+
+const openModal = (game) => {
     modalTrigger = document.activeElement
     selectedGame.value = { ...game, description: '' }
-
-    const fullGame = await getFullGame(game.name)
-    if (selectedGame.value?.name === game.name) {
-        selectedGame.value = {
-            ...game,
-            ...fullGame,
-            stats: game.stats,
-        }
-    }
+    descriptionStatus.value = 'loading'
+    void loadGameDescription(game)
 }
 const closeModal = () => {
     if (!selectedGame.value) return
     const trigger = modalTrigger
     selectedGame.value = null
+    descriptionStatus.value = 'idle'
     nextTick(() => trigger?.focus())
 }
 const onModalOpenChange = (open) => { if (!open) closeModal() }
