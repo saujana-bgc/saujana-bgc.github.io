@@ -44,7 +44,7 @@
 
       <p v-if="snapshot.message" class="table-note">{{ snapshot.message }}</p>
     </template>
-    <section v-else class="results-card empty-results"><span class="empty-tile" aria-hidden="true">一</span><p class="eyebrow">The field is taking shape</p><h2>{{ error ? 'Updates are temporarily unavailable' : 'The first draw is still to come.' }}</h2><p>{{ error ? 'Use Refresh above to try again.' : 'Table assignments will appear here when the organiser publishes the draw. Scores follow after each round is certified.' }}</p><UButton v-if="!error" class="refresh-button" @click="$emit('register')">Back to registration →</UButton></section>
+    <section v-else class="results-card empty-results"><span class="empty-tile" aria-hidden="true">一</span><p class="eyebrow">The field is taking shape</p><h2>{{ error ? 'We couldn’t load the standings.' : 'The first draw is still to come.' }}</h2><p>{{ error ? 'Check your connection, then refresh the standings.' : 'Table assignments will appear here when the organiser publishes the draw. Scores follow after each round is certified.' }}</p><UButton v-if="error" class="refresh-button" @click="$emit('refresh')">Try again</UButton><UButton v-else class="refresh-button" @click="$emit('register')">Back to registration →</UButton></section>
     <p v-if="event?.stage !== 'completed'" class="auto-update-note">Updates automatically every 30 seconds. Draft scores stay private.</p>
   </div>
 </template>

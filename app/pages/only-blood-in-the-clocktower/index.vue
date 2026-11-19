@@ -14,10 +14,10 @@
         <div class="next-copy">
           <p class="eyebrow">Next Clocktower gathering</p>
           <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError || archiveError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
-          <p v-if="nextGathering?.time">{{ nextGathering.time }}</p>
+          <p v-if="nextGathering?.time">{{ formatGatheringTime(nextGathering.time) }}</p>
           <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <UIcon name="i-lucide-map-pin" aria-hidden="true" /></a></p>
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
-          <p v-else-if="eventError || archiveError">We couldn’t confirm the schedule just now.</p>
+          <p v-else-if="(eventError || archiveError) && !nextGathering">We couldn’t confirm the schedule just now.</p>
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
           <UButton v-if="(eventError || archiveError) && !nextGathering" class="retry-button" type="button" @click="retryGatheringSources">Try again</UButton>
         </div>
@@ -62,6 +62,7 @@
 
 <script setup>
 import { formatGatheringDate, getGatheringDateStamp, getKualaLumpurDate } from '~/utils/gatheringDates'
+import { formatGatheringTime } from '~/utils/gatheringTime'
 
 const config = useRuntimeConfig()
 const route = useRoute()

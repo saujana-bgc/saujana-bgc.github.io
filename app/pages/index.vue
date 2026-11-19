@@ -21,7 +21,7 @@
             <div class="next-gathering-details">
               <span class="gathering-detail">
                 <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>
-                {{ nextGathering.time }}
+                {{ formatGatheringTime(nextGathering.time) }}
               </span>
               <span class="gathering-detail">
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>
@@ -139,6 +139,7 @@
 <script setup>
 import { communityPillars } from '~/utils/communityPillars'
 import { getGatheringDateStamp, getKualaLumpurDate } from '~/utils/gatheringDates'
+import { formatGatheringTime } from '~/utils/gatheringTime'
 
 const nextGathering = ref(null)
 const gatheringStatus = ref('loading')

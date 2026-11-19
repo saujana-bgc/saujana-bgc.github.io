@@ -24,8 +24,8 @@
             </div>
 
             <div v-if="!isLoading" class="summary-stats" aria-live="polite">
-              <span><strong>{{ birthdays.length }}</strong> birthdays</span>
-              <span><strong>{{ publicGreetingCount }}</strong> public greetings allowed</span>
+              <span><strong>{{ birthdays.length }}</strong> {{ birthdays.length === 1 ? 'birthday' : 'birthdays' }}</span>
+              <span><strong>{{ publicGreetingCount }}</strong> public {{ publicGreetingCount === 1 ? 'greeting allowed' : 'greetings allowed' }}</span>
             </div>
 
             <UButton v-if="calendarYear !== currentYear" class="today-button" type="button" @click="calendarYear = currentYear">

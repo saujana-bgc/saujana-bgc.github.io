@@ -68,5 +68,5 @@ export function getPublicPage(path: string) {
   if (!page) return null
   // GitHub Pages redirects directory routes to a trailing slash.
   const canonical = `${siteUrl}${canonicalPath === '/' ? '/' : `${canonicalPath}/`}`
-  return { ...page, canonical, image: 'image' in page ? page.image : '/images/saujana-brand.avif' }
+  return { ...page, canonical, image: 'image' in page ? page.image : '/images/saujana-social.jpg' }
 }

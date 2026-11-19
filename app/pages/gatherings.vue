@@ -29,7 +29,7 @@
 
         <div class="event-facts">
           <time class="event-fact" :datetime="event.date">{{ activeTab === 'past' && !expandedEvents.has(event.id) ? formatArchiveDate(event.date) : formatDate(event.date) }}</time>
-          <span v-if="event.time && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact">{{ event.time }}</span>
+          <time v-if="event.time && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact" :datetime="event.time">{{ formatGatheringTime(event.time) }}</time>
           <span v-if="event.venue" class="event-fact">{{ event.venue }}</span>
           <a v-if="event.venue_url && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <UIcon name="i-lucide-map-pin" aria-hidden="true" /></a>
         </div>
@@ -357,6 +357,7 @@
 
 <script setup>
 import { formatGatheringDate } from '~/utils/gatheringDates'
+import { formatGatheringTime } from '~/utils/gatheringTime'
 
 const supabase = useSupabase()
 const route = useRoute()
