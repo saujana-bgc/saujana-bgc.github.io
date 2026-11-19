@@ -332,7 +332,9 @@ async function restoreSavedHold() {
   } catch (cause) {
     restoreFailed.value=true
     notice.value=savedHoldCanDiscard.value ? '' : 'Your saved reservation is still in this browser. Restore or release it before starting another registration.'
-    error.value='We couldn’t restore your saved place just now. Check your connection and try again.'
+    error.value = /^all places\b/i.test(cause?.message ?? '')
+      ? 'All places are currently reserved. Your registration details are saved, and you can try again if a place becomes available.'
+      : 'We couldn’t restore your saved place just now. Check your connection and try again.'
   } finally { restorePending.value=false }
 }
 
@@ -381,7 +383,13 @@ async function restartCancelledRegistration() {
     await nextTick()
     paymentPanel.value?.scrollIntoView({behavior:scrollBehavior(),block:'start'})
     paymentPanel.value?.focus({preventScroll:true})
-  } catch { restartRecoveryAvailable.value=true;restoreFailed.value=true;error.value='We couldn’t start a new reservation just now. Try restoring your saved place.' }
+  } catch (cause) {
+    restartRecoveryAvailable.value = true
+    restoreFailed.value = true
+    error.value = /^all places\b/i.test(cause?.message ?? '')
+      ? 'All places are currently reserved. Your registration details are saved, and you can try again if a place becomes available.'
+      : 'We couldn’t start a new reservation just now. Try restoring your saved place.'
+  }
   finally { busy.value=false }
 }
 
@@ -451,6 +459,14 @@ async function reservePlace() {
     paymentPanel.value?.scrollIntoView({behavior:scrollBehavior(),block:'start'})
     paymentPanel.value?.focus({preventScroll:true})
   } catch (cause) {
+    if (/^all places\b/i.test(cause?.message ?? '')) {
+      sessionStorage.removeItem(DRAFT_KEY)
+      error.value = ''
+      restoreFailed.value = false
+      notice.value = ''
+      await loadPublic()
+      return
+    }
     error.value = 'We couldn’t confirm your place reservation. Your details are saved in this browser. Restore your saved place to check its status before trying again.'
     if (sessionStorage.getItem(DRAFT_KEY)) {
       restoreFailed.value = true

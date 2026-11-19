@@ -52,7 +52,7 @@ test('a failed score flush stops after one attempt and does not record the penal
   assert.equal(state.busy.value, false)
   assert.deepEqual(state.roundMutationLocks.value, [])
   assert.equal(state.tableSaveStates.table, 'error')
-  assert.match(state.error.value, /Temporary network failure/)
+  assert.match(state.error.value, /couldn’t save this table.*entries are still here; try again/i)
   assert.equal(state.scores.table['player-0'], 40000)
 })
 
