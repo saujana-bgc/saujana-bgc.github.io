@@ -463,6 +463,9 @@ function resetForm() {
   .field-group :deep(.birthday-control input) { border: 0; box-shadow: none; }
   .field-group :deep(.birthday-control:focus-within) { border-color: var(--matcha-leaf); box-shadow: 0 0 0 3px rgba(101, 119, 99, .11); }
 }
+@media (max-width: 380px) {
+  .date-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
 .submit-button, .secondary-button { min-height: 48px; border-radius: var(--radius-control); box-shadow: none; font-size: .88rem; text-transform: none; letter-spacing: 0; }
 
 </style>

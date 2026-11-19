@@ -580,4 +580,15 @@ const expectations = [
   .next-gathering-details { gap: 5px 12px; font-size: .87rem; }
   .hero-artwork { max-width: 420px; margin-inline: auto; }
 }
+@media (max-width: 360px) and (max-height: 650px) {
+  .hero-section { gap: 6px; padding-top: 4px; }
+  .hero-copy h1 { font-size: 1.85rem; }
+  .hero-copy p { font-size: .95rem; }
+  .hero-actions { margin-top: 10px; }
+  .next-gathering { grid-template-columns: 46px minmax(0, 1fr); gap: 5px 10px; padding: 8px; }
+  .next-gathering-date { width: 44px; min-height: 48px; }
+  .next-gathering-title { font-size: 1.14rem; }
+  .next-gathering-details { gap: 4px 9px; font-size: .84rem; }
+  .next-gathering-link { min-height: 44px; }
+}
 </style>

@@ -1376,6 +1376,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     line-height: 1.5;
 }
 .event-directions { color: var(--matcha-leaf); font-weight: 650; text-underline-offset: 3px; }
+.event-facts .event-directions { display: inline-flex; min-height: 44px; align-items: center; padding: 0 8px; margin: -10px -8px; }
 
 .event-games-note {
     display: flex;

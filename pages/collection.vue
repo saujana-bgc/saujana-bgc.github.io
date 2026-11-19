@@ -669,7 +669,13 @@ main:has(.collection-search) > .sort-controls { width: min(100% - 40px, 1160px);
   .collection-search { align-items: center; grid-template-columns: 1fr; }
   .collection-search-input { grid-column: 1; }
   .collection-search-meta { width: 100%; }
-  .collection-first-pick { width: min(100% - 40px, 1160px); align-items: flex-start; flex-direction: column; gap: 12px; }
+  .collection-first-pick { width: min(100% - 40px, 1160px); align-items: center; flex-direction: row; gap: 10px; margin: 0; padding: 12px 14px; }
+  .collection-first-pick .eyebrow,
+  .collection-first-pick p:not(.eyebrow) { display: none; }
+  .collection-first-pick h2 { margin: 0; font-size: 1.05rem; }
+  .collection-first-pick .sort-btn { flex: 0 0 auto; padding-inline: 10px; }
+  .editorial-grid { padding-top: 10px; }
+  .pebble-container { margin-block: 8px; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-category-options { gap: 6px; flex-wrap: wrap; padding: 2px 0 8px; }
