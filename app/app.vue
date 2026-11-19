@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { getPublicPage, siteName, siteUrl } from '~/utils/siteSeo'
+import { getPublicPage, siteName, siteUrl } from '#shared/siteSeo'
 
 const route = useRoute()
 useHead(() => {

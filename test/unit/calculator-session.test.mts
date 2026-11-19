@@ -5,7 +5,7 @@ import {
   sanitizeCalculatorForm,
   sanitizeCalculatorGroups,
   type SessionIdRefs,
-} from '../utils/riichiCalculatorSession.ts'
+} from '../../app/utils/riichiCalculatorSession.ts'
 
 const refs: SessionIdRefs = {
   yakuIds: ['riichi', 'tanyao', 'chiitoitsu', 'kokushi', 'daisangen'],

@@ -4,9 +4,9 @@ import test from 'node:test'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { transformSync } from 'esbuild'
 import { computed, reactive, ref } from 'vue'
-import { scoreFourPlayerTable } from '../utils/riichiOpenScoring.js'
+import { scoreFourPlayerTable } from '../../app/utils/riichiOpenScoring.js'
 
-const adminPageSource = readFileSync(new URL('../pages/admin/riichi-open.vue', import.meta.url), 'utf8')
+const adminPageSource = readFileSync(new URL('../../app/pages/admin/riichi-open.vue', import.meta.url), 'utf8')
 const adminPage = compileScript(parse(adminPageSource).descriptor, { id: 'riichi-open-admin-reliability' })
 
 function page(callAdmin: (action: string, payload: any) => Promise<any>) {
@@ -120,7 +120,7 @@ test('a stale participant save reloads the latest row and preserves the organise
   assert.match(state.error.value, /Another organiser changed this participant/)
 })
 
-const adminFunctionSource = readFileSync(new URL('../supabase/functions/riichi-open-admin/index.ts', import.meta.url), 'utf8')
+const adminFunctionSource = readFileSync(new URL('../../supabase/functions/riichi-open-admin/index.ts', import.meta.url), 'utf8')
 const adminFunction = transformSync(adminFunctionSource.replace(/^import .*\r?\n/, ''), { loader: 'ts', format: 'esm' }).code
 
 function adminHandler(rpc: (name: string, args: any) => Promise<any>) {

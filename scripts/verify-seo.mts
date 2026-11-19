@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { getPublicPage, publicRoutes, siteUrl } from '../utils/siteSeo.ts'
+import { getPublicPage, publicRoutes, siteUrl } from '../shared/siteSeo.ts'
 
 const output = new URL('../.output/public/', import.meta.url)
 const readOutput = (path: string) => readFileSync(new URL(path, output), 'utf8')

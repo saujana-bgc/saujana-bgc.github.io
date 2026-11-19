@@ -11,7 +11,7 @@ This plan builds on the [Zen design plan](zen-design-plan.md) and the [responsiv
 - Use the public header and Home’s content width as the alignment reference. Define three layout widths for reading, standard pages and wide data. Align headings, toolbars and card edges to the same gutters within a page. Let ordinary copy and titles wrap naturally, including when cards have different amounts of text.
 - Give the existing spacing scale named roles for field groups, cards and sections. Retain the shared card and control radii. Use plain sections for supporting copy, bordered surfaces for distinct objects and stronger elevation for overlays. Keep photo crops consistent within each card family, with room for event art to retain its character.
 - Standardise the visual hierarchy for primary, secondary and destructive actions, tabs, selected filters, focus and status. Use readable labels and visible states that work without colour. Keep familiar controls and their feedback in the same location across equivalent pages.
-- Put shared layout and type rules in [main.css](../assets/css/main.css) and shared Nuxt UI variants in [app.config.ts](../app.config.ts). Try the rules on Home, Gatherings and Birthday Club before extracting shared components or changing global defaults.
+- Put shared layout and type rules in [main.css](../app/assets/css/main.css) and shared Nuxt UI variants in [app.config.ts](../app.config.ts). Try the rules on Home, Gatherings and Birthday Club before extracting shared components or changing global defaults.
 
 ## 2. Pilot Home, Gatherings and Birthday Club
 

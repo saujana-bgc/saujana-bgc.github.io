@@ -4,7 +4,7 @@ import test from 'node:test'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { computed, effectScope, ref, shallowRef, watch } from 'vue'
 
-const { descriptor } = parse(readFileSync(new URL('../pages/collection.vue', import.meta.url), 'utf8'))
+const { descriptor } = parse(readFileSync(new URL('../../app/pages/collection.vue', import.meta.url), 'utf8'))
 const script = compileScript(descriptor, { id: 'collection-performance' })
 const games = Array.from({ length: 120 }, (_, index) => ({
   name: `Game ${String(index).padStart(3, '0')}`, players: '2-4P', weight: 2,

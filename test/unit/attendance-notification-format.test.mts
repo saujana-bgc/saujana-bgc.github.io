@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { equalSecret, makeMessage, splitMessage, type AttendanceNotificationJob } from '../supabase/functions/attendance-notifications/format.ts'
+import { equalSecret, makeMessage, splitMessage, type AttendanceNotificationJob } from '../../supabase/functions/attendance-notifications/format.ts'
 
 function job(operation: AttendanceNotificationJob['operation'], payload: AttendanceNotificationJob['payload']): AttendanceNotificationJob {
   return { id: 'job-1', operation, attendee_id: 1, event_id: 2, payload, attempts: 1, lease_token: 'lease-1' }

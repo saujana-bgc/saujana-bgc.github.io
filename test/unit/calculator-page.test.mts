@@ -4,14 +4,14 @@ import test from 'node:test'
 import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc'
 import * as vue from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import { MANUAL_YAKU, calculateManualHanFuScore } from '../utils/scoring/manual.ts'
-import { score as scoreFullHand } from '../utils/scoring/index.ts'
-import { parseHand } from '../utils/scoring/hand-parser.ts'
-import { validateTileSet } from '../utils/scoring/tile-set.ts'
-import { DEFAULT_LOCAL_YAKU } from '../utils/scoring/types.ts'
+import { MANUAL_YAKU, calculateManualHanFuScore } from '../../app/utils/scoring/manual.ts'
+import { score as scoreFullHand } from '../../app/utils/scoring/index.ts'
+import { parseHand } from '../../app/utils/scoring/hand-parser.ts'
+import { validateTileSet } from '../../app/utils/scoring/tile-set.ts'
+import { DEFAULT_LOCAL_YAKU } from '../../app/utils/scoring/types.ts'
 
 // Compile the real page so assertions cover both its computed state and template.
-const { descriptor } = parse(readFileSync(new URL('../pages/riichi-calculator.vue', import.meta.url), 'utf8'))
+const { descriptor } = parse(readFileSync(new URL('../../app/pages/riichi-calculator.vue', import.meta.url), 'utf8'))
 const script = compileScript(descriptor, { id: 'calculator-test' })
 const template = compileTemplate({
   source: descriptor.template!.content, filename: 'riichi-calculator.vue', id: 'calculator-test',

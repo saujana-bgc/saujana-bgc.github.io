@@ -16,7 +16,7 @@ I checked the local Nuxt app at desktop width and at 390 × 844, followed the ne
 | P1 | The admin preview uses separate markup from the public page. Photos can be approved and marked as covers, but the editor has no separate spoiler flag. Approved public names are mentioned in the preview and have no editable field in this editor. | An organiser cannot reliably check the exact public presentation or distinguish permission to publish a photo from permission to show it before the reveal. |
 | P1 | Save feedback is split between a top-of-page error and a bottom action bar. Publish validation focuses the first incomplete field, but the error itself is remote from that field. Photo upload has one shared busy state and no per-file progress or retry. | A host working on a phone may know that something failed without knowing which entry or upload needs attention. |
 
-[Public page](../pages/only-blood-in-the-clocktower.vue) · [Organiser editor](../pages/admin/only-blood-in-the-clocktower.vue) · [Admin layout](../layouts/admin.vue) · [Gatherings signup](../pages/gatherings.vue)
+[Public page](../app/pages/only-blood-in-the-clocktower.vue) · [Organiser editor](../app/pages/admin/only-blood-in-the-clocktower.vue) · [Admin layout](../app/layouts/admin.vue) · [Gatherings signup](../app/pages/gatherings.vue)
 
 ## Visual direction
 

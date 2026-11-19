@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { receiptRecoveryAction } from '../supabase/functions/riichi-open-public/receipt-recovery.ts'
+import { receiptRecoveryAction } from '../../supabase/functions/riichi-open-public/receipt-recovery.ts'
 
 test('a lost RPC response returns the registration that references the final receipt', () => {
   assert.equal(receiptRecoveryAction('event/hold/final-a', 'event/hold/final-a', false), 'return-committed')

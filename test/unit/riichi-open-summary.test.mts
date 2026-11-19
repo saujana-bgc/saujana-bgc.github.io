@@ -2,9 +2,9 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { transformSync } from 'esbuild'
-import { receiptRecoveryAction } from '../supabase/functions/riichi-open-public/receipt-recovery.ts'
+import { receiptRecoveryAction } from '../../supabase/functions/riichi-open-public/receipt-recovery.ts'
 
-const source = readFileSync(new URL('../supabase/functions/riichi-open-public/index.ts', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../supabase/functions/riichi-open-public/index.ts', import.meta.url), 'utf8')
 const compiled = transformSync(source.replace(/^import .*\r?\n/gm, ''), { loader: 'ts', format: 'esm' }).code
 
 function publicHandler(holdResult: object) {

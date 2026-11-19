@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { computed, ref } from 'vue'
-import { formatGatheringDate, getGatheringDateStamp, getKualaLumpurDate } from '../utils/gatheringDates.js'
+import { formatGatheringDate, getGatheringDateStamp, getKualaLumpurDate } from '../../app/utils/gatheringDates.js'
 
-const { descriptor } = parse(readFileSync(new URL('../pages/only-blood-in-the-clocktower/index.vue', import.meta.url), 'utf8'))
+const { descriptor } = parse(readFileSync(new URL('../../app/pages/only-blood-in-the-clocktower/index.vue', import.meta.url), 'utf8'))
 const { content } = compileScript(descriptor, { id: 'clocktower-public-page' })
 
 function page() {

@@ -6,7 +6,7 @@ Run **Riichi League Season 2** from **December 2026 through 28 February 2027** u
 
 ## What would change
 
-Season 1 already covered three months, from 1 August to 31 October 2026. It supports three- and four-player games and counts each player's best result per day, up to their best eight days. That suits drop-in play because a later loss cannot reduce a player's season total. Elo counts each rated result and adjusts for the strength of the players at the table. [League standings logic](../pages/riichi-league.vue#L603) · [Season 1 configuration](../supabase/migrations_archive/20261002010000_create_riichi_league_data.sql#L221)
+Season 1 already covered three months, from 1 August to 31 October 2026. It supports three- and four-player games and counts each player's best result per day, up to their best eight days. That suits drop-in play because a later loss cannot reduce a player's season total. Elo counts each rated result and adjusts for the strength of the players at the table. [League standings logic](../app/pages/riichi-league.vue#L603) · [Season 1 configuration](../supabase/migrations_archive/20261002010000_create_riichi_league_data.sql#L221)
 
 Riichi Open I used a random draw for the first qualifier, a snake assignment based on the first qualifier's results for the second, and a final for the top four. The final started at equal scores. The proposed league seeding starts with the first qualifier at Open II. [Riichi Open I tournament rules](../public/riichi-open/rules.md#1-tournament-format-event-rules)
 
@@ -23,7 +23,7 @@ Riichi Open I used a random draw for the first qualifier, a snake assignment bas
 | Results and corrections | Assign each game its official gathering date, session and round number when it starts. Have all four players confirm the result and have one player submit it. Submission can happen any time within three days, but Elo is processed in the recorded playing order, not the order entries arrive. |
 | Season close | Publish the December opening session date before play begins. The season ends on **28 February 2027**. Submit results by **11:59 pm Malaysia time on the third calendar day after the official gathering date**. An official gathering may run after midnight, and its games retain the assigned gathering date. A 28 February gathering’s deadline is 3 March. Corrections close at **11:59 pm Malaysia time on 7 March 2027**, seven calendar days after the season ends. Freeze the standings after resolving corrections filed on time. The highest-rated eligible player wins the season. Players with exactly equal ratings share their place. |
 
-Use a stable league player ID. During Open registration, have an organiser confirm a player's identity if their entry name differs from their league name. The score-entry workflow must capture the gathering date and round number assigned when the game starts. The current league form assigns a table number when a result is saved, so the form will need to preserve the official round sequence separately from submission time. [Current league score entry](../pages/riichi-league.vue#L165)
+Use a stable league player ID. During Open registration, have an organiser confirm a player's identity if their entry name differs from their league name. The score-entry workflow must capture the gathering date and round number assigned when the game starts. The current league form assigns a table number when a result is saved, so the form will need to preserve the official round sequence separately from submission time. [Current league score entry](../app/pages/riichi-league.vue#L165)
 
 The Season 2 standings on the Riichi League page will show each player's Elo, counted rated games and number of different playing dates. Players report missing or incorrect results to the league organiser with the date, session and round number, and the score they believe should be recorded.
 
@@ -59,7 +59,7 @@ Keep the 1,500 starting rating for every player in Season 2. A special newcomer 
 
 ### What the Season 1 archive shows
 
-The archived import covers the first nine weeks. It contains **70 four-player hanchans and 34 players** in those games. Season 1 used 25,000 starting points and red fives, so the replay reflects play under those rules. [Season 1 gameplay rules](../pages/riichi-league.vue#L329)
+The archived import covers the first nine weeks. It contains **70 four-player hanchans and 34 players** in those games. Season 1 used 25,000 starting points and red fives, so the replay reflects play under those rules. [Season 1 gameplay rules](../app/pages/riichi-league.vue#L329)
 
 | Minimum four-player hanchans | Minimum dates | Players who would have earned a rank |
 | --- | --- | --- |
@@ -162,7 +162,7 @@ Ask entrants to stay until the finalists and any standbys are announced, around 
 | 7:00–8:30 pm | Final clock |
 | About 8:50 pm | Awards |
 
-Before registration, rehearse the 90-minute clock, the four-round rotation, and certification through the final with a sample field. Record the last completed hand and score verification time. Include a no-show at check-in, a withdrawal after Qualifier 1 with and without a reserve, and a finalist withdrawal with tied candidates for the replacement seat. Verify that the reserve appears under their own name, certified scores survive a suspension, Qualifiers 3 and 4 are published, and the final cut and replacement order use all four rounds and the same tie-breakers. The current admin flow locks the roster during play and goes from Qualifier 2 to the final. [Current admin roster and round workflow](../pages/admin/riichi-open.vue#L25)
+Before registration, rehearse the 90-minute clock, the four-round rotation, and certification through the final with a sample field. Record the last completed hand and score verification time. Include a no-show at check-in, a withdrawal after Qualifier 1 with and without a reserve, and a finalist withdrawal with tied candidates for the replacement seat. Verify that the reserve appears under their own name, certified scores survive a suspension, Qualifiers 3 and 4 are published, and the final cut and replacement order use all four rounds and the same tie-breakers. The current admin flow locks the roster during play and goes from Qualifier 2 to the final. [Current admin roster and round workflow](../app/pages/admin/riichi-open.vue#L25)
 
 ## Review after the pilot
 

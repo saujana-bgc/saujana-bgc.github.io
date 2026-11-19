@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
-import type { useAdminAuth } from '../composables/useAdminAuth.js'
+import type { useAdminAuth } from '../../app/composables/useAdminAuth.js'
 
-const source = readFileSync(new URL('../composables/useAdminAuth.js', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../app/composables/useAdminAuth.js', import.meta.url), 'utf8')
   .replace('export function useAdminAuth', 'function useAdminAuth')
   .replaceAll('import.meta.client', 'true')
 

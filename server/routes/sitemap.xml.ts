@@ -1,4 +1,4 @@
-import { getPublicPage, publicRoutes } from '../../utils/siteSeo'
+import { getPublicPage, publicRoutes } from '../../shared/siteSeo'
 
 export default defineEventHandler((event) => {
   setResponseHeader(event, 'Content-Type', 'application/xml; charset=utf-8')

@@ -29,7 +29,7 @@ Updated that expectation and added two behaviour tests: releasing a replacement 
 
 ## Transactional database smoke test
 
-Executed `tests/sql/riichi-open-launch-smoke.sql` against the connected project. It checks reservation and finalisation idempotency, capacity rejection, cancellation/restart/release/retry, recovery of a submitted restart, prevention of ancestor reactivation while a replacement holds or uses a place, expired-payment exception handling and rejection of a fifth reservation from one network fingerprint.
+Executed `test/sql/riichi-open-launch-smoke.sql` against the connected project. It checks reservation and finalisation idempotency, capacity rejection, cancellation/restart/release/retry, recovery of a submitted restart, prevention of ancestor reactivation while a replacement holds or uses a place, expired-payment exception handling and rejection of a fifth reservation from one network fingerprint.
 
 All assertions passed. A deliberately caught exception rolls back every fixture write; further assertions verify original hold, registration, participant and audit counts and event capacity. A follow-up query confirmed zero fixture registrations, one verified and one cancelled real registration, zero active holds, one active participant, zero rounds and zero publications.
 

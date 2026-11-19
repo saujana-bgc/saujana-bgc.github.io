@@ -26,25 +26,25 @@ The site already has a recognisable family of pages. The warm palette, serif tit
 
 | Page | Change to make |
 | --- | --- |
-| [Home](../pages/index.vue) | Shorten the event explanation in the hero. Let the next-event panel provide logistics and send each activity card to its own overview. |
-| [Gatherings](../pages/gatherings.vue) | Retain the early Upcoming and Past controls. Unify card facts, shorten repeated activity notes and keep event-specific sign-up and spend guidance with the action. |
-| [Board Games](../pages/board-games.vue) | The intro sets expectations; the feature explains the Just One puzzle. Use the same calendar CTA as Riichi Mahjong, with Collection and Play History as secondary links. |
-| [Riichi Mahjong](../pages/riichi-mahjong.vue) | Consolidate the invitation to watch or try a turn. Keep League, Calculator and Open together, and identify the Open edition at the next step. |
-| [Only Blood in the Clocktower](../pages/only-blood-in-the-clocktower/index.vue) | Keep the next date and action together in one event panel. The duplicate date teaser and jump link are removed. Retain the event and game names and recaps link. |
-| [Clocktower Recaps](../pages/only-blood-in-the-clocktower/recaps.vue) | Remove repeated eyebrow labels and the second Clear filters action. Preserve spoiler controls and shared session or game links. |
-| [Collection](../pages/collection.vue) | Keep search first. Move the shelf update below the results area, put the no-play filter beside search, and add a retry action. Preserve virtual grid measurements. |
-| [Play History](../pages/playlog.vue) | Put search reset beside search, shorten the reveal prompt and keep dated groups and the return link to the matched Collection game. Add direct retry if the data composable exposes a refetch action. |
-| [Birthday Club](../pages/birthday-club.vue) | Keep the illustrated card. Use one confirmation heading and a short saved-preference line. |
-| [Riichi League](../pages/riichi-league.vue) | Remove the duplicate Season table eyebrow. Review selected season dates, score entry availability and approved Season 2 guidance together. |
-| [Riichi Calculator](../pages/riichi-calculator.vue) | Keep compact tile and han/fu entry. Clarify the circumstances heading as Tile bonuses and win details. Review focus and validation styles. |
-| [Riichi Open](../pages/riichi-open/index.vue) | Identify the edition in the event details and metadata. Make the main action follow the event stage and check the initial load, explicit tab links, standings and receipt recovery together. |
+| [Home](../app/pages/index.vue) | Shorten the event explanation in the hero. Let the next-event panel provide logistics and send each activity card to its own overview. |
+| [Gatherings](../app/pages/gatherings.vue) | Retain the early Upcoming and Past controls. Unify card facts, shorten repeated activity notes and keep event-specific sign-up and spend guidance with the action. |
+| [Board Games](../app/pages/board-games.vue) | The intro sets expectations; the feature explains the Just One puzzle. Use the same calendar CTA as Riichi Mahjong, with Collection and Play History as secondary links. |
+| [Riichi Mahjong](../app/pages/riichi-mahjong.vue) | Consolidate the invitation to watch or try a turn. Keep League, Calculator and Open together, and identify the Open edition at the next step. |
+| [Only Blood in the Clocktower](../app/pages/only-blood-in-the-clocktower/index.vue) | Keep the next date and action together in one event panel. The duplicate date teaser and jump link are removed. Retain the event and game names and recaps link. |
+| [Clocktower Recaps](../app/pages/only-blood-in-the-clocktower/recaps.vue) | Remove repeated eyebrow labels and the second Clear filters action. Preserve spoiler controls and shared session or game links. |
+| [Collection](../app/pages/collection.vue) | Keep search first. Move the shelf update below the results area, put the no-play filter beside search, and add a retry action. Preserve virtual grid measurements. |
+| [Play History](../app/pages/playlog.vue) | Put search reset beside search, shorten the reveal prompt and keep dated groups and the return link to the matched Collection game. Add direct retry if the data composable exposes a refetch action. |
+| [Birthday Club](../app/pages/birthday-club.vue) | Keep the illustrated card. Use one confirmation heading and a short saved-preference line. |
+| [Riichi League](../app/pages/riichi-league.vue) | Remove the duplicate Season table eyebrow. Review selected season dates, score entry availability and approved Season 2 guidance together. |
+| [Riichi Calculator](../app/pages/riichi-calculator.vue) | Keep compact tile and han/fu entry. Clarify the circumstances heading as Tile bonuses and win details. Review focus and validation styles. |
+| [Riichi Open](../app/pages/riichi-open/index.vue) | Identify the edition in the event details and metadata. Make the main action follow the event stage and check the initial load, explicit tab links, standings and receipt recovery together. |
 | [Season 2 and Open II rules](../public/riichi-season-2-and-open-ii-rules.html) | Preserve the draft status until publication is approved. Bring the standalone page’s brand and navigation into line with the Riichi pages and point its League link at the canonical site. |
-| [Organiser dashboard](../pages/admin/index.vue) | Align module labels with the organiser menu and keep direct links into tournament tasks. |
-| [Organiser Birthday Club calendar](../pages/admin/birthday-club.vue) | Match module heading, loading, empty and retry treatment. Keep each greeting preference legible in the calendar and date list. |
-| [Clocktower organiser](../pages/admin/only-blood-in-the-clocktower.vue) | Group New gathering, draft status and publish feedback around the task they affect. Keep a single prominent New gathering action visible at a time. |
-| [Riichi Open organiser](../pages/admin/riichi-open.vue) | Align the heading with the organiser navigation. Keep next task, public standings and certification easy to locate. |
-| [Visitor names](../pages/admin/visitors.vue) | Use the shared organiser heading and status styles. Keep the Kuala Lumpur date grouping and seven-day scope visible. |
-| [Legacy Birthday Club calendar](../pages/birthday-club-calendar.vue) | Verify the old URL reaches the organiser calendar and the sign-in route retains that destination. |
+| [Organiser dashboard](../app/pages/admin/index.vue) | Align module labels with the organiser menu and keep direct links into tournament tasks. |
+| [Organiser Birthday Club calendar](../app/pages/admin/birthday-club.vue) | Match module heading, loading, empty and retry treatment. Keep each greeting preference legible in the calendar and date list. |
+| [Clocktower organiser](../app/pages/admin/only-blood-in-the-clocktower.vue) | Group New gathering, draft status and publish feedback around the task they affect. Keep a single prominent New gathering action visible at a time. |
+| [Riichi Open organiser](../app/pages/admin/riichi-open.vue) | Align the heading with the organiser navigation. Keep next task, public standings and certification easy to locate. |
+| [Visitor names](../app/pages/admin/visitors.vue) | Use the shared organiser heading and status styles. Keep the Kuala Lumpur date grouping and seven-day scope visible. |
+| [Legacy Birthday Club calendar](../app/pages/birthday-club-calendar.vue) | Verify the old URL reaches the organiser calendar and the sign-in route retains that destination. |
 | Missing-page fallback | Add public/404.html with Saujana styling and links to Home and Gatherings. Confirm the generated Pages artifact contains it. |
 
 ## Review coverage

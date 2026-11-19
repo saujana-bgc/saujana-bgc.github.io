@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { score } from '../utils/scoring/index.ts'
-import type { Hand, HonorValue, Meld, Suit, Tile, WindValue } from '../utils/scoring/types.ts'
+import { score } from '../../app/utils/scoring/index.ts'
+import type { Hand, HonorValue, Meld, Suit, Tile, WindValue } from '../../app/utils/scoring/types.ts'
 
 const suited = (suit: Suit, value: number): Tile => ({
   suit,

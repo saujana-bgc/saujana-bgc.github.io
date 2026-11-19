@@ -4,7 +4,7 @@ import test from 'node:test'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { computed, effectScope, nextTick, proxyRefs, reactive, ref, watch } from 'vue'
 
-const { descriptor } = parse(readFileSync(new URL('../components/riichi/TileHandEntry.vue', import.meta.url), 'utf8'))
+const { descriptor } = parse(readFileSync(new URL('../../app/components/riichi/TileHandEntry.vue', import.meta.url), 'utf8'))
 const script = compileScript(descriptor, { id: 'tile-entry-shortcuts' })
 const component = new Function('computed', 'nextTick', 'ref', 'watch', script.content
   .replace(/^import[\s\S]*?from ['"][^'"]+['"];?\s*$/gm, '')

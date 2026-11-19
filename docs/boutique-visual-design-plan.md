@@ -41,9 +41,9 @@ The review used current Vue and CSS source and above-the-fold screenshots from t
 
 ## Implementation order
 
-1. **Prototype the shared system.** Start with Home, Gatherings and Riichi Calculator at 390 and 1440 CSS px. These cover an editorial page, an event and sign-up page, and a dense utility. Compare title scale, action prominence and image crop before committing shared variants to [main.css](../assets/css/main.css), [app.config.ts](../app.config.ts) and the [public layout](../layouts/default.vue).
-2. **Extend the public pages.** Apply the imagery and editorial layout to Board Games, Riichi Mahjong, Clocktower and Birthday Club. Reuse [ActivityOverviewFeature](../components/ActivityOverviewFeature.vue) where the content fits. Carry the chosen toolbar, list, table and reading styles into Collection, Play History, Recaps, League, Open and Rules. Keep page-local styles for controls that serve a specific task.
-3. **Finish organiser pages and fallbacks.** Apply the same palette, type, actions and feedback to the [organiser layout](../layouts/admin.vue) and its modules. Finish the 404 and check both legacy redirects. Record the approved patterns in [CODEX.md](../CODEX.md) once the rollout is verified.
+1. **Prototype the shared system.** Start with Home, Gatherings and Riichi Calculator at 390 and 1440 CSS px. These cover an editorial page, an event and sign-up page, and a dense utility. Compare title scale, action prominence and image crop before committing shared variants to [main.css](../app/assets/css/main.css), [app.config.ts](../app.config.ts) and the [public layout](../app/layouts/default.vue).
+2. **Extend the public pages.** Apply the imagery and editorial layout to Board Games, Riichi Mahjong, Clocktower and Birthday Club. Reuse [ActivityOverviewFeature](../app/components/ActivityOverviewFeature.vue) where the content fits. Carry the chosen toolbar, list, table and reading styles into Collection, Play History, Recaps, League, Open and Rules. Keep page-local styles for controls that serve a specific task.
+3. **Finish organiser pages and fallbacks.** Apply the same palette, type, actions and feedback to the [organiser layout](../app/layouts/admin.vue) and its modules. Finish the 404 and check both legacy redirects. Record the approved patterns in [CODEX.md](../CODEX.md) once the rollout is verified.
 
 ## Release checks
 

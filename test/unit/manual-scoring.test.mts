@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { calculateManualHanFuScore, calculateManualScore, manualYakuUnavailableReason, type ManualScoreInput } from '../utils/scoring/manual.ts'
+import { calculateManualHanFuScore, calculateManualScore, manualYakuUnavailableReason, type ManualScoreInput } from '../../app/utils/scoring/manual.ts'
 
 function hand(overrides: Partial<ManualScoreInput> = {}): ManualScoreInput {
   return {

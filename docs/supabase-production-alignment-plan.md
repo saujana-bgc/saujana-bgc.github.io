@@ -27,9 +27,9 @@ Execution record updated 5 November 2026. Production project: `gjucszyfwcpsquirx
 ### Verification
 
 - Clean local replay succeeds with the baseline, hardening and storage setup migration plus fake seed fixtures. A Windows reserved-port conflict can prevent the local Supabase Edge Runtime health check on port 54321; the database replay completed on a temporary local database port.
-- `tests/sql/riichi-open-launch-smoke.sql` passes: reservation and finalisation retries, cancelled-registration recovery, capacity, rate-limit and expired-hold cases. All writes roll back.
-- `tests/sql/attendance-write-smoke.sql` passes for attendee insert, update and delete as `anon`; all writes roll back.
-- `tests/sql/security-and-league-smoke.sql` passes: non-admin birthday reads are hidden, `birthday_admin` can read, and public league submission works; all writes roll back.
+- `test/sql/riichi-open-launch-smoke.sql` passes: reservation and finalisation retries, cancelled-registration recovery, capacity, rate-limit and expired-hold cases. All writes roll back.
+- `test/sql/attendance-write-smoke.sql` passes for attendee insert, update and delete as `anon`; all writes roll back.
+- `test/sql/security-and-league-smoke.sql` passes: non-admin birthday reads are hidden, `birthday_admin` can read, and public league submission works; all writes roll back.
 - Production receipt check found 7 active registration receipt references and all 7 referenced storage objects. The event has 7 active registrations against capacity 16 and no active holds.
 - Production Supabase advisor no longer reports mutable search path for `enforce_riichi_capacity()` or the birthday JWT init-plan warning.
 - Under Node `26.13.0` and npm `12.2.2` (the versions pinned by `.nvmrc` and CI), `npm test` passed all 136 tests. `npm run generate` passed static generation and SEO checks (8 public pages).

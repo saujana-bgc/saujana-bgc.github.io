@@ -4,7 +4,7 @@ import test from 'node:test'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { computed, ref, shallowRef } from 'vue'
 
-const { descriptor } = parse(readFileSync(new URL('../pages/riichi-open/index.vue', import.meta.url), 'utf8'))
+const { descriptor } = parse(readFileSync(new URL('../../app/pages/riichi-open/index.vue', import.meta.url), 'utf8'))
 const script = compileScript(descriptor, { id: 'riichi-open-recovery' })
 const HOLD = 'riichi-open-i-registration-hold'
 const DRAFT = 'riichi-open-i-registration-draft'

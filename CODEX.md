@@ -18,7 +18,7 @@ Let ordinary copy and short callouts use the space their container provides. Giv
 
 ## Visual consistency
 
-Align page content to the shared width, gutter and spacing tokens in `assets/css/main.css`. Reuse the established action, focus and status patterns for equivalent tasks. Keep event-specific accents and compact scoring controls scoped to their pages. Follow the [visual polish and predictability plan](docs/visual-polish-and-predictability-plan.md) when adding or revising a page.
+Align page content to the shared width, gutter and spacing tokens in `app/assets/css/main.css`. Reuse the established action, focus and status patterns for equivalent tasks. Keep event-specific accents and compact scoring controls scoped to their pages. Follow the [visual polish and predictability plan](docs/visual-polish-and-predictability-plan.md) when adding or revising a page.
 
 Use the Saujana paper, near-white, green and brass palette with Playfair Display for public display headings and the existing sans serif for body text and controls. Keep body copy at least 16px and recurring controls and essential metadata at least 14px. Use photo-led introductions for discovery pages, bring tools and search close to the top of utility pages, and give long reference content a comfortable reading width. Show game covers in consistent square frames and keep tournament artwork in its portrait ratio. Use tabular figures for dates and scores. Follow the [boutique visual design plan](docs/boutique-visual-design-plan.md) for page-specific direction.
 

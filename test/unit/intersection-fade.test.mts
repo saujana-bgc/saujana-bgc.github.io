@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
-const source = readFileSync(new URL('../plugins/intersection-fade.client.js', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../../app/plugins/intersection-fade.client.js', import.meta.url), 'utf8')
 
 class Element {
   nodeType = 1

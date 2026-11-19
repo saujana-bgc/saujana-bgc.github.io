@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { getPublicPage, publicRoutes } from './utils/siteSeo'
+import { getPublicPage, publicRoutes } from './shared/siteSeo'
 
 export default defineNuxtConfig({
   modules: ['@nuxt/ui'],
@@ -43,7 +43,7 @@ export default defineNuxtConfig({
   },
   typescript: {
     appTsConfig: {
-      exclude: ['../scripts/**/*', '../supabase/**/*', '../tests/**/*'],
+      exclude: ['../scripts/**/*', '../supabase/**/*', '../test/**/*'],
     },
   },
   css: ['~/assets/css/main.css'],
