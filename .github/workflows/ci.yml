@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Chromium for responsive checks
+        run: npx playwright install --with-deps chromium
+
       - name: Check types
         run: npm run typecheck
 
@@ -35,3 +38,6 @@ jobs:
 
       - name: Generate static site and verify SEO
         run: npm run generate
+
+      - name: Verify responsive layouts
+        run: npm run verify:responsive

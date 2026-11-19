@@ -12,3 +12,10 @@
 - Review at 320, 390, 768, 1024, and 1440 CSS pixels. Include browser zoom at 200% and spot-check Safari or Firefox for pages that use optional wrapping styles.
 - Check the longest real headings, links, attendee names, event titles, and form messages. Text should wrap naturally, remain visible, and avoid horizontal page scrolling. Wide data tables may scroll inside their own containers.
 - Add a browser check to CI when rolling out the shared rules. Use generous content fixtures and assert that key blocks can use their intended width and that the document does not overflow. Avoid requiring exact line breaks, which vary with fonts and rendering engines.
+
+## Completed audit — 19 November 2026
+
+- Reviewed all 20 generated page routes, including organiser pages, the birthday calendar redirect, the Riichi Open rules route, and the custom 404 page. Existing prose widths are deliberate reading measures; no further shared CSS change was needed.
+- Chromium checks all generated routes at 320, 390, 512, 720, 768, 1024, and 1440 CSS pixels. The 512 and 720 pixel widths also cover common desktop viewports at 200% zoom. The home respect note is checked against its available width and a longer copy fixture.
+- Firefox spot checks cover the home, board games, riichi mahjong, and Clocktower pages at 320 and 1440 pixels.
+- The `verify:responsive` check runs in CI after static generation. It discovers generated routes automatically, so newly prerendered pages join the check without editing a route list.
