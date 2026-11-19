@@ -18,7 +18,7 @@
       </header>
 
       <div class="birthday-card-body">
-        <div v-if="isSubmitted" class="birthday-success" role="status">
+        <div v-if="isSubmitted" class="birthday-success action-status action-status--success" role="status">
           <h2>Thanks, {{ submittedName }}. Your birthday is saved.</h2>
           <p>We’ve saved your greeting preference.</p>
           <UButton class="secondary-button" color="neutral" variant="outline" type="button" @click="resetForm">
@@ -95,7 +95,7 @@
             </span>
           </label>
 
-          <p v-if="submitError" class="submit-error" role="alert">{{ submitError }}</p>
+          <p v-if="submitError" class="submit-error action-status action-status--error" role="alert">{{ submitError }}</p>
 
           <UButton class="submit-button" type="submit" :disabled="isSubmitting">
             {{ isSubmitting ? 'Saving your birthday…' : 'Join the Birthday Club' }}
@@ -200,7 +200,7 @@ function resetForm() {
 
 .birthday-card {
   --birthday-inset: clamp(20px, 5vw, 48px);
-  max-width: 680px;
+  max-width: var(--content-reading);
   margin-inline: auto;
   background: var(--white-pure);
   border: 1px solid var(--line);
@@ -399,13 +399,9 @@ function resetForm() {
 
 .submit-error {
   margin: 0 0 16px;
-  padding: 11px 14px;
-  border-radius: 10px;
-  background: rgba(173, 92, 105, 0.08);
-  color: #8b4653;
   font-size: 0.8rem;
   line-height: 1.5;
-  text-align: center;
+  text-align: left;
 }
 
 .submit-button,
@@ -431,10 +427,10 @@ function resetForm() {
 .secondary-button:hover { transform: translateY(-1px); box-shadow: 0 13px 28px rgba(101, 119, 99, 0.25); }
 .submit-button:disabled { cursor: wait; opacity: 0.62; }
 
-.birthday-success { padding: 18px 0 6px; text-align: center; }
+.birthday-success { padding: 16px; text-align: left; }
 .success-kicker { margin: 16px 0 8px; color: var(--matcha-leaf); font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-.birthday-success h2 { margin: 0; color: var(--matcha-leaf); font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 6vw, 2.4rem); font-style: italic; font-weight: 400; }
-.birthday-success > p:not(.success-kicker) { max-width: 390px; margin: 18px auto 28px; line-height: 1.7; opacity: 0.72; }
+.birthday-success h2 { margin: 0; color: var(--matcha-leaf); font-family: var(--font-display); font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 400; }
+.birthday-success > p:not(.success-kicker) { max-width: var(--content-reading); margin: 10px 0 20px; line-height: 1.7; color: var(--muted); }
 .secondary-button { width: auto; padding-left: 26px; padding-right: 26px; background: var(--lavender-mist); color: var(--matcha-leaf); box-shadow: none; }
 
 @media (max-width: 560px) {
@@ -467,6 +463,6 @@ function resetForm() {
   .field-group :deep(.birthday-control input) { border: 0; box-shadow: none; }
   .field-group :deep(.birthday-control:focus-within) { border-color: var(--matcha-leaf); box-shadow: 0 0 0 3px rgba(101, 119, 99, .11); }
 }
-.submit-button, .secondary-button { border-radius: 6px; box-shadow: none; font-size: .85rem; text-transform: none; letter-spacing: .02em; }
+.submit-button, .secondary-button { min-height: 48px; border-radius: var(--radius-control); box-shadow: none; font-size: .88rem; text-transform: none; letter-spacing: 0; }
 
 </style>

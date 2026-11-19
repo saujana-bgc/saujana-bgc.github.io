@@ -120,7 +120,7 @@ async function signOut() { await auth.logout(); password.value = '' }
 </script>
 
 <style>
-.admin-root{min-height:70vh;width:min(1240px,94%);margin:0 auto;padding:28px 0 64px;color:var(--clay-text)}
+.admin-root{min-height:70vh;width:min(var(--content-wide),94%);margin:0 auto;padding:28px 0 64px;color:var(--clay-text)}
 .admin-mfa-qr{width:220px;height:220px;justify-self:center;background:white;padding:10px}
 .admin-mfa-key{overflow-wrap:anywhere;user-select:all}
 .admin-login-wrap{min-height:65vh;display:grid;grid-template-columns:1fr minmax(300px,450px);align-items:center;gap:clamp(28px,8vw,110px)}

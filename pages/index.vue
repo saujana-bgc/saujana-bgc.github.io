@@ -213,7 +213,7 @@ const expectations = [
 
 <style scoped>
 .home {
-  width: min(1160px, calc(100% - 40px));
+  width: min(var(--content-page), calc(100% - var(--page-gutter) * 2));
   min-width: 0;
   margin-inline: auto;
   padding-bottom: 12px;
@@ -315,7 +315,7 @@ const expectations = [
 .next-gathering-date { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 58px; min-height: 58px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-silk); color: var(--matcha-leaf); grid-column: 1; grid-row: 1; }
 .next-gathering-date strong { font: 400 1.45rem/1.1 var(--font-display); }
 .next-gathering-date span { font-size: .62rem; font-weight: 700; letter-spacing: .12em; }
-.next-gathering-empty { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+.next-gathering-empty { display: flex; grid-column: 1 / -1; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
 .next-gathering-empty p { margin: 0; color: var(--muted); }
 
 .next-gathering-label {
@@ -381,7 +381,7 @@ const expectations = [
 .next-gathering-link:hover { background: #293d31; }
 
 .home-section {
-  margin-top: clamp(48px, 7vw, 80px);
+  margin-top: var(--section-space);
   padding-top: clamp(28px, 4vw, 44px);
   border-top: 1px solid var(--line);
 }
@@ -570,13 +570,14 @@ const expectations = [
 }
 
 @media (max-width: 600px) {
-  .home { width: calc(100% - 32px); }
+  .home { --page-gutter: 16px; }
   .hero-section { padding-top: 12px; padding-bottom: 4px; border-bottom: 0; }
   .hero-copy,
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .care-guide { grid-template-columns: minmax(0, 1fr); }
   .next-gathering { grid-template-columns: 54px minmax(0, 1fr); align-items: start; gap: 8px 12px; margin-top: 8px; padding: 14px; }
+  .next-gathering-empty { align-items: flex-start; flex-direction: column; gap: 6px; }
   .next-gathering-date { width: 50px; min-height: 54px; grid-row: 1; }
   .next-gathering-copy { grid-column: 2; grid-row: 1; }
   .next-gathering-link { grid-column: 1 / -1; grid-row: 2; width: 100%; justify-content: center; }

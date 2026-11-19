@@ -14,6 +14,10 @@ Prefer an invitation over an instruction where it stays clear. For example, “C
 
 Let ordinary copy and short callouts use the space their container provides. Give long articles and guides an intentional reading width. Use balanced wrapping for short headings where it helps. Reserve forced breaks and no-wrap styles for cases where the content needs them. Follow the [responsive text wrapping plan](docs/responsive-text-wrapping-plan.md) when changing layouts or adding pages.
 
+## Visual consistency
+
+Align page content to the shared width, gutter and spacing tokens in `assets/css/main.css`. Reuse the established action, focus and status patterns for equivalent tasks. Keep event-specific accents and compact scoring controls scoped to their pages. Follow the [visual polish and predictability plan](docs/visual-polish-and-predictability-plan.md) when adding or revising a page.
+
 ## Search indexing
 
 Keep admin pages out of search. Serve every `/admin` page with a `noindex, nofollow, noarchive` robots meta tag in the generated HTML and exclude it from the public sitemap. Keep these routes crawlable so search engines can read the `noindex` tag. Cover new admin routes in `scripts/verify-seo.mts`.

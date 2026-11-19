@@ -166,7 +166,7 @@ onMounted(() => {
 
 <style scoped>
 .site-meta {
-  width: min(1160px, calc(100% - 40px));
+  width: min(var(--content-page), calc(100% - var(--page-gutter) * 2));
   margin: 24px auto 0;
   padding: 22px 0 28px;
   border-top: 1px solid var(--line);

@@ -40,7 +40,7 @@
         </p>
 
         <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-rsvp-actions">
-          <div v-if="signupSuccess[event.id]" class="signup-success" role="status">
+          <div v-if="signupSuccess[event.id]" class="signup-success action-status action-status--success" role="status">
             <p>{{ signupSuccess[event.id] }}</p>
             <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
           </div>
@@ -2148,10 +2148,10 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .tabs { margin: 8px auto 28px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; box-shadow: none; background: var(--surface-soft); }
 .tab { min-height: 44px; border-radius: 5px; font-size: .78rem; letter-spacing: .03em; text-transform: none; opacity: 1; padding: 10px 28px; }
 .tab-active { background: var(--matcha-leaf); color: white; box-shadow: none; }
-.event-card { max-width: 960px; border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
+.event-card { max-width: var(--content-stack); border-color: var(--line); box-shadow: var(--shadow-card); border-radius: var(--radius-card); }
 .gatherings-main > .tabs { margin-top: 0; }
 .gatherings-main > .tabs {
-  width: min(calc(100% - 40px), 960px);
+  width: min(calc(100% - var(--page-gutter) * 2), var(--content-stack));
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -2378,12 +2378,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .signup-error { color: #963d54; font-size: .85rem; line-height: 1.6; margin: 0 0 12px; }
 .signup-field .signup-error { margin: 0; }
 .signup-success {
-    border-left: 3px solid var(--matcha-leaf);
-    border-radius: 6px;
-    padding: 14px 16px;
     margin: 0 0 14px;
-    background: var(--surface-soft);
-    color: var(--matcha-leaf);
     font-size: .9rem;
     line-height: 1.6;
 }
