@@ -8,8 +8,8 @@
 
     <section class="activity-content" aria-labelledby="first-game-title">
       <ActivityOverviewFeature
-        src="/images/site/overview-mika-board-games-1200.webp"
-        src-set="/images/site/overview-mika-board-games-480.webp 480w, /images/site/overview-mika-board-games-800.webp 800w, /images/site/overview-mika-board-games-1200.webp 1200w"
+        src="/images/site/overview-mika-board-games-1200.avif"
+        src-set="/images/site/overview-mika-board-games-480.avif 480w, /images/site/overview-mika-board-games-800.avif 800w, /images/site/overview-mika-board-games-1200.avif 1200w"
         sizes="(max-width: 680px) calc(100vw - 2.5rem), (max-width: 1000px) 40vw, 384px"
         alt="Four players write word clues together during a game of Just One."
       >

@@ -45,8 +45,8 @@
       <figure class="hero-artwork">
         <img
           class="hero-banner"
-          src="/images/site/saujana-home-hero.webp"
-          srcset="/images/site/saujana-home-hero-768.webp 768w, /images/site/saujana-home-hero-1280.webp 1280w"
+          src="/images/site/saujana-home-hero.avif"
+          srcset="/images/site/saujana-home-hero-768.avif 768w, /images/site/saujana-home-hero-1280.avif 1280w"
           sizes="(max-width: 600px) 420px, (max-width: 900px) 40vw, 560px"
           alt="A collage of Saujana players at board game and riichi mahjong gatherings."
           width="1671"
@@ -69,7 +69,7 @@
         </div>
         <img
           class="first-visit-photo"
-          src="/images/site/first-gathering-cafe.webp"
+          src="/images/site/first-gathering-cafe.avif"
           alt="Saujana players chatting around a café table scattered with cards and tokens."
           width="1200"
           height="900"
@@ -95,7 +95,7 @@
           <div class="community-card-image-frame" :class="{ 'is-rotated': pillar.id === 'board-games' }">
             <img
               class="community-card-image"
-              :src="`/images/site/what-we-play-${pillar.id}.webp`"
+              :src="`/images/site/what-we-play-${pillar.id}.avif`"
               :alt="pillar.image.alt"
               :width="pillar.image.width"
               :height="pillar.image.height"

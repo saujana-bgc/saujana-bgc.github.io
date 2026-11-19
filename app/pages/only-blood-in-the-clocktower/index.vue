@@ -35,8 +35,8 @@
 
     <section id="what-to-expect" class="welcome-note" aria-labelledby="welcome-title">
       <ActivityOverviewFeature
-        src="/images/site/overview-mika-clocktower-1200.webp"
-        src-set="/images/site/overview-mika-clocktower-480.webp 480w, /images/site/overview-mika-clocktower-800.webp 800w, /images/site/overview-mika-clocktower-1200.webp 1200w"
+        src="/images/site/overview-mika-clocktower-1200.avif"
+        src-set="/images/site/overview-mika-clocktower-480.avif 480w, /images/site/overview-mika-clocktower-800.avif 800w, /images/site/overview-mika-clocktower-1200.avif 1200w"
         sizes="(max-width: 680px) calc(100vw - 2.5rem), (max-width: 1000px) 40vw, 384px"
         alt="Four players compare stories over a Blood on the Clocktower town-square mat."
       >

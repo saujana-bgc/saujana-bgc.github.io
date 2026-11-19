@@ -582,7 +582,7 @@ function isClocktowerEvent(event) {
 }
 
 function getEventImage(event) {
-    return isSpookyGameDay(event) ? '/images/venues/richeese.png' : getVenueImage(event.venue)
+    return isSpookyGameDay(event) ? '/images/venues/richeese.avif' : getVenueImage(event.venue)
 }
 
 function hasFlyer(event) {

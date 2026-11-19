@@ -81,7 +81,7 @@ const canFullscreen = computed(() => {
   return Boolean(player && (player.requestFullscreen || player.webkitEnterFullscreen))
 })
 const videoUrl = '/videos/riichi-calculator-tutorial.mp4?v=20261022-mixkit-audio-v6'
-const posterUrl = '/images/riichi-calculator-tutorial-poster.webp'
+const posterUrl = '/images/riichi-calculator-tutorial-poster.avif'
 let returnFocusTo = null
 let scrollLock = null
 

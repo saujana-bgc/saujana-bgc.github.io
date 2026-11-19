@@ -10,7 +10,7 @@
         </p>
         <img
           class="birthday-mika"
-          src="/images/site/mika-birthday-club.webp"
+          src="/images/site/mika-birthday-club.avif"
           alt=""
           width="240"
           height="240"

@@ -36,7 +36,7 @@ useHead(() => {
       textContent: JSON.stringify({
         '@context': 'https://schema.org',
         '@graph': [
-          { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: siteName, url: `${siteUrl}/`, logo: `${siteUrl}/images/saujana-brand.webp`, sameAs: ['https://www.instagram.com/saujana.bgc/'] },
+          { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: siteName, url: `${siteUrl}/`, logo: `${siteUrl}/images/saujana-brand.avif`, sameAs: ['https://www.instagram.com/saujana.bgc/'] },
           { '@type': 'WebSite', '@id': `${siteUrl}/#website`, name: siteName, url: `${siteUrl}/`, publisher: { '@id': `${siteUrl}/#organization` } },
           { '@type': 'WebPage', '@id': page.canonical, url: page.canonical, name: page.title, description: page.description, isPartOf: { '@id': `${siteUrl}/#website` } },
         ],

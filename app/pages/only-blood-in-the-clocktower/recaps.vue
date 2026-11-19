@@ -175,7 +175,7 @@ function visibleGames(session) {
 
 function characterIcon(character) {
   const file = (character || 'custom').toLowerCase().replace(/[^a-z0-9]/g, '')
-  return `/images/clocktower/characters/${file}.webp`
+  return `/images/clocktower/characters/${file}.avif`
 }
 
 function clearArchiveFilters() {

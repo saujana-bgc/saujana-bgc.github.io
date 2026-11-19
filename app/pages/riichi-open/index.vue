@@ -21,7 +21,7 @@
         <div v-if="(publicLoaded && event?.stage !== 'completed') || hold || complete" class="hero-actions"><UButton class="event-button" @click="publicLoaded && !canRegister && !hold && !complete ? activeTab = 'standings' : goToRegistration()">{{ complete ? 'View my registration' : hold ? 'Continue your registration' : publicLoaded && !canRegister ? 'View standings' : 'Save my place' }} <span aria-hidden="true">→</span></UButton></div>
         <p v-if="canRegister" class="hero-reassurance">16 places · No participant account needed · Payment checked by the organiser</p>
       </div>
-      <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster-380.webp" srcset="/images/riichi-open/riichi-open-i-poster-380.webp 380w, /images/riichi-open/riichi-open-i-poster-760.webp 760w" sizes="(max-width: 760px) 46vw, 380px" alt="Riichi Open tournament poster with event date, venue, entry fee and format" width="760" height="950"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
+      <figure class="poster-card"><UButton type="button" class="poster-preview" aria-label="Open the full Riichi Open event poster" @click="openPoster"><img src="/images/riichi-open/riichi-open-i-poster-380.avif" srcset="/images/riichi-open/riichi-open-i-poster-380.avif 380w, /images/riichi-open/riichi-open-i-poster-760.avif 760w" sizes="(max-width: 760px) 46vw, 380px" alt="Riichi Open tournament poster with event date, venue, entry fee and format" width="760" height="950"></UButton><figcaption>Tap or click to view the full poster</figcaption></figure>
     </section>
 
     <section v-if="(publicLoaded && event?.stage !== 'completed') || hold || complete || restorePending || restoreFailed" id="registration" ref="registrationPanel" class="registration-panel" aria-labelledby="register-heading" tabindex="-1">
@@ -103,7 +103,7 @@
 
     <dialog v-if="posterOpen" ref="posterDialog" class="poster-dialog" aria-label="Riichi Open event poster" @click="closePosterFromBackdrop" @close="restorePosterFocus">
       <UButton type="button" class="poster-close" aria-label="Close event poster" @click="closePoster">×</UButton>
-      <img src="/images/riichi-open/riichi-open-i-poster.png" alt="Full Riichi Open tournament poster">
+      <img src="/images/riichi-open/riichi-open-i-poster.avif" alt="Full Riichi Open tournament poster">
     </dialog>
 
     <section v-show="activeTab === 'standings'" id="riichi-standings-panel" role="tabpanel" aria-labelledby="riichi-standings-tab">
