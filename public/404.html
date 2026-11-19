@@ -5,32 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#354c3e">
   <title>Page not found | Saujana BGC</title>
+  <link rel="preload" href="/fonts/Playfair_Display-normal-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <style>
-    :root { color-scheme: light; --paper: #f7f5ef; --surface: #fffefa; --green: #354c3e; --ink: #393d35; --muted: #6a6d64; --line: #dedbd1; }
+    @font-face { font-family: 'Playfair Display'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/Playfair_Display-normal-400-latin.woff2') format('woff2'); }
+    :root { color-scheme: light; --paper: #f7f5ef; --surface: #fffefa; --green: #354c3e; --ink: #393d35; --muted: #666c60; --line: #dedcd2; --gold: #8a6a3e; --display: 'Playfair Display', Georgia, serif; }
     * { box-sizing: border-box; }
-    body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; background: var(--paper); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
-    main { width: min(100%, 720px); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); text-align: center; }
-    .illustration { display: block; width: 100%; height: auto; }
-    .content { padding: clamp(24px, 6vw, 42px); }
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: clamp(16px, 4vw, 40px); background: var(--paper); color: var(--ink); font: 1rem/1.6 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
+    main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; width: min(100%, 960px); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 8px 30px rgba(44, 55, 40, .06); }
+    .content { grid-column: 1; grid-row: 1; padding: clamp(28px, 5vw, 56px); }
+    .illustration { grid-column: 2; grid-row: 1; display: block; width: 100%; height: auto; }
     a { color: var(--green); text-underline-offset: .2em; }
-    .brand { margin: 0 0 22px; color: var(--green); font: 1.3rem Georgia, serif; }
-    h1 { margin: 0; color: var(--green); font: 400 clamp(2.3rem, 8vw, 3.6rem)/1.1 Georgia, serif; }
-    p { color: var(--muted); }
-    nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 22px; margin-top: 24px; }
-    nav a { display: inline-flex; min-height: 44px; align-items: center; font-weight: 650; }
-    :focus-visible { outline: 3px solid #8a6a3e; outline-offset: 3px; }
+    .brand { margin: 0 0 20px; color: var(--green); font: 1.1rem var(--display); }
+    h1 { max-width: 12ch; margin: 0; color: var(--green); font: 400 clamp(2.3rem, 5vw, 3.6rem)/1.13 var(--display); letter-spacing: -.035em; }
+    .message { margin: 18px 0 0; color: var(--muted); }
+    nav { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; margin-top: 28px; }
+    nav a { display: inline-flex; min-height: 48px; align-items: center; font-weight: 600; }
+    nav .home-link { padding: 0 18px; border-radius: 8px; background: var(--green); color: var(--surface); text-decoration: none; }
+    nav .home-link:hover { background: #293d31; }
+    nav .gatherings-link { text-underline-offset: 5px; }
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    @media (max-width: 680px) {
+      body { padding: 16px; }
+      main { grid-template-columns: minmax(0, 1fr); }
+      .content { grid-column: 1; grid-row: 1; padding: clamp(26px, 8vw, 40px); }
+      .illustration { grid-column: 1; grid-row: 2; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <img class="illustration" src="/images/site/404-missing-path.webp" alt="A woman in an olive cardigan searches a board game map for the missing path." width="1536" height="1024">
+    <img class="illustration" src="/images/site/404-missing-path.webp" alt="" width="1536" height="1024">
     <section class="content">
       <p class="brand">Saujana Board Game Community</p>
       <h1>We couldn’t find that page.</h1>
-      <p>Try the gatherings calendar or head back to the home page.</p>
+      <p class="message">The link may be out of date.</p>
       <nav aria-label="Page recovery">
-        <a href="/">Home</a>
-        <a href="/gatherings/">Find a gathering</a>
+        <a class="home-link" href="/">Back to home</a>
+        <a class="gatherings-link" href="/gatherings/">Find a gathering</a>
       </nav>
     </section>
   </main>
