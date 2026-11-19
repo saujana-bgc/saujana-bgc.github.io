@@ -4,6 +4,7 @@ import test from 'node:test'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import { computed, ref } from 'vue'
 import { formatGatheringDate, getGatheringDateStamp, getKualaLumpurDate } from '../../app/utils/gatheringDates.js'
+import { formatGatheringTime } from '../../app/utils/gatheringTime.js'
 
 const { descriptor } = parse(readFileSync(new URL('../../app/pages/only-blood-in-the-clocktower/index.vue', import.meta.url), 'utf8'))
 const { content } = compileScript(descriptor, { id: 'clocktower-public-page' })
@@ -11,13 +12,13 @@ const { content } = compileScript(descriptor, { id: 'clocktower-public-page' })
 function page() {
   const dependencies = {
     computed, ref, onMounted() {},
-    formatGatheringDate, getGatheringDateStamp,
+    formatGatheringDate, formatGatheringTime, getGatheringDateStamp,
     getKualaLumpurDate: () => getKualaLumpurDate(new Date('2026-11-11T17:00:00Z')),
     useRuntimeConfig: () => ({ public: {} }),
     useRoute: () => ({ query: {} }),
     Date: class extends Date { constructor() { super('2026-11-11T17:00:00Z') } },
   }
-  const source = content.replace(/^import .*gatheringDates.*$/gm, '')
+  const source = content.replace(/^import .*gathering(?:Dates|Time).*$/gm, '')
   const component = new Function(...Object.keys(dependencies), source.replace('export default', 'return'))(...Object.values(dependencies))
   return component.setup({}, { expose() {} })
 }
