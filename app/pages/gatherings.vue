@@ -34,20 +34,69 @@
           <a v-if="event.venue_url && (activeTab !== 'past' || expandedEvents.has(event.id))" class="event-fact event-directions" :href="event.venue_url" target="_blank" rel="noopener noreferrer">Directions <UIcon name="i-lucide-map-pin" aria-hidden="true" /></a>
         </div>
 
-        <p v-if="activeTab !== 'past' || expandedEvents.has(event.id)" class="event-games-note">
-          <span>Board games · Riichi mahjong</span>
-          <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Blood on the Clocktower</span></template>
-        </p>
-
-        <div v-if="activeTab === 'present' && !isSpookyGameDay(event)" class="event-rsvp-actions">
+        <div v-if="activeTab === 'present' && !isSpookyGameDay(event) && !newRows[event.id]" class="event-rsvp-actions">
           <div v-if="signupSuccess[event.id]" class="signup-success action-status action-status--success" role="status">
             <p>{{ signupSuccess[event.id] }}</p>
             <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
           </div>
-          <UButton v-if="canEditEvent(event) && !newRows[event.id]" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
-          <span v-if="!newRows[event.id]" class="signup-minimum-note">RM10 minimum spend per person, paid at the counter after ordering. Ask for Saujana BGC when you arrive.</span>
-          <span v-if="!newRows[event.id] && !signupSuccess[event.id]" class="signup-welcome-note">Coming on your own? We’ll help you find a table. Read <NuxtLink to="/#respect-at-table" no-prefetch>Respect at the table</NuxtLink>.</span>
+          <UButton v-if="canEditEvent(event)" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
+          <span class="signup-minimum-note">RM10 minimum spend per person, paid at the counter after ordering. Ask for Saujana BGC when you arrive.</span>
+          <span v-if="!signupSuccess[event.id]" class="signup-welcome-note">Coming on your own? We’ll help you find a table. Read <NuxtLink to="/#respect-at-table" no-prefetch>Respect at the table</NuxtLink>.</span>
         </div>
+
+        <div v-if="activeTab === 'present' && canEditEvent(event) && newRows[event.id]" class="signup-section">
+          <form
+            :ref="el => setSignupFormRef(event.id, el)"
+            class="signup-form"
+            :aria-label="`Sign up for ${event.name}`"
+            :aria-busy="Boolean(savingRows[event.id])"
+            @submit.prevent="saveNewRow(event.id)"
+          >
+            <h3 class="signup-form-heading" tabindex="-1">Sign up</h3>
+            <fieldset class="signup-fields" :disabled="savingRows[event.id]">
+              <legend class="signup-sr-only">Your details</legend>
+              <div class="signup-field signup-field-name">
+                <label :for="`signup-name-${event.id}`">Name or nickname <span>(required)</span></label>
+                <p :id="`signup-name-hint-${event.id}`" class="signup-field-hint">Your name or nickname appears on the public attendee list.</p>
+                <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-hint-${event.id} signup-name-error-${event.id}` : `signup-name-hint-${event.id}`" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === newRows[event.id] && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === newRows[event.id] && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @keydown="onNameAutocompleteKeydown($event, newRows[event.id])" @blur="hideNameAutocompleteSoon" />
+                <p v-if="nameErrors[event.id]" :id="`signup-name-error-${event.id}`" class="signup-error" role="alert">Add the name you’d like us to know you by.</p>
+              </div>
+              <details class="signup-optional-details">
+                <summary>Optional details</summary>
+                <p class="signup-privacy-note">If you add an arrival time, games or notes, they’ll also appear on the public attendee list. For a private request, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin on WhatsApp</a>.</p>
+                <div class="signup-optional-fields">
+                  <div class="signup-field">
+                    <label :for="`signup-eta-${event.id}`">Arrival time</label>
+                    <p class="signup-field-hint">You can leave this blank if you’re unsure.</p>
+                    <input :id="`signup-eta-${event.id}`" v-model="newRows[event.id].eta" name="eta" type="time" class="signup-input" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, newRows[event.id])" />
+                  </div>
+                  <div class="signup-field">
+                    <label :for="`signup-games-${event.id}`">Games to bring</label>
+                    <textarea :id="`signup-games-${event.id}`" v-model="newRows[event.id].bringing_games" name="bringing_games" class="signup-input signup-area" placeholder="Any games you’d like to share" rows="2" />
+                  </div>
+                  <div class="signup-field signup-field-notes">
+                    <label :for="`signup-notes-${event.id}`">Public notes</label>
+                    <textarea :id="`signup-notes-${event.id}`" v-model="newRows[event.id].notes" name="notes" class="signup-input signup-area" placeholder="Anything attendees should know" rows="2" />
+                  </div>
+                </div>
+              </details>
+            </fieldset>
+            <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
+            <div class="signup-form-footer">
+              <p class="signup-sr-only" role="status">{{ savingRows[event.id] ? 'Saving your sign-up…' : '' }}</p>
+              <p class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
+              <div class="signup-submit-actions">
+                <UButton type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Signing up…' : 'Sign up' }}</UButton>
+                <UButton type="button" class="btn-cancel" :disabled="savingRows[event.id]" @click="cancelNewRow(event.id)">Cancel</UButton>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <p v-if="activeTab !== 'past' || expandedEvents.has(event.id)" class="event-games-note">
+          <span>Board games · Riichi mahjong</span>
+          <template v-if="isClocktowerEvent(event)"><span class="event-games-extra">Blood on the Clocktower</span></template>
+        </p>
 
         <UButton v-if="activeTab === 'past'" class="expand-bar" :aria-expanded="expandedEvents.has(event.id)" :aria-controls="`gathering-${event.id}`" @click="toggleEvent(event.id)">
           <span>{{ expandedEvents.has(event.id) ? 'Hide' : 'Details' }}</span>
@@ -69,57 +118,6 @@
               Sign-up details couldn’t be loaded.
               <UButton type="button" size="sm" @click="retryAttendees(event)">Try again</UButton>
             </p>
-            <div v-if="canEditEvent(event) && newRows[event.id]" class="signup-section">
-              <form
-                :ref="el => setSignupFormRef(event.id, el)"
-                class="signup-form"
-                :aria-label="`Sign up for ${event.name}`"
-                :aria-busy="Boolean(savingRows[event.id])"
-                @submit.prevent="saveNewRow(event.id)"
-              >
-                <div class="signup-form-heading">
-                  <h4>Sign up for {{ event.name }}</h4>
-                </div>
-                <fieldset class="signup-fields" :disabled="savingRows[event.id]">
-                  <legend class="signup-sr-only">Your details</legend>
-                  <div class="signup-field signup-field-name">
-                    <label :for="`signup-name-${event.id}`">Name or nickname <span class="signup-required">(required)</span></label>
-                    <p :id="`signup-name-hint-${event.id}`" class="signup-field-hint">A nickname is fine. The name you enter appears on the public attendee list.</p>
-                    <input :id="`signup-name-${event.id}`" v-model="newRows[event.id].name" name="name" class="signup-input" :class="{ 'input-error': nameErrors[event.id] }" :aria-invalid="Boolean(nameErrors[event.id])" :aria-describedby="nameErrors[event.id] ? `signup-name-hint-${event.id} signup-name-error-${event.id}` : `signup-name-hint-${event.id}`" :aria-expanded="nameAutocomplete.visible && nameAutocomplete.row === newRows[event.id] && filteredNameOptions.length > 0" :aria-activedescendant="nameAutocomplete.row === newRows[event.id] && activeNameOptionIndex >= 0 ? `name-option-${activeNameOptionIndex}` : undefined" aria-controls="name-autocomplete-list" role="combobox" aria-autocomplete="list" placeholder="What should we call you?" autocomplete="off" required @focus="showNameAutocomplete($event, newRows[event.id])" @input="onNewNameInput($event, event.id)" @keydown="onNameAutocompleteKeydown($event, newRows[event.id])" @blur="hideNameAutocompleteSoon" />
-                    <p v-if="nameErrors[event.id]" :id="`signup-name-error-${event.id}`" class="signup-error" role="alert">Add the name you’d like us to know you by.</p>
-                  </div>
-                  <details class="signup-optional-details">
-                    <summary>Optional details</summary>
-                    <div class="signup-optional-fields">
-                      <div class="signup-field">
-                        <label :for="`signup-eta-${event.id}`">Arrival time</label>
-                        <p class="signup-field-hint">You can leave this blank if you’re unsure.</p>
-                        <input :id="`signup-eta-${event.id}`" v-model="newRows[event.id].eta" name="eta" type="time" class="signup-input" :min="eventStartTime(event) || undefined" @change="validateEtaForEvent(event, newRows[event.id])" />
-                      </div>
-                      <div class="signup-field">
-                        <label :for="`signup-games-${event.id}`">Games to bring</label>
-                        <textarea :id="`signup-games-${event.id}`" v-model="newRows[event.id].bringing_games" name="bringing_games" class="signup-input signup-area" placeholder="Any games you’d like to share" rows="2" />
-                      </div>
-                      <div class="signup-field signup-field-notes">
-                        <label :for="`signup-notes-${event.id}`">Public notes</label>
-                        <textarea :id="`signup-notes-${event.id}`" v-model="newRows[event.id].notes" name="notes" class="signup-input signup-area" placeholder="Anything attendees should know" rows="2" />
-                      </div>
-                    </div>
-                  </details>
-                </fieldset>
-                <p class="signup-privacy-note">If you add an arrival time, games or notes, they’ll also appear on the public attendee list. For a private request, <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">message the admin on WhatsApp</a>.</p>
-                <p v-if="signupErrors[event.id]" class="signup-error" role="alert">{{ signupErrors[event.id] }}</p>
-                <div class="signup-form-footer">
-                  <p class="signup-save-hint" role="status">{{ savingRows[event.id] ? 'Saving your sign-up…' : '' }}</p>
-                  <p class="signup-minimum-note">RM10 minimum spend per person. Pay at the counter after ordering.</p>
-                  <div class="signup-submit-actions">
-                    <UButton type="submit" class="btn-save" :disabled="savingRows[event.id]">{{ savingRows[event.id] ? 'Signing up…' : 'Sign up' }}</UButton>
-                    <UButton type="button" class="btn-cancel" :disabled="savingRows[event.id]" @click="cancelNewRow(event.id)">Cancel</UButton>
-                  </div>
-                </div>
-              </form>
-            </div>
-
             <details class="attendee-list-details">
               <summary class="attendee-list-summary">
                 <span>{{ activeTab === 'past' ? 'Who signed up' : 'Who’s signed up' }}</span>
@@ -902,17 +900,32 @@ function setSignupFormRef(eventId, el) {
     else signupFormRefs.delete(eventId)
 }
 
-async function focusSignupForm(eventId) {
+async function focusSignupForm(eventId, { focusName = false } = {}) {
     await nextTick()
-    const target = signupFormRefs.get(eventId)
-    target?.scrollIntoView({ block: 'start', inline: 'nearest' })
-    const input = target?.querySelector('input[name="name"]')
-    input?.focus({ preventScroll: true })
+    const form = signupFormRefs.get(eventId)
+    if (!form) return
+
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const focusTarget = isMobile && !focusName
+        ? form.querySelector('.signup-form-heading')
+        : form.elements.namedItem('name')
+
+    form.scrollIntoView({ block: 'start', inline: 'nearest', behavior: isMobile ? 'instant' : 'auto' })
+    focusTarget?.focus({ preventScroll: true })
 }
 
 async function focusSignupTrigger(eventId) {
     await nextTick()
-    document.getElementById(`signup-trigger-${eventId}`)?.focus()
+    const trigger = document.getElementById('signup-trigger-' + eventId)
+    if (!trigger) return
+
+    if (window.matchMedia('(max-width: 767px)').matches) {
+        const scrollTarget = signupSuccess[eventId] ? trigger.previousElementSibling : trigger
+        scrollTarget?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' })
+        trigger.focus({ preventScroll: true })
+    } else {
+        trigger.focus()
+    }
 }
 
 async function addRow(eventId) {
@@ -952,7 +965,7 @@ async function saveNewRow(eventId) {
     const row = newRows[eventId]
     if (!row.name.trim()) {
         nameErrors[eventId] = true
-        await focusSignupForm(eventId)
+        await focusSignupForm(eventId, { focusName: true })
         return
     }
     nameErrors[eventId] = false
@@ -2220,7 +2233,6 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-facts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
 .event-facts .event-fact { color: var(--clay-text); }
 .event-card .event-games-note { margin: 8px 0; }
-.event-card .signup-form-heading { margin-bottom: 14px; }
 .event-card::before { display: none; }
 .event-card:hover { transform: none; box-shadow: var(--shadow-card); }
 .event-card .hero-title { font-style: normal; }
@@ -2270,8 +2282,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .event-card:has(.event-image-wrap) > .event-description { grid-column: 1 / -1; grid-row: 6; }
 .event-card:has(.event-flyer-image) > .attendees-section,
 .event-card:has(.event-image-wrap) > .attendees-section { display: contents; }
-.event-card:has(.event-flyer-image) > .attendees-section > .signup-section,
-.event-card:has(.event-image-wrap) > .attendees-section > .signup-section { grid-column: 1 / -1; grid-row: 5; }
+.event-card:has(.event-flyer-image) > .signup-section,
+.event-card:has(.event-image-wrap) > .signup-section { grid-column: 1 / -1; grid-row: 5; }
 .event-card:has(.event-flyer-image) .attendee-list-details,
 .event-card:has(.event-image-wrap) .attendee-list-details { grid-column: 1 / -1; grid-row: 7; margin-top: 12px; }
 .event-card:has(.event-flyer-image) > .expand-bar,
@@ -2300,13 +2312,14 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
   }
   .event-card:has(.event-flyer-image) > .event-rsvp-actions,
   .event-card:has(.event-image-wrap) > .event-rsvp-actions { order: 3; }
+  .event-card:has(.event-flyer-image) > .signup-section,
+  .event-card:has(.event-image-wrap) > .signup-section { order: 4; width: 100%; }
   .event-card:has(.event-flyer-image) > .event-games-note,
-  .event-card:has(.event-image-wrap) > .event-games-note { order: 4; }
-  .event-description { order: 6; }
-  .event-card:has(.event-flyer-image) > .attendees-section,
-  .event-card:has(.event-image-wrap) > .attendees-section { display: contents; }
-  .event-card:has(.event-flyer-image) > .attendees-section > .signup-section,
-  .event-card:has(.event-image-wrap) > .attendees-section > .signup-section { order: 5; }
+  .event-card:has(.event-image-wrap) > .event-games-note { order: 5; }
+  .event-card:has(.event-flyer-image) > .event-description,
+  .event-card:has(.event-image-wrap) > .event-description { order: 6; }
+  .event-card:has(.event-flyer-image) .attendee-load-error,
+  .event-card:has(.event-image-wrap) .attendee-load-error { order: 8; }
   .event-card:has(.event-flyer-image) .attendee-list-details,
   .event-card:has(.event-image-wrap) .attendee-list-details { order: 8; margin-top: 10px; }
   .gatherings-main > .tabs { margin-top: 0; }
@@ -2332,8 +2345,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     background: var(--surface-soft);
     scroll-margin-top: 110px;
 }
-.signup-form-heading h4 { margin: 0 0 6px; font-size: 1.05rem; color: var(--matcha-leaf); }
-.signup-field-hint, .signup-save-hint {
+.signup-form-heading { margin: 0 0 12px; font-size: 1.05rem; color: var(--matcha-leaf); }
+.signup-field-hint {
     margin: 0;
     color: var(--muted);
     font-size: .82rem;
@@ -2398,12 +2411,16 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .signup-submit-actions button:disabled { opacity: .65; cursor: wait; transform: none; }
 .signup-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 767px) {
-    .signup-form { padding: 18px; scroll-margin-top: 88px; }
-    .signup-fields { grid-template-columns: minmax(0, 1fr); gap: 16px; margin: 18px 0; }
+    .event-rsvp-actions { width: 100%; }
+    .event-rsvp-actions > .btn-add { width: 100%; justify-content: center; }
+    .signup-success { scroll-margin-top: 88px; }
+    .signup-form { padding: 14px; scroll-margin-top: 88px; }
+    .signup-fields { grid-template-columns: minmax(0, 1fr); gap: 6px; margin: 8px 0 10px; }
     .signup-optional-fields { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-    .signup-form-footer { align-items: stretch; flex-direction: column; }
-    .signup-submit-actions { flex-direction: column; align-items: stretch; }
-    .signup-submit-actions .btn-save { min-height: 48px; }
+    .signup-form-footer { display: grid; gap: 8px; padding-top: 10px; }
+    .signup-form-footer .signup-minimum-note { margin: 0; }
+    .signup-submit-actions { flex-wrap: wrap; }
+    .signup-submit-actions .btn-save { flex: 1; min-width: 0; min-height: 48px; justify-content: center; }
     .signup-submit-actions .btn-cancel { border: 1px solid var(--line); }
 }
 
