@@ -55,7 +55,7 @@
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>
 
         <article v-for="game in virtualGames" :key="game.name" class="editorial-card">
-          <UButton type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game)">
+          <UButton type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game, $event)">
             <img
               :src="'/' + game.img"
               :alt="game.name"
@@ -149,6 +149,7 @@ function resetCategories() { selectedCategories.value = [] }
 const selectedGame = ref(null)
 const descriptionStatus = ref('idle')
 let modalTrigger = null
+let focusRestoreTimer = null
 const gridRef = ref(null)
 const gridTop = ref(0)
 const scrollY = ref(0)
@@ -305,8 +306,11 @@ async function loadGameDescription(game) {
     }
 }
 
-const openModal = (game) => {
-    modalTrigger = document.activeElement
+const openModal = (game, event) => {
+    clearTimeout(focusRestoreTimer)
+    modalTrigger = event?.target?.closest?.('button')
+        ?? event?.currentTarget?.querySelector?.('button')
+        ?? document.activeElement
     selectedGame.value = { ...game, description: '' }
     descriptionStatus.value = 'loading'
     void loadGameDescription(game)
@@ -316,7 +320,9 @@ const closeModal = () => {
     const trigger = modalTrigger
     selectedGame.value = null
     descriptionStatus.value = 'idle'
-    nextTick(() => trigger?.focus())
+    nextTick(() => {
+        focusRestoreTimer = window.setTimeout(() => trigger?.focus(), 250)
+    })
 }
 const onModalOpenChange = (open) => { if (!open) closeModal() }
 const handleImgError = (e) => { e.target.src = FALLBACK_IMG }

@@ -106,7 +106,9 @@
         <UButton type="button" class="poster-zoom" :aria-pressed="posterZoomed" @click="posterZoomed = !posterZoomed">{{ posterZoomed ? 'Fit poster' : 'Zoom in to read' }}</UButton>
         <UButton type="button" class="poster-close" aria-label="Close event poster" @click="closePoster">×</UButton>
       </div>
-      <img :class="{ 'is-zoomed': posterZoomed }" src="/images/riichi-open/riichi-open-i-poster.avif" alt="Full Riichi Open tournament poster">
+      <div class="poster-viewport" :class="{ 'is-zoomed': posterZoomed }">
+        <img src="/images/riichi-open/riichi-open-i-poster.avif" alt="Full Riichi Open tournament poster">
+      </div>
     </dialog>
 
     <section v-show="activeTab === 'standings'" id="riichi-standings-panel" role="tabpanel" aria-labelledby="riichi-standings-tab">
@@ -596,15 +598,15 @@ async function cancelHold() {
 .poster-preview:hover{transform:translateY(-3px);box-shadow:0 20px 42px #26392b30}
 .poster-preview:focus-visible,.poster-close:focus-visible{outline:3px solid #bc9d60;outline-offset:4px}
 .poster-preview img{display:block;width:100%;height:100%;object-fit:contain}
-.poster-dialog{position:fixed;width:min(94vw,900px);height:min(94dvh,1125px);max-width:none;max-height:none;padding:12px 14px 14px;border:1px solid #d9c994;border-radius:14px;background:#fbfaf6;box-shadow:0 28px 100px #111a1280;overflow:auto;box-sizing:border-box}
+.poster-dialog{position:fixed;width:min(94vw,900px);height:min(94dvh,1125px);max-width:none;max-height:none;padding:12px 14px 14px;border:1px solid #d9c994;border-radius:14px;background:#fbfaf6;box-shadow:0 28px 100px #111a1280;overflow:hidden;box-sizing:border-box}
 .poster-dialog::backdrop{background:#18241bd9;backdrop-filter:blur(4px)}
-.poster-toolbar{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:40px;margin-bottom:8px;background:#fbfaf6}
+.poster-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:40px;margin-bottom:8px;background:#fbfaf6}
 .poster-zoom,.poster-close{min-height:40px;border:1px solid var(--line);border-radius:8px;background:var(--white-pure);color:var(--matcha-leaf)}
 .poster-zoom{padding:8px 12px;font-size:.82rem}
 .poster-close{width:40px;flex:0 0 40px;font-size:1.35rem}
-.poster-dialog>img{display:block;width:min(100%,800px);height:auto;margin:0 auto;object-fit:contain}
-.poster-dialog>img.is-zoomed{width:180%;max-width:none;margin-left:0;margin-right:0}
-.poster-close{position:absolute;top:9px;right:10px;z-index:1;width:34px;height:34px;border:1px solid #d8d5c8;border-radius:50%;background:#fbfaf6;color:#354c3e;font:1.4rem/1 'Segoe UI',sans-serif;cursor:pointer}
+.poster-viewport{max-height:calc(94dvh - 82px);overflow:auto;overscroll-behavior:contain}
+.poster-viewport img{display:block;width:min(100%,800px);height:auto;margin-inline:auto;object-fit:contain}
+.poster-viewport.is-zoomed img{width:180%;max-width:none;margin-inline:0}
 .poster-card figcaption{margin-top:9px;color:var(--muted);font-size:.7rem}
 @media(max-width:760px){.poster-card{width:min(46vw,190px);margin:14px auto 18px}}
 @media(prefers-reduced-motion:reduce){.poster-preview{transition:none}}
