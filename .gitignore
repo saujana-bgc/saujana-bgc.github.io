@@ -54,6 +54,7 @@ supabase/migrations/*
 !supabase/seed.sql
 !supabase/functions/
 supabase/functions/*
+!supabase/functions/deno.json
 !supabase/functions/_shared/
 supabase/functions/_shared/*
 !supabase/functions/_shared/*.ts

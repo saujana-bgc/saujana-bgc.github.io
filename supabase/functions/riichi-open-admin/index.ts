@@ -1,7 +1,6 @@
 import { adminUser, bucket, eventSlug, options, reply, safeMessage, serviceClient } from '../_shared/riichi-open.ts'
 
 const object = (value: unknown) => value && typeof value === 'object' ? value as Record<string, unknown> : {}
-const fail = (message: string): never => { throw new Error(message) }
 
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return options(request)
