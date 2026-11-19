@@ -71,8 +71,8 @@
         </section>
 
         <div v-if="filteredSessions.length === 0" class="loading-state">
-          <p>{{ search.trim() ? `No gatherings include “${search.trim()}”. Try another game title.` : 'Our play history is waiting for its first entry.' }}</p>
-          <NuxtLink class="context-link" to="/collection/" no-prefetch>Explore the collection <span aria-hidden="true">→</span></NuxtLink>
+          <p>{{ search.trim() ? `No gatherings include “${search.trim()}”. Try another game title.` : 'No plays logged just yet. Take a look through the collection and see what you might like to try.' }}</p>
+          <NuxtLink class="context-link" to="/collection/" no-prefetch>Browse the collection <span aria-hidden="true">→</span></NuxtLink>
         </div>
 
         <div v-if="totalPages > 1" class="pagination">

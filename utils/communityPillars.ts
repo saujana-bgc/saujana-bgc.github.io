@@ -9,7 +9,7 @@ export const communityPillars = [
     },
     description: 'From quick party games to thoughtful strategy, we’ll help you find a table that suits you.',
     links: [
-      { label: 'Explore board games', to: '/board-games/' },
+      { label: 'Find a board game', to: '/board-games/' },
     ],
   },
   {
@@ -22,7 +22,7 @@ export const communityPillars = [
     },
     description: 'Watch a hand take shape, or try a turn with someone beside you to help.',
     links: [
-      { label: 'Explore Riichi Mahjong', to: '/riichi-mahjong/' },
+      { label: 'Discover Riichi Mahjong', to: '/riichi-mahjong/' },
     ],
   },
   {
@@ -33,9 +33,9 @@ export const communityPillars = [
       width: 900,
       height: 600,
     },
-    description: 'Take a secret role, share clues and help the village find the Demon. You’re welcome to watch first.',
+    description: 'Take a secret role and compare stories. The village has a Demon to find, and you’re welcome to watch a round first.',
     links: [
-      { label: 'Explore Blood on the Clocktower', to: '/only-blood-in-the-clocktower/' },
+      { label: 'Enter the Clocktower', to: '/only-blood-in-the-clocktower/' },
     ],
   },
 ] as const

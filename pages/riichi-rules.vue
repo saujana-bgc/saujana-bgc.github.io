@@ -21,7 +21,7 @@
           <div><dt>Starting points</dt><dd>30,000</dd></div>
           <div><dt>Red fives</dt><dd>None</dd></div>
         </dl>
-        <a class="beginner-guide-link" href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Read the beginner guide (PDF, 11 MB) ↗</a>
+        <a class="beginner-guide-link" href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Read the beginner guide (PDF, 9.1 MB) ↗</a>
         <p class="beginner-guide-note">Guide correction. Temporary furiten ends on your next draw or your own tile call. If you pass after declaring riichi, it lasts for the rest of the hand.</p>
       </article>
       <article class="table-summary sanma-summary" aria-labelledby="three-player-title">

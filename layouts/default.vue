@@ -53,7 +53,7 @@
     </div>
 
     <footer v-if="!isAdminRoute" ref="footerRef" class="site-meta" aria-label="Site information">
-      <p class="footer-signature">Come Play with Saujana</p>
+      <p class="footer-signature">Come play with Saujana</p>
       <div class="footer-social-links">
         <SocialLink channel="whatsapp" label="Say hello on WhatsApp" />
         <SocialLink channel="instagram" label="See gathering photos on Instagram" />

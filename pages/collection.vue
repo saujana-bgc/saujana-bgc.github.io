@@ -77,7 +77,7 @@
 
       <div v-if="!isPending && displayedGames.length === 0" class="collection-empty">
         <p>{{ search.trim() ? `No games match “${search.trim()}”.` : 'No games match these filters.' }}</p>
-        <p>Try a shorter search, or give the whole shelf another look.</p>
+        <p>Try a shorter title or clear your filters to browse all the games.</p>
         <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Show all games</UButton>
       </div>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>

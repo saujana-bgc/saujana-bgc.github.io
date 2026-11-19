@@ -10,6 +10,8 @@ Keep game titles, published descriptions, event details, league rules and consen
 
 Prefer an invitation over an instruction where it stays clear. For example, “Come watch a hand and ask us how it works” can welcome a new player, while “Save your place” only fits when the action really reserves a place. Say “You’re on the sign-up list” for a saved gathering sign-up. Reserve “Your place is confirmed” for confirmed tournament entries. A quiet playful line belongs in an introduction, while a form label, payment term or rule should be precise.
 
+For new visitor copy, offer one useful next step such as “Find a gathering”, “Watch a hand first” or “We’ll help you find a table”. Keep Board Games relaxed, Riichi Mahjong thoughtful, Blood on the Clocktower lightly mysterious and Birthday Club affectionate. Use “No plays logged” for an empty play record. Event descriptions should name the activity, say what someone can try, then give the verified logistics. Don’t promise attendance, an available place or a public greeting unless the saved state confirms it.
+
 ## Responsive text
 
 Let ordinary copy and short callouts use the space their container provides. Give long articles and guides an intentional reading width. Use balanced wrapping for short headings where it helps. Reserve forced breaks and no-wrap styles for cases where the content needs them. Follow the [responsive text wrapping plan](docs/responsive-text-wrapping-plan.md) when changing layouts or adding pages.

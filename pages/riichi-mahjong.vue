@@ -3,7 +3,7 @@
     <header class="page-intro">
       <h1 class="hero-title">Riichi Mahjong</h1>
       <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? In four-player riichi and three-player sanma, the fun is spotting which tiles fit.</p>
-      <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
+      <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
     </header>
 
     <section class="activity-content" aria-labelledby="first-hand-title">
@@ -13,9 +13,9 @@
       >
         <div class="activity-copy">
           <p class="page-eyebrow">A turn at the table</p>
-          <h2 id="first-hand-title">See a hand take shape, one tile at a time.</h2>
+          <h2 id="first-hand-title">Watch a hand take shape, one tile at a time.</h2>
           <p>On your turn, draw one tile and discard another. You’re collecting matching sets, number runs and a pair. To win, your complete hand also needs at least one yaku, a recognised pattern or winning condition. We play both four-player riichi and three-player sanma.</p>
-          <p><a class="activity-resource-link" href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Open our two-page beginner guide (PDF, 11 MB) <span aria-hidden="true">↗</span></a></p>
+          <p><a class="activity-resource-link" href="/guides/riichi-beginner-guide.pdf" target="_blank" rel="noopener">New to riichi? Open our two-page beginner guide (PDF, 9.1 MB) <span aria-hidden="true">↗</span></a></p>
           <p>Watch a hand and ask what a player is collecting, or try a turn with someone beside you to help.</p>
         </div>
       </ActivityOverviewFeature>

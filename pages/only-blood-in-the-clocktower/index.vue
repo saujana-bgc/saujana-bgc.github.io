@@ -2,7 +2,7 @@
   <main class="clocktower-page">
     <header class="page-intro">
       <h1 class="hero-title">Only Blood in the Clocktower</h1>
-      <p class="stats-container">Two players tell different stories about last night. Who do you trust? In <em>Blood on the Clocktower</em>, share clues and vote to find the hidden Demon before evil takes over the town.</p>
+      <p class="stats-container">The town is full of stories. Who do you trust? In <em>Blood on the Clocktower</em>, compare clues and help the town find the Demon.</p>
     </header>
 
     <div class="gathering-banner">
@@ -46,7 +46,7 @@
           <li><strong>The Storyteller can help</strong><span>They run the game, explain your role and answer questions privately during play.</span></li>
           <li><strong>Being out doesn’t end your game</strong><span>If your character dies, you can still talk and help your team. You keep one final vote for later.</span></li>
         </ul>
-        <p class="welcome-joining">You can come on your own or with a friend. Tell the host you’re new; they’ll help you decide whether to watch or play.</p>
+        <p class="welcome-joining">Come on your own or with a friend. Tell the Storyteller you’re new, and they’ll help you decide whether to watch or play.</p>
         <a class="welcome-link" href="https://bloodontheclocktower.com/pages/how-to-play" target="_blank" rel="noopener noreferrer">Official how-to-play guide <span aria-hidden="true">↗</span></a>
       </ActivityOverviewFeature>
     </section>

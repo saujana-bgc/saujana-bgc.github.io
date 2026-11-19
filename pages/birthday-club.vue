@@ -6,7 +6,7 @@
           <h1 id="birthday-title" class="hero-title">Birthday Club</h1>
         </div>
         <p class="birthday-intro-copy">
-          If you’d like us to remember your birthday, share your name, month and day.
+          Share your name, month and day if you’d like us to remember your birthday. You can choose whether we share a public greeting.
         </p>
         <img
           class="birthday-mika"
@@ -19,8 +19,8 @@
 
       <div class="birthday-card-body">
         <div v-if="isSubmitted" class="birthday-success action-status action-status--success" role="status">
-          <h2>Thanks, {{ submittedName }}. Your birthday is saved.</h2>
-          <p>We’ve saved your greeting preference.</p>
+          <h2>Thanks, {{ submittedName }}. We’ve saved your birthday.</h2>
+          <p>{{ allowPublicGreeting ? 'You’ve allowed a public birthday greeting.' : 'Only organisers can see your birthday.' }}</p>
           <UButton class="secondary-button" color="neutral" variant="outline" type="button" @click="resetForm">
             Add another birthday
           </UButton>
@@ -98,7 +98,7 @@
           <p v-if="submitError" class="submit-error action-status action-status--error" role="alert">{{ submitError }}</p>
 
           <UButton class="submit-button" type="submit" :disabled="isSubmitting">
-            {{ isSubmitting ? 'Saving your birthday…' : 'Join the Birthday Club' }}
+            {{ isSubmitting ? 'Saving your birthday…' : 'Save my birthday' }}
           </UButton>
         </form>
       </div>

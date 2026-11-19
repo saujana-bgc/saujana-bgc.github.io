@@ -2,7 +2,7 @@
   <main class="home">
     <section class="hero-section" aria-labelledby="home-title">
       <div class="hero-copy">
-        <h1 id="home-title" class="hero-title">Come Play with Saujana</h1>
+        <h1 id="home-title" class="hero-title">Come play with Saujana</h1>
         <p>We gather for board games and riichi mahjong, with Blood on the Clocktower on selected dates. Coming on your own? We’ll help you find a table.</p>
         <div class="hero-actions">
           <NuxtLink class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
@@ -89,7 +89,7 @@
     </section>
 
     <section id="community-pillars" class="home-section" aria-labelledby="community-pillars-title" tabindex="-1">
-      <h2 id="community-pillars-title" class="hero-title story-title">What We Play</h2>
+      <h2 id="community-pillars-title" class="hero-title story-title">What we play</h2>
       <div class="community-pillars">
         <article v-for="pillar in communityPillars" :key="pillar.id" class="community-card">
           <div class="community-card-image-frame" :class="{ 'is-rotated': pillar.id === 'board-games' }">

@@ -175,7 +175,7 @@ async function load(options = {}) {
     data.value = latest
     if (!activeRounds.value.some(round => round.id === penalty.round_id)) penalty.round_id = activeRounds.value[0]?.id ?? ''
     if (!penaltyParticipants.value.some(person => person.id === penalty.participant_id)) penalty.participant_id = ''
-  } catch (cause) { error.value = cause.message }
+  } catch { error.value = 'We couldn’t load the tournament workspace. Check your connection and try again.' }
   finally { loading.value = false }
 }
 async function act(action,payload={}){
@@ -199,14 +199,14 @@ async function act(action,payload={}){
     catch(cause){
       if(['generate_q1','prepare_round'].includes(action)){
         await load()
-        if(unpublishedRounds.value.length)error.value=`${cause.message} Seating was prepared, but publication failed. Use the retry control above the penalties section.`
-        else error.value=cause.message
+        if(unpublishedRounds.value.length)error.value='Seating is ready, but publishing the round didn’t finish. Use the retry control above the penalties section.'
+        else error.value='We couldn’t prepare this round. Check the roster and try again.'
         return null
       }
       throw cause
     }
   }catch(cause){
-    error.value=cause.message
+    error.value='We couldn’t complete that update. Check the latest event details and try again.'
     if(/round changed|reload before editing/i.test(cause.message)){revisionConflict.value=true;await load();error.value='Another organiser changed this round. Your entries are preserved; review the latest saved scores before continuing.'}
     else if(/private note changed/i.test(cause.message))await load()
     return null
@@ -220,7 +220,7 @@ async function republishRound(round){
   if(result)message.value=`${humanize(round.round_key)} seating is now public.`
 }
 async function toggleRegistration(){const result=await act('registration_open',{open:!data.value.event.registration_open});if(result)message.value=`Registration ${data.value.event.registration_open?'opened':'closed'}.`}
-async function previewReceipt(registration){try{const result=await callAdmin('receipt_url',{path:registration.receipt_path});preview.value={url:result.url,mime:registration.receipt_mime,name:registration.display_name};await nextTick();receiptDialog.value?.showModal()}catch(cause){error.value=cause.message}}
+async function previewReceipt(registration){try{const result=await callAdmin('receipt_url',{path:registration.receipt_path});preview.value={url:result.url,mime:registration.receipt_mime,name:registration.display_name};await nextTick();receiptDialog.value?.showModal()}catch{error.value='We couldn’t open this receipt. Check your connection and try again.'}}
 function closeReceiptBackdrop(event){if(event.target===receiptDialog.value)receiptDialog.value.close()}
 function scrollBehavior(){return window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}
 function jumpTo(id){if(id)document.getElementById(id)?.scrollIntoView({behavior:scrollBehavior(),block:'start'})}
@@ -262,7 +262,7 @@ async function saveParticipant(person){
       error.value=''
     }catch(cause){
       participantSaveStates[person.id]='error'
-      error.value=cause.message
+      error.value='We couldn’t save this participant’s details. Your entries are still here; try again.'
       if(/participant changed in another session/i.test(cause.message)){
         await load()
         if(participantConflicts[person.id]?.length){participantSaveStates[person.id]='';error.value='Another organiser changed this participant. Review the roster fields before saving again.'}
@@ -341,7 +341,7 @@ async function saveTable(round,table){
       return true
     }catch(cause){
       tableSaveStates[table.id]='error'
-      error.value=cause.message
+      error.value='We couldn’t save this table. Your score entries are still here; try again.'
       if(/round changed|reload before editing/i.test(cause.message)){revisionConflict.value=true;await load();error.value='Another organiser changed this round. Your entries are preserved; review the latest saved scores before continuing.'}
       return false
     }
@@ -425,7 +425,7 @@ async function prepareNext(roundKey){
       await load()
       const refreshedSource=data.value?.rounds.find(row=>row.id===sourceRound?.id&&row.status==='certified')
       if(refreshedSource&&getQualifyingTieGroups(refreshedSource.id).length){error.value='A qualifying tie could not be resolved automatically. Reload the event and try preparing the round again.';tieDrawInProgress.value=false;return}
-    }else{error.value=cause.message;tieDrawInProgress.value=false;return}
+    }else{error.value='We couldn’t record the tie order. Refresh the event and try again.';tieDrawInProgress.value=false;return}
   }
   tieDrawInProgress.value=false
   const result=await act('prepare_round',{round_key:roundKey})
@@ -476,7 +476,7 @@ function getQualifyingTieGroups(roundId){
 }
 function randomIndex(max){const range=0x100000000,limit=Math.floor(range/max)*max,buffer=new Uint32Array(1);let value;do{globalThis.crypto.getRandomValues(buffer);value=buffer[0]}while(value>=limit);return value%max}
 function secureRandomOrder(participantIds){const order=[...participantIds];for(let i=order.length-1;i>0;i--){const j=randomIndex(i+1);[order[i],order[j]]=[order[j],order[i]]}return order}
-async function exportData(){try{const output=await callAdmin('export');const blob=new Blob([JSON.stringify(output,null,2)],{type:'application/json'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='riichi-open-i-organiser-export.json';link.click();URL.revokeObjectURL(link.href)}catch(cause){error.value=cause.message}}
+async function exportData(){try{const output=await callAdmin('export');const blob=new Blob([JSON.stringify(output,null,2)],{type:'application/json'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='riichi-open-i-organiser-export.json';link.click();URL.revokeObjectURL(link.href)}catch{error.value='We couldn’t export the event data. Try again.'}}
 function paymentStatus(person){return data.value.registrations.find(row=>row.id===person.registration_id)?.status??'No linked registration'}
 function formatDate(value){return value?new Date(value).toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'}):'—'}
 function humanize(value=''){return String(value).replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}

@@ -3,7 +3,7 @@
     <header class="page-intro">
       <h1 class="hero-title">Board Games</h1>
       <p class="stats-container">From quick party games to thoughtful strategy, choose a table that suits you. We’ll help you find a game and learn as you play.</p>
-      <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>See weekly gathering dates <span aria-hidden="true">→</span></NuxtLink>
+      <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
     </header>
 
     <section class="activity-content" aria-labelledby="first-game-title">
@@ -13,7 +13,7 @@
       >
         <div class="activity-copy">
           <p class="page-eyebrow">What playing can look like</p>
-          <h2 id="first-game-title">You can join with one good clue.</h2>
+          <h2 id="first-game-title">Start with one good clue.</h2>
           <p>Ocean. Blue. Big. What word would you guess? In <em>Just One</em>, you write one-word clues for a teammate. Matching clues disappear, so it pays to think a little differently.</p>
         </div>
       </ActivityOverviewFeature>

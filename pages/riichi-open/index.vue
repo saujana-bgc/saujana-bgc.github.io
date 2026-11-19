@@ -262,7 +262,7 @@ async function loadPublic() {
     if (notice.value.startsWith('Live registration')) notice.value = ''
     await refreshOwnRegistration()
   } catch (cause) {
-    standingsError.value = cause.message || 'Please refresh in a moment.'
+    standingsError.value = 'We couldn’t load the event details just now. Check your connection and try again.'
   } finally { refreshing.value = false }
 }
 
@@ -332,7 +332,7 @@ async function restoreSavedHold() {
   } catch (cause) {
     restoreFailed.value=true
     notice.value=savedHoldCanDiscard.value ? '' : 'Your saved reservation is still in this browser. Restore or release it before starting another registration.'
-    error.value=cause.message || 'Could not restore the saved reservation. Check your connection and try again.'
+    error.value='We couldn’t restore your saved place just now. Check your connection and try again.'
   } finally { restorePending.value=false }
 }
 
@@ -381,7 +381,7 @@ async function restartCancelledRegistration() {
     await nextTick()
     paymentPanel.value?.scrollIntoView({behavior:scrollBehavior(),block:'start'})
     paymentPanel.value?.focus({preventScroll:true})
-  } catch (cause) { restartRecoveryAvailable.value=true;restoreFailed.value=true;error.value=cause.message || 'A new reservation could not be started. Try restoring the saved place.' }
+  } catch { restartRecoveryAvailable.value=true;restoreFailed.value=true;error.value='We couldn’t start a new reservation just now. Try restoring your saved place.' }
   finally { busy.value=false }
 }
 
@@ -404,7 +404,7 @@ async function releaseSavedHold() {
     savedHoldCanDiscard.value=false
     notice.value='Saved place released. You can start a new registration.'
     await loadPublic()
-  } catch (cause) { error.value=cause.message || 'The saved place could not be released.' }
+  } catch { error.value='We couldn’t release the saved place just now. Check its status before trying again.' }
   finally { busy.value=false }
 }
 
@@ -451,7 +451,7 @@ async function reservePlace() {
     paymentPanel.value?.scrollIntoView({behavior:scrollBehavior(),block:'start'})
     paymentPanel.value?.focus({preventScroll:true})
   } catch (cause) {
-    error.value = cause.message
+    error.value = 'We couldn’t confirm your place reservation. Your details are saved in this browser. Restore your saved place to check its status before trying again.'
     if (sessionStorage.getItem(DRAFT_KEY)) {
       restoreFailed.value = true
       notice.value = 'Your reservation may have been created. Reconnect to check its status before starting another registration.'
@@ -493,7 +493,7 @@ async function submitReceipt() {
     if (!upload.ok) throw new Error('The receipt upload failed. Please try choosing the file again.')
     const result=await callPublic('finalize',submission)
     await finishRegistration(result)
-  } catch (cause) { error.value = cause.message }
+  } catch { error.value = 'We couldn’t confirm that your receipt was submitted. Check your registration status before trying again.' }
   finally { busy.value = false }
 }
 
@@ -535,7 +535,7 @@ async function cancelHold() {
       }
     }
     await loadPublic()
-  } catch(cause) { error.value=cause.message }
+  } catch { error.value='We couldn’t release this place just now. Check your registration status before trying again.' }
   finally { busy.value=false }
 }
 </script>
