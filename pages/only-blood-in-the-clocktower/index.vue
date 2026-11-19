@@ -13,13 +13,13 @@
         </div>
         <div class="next-copy">
           <p class="eyebrow">Next Clocktower gathering</p>
-          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
+          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError || archiveError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
           <p v-if="nextGathering?.time">{{ nextGathering.time }}</p>
           <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions ↗</a></p>
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
-          <p v-else-if="eventError">We couldn’t load the schedule just now.</p>
+          <p v-else-if="eventError || archiveError">We couldn’t confirm the schedule just now.</p>
           <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
-          <UButton v-if="eventError" class="retry-button" type="button" @click="loadCommunityEvents">Try again</UButton>
+          <UButton v-if="(eventError || archiveError) && !nextGathering" class="retry-button" type="button" @click="retryGatheringSources">Try again</UButton>
         </div>
         <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
         <template v-else-if="!eventLoading">
@@ -63,6 +63,7 @@ const config = useRuntimeConfig()
 const route = useRoute()
 
 const sessions = ref([])
+const archiveError = ref(false)
 const eventLoading = ref(true)
 const eventError = ref(false)
 const communityEvents = ref([])
@@ -140,6 +141,7 @@ function hasResults(session) {
 }
 
 async function loadArchive() {
+  archiveError.value = false
   try {
     const response = await fetch(config.public.supabaseUrl + '/functions/v1/botc-archive', {
       method: 'POST', headers, body: JSON.stringify({ action: 'public' }),
@@ -147,7 +149,13 @@ async function loadArchive() {
     const body = await response.json()
     if (!response.ok) throw new Error(body.error)
     sessions.value = body.sessions || []
-  } catch {}
+  } catch {
+    archiveError.value = true
+  }
+}
+
+async function retryGatheringSources() {
+  await Promise.all([loadArchive(), loadCommunityEvents()])
 }
 
 async function loadCommunityEvents() {

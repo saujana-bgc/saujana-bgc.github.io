@@ -38,6 +38,7 @@
           <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
           <p v-else-if="gatheringStatus === 'unavailable'">We can’t reach the calendar just now.</p>
           <p v-else>We haven’t announced the next gathering yet. Have a question? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
+          <UButton v-if="gatheringStatus === 'unavailable'" type="button" variant="outline" color="neutral" @click="loadNextGathering">Try again</UButton>
           <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Browse gatherings <span aria-hidden="true">→</span></NuxtLink>
         </div>
       </section>
@@ -142,7 +143,8 @@ const nextGathering = ref(null)
 const gatheringStatus = ref('loading')
 const nextGatheringDateStamp = computed(() => nextGathering.value ? formatGatheringDateStamp(nextGathering.value.date) : null)
 
-onMounted(async () => {
+async function loadNextGathering() {
+  gatheringStatus.value = 'loading'
   try {
     const { data, error } = await useSupabase()
       .from('events')
@@ -162,6 +164,10 @@ onMounted(async () => {
   } catch {
     gatheringStatus.value = 'unavailable'
   }
+}
+
+onMounted(async () => {
+  await loadNextGathering()
 })
 
 function formatGatheringDateStamp(dateValue) {

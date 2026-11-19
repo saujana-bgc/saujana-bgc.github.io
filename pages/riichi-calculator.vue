@@ -1,6 +1,7 @@
 <template>
   <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1) }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
     <header class="page-intro calculator-heading">
+      <NuxtLink class="activity-parent-link" to="/riichi-mahjong/" no-prefetch>Riichi Mahjong</NuxtLink>
       <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi Calculator</h1>
       <p class="calculator-description">Check a Japanese mahjong hand or enter han and fu to calculate ron and tsumo payments.</p>

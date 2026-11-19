@@ -1,18 +1,10 @@
 <template>
   <main style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="page-intro collection-intro fade-up">
+      <NuxtLink class="activity-parent-link" to="/board-games/" no-prefetch>Board Games</NuxtLink>
       <p class="page-eyebrow">Board Games</p>
       <h1 class="hero-title">Collection</h1>
     </header>
-
-      <section class="collection-first-pick fade-up" aria-labelledby="first-pick-title">
-        <div>
-          <p class="eyebrow">An easy place to start</p>
-          <h2 id="first-pick-title">Try a round of Just One</h2>
-          <p>Give one-word clues, then see if your team thinks alike. It’s a gentle way into the collection.</p>
-        </div>
-        <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
-      </section>
 
       <div class="collection-search fade-up">
         <UInput
@@ -44,6 +36,15 @@
           </div>
         </div>
       </details>
+
+      <section class="collection-first-pick fade-up" aria-labelledby="first-pick-title">
+        <div>
+          <p class="eyebrow">An easy place to start</p>
+          <h2 id="first-pick-title">Try a round of Just One</h2>
+          <p>Give one-word clues, then see if your team thinks alike. It’s a gentle way into the collection.</p>
+        </div>
+        <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
+      </section>
 
       <div v-if="isError" class="page-hint" role="alert">We couldn’t load play history. <UButton type="button" @click="reloadPlayHistory">Try again</UButton></div>
 
@@ -642,9 +643,9 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 /* Keep keyboard and visual order aligned on the collection page. */
 main:has(.collection-search) { gap: 10px; }
 main:has(.collection-search) > .collection-search { margin-bottom: 0; }
-main:has(.collection-search) > .collection-first-pick { order: 1; width: min(100% - 40px, 1160px); }
+main:has(.collection-search) > .collection-first-pick { order: 2; width: min(100% - 40px, 1160px); }
 main:has(.collection-search) > .collection-search { order: 0; }
-main:has(.collection-search) > .sort-controls { order: 2; }
+main:has(.collection-search) > .sort-controls { order: 1; }
 main:has(.collection-search) > .editorial-grid { order: 3; }
 main:has(.collection-search) > .collection-updated { order: 4; width: min(100% - 40px, 1160px); }
 main:has(.collection-search) > .sort-controls { width: min(100% - 40px, 1160px); margin: 0 auto 8px; }

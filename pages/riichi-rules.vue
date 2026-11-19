@@ -1,6 +1,7 @@
 <template>
   <main class="rules-page">
     <header class="page-intro rules-intro">
+      <NuxtLink class="activity-parent-link" to="/riichi-mahjong/" no-prefetch>Riichi Mahjong</NuxtLink>
       <p class="page-eyebrow">Riichi Mahjong</p>
       <h1 class="hero-title">Riichi Rules</h1>
       <p class="rules-deck">Table settings for four-player riichi and three-player sanma at Saujana, with rules for the Riichi Open tournament series.</p>
