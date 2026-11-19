@@ -10,6 +10,10 @@ Keep game titles, published descriptions, event details, league rules and consen
 
 Prefer an invitation over an instruction where it stays clear. For example, “Come watch a hand and ask us how it works” can welcome a new player, while “Save your place” only fits when the action really reserves a place. Say “You’re on the sign-up list” for a saved gathering sign-up. Reserve “Your place is confirmed” for confirmed tournament entries. A quiet playful line belongs in an introduction, while a form label, payment term or rule should be precise.
 
+## Responsive text
+
+Let ordinary copy and short callouts use the space their container provides. Give long articles and guides an intentional reading width. Use balanced wrapping for short headings where it helps. Reserve forced breaks and no-wrap styles for cases where the content needs them. Follow the [responsive text wrapping plan](docs/responsive-text-wrapping-plan.md) when changing layouts or adding pages.
+
 ## Search indexing
 
 Keep admin pages out of search. Serve every `/admin` page with a `noindex, nofollow, noarchive` robots meta tag in the generated HTML and exclude it from the public sitemap. Keep these routes crawlable so search engines can read the `noindex` tag. Cover new admin routes in `scripts/verify-seo.mts`.

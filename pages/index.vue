@@ -542,7 +542,7 @@ const expectations = [
 }
 
 .respect-note h3 { margin: 0; color: var(--matcha-leaf); font: 400 1.25rem/1.3 var(--font-display); }
-.respect-note p { margin: 0; max-width: 60rem; color: var(--muted); font-size: .9rem; line-height: 1.65; text-wrap: pretty; }
+.respect-note p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.65; }
 .respect-note a { color: var(--matcha-leaf); text-underline-offset: .18em; }
 
 @media (min-width: 901px) {
