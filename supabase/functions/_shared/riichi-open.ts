@@ -57,7 +57,12 @@ export async function adminUser(request: Request, client: SupabaseClient): Promi
   const token = authorization.replace(/^Bearer\s+/i, '')
   if (!token) throw new Error('Sign in to continue.')
   const { data, error } = await client.auth.getUser(token)
-  if (error || !data.user || data.user.app_metadata?.role !== 'birthday_admin') throw new Error('You do not have organiser access.')
+  let assuranceLevel = ''
+  try {
+    const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    assuranceLevel = JSON.parse(atob(payload.padEnd(Math.ceil(payload.length / 4) * 4, '='))).aal
+  } catch { /* Invalid tokens are rejected by getUser below. */ }
+  if (error || !data.user || data.user.app_metadata?.role !== 'birthday_admin' || assuranceLevel !== 'aal2') throw new Error('Sign in with your authenticator to continue.')
   return data.user
 }
 

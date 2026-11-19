@@ -1,8 +1,8 @@
 <template>
   <main class="admin-root">
-    <section v-if="isRestoring || !isAuthenticated" class="admin-login-wrap">
+    <section v-if="isRestoring || !isAuthenticated || mfaRequired" class="admin-login-wrap">
       <div class="admin-login-intro"><NuxtLink to="/" class="admin-brand" aria-label="Saujana Board Game Community home"><img class="admin-brand-mark brand-mark" src="/images/saujana-brand.webp" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>Board Game Community</small></span></NuxtLink><p class="eyebrow">Saujana organisers</p><h1>Organiser dashboard</h1><p>Sign in to manage community birthdays, Clocktower recaps and Riichi Open.</p></div>
-      <form class="admin-login-card" @submit.prevent="submitLogin">
+      <form v-if="!mfaRequired" class="admin-login-card" @submit.prevent="submitLogin">
         <label>Username<UInput v-model="username" class="admin-login-input" autocomplete="username" required /></label>
         <label>Password<UInput v-model="password" class="admin-login-input" type="password" autocomplete="current-password" required /></label>
         <label class="remember"><UCheckbox v-model="remember" /> Remember me on this device</label>
@@ -10,6 +10,15 @@
         <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</UButton>
         <p class="admin-help">Use your organiser username and password.</p>
+      </form>
+      <form v-else class="admin-login-card" @submit.prevent="submitMfa">
+        <h2>Verify your authenticator</h2>
+        <p v-if="mfaQrCode" class="admin-help">Scan this code with your authenticator app, then enter its six-digit code.</p>
+        <img v-if="mfaQrCode" class="admin-mfa-qr" :src="mfaQrCode" alt="Authenticator setup QR code">
+        <label>Six-digit code<UInput v-model="mfaCode" class="admin-login-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
+        <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
+        <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Verifying…' : 'Verify and sign in' }}</UButton>
+        <UButton color="neutral" variant="outline" type="button" :disabled="busy" @click="cancelMfa">Cancel sign in</UButton>
       </form>
     </section>
     <template v-else>
@@ -36,12 +45,13 @@ import { adminNavigation } from '~/utils/adminNavigation.js'
 
 useHead({ title: 'Organiser Dashboard | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
 const auth = useAdminAuth()
-const { isRestoring, isAuthenticated } = auth
+const { isRestoring, isAuthenticated, mfaRequired, mfaQrCode } = auth
 const route = useRoute()
 const router = useRouter()
 const username = ref('admin')
 const password = ref('')
 const remember = ref(false)
+const mfaCode = ref('')
 const error = ref('')
 const busy = ref(false)
 let restoreWatchdog
@@ -68,10 +78,38 @@ async function submitLogin() {
       return
     }
     password.value = ''
-    const next = route.path.startsWith('/admin') ? route.fullPath : '/admin'
-    await router.replace(next.startsWith('/admin') && !next.startsWith('//') ? next : '/admin')
+    if (auth.mfaRequired.value) return
+    await finishLogin()
   } catch { error.value = 'Sign-in is unavailable right now. Please try again.' }
   finally { busy.value = false }
+}
+
+async function submitMfa() {
+  busy.value = true
+  error.value = ''
+  try {
+    if (!await auth.verifyMfa(mfaCode.value)) {
+      error.value = 'That code could not be verified. Check the code and try again.'
+      return
+    }
+    mfaCode.value = ''
+    await finishLogin()
+  } catch {
+    error.value = 'Authenticator verification is unavailable right now. Please try again.'
+  } finally {
+    busy.value = false
+  }
+}
+
+async function finishLogin() {
+  const next = route.path.startsWith('/admin') ? route.fullPath : '/admin'
+  await router.replace(next.startsWith('/admin') && !next.startsWith('//') ? next : '/admin')
+}
+
+function cancelMfa() {
+  auth.cancelMfa()
+  mfaCode.value = ''
+  error.value = ''
 }
 
 async function signOut() { await auth.logout(); password.value = '' }
@@ -79,6 +117,7 @@ async function signOut() { await auth.logout(); password.value = '' }
 
 <style>
 .admin-root{min-height:70vh;width:min(1240px,94%);margin:0 auto;padding:28px 0 64px;color:var(--clay-text)}
+.admin-mfa-qr{width:220px;height:220px;justify-self:center;background:white;padding:10px}
 .admin-login-wrap{min-height:65vh;display:grid;grid-template-columns:1fr minmax(300px,450px);align-items:center;gap:clamp(28px,8vw,110px)}
 .admin-login-intro h1,.admin-page h1{font:400 clamp(2.5rem,6vw,4.3rem)/1.05 var(--font-display);color:var(--matcha-leaf);margin:0}.admin-login-intro h1 em{color:var(--gold-leaf)}
 .admin-login-intro>p:last-child{max-width:420px;color:var(--muted);line-height:1.7}
