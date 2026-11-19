@@ -188,6 +188,16 @@ button:disabled { cursor: not-allowed; }
 .action-status--success { background: var(--status-success-bg); color: var(--status-success-ink); }
 .action-status--error { background: var(--status-error-bg); color: var(--status-error-ink); }
 .action-status--pending { background: var(--surface-soft); color: var(--muted); }
+.action-status :is(button, a.action-status-action),
+.action-status-action {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--white-pure);
+  color: var(--matcha-leaf);
+  font: 600 .875rem/1.3 var(--font-body);
+}
+.action-status--error :is(button, a.action-status-action):hover { border-color: var(--matcha-leaf); background: var(--surface-soft); }
 .site-shell, .page-content { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .site-shell { min-height: 100vh; }
 .page-content { outline: none; padding-top: var(--page-top-inset); }

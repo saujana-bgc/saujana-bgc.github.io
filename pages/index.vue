@@ -38,7 +38,7 @@
           <p v-if="gatheringStatus === 'loading'">Checking the calendar…</p>
           <p v-else-if="gatheringStatus === 'unavailable'">We couldn’t load the calendar just now.</p>
           <p v-else>We haven’t announced the next gathering yet. Have a question? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
-          <UButton v-if="gatheringStatus === 'unavailable'" type="button" variant="outline" color="neutral" @click="loadNextGathering">Try again</UButton>
+          <UButton v-if="gatheringStatus === 'unavailable'" type="button" class="action-status-action" variant="outline" color="neutral" @click="loadNextGathering">Try again</UButton>
           <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
         </div>
       </section>
@@ -564,12 +564,15 @@ const expectations = [
 
 @media (max-width: 600px) {
   .home { --page-gutter: 16px; }
-  .hero-section { padding-top: 12px; padding-bottom: 4px; border-bottom: 0; }
+  .hero-section { gap: 12px; padding-top: 8px; padding-bottom: 4px; border-bottom: 0; }
+  .hero-copy h1 { font-size: clamp(2.1rem, 9vw, 2.65rem); line-height: 1.08; }
+  .hero-copy p { margin-top: 12px; line-height: 1.55; }
+  .hero-actions { gap: 6px 16px; margin-top: 16px; }
   .hero-copy,
   .hero-copy h1 { min-width: 0; max-width: 100%; }
   .first-visit-layout { grid-template-areas: "copy" "photo" "steps"; grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .care-guide { grid-template-columns: minmax(0, 1fr); }
-  .next-gathering { grid-template-columns: 54px minmax(0, 1fr); align-items: start; gap: 8px 12px; margin-top: 8px; padding: 14px; }
+  .next-gathering { grid-template-columns: 54px minmax(0, 1fr); align-items: start; gap: 8px 12px; margin-top: 0; padding: 12px; }
   .next-gathering-empty { align-items: flex-start; flex-direction: column; gap: 6px; }
   .next-gathering-date { width: 50px; min-height: 54px; grid-row: 1; }
   .next-gathering-copy { grid-column: 2; grid-row: 1; }

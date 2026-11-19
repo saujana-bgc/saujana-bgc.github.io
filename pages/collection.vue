@@ -45,7 +45,7 @@
         <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
       </section>
 
-      <div v-if="isError" class="page-hint action-status action-status--error" role="alert">We couldn’t load play history. Your search and filters are still here. <UButton type="button" @click="retry">Try again</UButton></div>
+      <div v-if="isError" class="page-hint collection-feedback action-status action-status--error" role="alert">We couldn’t load play history. Your search and filters are still here. <UButton type="button" variant="outline" color="neutral" @click="retry">Try again</UButton></div>
 
       <div ref="gridRef" class="editorial-grid">
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>
@@ -643,8 +643,9 @@ main:has(.collection-search) > .collection-search { order: 0; }
 main:has(.collection-search) > .sort-controls { order: 1; }
 main:has(.collection-search) > .editorial-grid { order: 3; }
 main:has(.collection-search) > .collection-updated { order: 4; width: min(100% - 40px, 1160px); }
-main:has(.collection-search) > .sort-controls { width: min(100% - 40px, 1160px); margin: 0 auto 8px; }
+main:has(.collection-search) > .sort-controls { width: min(100% - 40px, 1160px); max-width: 1160px; margin: 0 auto 8px; }
 .collection-search { flex-direction: column; align-items: stretch; gap: 7px; }
+.collection-feedback { width: min(1160px, calc(100% - 40px)); margin: 0 auto 8px; }
 .collection-search {
   width: min(1160px, calc(100% - 40px));
   display: grid;
@@ -668,7 +669,7 @@ main:has(.collection-search) > .sort-controls { width: min(100% - 40px, 1160px);
   .collection-search { align-items: center; grid-template-columns: 1fr; }
   .collection-search-input { grid-column: 1; }
   .collection-search-meta { width: 100%; }
-  .collection-first-pick { width: 90%; align-items: flex-start; flex-direction: column; gap: 12px; }
+  .collection-first-pick { width: min(100% - 40px, 1160px); align-items: flex-start; flex-direction: column; gap: 12px; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-category-options { gap: 6px; flex-wrap: wrap; padding: 2px 0 8px; }
