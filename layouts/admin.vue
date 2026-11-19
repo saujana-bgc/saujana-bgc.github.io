@@ -13,8 +13,12 @@
       </form>
       <form v-else class="admin-login-card" @submit.prevent="submitMfa">
         <h2>Verify your authenticator</h2>
-        <p v-if="mfaQrCode" class="admin-help">Scan this code with your authenticator app, then enter its six-digit code.</p>
+        <p v-if="mfaQrCode" class="admin-help">Scan this QR code with your authenticator app, then enter the six-digit code it gives you.</p>
         <img v-if="mfaQrCode" class="admin-mfa-qr" :src="mfaQrCode" alt="Authenticator setup QR code">
+        <details v-if="mfaSecret" class="admin-help">
+          <summary>Enter the setup key manually</summary>
+          <code class="admin-mfa-key">{{ mfaSecret }}</code>
+        </details>
         <label>Six-digit code<UInput v-model="mfaCode" class="admin-login-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
         <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Verifying…' : 'Verify and sign in' }}</UButton>
@@ -45,7 +49,7 @@ import { adminNavigation } from '~/utils/adminNavigation.js'
 
 useHead({ title: 'Organiser Dashboard | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
 const auth = useAdminAuth()
-const { isRestoring, isAuthenticated, mfaRequired, mfaQrCode } = auth
+const { isRestoring, isAuthenticated, mfaRequired, mfaQrCode, mfaSecret } = auth
 const route = useRoute()
 const router = useRouter()
 const username = ref('admin')
@@ -78,8 +82,6 @@ async function submitLogin() {
       return
     }
     password.value = ''
-    if (auth.mfaRequired.value) return
-    await finishLogin()
   } catch { error.value = 'Sign-in is unavailable right now. Please try again.' }
   finally { busy.value = false }
 }
@@ -106,10 +108,12 @@ async function finishLogin() {
   await router.replace(next.startsWith('/admin') && !next.startsWith('//') ? next : '/admin')
 }
 
-function cancelMfa() {
-  auth.cancelMfa()
+async function cancelMfa() {
+  busy.value = true
   mfaCode.value = ''
   error.value = ''
+  try { await auth.logout('local') }
+  finally { busy.value = false }
 }
 
 async function signOut() { await auth.logout(); password.value = '' }
@@ -118,6 +122,7 @@ async function signOut() { await auth.logout(); password.value = '' }
 <style>
 .admin-root{min-height:70vh;width:min(1240px,94%);margin:0 auto;padding:28px 0 64px;color:var(--clay-text)}
 .admin-mfa-qr{width:220px;height:220px;justify-self:center;background:white;padding:10px}
+.admin-mfa-key{overflow-wrap:anywhere;user-select:all}
 .admin-login-wrap{min-height:65vh;display:grid;grid-template-columns:1fr minmax(300px,450px);align-items:center;gap:clamp(28px,8vw,110px)}
 .admin-login-intro h1,.admin-page h1{font:400 clamp(2.5rem,6vw,4.3rem)/1.05 var(--font-display);color:var(--matcha-leaf);margin:0}.admin-login-intro h1 em{color:var(--gold-leaf)}
 .admin-login-intro>p:last-child{max-width:420px;color:var(--muted);line-height:1.7}

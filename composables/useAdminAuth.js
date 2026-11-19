@@ -11,12 +11,11 @@ export function useAdminAuth() {
   const session = useState('saujana-admin-session', () => null)
   const storageType = useState('saujana-admin-storage-type', () => null)
   const isRestoring = useState('saujana-admin-restoring', () => true)
-  const mfaRequired = useState('saujana-admin-mfa-required', () => false)
-  const mfaQrCode = useState('saujana-admin-mfa-qr-code', () => '')
-  const mfaFactorId = useState('saujana-admin-mfa-factor-id', () => '')
-  const mfaChallengeId = useState('saujana-admin-mfa-challenge-id', () => '')
-  const rememberAfterMfa = useState('saujana-admin-remember-after-mfa', () => false)
-  const isAuthenticated = computed(() => Boolean(session.value?.access_token))
+  const pendingMfa = useState('saujana-admin-pending-mfa', () => null)
+  const mfaRequired = computed(() => Boolean(pendingMfa.value))
+  const mfaQrCode = computed(() => pendingMfa.value?.qrCode ?? '')
+  const mfaSecret = computed(() => pendingMfa.value?.secret ?? '')
+  const isAuthenticated = computed(() => isMfaSession(session.value))
 
   function getStorage(type) {
     if (!import.meta.client) return null
@@ -84,8 +83,7 @@ export function useAdminAuth() {
   }
 
   async function validateSession(candidate) {
-    if (!candidate?.access_token) return false
-    if (jwtClaims(candidate.access_token)?.aal !== 'aal2') return false
+    if (!isMfaSession(candidate)) return false
     const response = await authRequest('user', {
       headers: { Authorization: `Bearer ${candidate.access_token}` },
     })
@@ -103,6 +101,10 @@ export function useAdminAuth() {
     }
   }
 
+  function isMfaSession(candidate) {
+    return Boolean(candidate?.access_token && jwtClaims(candidate.access_token)?.aal === 'aal2')
+  }
+
   async function mfaRequest(path, accessToken, options = {}) {
     return authRequest(`factors${path}`, {
       ...options,
@@ -110,64 +112,64 @@ export function useAdminAuth() {
     })
   }
 
-  async function prepareMfa(nextSession, rememberMe) {
-    const response = await mfaRequest('', nextSession.access_token)
+  async function prepareMfa(accessToken, rememberMe, revision) {
+    // Supabase Auth lists authenticators on the user profile.
+    const response = await authRequest('user', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
     if (!response.ok) throw new Error('Authenticator setup is unavailable. Please try again.')
-    const factorList = await response.json()
-    const verifiedFactor = (factorList.totp ?? []).find(factor => factor.status === 'verified')
-    let factor = verifiedFactor
+    const user = await response.json()
+    if (revision !== authRevision || user.app_metadata?.role !== REQUIRED_ROLE) return false
+
+    let factor = user.factors?.find(factor => factor.factor_type === 'totp' && factor.status === 'verified')
+    let qrCode = ''
+    let secret = ''
 
     if (!factor) {
-      const enrollResponse = await mfaRequest('', nextSession.access_token, {
+      const enrollResponse = await mfaRequest('', accessToken, {
         method: 'POST',
-        body: JSON.stringify({ factor_type: 'totp', friendly_name: 'Saujana organiser' }),
+        body: JSON.stringify({ factor_type: 'totp' }),
       })
       if (!enrollResponse.ok) throw new Error('Could not set up an authenticator. Please try again.')
       factor = await enrollResponse.json()
-      mfaQrCode.value = factor.totp?.qr_code ?? ''
-    } else {
-      mfaQrCode.value = ''
+      const svg = factor.totp?.qr_code
+      qrCode = svg ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}` : ''
+      secret = factor.totp?.secret ?? ''
+      if (!qrCode && !secret) throw new Error('Authenticator setup information is unavailable. Please try again.')
     }
 
-    const challengeResponse = await mfaRequest(`/${factor.id}/challenge`, nextSession.access_token, { method: 'POST' })
-    if (!challengeResponse.ok) throw new Error('Could not start authenticator verification. Please try again.')
-    const challenge = await challengeResponse.json()
-    session.value = nextSession
-    mfaFactorId.value = factor.id
-    mfaChallengeId.value = challenge.id
-    rememberAfterMfa.value = rememberMe
-    mfaRequired.value = true
+    if (revision !== authRevision || !factor.id) return false
+    pendingMfa.value = { accessToken, factorId: factor.id, rememberMe, qrCode, secret }
     isRestoring.value = false
-  }
-
-  async function verifyMfa(code) {
-    const pendingSession = session.value
-    if (!pendingSession?.access_token || !mfaFactorId.value || !mfaChallengeId.value) return false
-    const response = await mfaRequest(`/${mfaFactorId.value}/verify`, pendingSession.access_token, {
-      method: 'POST',
-      body: JSON.stringify({ challenge_id: mfaChallengeId.value, code: code.trim() }),
-    })
-    if (!response.ok) return false
-    const verifiedSession = await response.json()
-    if (jwtClaims(verifiedSession.access_token)?.aal !== 'aal2' || verifiedSession.user?.app_metadata?.role !== REQUIRED_ROLE) return false
-    saveSession(verifiedSession, rememberAfterMfa.value ? 'local' : 'session')
-    mfaRequired.value = false
-    mfaFactorId.value = ''
-    mfaChallengeId.value = ''
-    mfaQrCode.value = ''
     return true
   }
 
-  async function cancelMfa() {
-    await logout()
-    mfaRequired.value = false
-    mfaFactorId.value = ''
-    mfaChallengeId.value = ''
-    mfaQrCode.value = ''
+  async function verifyMfa(code) {
+    const pending = pendingMfa.value
+    if (!pending || !/^[0-9]{6}$/.test(code.trim())) return false
+    const factorPath = `/${pending.factorId}`
+    const challengeResponse = await mfaRequest(`${factorPath}/challenge`, pending.accessToken, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    })
+    if (!challengeResponse.ok) throw new Error('Could not start authenticator verification. Please try again.')
+    const challenge = await challengeResponse.json()
+    if (pending !== pendingMfa.value) return false
+
+    const response = await mfaRequest(`${factorPath}/verify`, pending.accessToken, {
+      method: 'POST',
+      body: JSON.stringify({ challenge_id: challenge.id, code: code.trim() }),
+    })
+    if (!response.ok) return false
+    const verifiedSession = await response.json()
+    if (pending !== pendingMfa.value || !isMfaSession(verifiedSession) || verifiedSession.user?.app_metadata?.role !== REQUIRED_ROLE) return false
+    saveSession(verifiedSession, pending.rememberMe ? 'local' : 'session')
+    pendingMfa.value = null
+    return true
   }
 
   async function refreshSession() {
-    if (!session.value?.refresh_token) return false
+    if (!isAuthenticated.value || !session.value.refresh_token) return false
     if (sharedRefreshPromise) return sharedRefreshPromise
     const revision = authRevision
     sharedRefreshPromise = (async () => {
@@ -184,7 +186,7 @@ export function useAdminAuth() {
         return false
       }
       const nextSession = await response.json()
-      if (nextSession.user?.app_metadata?.role !== REQUIRED_ROLE || jwtClaims(nextSession.access_token)?.aal !== 'aal2') {
+      if (nextSession.user?.app_metadata?.role !== REQUIRED_ROLE || !isMfaSession(nextSession)) {
         if (revision === authRevision) {
           clearStoredSessions()
           session.value = null
@@ -213,7 +215,10 @@ export function useAdminAuth() {
         }
       }
       const stored = loadStoredSession()
-      if (!stored?.session?.access_token) return false
+      if (!isMfaSession(stored?.session)) {
+        if (stored) clearStoredSessions()
+        return false
+      }
       let candidate = stored.session
       const expiresSoon = Number(candidate.expires_at ?? 0) <= Math.floor(Date.now() / 1000) + 30
       if (expiresSoon) {
@@ -227,7 +232,7 @@ export function useAdminAuth() {
           return false
         }
         candidate = await response.json()
-        if (candidate.user?.app_metadata?.role !== REQUIRED_ROLE) {
+        if (candidate.user?.app_metadata?.role !== REQUIRED_ROLE || !isMfaSession(candidate)) {
           clearStoredSessions()
           return false
         }
@@ -272,7 +277,7 @@ export function useAdminAuth() {
     isRestoring.value = false
   }
 
-  async function login(username, password, rememberMe = true) {
+  async function login(username, password, rememberMe = false) {
     if (username.trim().toLowerCase() !== 'admin') return false
     const revision = ++authRevision
     const response = await authRequest('token?grant_type=password', {
@@ -283,26 +288,26 @@ export function useAdminAuth() {
     const nextSession = await response.json()
     if (nextSession.user?.app_metadata?.role !== REQUIRED_ROLE) return false
     if (revision !== authRevision) return false
-    await prepareMfa(nextSession, rememberMe)
-    return true
+    return prepareMfa(nextSession.access_token, rememberMe, revision)
   }
 
-  async function logout() {
+  async function logout(scope = 'global') {
     authRevision += 1
-    const token = session.value?.access_token
-    if (token) {
-      try {
-        await authRequest('logout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
-      } catch { /* Local sign-out must still complete when the network is unavailable. */ }
-    }
-    clearStoredSessions()
+    const token = session.value?.access_token ?? pendingMfa.value?.accessToken
+    pendingMfa.value = null
     session.value = null
     storageType.value = null
+    clearStoredSessions()
+    if (token) {
+      try {
+        await authRequest(`logout?scope=${scope}`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
+      } catch { /* Local sign-out must still complete when the network is unavailable. */ }
+    }
     if (import.meta.client) window.dispatchEvent(new CustomEvent('saujana-admin-logout'))
   }
 
   async function authenticatedFetch(path, options = {}) {
-    if (!session.value?.access_token) throw new Error('Not authenticated')
+    if (!isAuthenticated.value) throw new Error('Not authenticated')
     const request = (accessToken) => fetch(path, {
       ...options,
       headers: { ...options.headers, Authorization: `Bearer ${accessToken}` },
@@ -343,9 +348,9 @@ export function useAdminAuth() {
   if (import.meta.client && !window.__saujanaAdminStorageListener) {
     window.__saujanaAdminStorageListener = true
     window.addEventListener('storage', (event) => {
-      if (![STORAGE_KEY, LEGACY_STORAGE_KEY].includes(event.key)) return
+      if (pendingMfa.value || ![STORAGE_KEY, LEGACY_STORAGE_KEY].includes(event.key)) return
       const stored = loadStoredSession()
-      if (stored?.session?.access_token) {
+      if (isMfaSession(stored?.session)) {
         authRevision += 1
         session.value = stored.session
         storageType.value = stored.type
@@ -360,5 +365,5 @@ export function useAdminAuth() {
     })
   }
 
-  return { session, isAuthenticated, isRestoring, mfaRequired, mfaQrCode, login, verifyMfa, cancelMfa, logout, restoreSession, cancelRestore, refreshSession, authenticatedFetch }
+  return { session, isAuthenticated, isRestoring, mfaRequired, mfaQrCode, mfaSecret, login, verifyMfa, logout, restoreSession, cancelRestore, refreshSession, authenticatedFetch }
 }
