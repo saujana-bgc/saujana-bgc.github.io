@@ -27,7 +27,7 @@
 </template>
 
 <style scoped>
-.activity-page { width: min(100% - 40px, 960px); margin: 0 auto; }
+.activity-page { width: min(100% - 40px, var(--content-stack)); margin: 0 auto; }
 .activity-page .page-intro { padding-inline: 0; }
 .activity-page .stats-container { max-width: 580px; }
 .activity-primary { display: inline-flex; min-height: 48px; align-items: center; gap: 18px; margin: 22px auto 0; padding: 0 22px; border-radius: 6px; background: var(--matcha-leaf); color: white; font-weight: 650; text-decoration: none; }

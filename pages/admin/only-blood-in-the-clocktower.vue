@@ -4,7 +4,7 @@
       <div><p class="eyebrow">The Storyteller’s Desk</p><h1>Clocktower organiser</h1><p>Log games, write the recap and prepare the next gathering.</p></div>
       <UButton class="admin-primary" type="button" :disabled="busy" @click="startNew">New gathering</UButton>
     </header>
-    <p v-if="error" class="message error" role="alert">{{ error }}</p>
+    <p v-if="error" class="message error action-status action-status--error" role="alert">{{ error }}</p>
 
     <details v-if="saved.length" ref="savedPicker" class="saved-picker" :open="!draft.id && !isDirty">
       <summary><span>Open a saved gathering</span><span class="saved-count">{{ saved.length }}</span></summary>
@@ -172,7 +172,7 @@
           <UButton class="admin-primary" type="button" :disabled="busy" @click="save(false)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save draft' }}</UButton>
           <UButton class="publish-button" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Publish gathering' }}</UButton>
         </template>
-        <p v-if="notice" class="message" role="status">{{ notice }}</p>
+        <p v-if="notice" class="message action-status action-status--success" role="status">{{ notice }}</p>
       </div>
     </form>
 
@@ -485,12 +485,16 @@ function edit(session) {
   nextTick(() => {
     if (savedPicker.value) savedPicker.value.open = false
     editorTitle.value?.focus({ preventScroll: true })
-    editorForm.value?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    editorForm.value?.scrollIntoView({ block: 'start', behavior: scrollBehavior() })
   })
 }
 
 function confirmDiscard() {
   return !isDirty.value || window.confirm('Discard your unsaved changes and switch gatherings?')
+}
+
+function scrollBehavior() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
 }
 
 function startNew() {
@@ -500,7 +504,7 @@ function startNew() {
   nextTick(() => {
     if (savedPicker.value) savedPicker.value.open = false
     editorTitle.value?.focus({ preventScroll: true })
-    editorForm.value?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    editorForm.value?.scrollIntoView({ block: 'start', behavior: scrollBehavior() })
   })
 }
 

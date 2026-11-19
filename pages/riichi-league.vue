@@ -16,7 +16,7 @@
       <div v-else-if="isLoadingLeague" class="league-shortcuts-placeholder" aria-hidden="true"></div>
     </header>
 
-    <p v-if="leagueLoadError" class="league-load-error" role="alert">{{ leagueLoadError }} <UButton type="button" @click="loadLeagueFromSupabase">Try again</UButton></p>
+    <p v-if="leagueLoadError" class="league-load-error action-status action-status--error" role="alert">{{ leagueLoadError }} <UButton type="button" @click="loadLeagueFromSupabase">Try again</UButton></p>
     <p v-if="isLoadingLeague && !selectedSeason" role="status">Loading the latest league results…</p>
     <p v-else-if="!isLoadingLeague && !selectedSeason && !leagueLoadError" role="status">There are no league seasons to show yet.</p>
 
@@ -622,7 +622,7 @@ function editTable(table) {
   scoreEntryMessage.value = ''
   nextTick(() => {
     document.getElementById('score-entry-heading')?.focus()
-    document.getElementById('score-entry')?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    document.getElementById('score-entry')?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
   })
 }
 

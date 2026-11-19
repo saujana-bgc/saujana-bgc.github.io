@@ -25,12 +25,13 @@ Keep loading and error messages near the content they describe. Reserve enough s
 
 Prefer static placeholders and brief interaction feedback. Audit shimmer, content reveals and explicit smooth scrolling in Gatherings, Play History and Riichi Open. Respect the system reduced motion setting in both CSS and JavaScript. Keep important changes, such as a deadline expiring, visible in text without announcing every timer tick.
 
-## First pass applied — 19 November 2026
+## Rollout applied — 19 November 2026
 
-- Added shared page, wide, reading and card-stack widths, page gutters, section spacing and success/error status colours. Home, the shared footer, the organiser shell, Gatherings and Birthday Club now use those tokens.
-- Home, Gatherings and Birthday Club share the same success panel treatment. Birthday Club errors use the same clear left-aligned error panel. Button sizing and corners follow the shared control scale.
-- Fixed the home page’s empty calendar message on phones so its text and link can use the full card width.
-- Generated the static site and checked all 20 routes plus the custom 404 at seven viewport widths. The responsive and SEO checks passed. Later page groups in this plan still need their rollout pass.
+- Added shared page, wide, reading and card-stack widths, page gutters, section spacing and success, pending and error status styles. Applied them across Home, Gatherings, Birthday Club, browsing pages, play and registration flows, game guides, event pages and organiser modules.
+- Standardised status panels, control corners, Collection filters and cards, and several loading, empty and retry states while retaining compact, domain-specific scoring controls.
+- Fixed Home’s empty calendar message on phones so its text and link can use the full card width.
+- Made explicit smooth-scroll actions follow the reduced-motion preference. The shared CSS also disables smooth page scrolling and reduces animation and transition duration for visitors who request reduced motion.
+- Added the shared visual rules to `CODEX.md` so future pages use the same layout, wrapping, action, focus and status patterns.
 
 ## 3. Roll out by task
 
@@ -45,3 +46,9 @@ Prefer static placeholders and brief interaction feedback. Audit shimmer, conten
 - Use local or staging data to walk successful and failed sign-up, receipt review and recovery. A visitor should be able to tell what happened, what remains and where to go next without refreshing or submitting again to find out.
 - Invite interested visitors, including people with lived experience of OCD, to try finding the next gathering, signing up and recovering from an error. Ask where the layout or feedback felt unclear. Participation and disclosure are optional.
 - After the pilot, capture the agreed layout and interaction patterns in `CODEX.md`. For each new page, start from the closest existing pattern and review its populated, loading, empty and error states where applicable. Include the route in the static preview so the existing responsive check discovers it.
+
+## Implementation and verification record — 19 November 2026
+
+- Generated the static site and passed `npm run verify:responsive` across 20 generated routes and the custom/missing-path 404 at 320, 390, 512, 720, 768, 1024 and 1440 CSS pixels. Passed `npm run verify:seo`, `npm run typecheck` and `npm test` (147 tests).
+- Completed Firefox responsive spot checks for five public routes at 320 and 1440 CSS pixels. These narrow viewport checks help expose wrapping and overflow issues. They do not substitute for a literal 200% browser-zoom check.
+- A complete keyboard and assistive-technology review, a 200% browser-zoom review, staged success/failure flows for data-backed forms and voluntary feedback from visitors remain human review steps. No external services or live sign-up data were used for this rollout.

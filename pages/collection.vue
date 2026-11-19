@@ -402,13 +402,13 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 }
 
 .collection-search-input :deep(.collection-search-field) {
-    border: 1px solid rgba(107, 122, 104, 0.2);
+    border: 1px solid var(--line);
     background: var(--white-pure);
     color: inherit;
     font-family: inherit;
     font-size: 0.88rem;
-    padding: 13px 18px;
-    border-radius: 40px;
+    padding: 12px 14px;
+    border-radius: var(--radius-control);
     outline: none;
     box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -448,25 +448,25 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 }
 
 .sort-btn {
-    background: var(--white-pure); border: 1px solid rgba(107, 122, 104, 0.15);
-    padding: 10px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 1px; color: var(--matcha-leaf);
-    cursor: pointer; transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    min-height: 44px;
+    background: var(--white-pure); border: 1px solid var(--line);
+    padding: 10px 12px; border-radius: var(--radius-control); font-size: 0.78rem; font-weight: 600;
+    color: var(--matcha-leaf);
+    cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s;
     text-align: center;
 }
 
 .sort-btn:hover {
     border-color: var(--matcha-leaf);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 14px var(--pebble-shadow);
+    background: var(--surface-soft);
 }
 
 .sort-btn.active { background: var(--matcha-leaf); color: white; border-color: var(--matcha-leaf); }
 
 /* --- THE EDITORIAL GRID --- */
 .editorial-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 16px; width: 92%; max-width: 1400px; padding: 20px 0 80px;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px; width: 92%; max-width: var(--content-wide); padding: 20px 0 80px;
 }
 
 .grid-spacer {
@@ -475,10 +475,10 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 }
 
 .editorial-card {
-    background: var(--white-pure); padding: 16px; border-radius: 20px;
-    text-align: center;
-    box-shadow: inset 0 3px 0 var(--gold-leaf), 0 15px 35px rgba(160, 100, 110, 0.09);
-    border: 1px solid rgba(201, 190, 239, 0.1);
+    background: var(--white-pure); padding: 16px; border-radius: var(--radius-card);
+    text-align: left;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
     display: flex; flex-direction: column; transition: transform 0.35s ease, box-shadow 0.35s ease;
     box-sizing: border-box; min-width: 0; height: 430px;
 }
@@ -593,11 +593,12 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 .category-selection { color: var(--muted); font-weight: 400; }
 .collection-filter-options .collection-category-options { padding: 0; }
 .collection-categories[open] .collection-category-options { padding: 2px 10px 10px; }
-.sort-btn { padding: 10px 12px; min-height: 44px; border-radius: 6px; text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
+.sort-btn { padding: 10px 12px; min-height: 44px; border-radius: var(--radius-control); text-transform: none; letter-spacing: 0; font-size: .8rem; font-weight: 500; border-color: var(--line); }
 .category-btn { flex: 0 0 auto; }
 .sort-btn:hover { transform: none; box-shadow: none; }
-.editorial-card { border: 1px solid var(--line); border-radius: 10px; padding: 18px; box-shadow: var(--shadow-card); text-align: left; height: 290px; }
-.editorial-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(44,55,40,.08); }
+.editorial-card { border: 1px solid var(--line); border-radius: var(--radius-card); padding: 18px; box-shadow: var(--shadow-card); text-align: left; height: 290px; }
+.editorial-card:hover { transform: none; box-shadow: var(--shadow-card); }
+.editorial-card:hover .pebble-container img { transform: none; }
 .card-game-title {
   display: -webkit-box;
   min-height: 2.7em;

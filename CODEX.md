@@ -18,6 +18,8 @@ Let ordinary copy and short callouts use the space their container provides. Giv
 
 Align page content to the shared width, gutter and spacing tokens in `assets/css/main.css`. Reuse the established action, focus and status patterns for equivalent tasks. Keep event-specific accents and compact scoring controls scoped to their pages. Follow the [visual polish and predictability plan](docs/visual-polish-and-predictability-plan.md) when adding or revising a page.
 
+Respect `prefers-reduced-motion` in both CSS and JavaScript initiated scrolling or animation. Give meaningful loading, success and error feedback a stable, nearby status style. Review populated, loading, empty and error states when they apply.
+
 ## Search indexing
 
 Keep admin pages out of search. Serve every `/admin` page with a `noindex, nofollow, noarchive` robots meta tag in the generated HTML and exclude it from the public sitemap. Keep these routes crawlable so search engines can read the `noindex` tag. Cover new admin routes in `scripts/verify-seo.mts`.

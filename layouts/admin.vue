@@ -7,7 +7,7 @@
         <label>Password<UInput v-model="password" class="admin-login-input" type="password" autocomplete="current-password" required /></label>
         <label class="remember"><UCheckbox v-model="remember" /> Remember me on this device</label>
         <p v-if="isRestoring" class="admin-help" role="status">Checking for a saved session. You can sign in here if needed.</p>
-        <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
+        <p v-if="error" class="admin-error action-status action-status--error" role="alert">{{ error }}</p>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</UButton>
         <p class="admin-help">Use your organiser username and password.</p>
       </form>
@@ -20,7 +20,7 @@
           <code class="admin-mfa-key">{{ mfaSecret }}</code>
         </details>
         <label>Six-digit code<UInput v-model="mfaCode" class="admin-login-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
-        <p v-if="error" class="admin-error" role="alert">{{ error }}</p>
+        <p v-if="error" class="admin-error action-status action-status--error" role="alert">{{ error }}</p>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Verifying…' : 'Verify and sign in' }}</UButton>
         <UButton color="neutral" variant="outline" type="button" :disabled="busy" @click="cancelMfa">Cancel sign in</UButton>
       </form>

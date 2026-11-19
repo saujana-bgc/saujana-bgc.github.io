@@ -115,7 +115,7 @@ function closeMobileToc() {
 </script>
 
 <style>
-.rules-page { width: min(100% - 40px, 1120px); margin: 0 auto; padding-bottom: 50px; }
+.rules-page { width: min(100% - 40px, var(--content-page)); margin: 0 auto; padding-bottom: 50px; }
 .rules-intro { max-width: 760px; margin-inline: auto; }
 .rules-intro .hero-title { margin-inline: auto; }
 .rules-back-link { margin: 0 auto 14px; }

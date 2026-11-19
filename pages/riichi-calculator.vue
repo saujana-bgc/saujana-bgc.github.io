@@ -1073,7 +1073,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 :global(body.riichi-calculator-body) { overflow-x: clip; }
-.calculator-page { width: min(1140px, 92%); margin: 0 auto; padding: 0 0 52px; color: var(--clay-text); }
+.calculator-page { width: min(var(--content-page), 92%); margin: 0 auto; padding: 0 0 52px; color: var(--clay-text); }
 .calculator-page .calculator-heading { max-width: 700px; margin: 0 auto 22px; padding: 0; }
 .calculator-heading .page-eyebrow { margin-bottom: 14px; }
 .calculator-heading .hero-title { font-size: clamp(2.25rem, 5.3vw, 3.7rem); }

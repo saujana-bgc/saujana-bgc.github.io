@@ -14,7 +14,7 @@
         <UButton v-if="search" type="button" class="page-btn" @click="search = ''">Clear search</UButton>
       </div>
       <template v-if="isPending">
-        <div class="loading-state loading-copy">Loading play history…</div>
+        <div class="loading-state loading-copy action-status action-status--pending" role="status">Loading play history…</div>
         <section class="session-card" v-for="n in 3" :key="'skel-'+n">
           <div class="skel" style="width: 200px; height: 22px; margin-bottom: 20px;"></div>
           <div style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -23,7 +23,7 @@
         </section>
       </template>
 
-        <div v-else-if="isError" class="loading-state" role="alert">
+        <div v-else-if="isError" class="loading-state action-status action-status--error" role="alert">
         <p>We couldn’t load play history.</p>
         <div class="error-actions">
           <UButton type="button" class="page-btn" @click="retry">Try again</UButton>
@@ -319,7 +319,7 @@ function toggleSessionGames(date) {
 const goToPage = (p) => {
     currentPage.value = p
     nextTick(() => {
-        resultsStart.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        resultsStart.value?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
         resultsStart.value?.focus({ preventScroll: true })
     })
 }
@@ -798,6 +798,7 @@ onUnmounted(() => {
 .search-input { min-height: 50px; border-radius: 8px; border-color: var(--line); }
 .session-card { border: 1px solid var(--line); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
 .session-card:hover { transform: none; box-shadow: var(--shadow-card); }
+.loading-state.action-status { margin: 16px auto; opacity: 1; font-size: .9rem; letter-spacing: 0; text-align: left; text-transform: none; }
 .stat-tile { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; box-shadow: none; padding: 20px 16px; }
 .stat-label { font-size: .7rem; letter-spacing: .02em; text-transform: none; opacity: 1; color: var(--muted); }
 .session-date { font-style: normal; font-size: 1.5rem; }

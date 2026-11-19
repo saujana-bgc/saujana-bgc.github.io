@@ -17,8 +17,8 @@
       </div>
       <p v-if="shareNotice" class="archive-state share-notice" role="status">{{ shareNotice }}</p>
       <p v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="filter-count" role="status">{{ filteredSessions.length }} of {{ recapSessions.length }} gatherings match these filters</p>
-      <p v-if="error" class="archive-state" role="alert">{{ error }} <UButton class="archive-button" type="button" @click="loadArchive">Try again</UButton></p>
-      <p v-else-if="loading" class="archive-state" role="status">Loading recaps…</p>
+      <p v-if="error" class="archive-state action-status action-status--error" role="alert">{{ error }} <UButton class="archive-button" type="button" @click="loadArchive">Try again</UButton></p>
+      <p v-else-if="loading" class="archive-state action-status action-status--pending" role="status">Loading recaps…</p>
       <div v-else-if="!recapSessions.length" class="archive-state empty-archive">
         <span class="empty-mark" aria-hidden="true">✧</span>
         <h3>The archive is quiet for now</h3>
@@ -26,7 +26,7 @@
         <NuxtLink class="recaps-next-gathering" to="/only-blood-in-the-clocktower/" no-prefetch>See the next Clocktower event <span aria-hidden="true">→</span></NuxtLink>
       </div>
 
-      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state" role="status">No gatherings match these filters. Adjust the year or script above.</p>
+      <p v-if="!loading && !error && recapSessions.length && !filteredSessions.length" class="archive-state action-status action-status--pending" role="status">No gatherings match these filters. Adjust the year or script above.</p>
       <article v-for="session in paginatedSessions" :id="'session-' + session.id" :key="session.id" class="session-card" :class="{ 'is-latest-session': session.id === featured?.id, 'has-cover': session.id === featured?.id && Boolean(coverPhoto(session)) }">
         <div class="session-masthead">
           <div class="session-heading">
@@ -281,7 +281,7 @@ onMounted(() => {
   --soft-ink: var(--muted);
   --rule: var(--line);
   --panel-pad: clamp(15px, 2.6vw, 34px);
-  width: min(1160px, calc(100% - 40px));
+  width: min(var(--content-page), calc(100% - var(--page-gutter) * 2));
   margin-inline: auto;
   padding-bottom: 24px;
   color: var(--ink);
