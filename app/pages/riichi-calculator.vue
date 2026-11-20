@@ -1368,6 +1368,15 @@ onBeforeUnmount(() => {
   .entry-mode button { min-height: 54px; }
   .calculator-form { gap: 10px; }
 }
+@media (max-width: 380px) and (max-height: 650px) {
+  .calculator-page .calculator-heading { margin-bottom: 2px; }
+  .calculator-heading .page-eyebrow { margin-bottom: 6px; }
+  .calculator-heading > .calculator-description { margin-top: 2px; }
+  .tutorial-trigger { min-height: 36px; margin-top: 4px; padding-block: 5px; }
+  .calculator-layout { gap: 8px; }
+  .entry-mode button { min-height: 48px; }
+  .calc-section { padding: 12px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .choice-button { transition: none; }
   .tutorial-trigger { transition: none; }

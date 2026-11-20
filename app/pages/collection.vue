@@ -55,6 +55,8 @@
         <div v-if="topSpacerHeight > 0" class="grid-spacer" :style="{ height: topSpacerHeight + 'px' }"></div>
 
         <article v-for="game in virtualGames" :key="game.name" class="editorial-card">
+          <h2 class="card-game-title">{{ game.name }}</h2>
+
           <UButton type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game, $event)">
             <img
               :src="'/' + game.img"
@@ -66,8 +68,6 @@
               @error="handleImgError"
             >
           </UButton>
-
-          <h2 class="card-game-title">{{ game.name }}</h2>
 
           <div class="card-players">
             {{ game.players }} • <span title="Complexity is rated out of 5. Higher ratings mean a more involved game.">Complexity: {{ game.weight ? `${game.weight}/5` : 'not rated' }}</span>
