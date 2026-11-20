@@ -36,11 +36,15 @@ Deno.serve(async (request) => {
           }
         }),
       }))
-      const paths = sessions.flatMap(session => (Array.isArray(session.games) ? session.games : []).flatMap((game: Record<string, unknown>) => Array.isArray(game.photos) ? game.photos.filter((photo: Record<string, unknown>) => photo.approved && typeof photo.path === 'string').map((photo: Record<string, unknown>) => photo.path as string) : []))
+      const paths = [...new Set(sessions.flatMap(session => (Array.isArray(session.games) ? session.games : []).flatMap((game: Record<string, unknown>) => Array.isArray(game.photos) ? game.photos.filter((photo: Record<string, unknown>) => photo.approved && typeof photo.path === 'string').map((photo: Record<string, unknown>) => photo.path as string) : [])))]
       const urls: Record<string, string> = {}
-      for (const path of paths) {
-        const { data: signed, error: signError } = await db.storage.from(BUCKET).createSignedUrl(path, 900)
-        if (!signError && signed) urls[path] = signed.signedUrl
+      if (paths.length) {
+        const { data: signed, error: signError } = await db.storage.from(BUCKET).createSignedUrls(paths, 900)
+        if (!signError) {
+          for (const item of signed ?? []) {
+            if (item.path && item.signedUrl) urls[item.path] = item.signedUrl
+          }
+        }
       }
       return reply(request, 200, { sessions, photo_urls: urls })
     }
@@ -61,9 +65,13 @@ Deno.serve(async (request) => {
         }),
       ))]
       const photoUrls: Record<string, string> = {}
-      for (const path of paths) {
-        const { data: signed, error: signError } = await db.storage.from(BUCKET).createSignedUrl(path, 900)
-        if (!signError && signed) photoUrls[path] = signed.signedUrl
+      if (paths.length) {
+        const { data: signed, error: signError } = await db.storage.from(BUCKET).createSignedUrls(paths, 900)
+        if (!signError) {
+          for (const item of signed ?? []) {
+            if (item.path && item.signedUrl) photoUrls[item.path] = item.signedUrl
+          }
+        }
       }
       return reply(request, 200, { sessions: sessions.data ?? [], players: players.data ?? [], photo_urls: photoUrls })
     }
