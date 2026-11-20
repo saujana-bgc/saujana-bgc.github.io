@@ -1622,7 +1622,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .signup-privacy-note { margin: 0 0 16px; color: var(--muted); font-size: .82rem; line-height: 1.6; }
 .signup-privacy-note a, .signup-welcome-note a { color: var(--matcha-leaf); text-decoration: underline; text-underline-offset: .18em; }
 
-.attendee-list-details { border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
+.attendee-list-details { align-self: stretch; min-inline-size: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--white-pure); }
 .attendee-list-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 8px 14px; color: var(--matcha-leaf); font-size: .9rem; font-weight: 700; cursor: pointer; list-style: none; }
 .attendee-list-summary::-webkit-details-marker { display: none; }
 .attendee-list-summary::after { content: '+'; margin-left: auto; font-size: 1.15rem; }
@@ -1977,7 +1977,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
         display: flex;
         flex-direction: column;
         gap: 10px;
-        width: 100%;
+        width: auto;
+        min-width: 0;
     }
 }
 
@@ -1995,6 +1996,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     margin-bottom: 12px;
     gap: 8px;
 }
+
+.card-header > :is(.card-name-input, .card-name-readonly) { min-width: 0; }
+.card-header > .btn-delete { flex: 0 0 44px; }
 
 .card-name-input {
     flex: 1;
@@ -2016,9 +2020,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .card-name-input::placeholder { opacity: 0.4; font-weight: 400; }
 
 .card-field {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
     margin-bottom: 8px;
     min-height: 32px;
 }
@@ -2032,8 +2036,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     font-weight: 700;
     color: var(--matcha-leaf);
     opacity: 0.65;
-    min-width: 64px;
-    padding-top: 7px;
+    min-width: 0;
+    padding-top: 0;
 }
 
 .card-value-input {
@@ -2047,9 +2051,12 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     border-radius: 8px;
     outline: none;
     transition: background 0.2s;
-    width: 0;
+    width: 100%;
+    min-width: 0;
     box-sizing: border-box;
 }
+
+.card-field > .attendee-readonly { min-width: 0; }
 
 .card-value-input:focus { background: rgba(255,255,255,0.75); }
 .card-value-input.card-area { resize: none; overflow: hidden; line-height: 1.5; overflow-wrap: anywhere; }

@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs'
-import { readdir, stat } from 'node:fs/promises'
+import { readFile, readdir, stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, relative, resolve, sep } from 'node:path'
 import { chromium, firefox } from 'playwright'
@@ -91,6 +91,73 @@ if (routesToCheck.some(route => !routes.includes(route))) {
 let browser
 const failures = []
 
+async function checkGatheringAttendeeCards(browser) {
+  const eventFixtures = [
+    { id: 'responsive-plain', name: 'Responsive fixture', date: '2099-11-22', time: '12:00', venue: 'Test venue', venue_url: null, description: 'Responsive layout fixture', flyer_path: null },
+    { id: 'responsive-photo', name: 'Responsive photo fixture', date: '2099-11-23', time: '12:00', venue: 'Eleven at Saujana', venue_url: null, description: 'Responsive layout fixture', flyer_path: null },
+  ]
+  const attendeeFixtures = eventFixtures.map((event, index) => ({
+    id: `responsive-attendee-${index}`,
+    event_id: event.id,
+    name: 'A long attendee name for the mobile fixture',
+    eta: '13:00',
+    amount_spent: 12.5,
+    bringing_games: 'Codenames',
+    notes: 'A long note for checking that attendee details still wrap within the mobile card.',
+  }))
+  const venuePhoto = await readFile(join(outputDirectory, 'images/venues/eleven_at_saujana.avif'))
+  const page = await browser.newPage({ isMobile: true, hasTouch: true, deviceScaleFactor: 2 })
+
+  try {
+    await page.route('**/*', async route => {
+      const requestUrl = new URL(route.request().url())
+      if (requestUrl.origin === baseUrl) return route.continue()
+      if (requestUrl.pathname === '/images/venues/eleven_at_saujana.avif') return route.fulfill({ contentType: 'image/avif', body: venuePhoto })
+      if (requestUrl.pathname === '/rest/v1/events') return route.fulfill({ json: eventFixtures })
+      if (requestUrl.pathname === '/rest/v1/attendees') return route.fulfill({ json: attendeeFixtures })
+      if (requestUrl.pathname.startsWith('/rest/v1/rpc/')) return route.fulfill({ json: [] })
+      return route.abort()
+    })
+
+    for (const width of [320, 360, 390, 430, 767, 768]) {
+      await page.setViewportSize({ width, height: 900 })
+      await page.goto(`${baseUrl}/gatherings/`, { waitUntil: 'load', timeout: 20000 })
+
+      for (const event of eventFixtures) {
+        const details = page.locator(`#gathering-${event.id} .attendee-list-details`)
+        await details.locator('summary').click()
+        await details.getByText('1 signed up', { exact: true }).waitFor()
+
+        const result = await details.evaluate(element => {
+          const card = element.querySelector('.attendee-card')
+          if (!card) return { missingCard: true }
+          const within = (outer, inner) => {
+            const outerRect = outer.getBoundingClientRect()
+            const innerRect = inner.getBoundingClientRect()
+            return innerRect.left >= outerRect.left - 1 && innerRect.right <= outerRect.right + 1
+          }
+          return {
+            isMobileCards: getComputedStyle(element.querySelector('.attendees-cards')).display !== 'none',
+            cardFitsList: within(element, card),
+            cardFitsEvent: within(element.closest('.event-card'), card),
+            controlsFit: [...card.querySelectorAll('.card-field > input, .card-field > textarea, .card-header > button')]
+              .every(control => within(card, control)),
+          }
+        })
+
+        if (width <= 767 && (!result.isMobileCards || result.missingCard || !result.cardFitsList || !result.cardFitsEvent || !result.controlsFit)) {
+          failures.push(`Gathering attendee card clips at ${width}px in ${event.id} fixture`)
+        }
+        if (width >= 768 && result.isMobileCards) {
+          failures.push(`Gathering attendee table does not replace mobile cards at ${width}px`)
+        }
+      }
+    }
+  } finally {
+    await page.close()
+  }
+}
+
 try {
   await new Promise((resolveListen, rejectListen) => {
     server.once('error', rejectListen)
@@ -98,6 +165,8 @@ try {
   })
   const browserType = process.env.RESPONSIVE_BROWSER === 'firefox' ? firefox : chromium
   browser = await browserType.launch({ headless: true })
+
+  if (routesToCheck.includes('/gatherings/')) await checkGatheringAttendeeCards(browser)
 
   for (const route of [...routesToCheck, ...(routesToCheck.length === routes.length ? ['/404.html', notFoundRoute] : [])]) {
     const page = await browser.newPage()
