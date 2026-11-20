@@ -69,6 +69,7 @@
                 </select>
               </label>
               <label>Storyteller<UInputMenu v-model="game.storyteller" :items="playerNames" mode="autocomplete" open-on-focus placeholder="Choose or enter a name" /></label>
+              <label>Outcome<select v-model="game.outcome"><option value="">Choose outcome</option><option value="Good wins">Good wins</option><option value="Evil wins">Evil wins</option><option value="No result">No winner</option><option value="Unknown">Unknown</option></select></label>
             </div>
             <p v-if="game.script && !scriptNames.includes(game.script)" class="script-hint">This game uses a previously saved script. You can keep it or switch to one of the listed scripts.</p>
             <p v-else-if="game.script" class="script-hint">{{ characters(game).length }} character suggestions loaded for {{ game.script }}.</p>
@@ -79,9 +80,11 @@
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <span class="seat-number" aria-label="Seat">{{ String(playerIndex + 1).padStart(2, '0') }}</span>
               <label class="player-name-field">Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
-              <label class="public-player-name-field">Public nickname <input v-model="player.public_name" maxlength="80" placeholder="Optional · hidden if blank"></label>
-              <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
-              <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
+              <details class="player-extras"><summary>More</summary>
+                <label class="public-player-name-field">Public nickname <input v-model="player.public_name" maxlength="80" placeholder="Optional · hidden if blank"></label>
+                <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
+                <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
+              </details>
               <label v-if="player.final_status" class="legacy-status">Saved final status<input v-model="player.final_status" placeholder="Optional note"></label>
               <UButton type="button" class="remove-player" :aria-label="'Remove ' + (player.name || 'player ' + (playerIndex + 1))" @click="game.players.splice(playerIndex,1)">Remove</UButton>
             </div>
@@ -93,25 +96,16 @@
             </div>
             <p v-if="game.players.length" class="keyboard-hint">In a Character field, press <kbd>Alt</kbd> + <kbd>N</kbd> to move to the next player.</p>
             <section v-if="bulkRosterOpen[game.id]" class="bulk-roster-panel">
-              <label>Paste one player name per line<textarea v-model="bulkRosterText[game.id]" rows="4" placeholder="Avery&#10;Jordan&#10;Sam"></textarea></label>
+              <label>Paste one player name per line <small>{{ Math.max(0, 20 - game.players.length) }} slots left</small><textarea v-model="bulkRosterText[game.id]" rows="4" placeholder="Avery&#10;Jordan&#10;Sam"></textarea></label>
               <div><UButton type="button" @click="toggleBulkRoster(game)">Cancel</UButton><UButton class="admin-primary" type="button" @click="addPastedPlayers(game)">Add names</UButton></div>
             </section>
-
-            <fieldset class="outcome-field">
-              <legend>Outcome</legend>
-              <div class="outcome-options">
-                <label><input v-model="game.outcome" type="radio" value="Good wins"><span>Good wins</span></label>
-                <label><input v-model="game.outcome" type="radio" value="Evil wins"><span>Evil wins</span></label>
-                <label><input v-model="game.outcome" type="radio" value="No result"><span>No winner</span></label>
-                <label><input v-model="game.outcome" type="radio" value="Unknown"><span>Unknown</span></label>
-              </div>
-            </fieldset>
 
             <details class="game-writing" :open="Boolean(game.teaser || game.recap)">
               <summary>Write this game’s recap</summary>
               <label>Recap title<input v-model="game.teaser" maxlength="240" placeholder="Optional short title"></label>
               <label>Retelling<textarea v-model="game.recap" rows="4" maxlength="3000" placeholder="What happened in this game? You can finish this later on desktop."></textarea></label>
             </details>
+            <details v-if="game.notes" class="legacy-writeup"><summary>Previous game note</summary><p>{{ game.notes }}</p></details>
             <details class="game-extras" :open="Boolean(game.photos?.length)">
               <summary>Photos <span v-if="game.photos?.length">{{ game.photos.length }}</span></summary>
               <label>Photos<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple @change="uploadPhotos($event,game)"></label>
@@ -137,6 +131,7 @@
           <h3>Games in this gathering</h3>
           <p class="empty-note">Each game has its own retelling. Save the draft on your phone and finish the stories later.</p>
         </section>
+        <details v-if="draft.recap" class="legacy-writeup"><summary>Previous gathering retelling</summary><p>{{ draft.recap }}</p></details>
 
         <details class="visitor-preview admin-card">
           <summary>Preview the public recap</summary>
@@ -148,10 +143,11 @@
               <p>{{ formatGatheringDate(draft.session_date) }}<template v-if="draft.venue"> · {{ draft.venue }}</template></p>
             </header>
             <template v-for="game in draft.games" :key="game.id">
-              <h4>{{ game.script || 'Script not recorded' }}</h4>
+              <h4>{{ game.teaser || game.script || 'Script not recorded' }}</h4>
               <div class="preview-content">
                 <p v-if="game.outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
                 <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
+                <p v-if="game.teaser"><strong>{{ game.teaser }}</strong></p>
                 <p v-if="game.recap">{{ game.recap }}</p>
               </div>
               <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
@@ -354,9 +350,11 @@ function addPastedPlayers(game) {
   const remainingSeats = Math.max(0, 20 - game.players.length)
   if (!remainingSeats) return
   const firstNewPlayerIndex = game.players.length
-  game.players.push(...names.slice(0, remainingSeats).map(name => ({ ...newPlayer(), name })))
-  bulkRosterText.value = { ...bulkRosterText.value, [game.id]: '' }
-  bulkRosterOpen.value = { ...bulkRosterOpen.value, [game.id]: false }
+  const addedNames = names.slice(0, remainingSeats)
+  const remainingNames = names.slice(remainingSeats)
+  game.players.push(...addedNames.map(name => ({ ...newPlayer(), name })))
+  bulkRosterText.value = { ...bulkRosterText.value, [game.id]: remainingNames.join('\n') }
+  if (!remainingNames.length) bulkRosterOpen.value = { ...bulkRosterOpen.value, [game.id]: false }
   nextTick(() => {
     const card = gameCards.value.find(item => item?.dataset.gameId === game.id)
     card?.querySelectorAll('input[data-character-field]').item(firstNewPlayerIndex)?.focus()
@@ -467,7 +465,7 @@ async function call(action, extra = {}) {
 async function load() {
   try {
     const result = await call('admin')
-    saved.value = result.sessions || []
+    saved.value = (result.sessions || []).sort((a, b) => String(b.updated_at || '').localeCompare(String(a.updated_at || '')))
     players.value = result.players || []
     photoUrls.value = result.photo_urls || {}
     return true
@@ -553,7 +551,7 @@ async function save(published = baseline.value.published) {
           ? card?.querySelector('.roster-actions > button')
           : missingPlayerIndex >= 0
             ? card?.querySelectorAll('input[data-player-name]')[missingPlayerIndex]
-            : card?.querySelector('.outcome-field input[type="radio"]')
+            : card?.querySelector('.game-basics select:last-child')
       field?.focus()
       field?.scrollIntoView({ block: 'center' })
     })
@@ -590,7 +588,7 @@ async function save(published = baseline.value.published) {
       ? 'Gathering saved, but its updated list and photo previews could not be loaded.'
       : cleanupErrors.length
         ? 'Gathering saved. A removed private photo could not be cleaned up yet.'
-        : committed.published ? 'Gathering published.' : 'Draft saved.'
+        : committed.published ? 'Gathering published.' : 'Saved online.'
     if (!refreshed) error.value = 'The save succeeded. Refresh the saved gatherings list before making more edits.'
   } catch (exception) {
     error.value = exception.message
@@ -816,6 +814,12 @@ button:disabled { opacity: .65; cursor: wait; }
 .section-heading h4 small { margin-left: 5px; color: var(--muted); font: .75rem var(--font-body); }
 .roster-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .game-extras { padding: 0 12px; border: 1px solid var(--desk-rule); border-radius: 7px; background: #f9f3ec; }
+.player-extras { grid-column: 2 / -1; }
+.player-extras > summary, .legacy-writeup > summary { min-height: 40px; padding: 9px 0; cursor: pointer; color: var(--matcha-leaf); font-size: .82rem; font-weight: 650; }
+.player-extras[open] { display: grid; grid-column: 1 / -1; gap: 8px; }
+.player-extras[open] > label { grid-column: 1 / -1; }
+.legacy-writeup { padding: 0 12px; border: 1px solid var(--desk-rule); border-radius: 7px; background: #f9f3ec; }
+.legacy-writeup p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .game-extras[open] { padding-bottom: 12px; }
 .game-extras > summary { display: flex; align-items: center; gap: 9px; min-height: 40px; cursor: pointer; font-size: .86rem; font-weight: 650; }
 .game-extras > summary span { color: var(--muted); font-size: .78rem; font-weight: 400; }

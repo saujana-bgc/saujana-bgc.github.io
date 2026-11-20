@@ -62,7 +62,6 @@
                 <p v-for="(paragraph, index) in retellingParagraphs(game.recap)" :key="index">{{ paragraph }}</p>
               </div>
             </section>
-            <p v-if="game.storyteller" class="game-storyteller">Storyteller · {{ game.storyteller }}</p>
           </article>
         </div>
 

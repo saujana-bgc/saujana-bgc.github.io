@@ -26,7 +26,6 @@ Deno.serve(async (request) => {
             script: game.script,
             teaser: game.teaser,
             recap: game.recap,
-            storyteller: game.storyteller,
             outcome: game.outcome,
             photos: (Array.isArray(game.photos) ? game.photos : []).filter((photo: Record<string, unknown>) => photo.approved === true).map((photo: Record<string, unknown>) => ({ path: photo.path, cover: photo.cover === true, approved: true })),
             players: (Array.isArray(game.players) ? game.players : []).map((rawPlayer: unknown, index: number) => {
@@ -49,7 +48,7 @@ Deno.serve(async (request) => {
     const user = await adminUser(request, db)
     if (body.action === 'admin') {
       const [sessions, players] = await Promise.all([
-        db.from('botc_sessions').select('*').order('session_date', { ascending: false }),
+        db.from('botc_sessions').select('*').order('updated_at', { ascending: false }),
         db.from('botc_players').select('id,private_name,public_name').order('private_name'),
       ])
       if (sessions.error || players.error) throw sessions.error ?? players.error
