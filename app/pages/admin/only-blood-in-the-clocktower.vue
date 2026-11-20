@@ -171,7 +171,7 @@
         </template>
         <template v-else>
           <UButton class="admin-primary" type="button" :disabled="busy" @click="save(false)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Save draft' }}</UButton>
-          <UButton class="publish-button" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Publish gathering' }}</UButton>
+          <UButton class="publish-button" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : draft.games.length ? 'Publish recap' : 'Publish gathering details' }}</UButton>
         </template>
         <p v-if="notice" class="message action-status action-status--success" role="status">{{ notice }}</p>
       </div>
@@ -605,9 +605,11 @@ async function save(published = baseline.value.published) {
     return
   }
 
-  if (published && !window.confirm(baseline.value.published
-    ? 'Update the public recap with these changes? Review the preview before continuing.'
-    : 'Publish this gathering to the public recap? Review the preview before continuing.')) return
+  if (published && !window.confirm(draft.value.games.length
+    ? baseline.value.published
+      ? 'Update this public recap? Review the preview before continuing.'
+      : 'Publish this gathering and its recap? Review the preview before continuing.'
+    : 'Publish these gathering details? They will not appear in public Recaps until you add a game.')) return
 
   saving.value = true
   try {
@@ -639,7 +641,7 @@ async function save(published = baseline.value.published) {
       ? 'Gathering saved, but its updated list and photo previews could not be loaded.'
       : cleanupErrors.length
         ? 'Gathering saved. A removed private photo could not be cleaned up yet.'
-        : committed.published ? 'Gathering published.' : 'Saved online.'
+        : committed.published && committed.games.length ? 'Gathering and recap published.' : committed.published ? 'Gathering details published.' : 'Saved online.'
     if (!refreshed) error.value = 'The save succeeded. Refresh the saved gatherings list before making more edits.'
   } catch (exception) {
     error.value = exception.message

@@ -114,11 +114,16 @@ function closeMobileToc() {
   mobileToc.value.open = false
 }
 function returnToContents(event) {
-  if (!window.matchMedia('(max-width: 800px)').matches) return
   event.preventDefault()
-  mobileToc.value.open = true
-  mobileToc.value.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
-  mobileToc.value.querySelector('summary')?.focus({ preventScroll: true })
+  const mobile = window.matchMedia('(max-width: 800px)').matches
+  const contents = mobile ? mobileToc.value : document.querySelector('.toc-desktop')
+  contents?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  if (mobile) {
+    mobileToc.value.open = true
+    mobileToc.value.querySelector('summary')?.focus({ preventScroll: true })
+  } else {
+    contents?.querySelector('a')?.focus({ preventScroll: true })
+  }
 }
 function handleBackToContents(event) {
   if (!event.target.closest('.back-to-contents')) return

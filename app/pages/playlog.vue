@@ -330,7 +330,8 @@ const goToPage = (p) => {
 }
 const gameButtonRefs = new Map()
 function setGameButtonRef(key, element) {
-    if (element) gameButtonRefs.set(key, element)
+    const button = element?.$el ?? element
+    if (button) gameButtonRefs.set(key, button)
     else gameButtonRefs.delete(key)
 }
 

@@ -8,7 +8,7 @@
         <NuxtLink to="/riichi-rules/" no-prefetch>Riichi Rules</NuxtLink>
         <NuxtLink to="/riichi-calculator/" no-prefetch>Riichi Calculator</NuxtLink>
         <NuxtLink to="/riichi-league/" no-prefetch>Riichi League</NuxtLink>
-        <NuxtLink to="/riichi-open/" no-prefetch>Riichi Open I results</NuxtLink>
+        <NuxtLink to="/riichi-open/?tab=standings" no-prefetch>Riichi Open I results</NuxtLink>
       </nav>
     </header>
 

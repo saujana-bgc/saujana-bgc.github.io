@@ -6,6 +6,7 @@
       <p class="stats-container">Stories, results and approved photos from our Blood on the Clocktower gatherings.</p>
     </header>
     <section id="clocktower-archive" class="archive" aria-labelledby="archive-title">
+      <p v-if="shareNotice && !shareTarget" class="archive-state action-status action-status--pending" role="status">{{ shareNotice }}</p>
       <header v-if="loading || error || recapSessions.length" class="archive-heading">
         <h2 id="archive-title" tabindex="-1">Gathering recaps</h2>
       </header>
@@ -252,6 +253,7 @@ async function focusSharedTarget() {
 
   if (!session) {
     shareNotice.value = 'This shared gathering or game is no longer available. Browse the recaps below.'
+    shareTarget.value = ''
     return
   }
 
