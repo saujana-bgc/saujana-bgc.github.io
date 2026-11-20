@@ -40,10 +40,17 @@
             <header class="game-recap-heading">
               <div class="game-title">
                 <span class="game-label">Game {{ number }}</span>
-                <h4 class="game-script" tabindex="-1">{{ game.teaser || game.script || 'Script not recorded' }}</h4>
+                <p class="game-script-name">{{ game.script || 'Script not recorded' }}</p>
+                <h4 class="game-script" tabindex="-1">{{ game.teaser || game.script || 'Game ' + number }}</h4>
               </div>
               <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
             </header>
+            <section v-if="game.recap" class="recap-story" aria-label="Game retelling">
+              <h5>Retelling</h5>
+              <div class="recap-prose">
+                <p v-for="(paragraph, index) in retellingParagraphs(game.recap)" :key="index">{{ paragraph }}</p>
+              </div>
+            </section>
             <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
               <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
                 <img class="character-art" :src="characterIcon(player.character)" alt="" loading="lazy" decoding="async">
@@ -56,12 +63,6 @@
                 </div>
               </li>
             </ol>
-            <section v-if="game.recap" class="recap-story" aria-label="Game retelling">
-              <h5>Retelling</h5>
-              <div class="recap-prose">
-                <p v-for="(paragraph, index) in retellingParagraphs(game.recap)" :key="index">{{ paragraph }}</p>
-              </div>
-            </section>
           </article>
         </div>
 

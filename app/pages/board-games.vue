@@ -5,8 +5,8 @@
       <p class="stats-container">From quick party games to thoughtful strategy, choose a table that suits you. We’ll help you find a game and learn as you play.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       <nav class="quick-destinations" aria-label="Board game pages">
-        <NuxtLink to="/collection/" no-prefetch>Browse the collection</NuxtLink>
-        <NuxtLink to="/playlog/" no-prefetch>Play history</NuxtLink>
+        <NuxtLink to="/collection/" no-prefetch>Collection</NuxtLink>
+        <NuxtLink to="/playlog/" no-prefetch>Play History</NuxtLink>
       </nav>
     </header>
 
@@ -25,10 +25,6 @@
       </ActivityOverviewFeature>
     </section>
 
-    <nav class="activity-links" aria-label="Explore board games">
-      <NuxtLink to="/collection/" no-prefetch><strong>Browse the collection</strong><span>See the games our hosts can bring to the table.</span><span aria-hidden="true">→</span></NuxtLink>
-      <NuxtLink to="/playlog/" no-prefetch><strong>Play History</strong><span>See games played at previous gatherings.</span><span aria-hidden="true">→</span></NuxtLink>
-    </nav>
   </main>
 </template>
 

@@ -13,16 +13,16 @@
         </div>
         <div class="next-copy">
           <p class="eyebrow">Next Clocktower gathering</p>
-          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : eventLoading ? 'Checking the calendar…' : eventError || archiveError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
+          <h2 id="next-night-title" aria-live="polite">{{ nextGathering ? formatDate(nextGathering.date) : calendarLoading ? 'Checking the calendar…' : eventError || archiveError ? 'Calendar unavailable' : 'No Clocktower date announced' }}</h2>
           <p v-if="nextGathering?.time">{{ formatGatheringTime(nextGathering.time) }}</p>
           <p v-if="nextGathering?.venue">{{ nextGathering.venue }} <a v-if="nextGathering.venue_url" :href="nextGathering.venue_url" target="_blank" rel="noopener noreferrer">Directions <UIcon name="i-lucide-map-pin" aria-hidden="true" /></a></p>
           <p v-if="nextGathering?.first_timer_note">{{ nextGathering.first_timer_note }}</p>
           <p v-else-if="(eventError || archiveError) && !nextGathering">We couldn’t confirm the schedule just now.</p>
-          <p v-else-if="eventLoading">Upcoming dates will appear here.</p>
+          <p v-else-if="calendarLoading">Upcoming dates will appear here.</p>
           <UButton v-if="(eventError || archiveError) && !nextGathering" class="retry-button" type="button" @click="retryGatheringSources">Try again</UButton>
         </div>
         <a v-if="nextGathering" class="calendar-link" :class="{ 'calendar-link-primary': nextGathering.signup_url }" :href="nextCtaHref">{{ nextCtaLabel }} <span aria-hidden="true">↗</span></a>
-        <template v-else-if="!eventLoading">
+        <template v-else-if="!calendarLoading">
           <a class="calendar-link" href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Ask about the next gathering <span aria-hidden="true">↗</span></a>
           <NuxtLink class="calendar-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">↗</span></NuxtLink>
         </template>
@@ -69,6 +69,7 @@ const route = useRoute()
 
 const sessions = ref([])
 const archiveError = ref(false)
+const archiveLoading = ref(true)
 const eventLoading = ref(true)
 const eventError = ref(false)
 const communityEvents = ref([])
@@ -120,6 +121,7 @@ const nextGathering = computed(() => {
   }
   return null
 })
+const calendarLoading = computed(() => eventLoading.value || archiveLoading.value)
 const nextCtaHref = computed(() => nextGathering.value?.signup_url || nextGathering.value?.href || '/gatherings/')
 const nextCtaLabel = computed(() => {
   if (nextGathering.value?.signup_url) return 'Sign up with the organiser'
@@ -138,6 +140,7 @@ function hasResults(session) {
 }
 
 async function loadArchive() {
+  archiveLoading.value = true
   archiveError.value = false
   try {
     const response = await fetch(config.public.supabaseUrl + '/functions/v1/botc-archive', {
@@ -148,6 +151,8 @@ async function loadArchive() {
     sessions.value = body.sessions || []
   } catch {
     archiveError.value = true
+  } finally {
+    archiveLoading.value = false
   }
 }
 

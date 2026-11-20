@@ -5,7 +5,8 @@
         <h1 id="home-title" class="hero-title">Come play with Saujana</h1>
         <p>Board games, riichi mahjong and Clocktower. Find your table.</p>
         <div class="hero-actions">
-          <NuxtLink class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+          <NuxtLink v-if="nextGathering" class="text-link" to="#next-gathering" no-prefetch>See the next gathering <span aria-hidden="true">↓</span></NuxtLink>
+          <NuxtLink v-else class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
         </div>
       </div>

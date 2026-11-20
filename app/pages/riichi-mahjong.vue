@@ -5,10 +5,10 @@
       <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? In four-player riichi and three-player sanma, the fun is spotting which tiles fit.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       <nav class="quick-destinations" aria-label="Riichi Mahjong pages">
-        <NuxtLink to="/riichi-calculator/" no-prefetch>Calculator</NuxtLink>
-        <NuxtLink to="/riichi-league/" no-prefetch>League</NuxtLink>
-        <NuxtLink to="/riichi-open/" no-prefetch>Riichi Open</NuxtLink>
-        <NuxtLink to="/riichi-rules/" no-prefetch>Rules</NuxtLink>
+        <NuxtLink to="/riichi-calculator/" no-prefetch>Riichi Calculator</NuxtLink>
+        <NuxtLink to="/riichi-league/" no-prefetch>Riichi League</NuxtLink>
+        <NuxtLink to="/riichi-open/" no-prefetch>Riichi Open I results</NuxtLink>
+        <NuxtLink to="/riichi-rules/" no-prefetch>Riichi Rules</NuxtLink>
       </nav>
     </header>
 
@@ -29,16 +29,6 @@
       </ActivityOverviewFeature>
     </section>
 
-    <section class="activity-tools" aria-labelledby="regular-play-title">
-      <p class="page-eyebrow">For regular players</p>
-      <h2 id="regular-play-title">Play, score and compete.</h2>
-      <nav class="activity-links" aria-label="Riichi Mahjong tools and events">
-        <NuxtLink to="/riichi-league/" no-prefetch><strong>Riichi League</strong><span>Follow the season standings and weekly results.</span><span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink to="/riichi-calculator/" no-prefetch><strong>Riichi Calculator</strong><span>Check a hand or calculate ron and tsumo payments.</span><span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink to="/riichi-open/" no-prefetch><strong>Riichi Open I</strong><span>See this edition’s final standings and event details.</span><span aria-hidden="true">→</span></NuxtLink>
-        <NuxtLink to="/riichi-rules/" no-prefetch><strong>Riichi Rules</strong><span>Read our table rules and Riichi Open series rules.</span><span aria-hidden="true">→</span></NuxtLink>
-      </nav>
-    </section>
   </main>
 </template>
 

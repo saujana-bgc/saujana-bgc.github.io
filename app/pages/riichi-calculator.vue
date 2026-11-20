@@ -1283,6 +1283,7 @@ onBeforeUnmount(() => {
   .calculator-heading .hero-title { font-size: clamp(1.65rem, 7vw, 2.25rem); line-height: 1.1; }
   .calculator-heading > .calculator-description { margin-top: 4px; font-size: .76rem; line-height: 1.4; }
   .tutorial-trigger { margin-top: 8px; }
+  .calculator-layout.tile-entry-active { margin-top: 0; }
   .calculator-layout { display: flex; flex-direction: column; gap: 12px; }
   .calculator-form, .result-panel { width: 100%; box-sizing: border-box; }
   .result-panel { position: fixed; inset: auto 10px calc(8px + env(safe-area-inset-bottom)); z-index: 20; width: min(620px, calc(100% - 20px)); max-height: min(35vh, 250px); overflow: auto; margin: 0 auto; box-shadow: 0 8px 28px rgba(44,55,40,.2); }
