@@ -3,7 +3,7 @@
     <header>
       <p class="eyebrow">Organiser workspace</p>
       <h1 id="admin-dashboard-title">Organiser dashboard</h1>
-      <p class="dashboard-lede">Manage birthdays, Clocktower recaps and the Riichi Open tournament.</p>
+      <p class="dashboard-lede">Choose a community tool or continue with the tournament.</p>
     </header>
 
     <section
@@ -115,6 +115,7 @@ useHead({ title: 'Organiser Dashboard | Saujana BGC', meta: [{ name: 'robots', c
   font-size: .875rem;
   line-height: 1.55;
 }
+.admin-section:first-of-type{margin-top:18px}
 
 .dashboard-arrow {
   flex: none;

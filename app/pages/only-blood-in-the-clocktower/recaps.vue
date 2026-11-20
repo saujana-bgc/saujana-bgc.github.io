@@ -30,7 +30,7 @@
         <div class="session-masthead">
           <div class="session-heading">
             <p class="session-kicker"><span v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</span><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
-            <h3 tabindex="-1">{{ session.venue || 'Saujana gathering' }}</h3>
+            <div class="session-title-row"><h3 tabindex="-1">{{ session.venue || 'Saujana gathering' }}</h3><UButton class="archive-button" type="button" @click="copyRecapLink(session.id)">Share gathering</UButton></div>
             <p class="metadata"><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
           <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="coverPhoto(session).alt || 'Table photo from ' + formatDate(session.session_date)" loading="lazy">
@@ -41,7 +41,7 @@
               <div class="game-title">
                 <span class="game-label">Game {{ number }}</span>
                 <p v-if="game.teaser" class="game-script-name">{{ game.script || 'Script not recorded' }}</p>
-                <h4 class="game-script" tabindex="-1">{{ game.teaser || game.script || 'Game ' + number }}</h4>
+                <div class="game-share-title"><h4 class="game-script" tabindex="-1">{{ game.teaser || game.script || 'Game ' + number }}</h4><UButton v-if="game.id" class="archive-button" type="button" @click="copyRecapLink(session.id, game.id)">Share game</UButton></div>
               </div>
               <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
             </header>
@@ -101,6 +101,7 @@
 </template>
 
 <style scoped>
+.session-title-row,.game-share-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.session-title-row h3,.game-share-title h4{min-width:0}.game-share-title{align-items:center}.session-title-row :deep(button),.game-share-title :deep(button){flex:none;min-height:40px;font-size:.76rem}.session-title-row{margin-bottom:4px}
 </style>
 
 <script setup>
@@ -199,6 +200,17 @@ async function changePage(page) {
   const heading = document.getElementById('archive-title')
   heading?.scrollIntoView({ block: 'start' })
   heading?.focus({ preventScroll: true })
+}
+
+async function copyRecapLink(sessionId, gameId = null) {
+  const url = new URL('/only-blood-in-the-clocktower/recaps/', window.location.origin)
+  url.searchParams.set(gameId ? 'game' : 'session', String(gameId ?? sessionId))
+  try {
+    await navigator.clipboard.writeText(url.href)
+    shareNotice.value = gameId ? 'Game link copied.' : 'Gathering link copied.'
+  } catch {
+    shareNotice.value = 'Copying isn’t available in this browser. Open this recap and copy its address.'
+  }
 }
 
 async function focusSharedTarget() {

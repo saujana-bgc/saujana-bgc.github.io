@@ -19,7 +19,7 @@
           <summary>Enter the setup key manually</summary>
           <code class="admin-mfa-key">{{ mfaSecret }}</code>
         </details>
-        <label>Six-digit code<UInput v-model="mfaCode" class="admin-login-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
+        <label>Six-digit code<UInput ref="mfaCodeInput" v-model="mfaCode" class="admin-login-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
         <p v-if="error" class="admin-error action-status action-status--error" role="alert">{{ error }}</p>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Verifying…' : 'Verify and sign in' }}</UButton>
         <UButton color="neutral" variant="outline" type="button" :disabled="busy" @click="cancelMfa">Cancel sign in</UButton>
@@ -27,6 +27,11 @@
     </section>
     <template v-else>
       <header class="admin-topbar"><NuxtLink to="/admin" class="admin-brand" aria-label="Saujana organiser workspace"><img class="admin-brand-mark brand-mark" src="/images/saujana-brand.avif" alt="" width="38" height="38"><span class="admin-brand-copy">Saujana <small>organiser workspace</small></span></NuxtLink><div><NuxtLink to="/" class="admin-public-link">Back to the website</NuxtLink><UButton class="admin-signout" color="neutral" variant="outline" @click="signOut">Sign out</UButton></div></header>
+      <label class="admin-mobile-nav">Organiser page
+        <select :value="route.path.replace(/\/+$/, '')" aria-label="Choose organiser page" @change="goToAdminPage($event.target.value)">
+          <option v-for="item in adminNavigation" :key="item.id" :value="item.to">{{ item.title }}</option>
+        </select>
+      </label>
       <nav class="admin-nav" aria-label="Admin pages">
         <NuxtLink
           v-for="item in adminNavigation"
@@ -38,7 +43,7 @@
           {{ item.title }}
         </NuxtLink>
       </nav>
-      <div class="admin-page"><slot /></div>
+      <div ref="adminPage" class="admin-page"><slot /></div>
     </template>
   </main>
 </template>
@@ -57,10 +62,13 @@ const remember = ref(false)
 const mfaCode = ref('')
 const error = ref('')
 const busy = ref(false)
+const mfaCodeInput = ref(null)
+const adminPage = ref(null)
 let restoreWatchdog
 function isCurrentPage(to) {
   return route.path.replace(/\/+$/, '') === to
 }
+function goToAdminPage(path) { if (path) router.push(path) }
 
 onMounted(async () => {
   restoreWatchdog = setTimeout(() => {
@@ -81,6 +89,8 @@ async function submitLogin() {
       return
     }
     password.value = ''
+    await nextTick()
+    mfaCodeInput.value?.$el?.querySelector('input')?.focus()
   } catch { error.value = 'Sign-in is unavailable right now. Please try again.' }
   finally { busy.value = false }
 }
@@ -99,12 +109,20 @@ async function submitMfa() {
     error.value = 'Authenticator verification is unavailable right now. Please try again.'
   } finally {
     busy.value = false
+    if (error.value) {
+      await nextTick()
+      mfaCodeInput.value?.$el?.querySelector('input')?.focus()
+    }
   }
 }
 
 async function finishLogin() {
   const next = route.path.startsWith('/admin') ? route.fullPath : '/admin'
   await router.replace(next.startsWith('/admin') && !next.startsWith('//') ? next : '/admin')
+  await nextTick()
+  const heading = adminPage.value?.querySelector('h1')
+  heading?.setAttribute('tabindex', '-1')
+  heading?.focus({ preventScroll: true })
 }
 
 async function cancelMfa() {
@@ -115,7 +133,12 @@ async function cancelMfa() {
   finally { busy.value = false }
 }
 
-async function signOut() { await auth.logout(); password.value = '' }
+async function signOut() {
+  const beforeSignOut = new Event('saujana-admin-before-signout', { cancelable: true })
+  if (!window.dispatchEvent(beforeSignOut)) return
+  await auth.logout()
+  password.value = ''
+}
 </script>
 
 <style>
@@ -142,4 +165,7 @@ async function signOut() { await auth.logout(); password.value = '' }
 .admin-nav { flex-wrap: wrap; }
 .admin-nav a { min-height: 44px; display: inline-flex; align-items: center; }
 .admin-nav a.active { box-shadow: inset 0 -2px 0 var(--gold-leaf); }
+.admin-mobile-nav { display: none; }
+@media(max-width:720px){.admin-root{padding-top:12px}.admin-topbar{align-items:center;padding-bottom:10px}.admin-brand{font-size:1rem}.admin-brand-mark{width:32px;height:32px}.admin-topbar>div{gap:8px}.admin-nav{display:none}.admin-mobile-nav{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:12px;margin:10px 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--white-pure);font-size:.8rem}.admin-mobile-nav select{min-width:0;min-height:42px;padding:7px 30px 7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--white-pure);color:var(--matcha-leaf);font:inherit}.admin-page{padding-top:12px}}
+@media(max-width:380px){.admin-brand-copy small{font-size:.49rem}.admin-public-link{font-size:.78rem}.admin-mobile-nav{gap:6px;font-size:.74rem}}
 </style>

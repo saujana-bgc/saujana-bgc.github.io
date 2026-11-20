@@ -40,15 +40,6 @@
         </div>
       </details>
 
-      <section class="collection-first-pick fade-up" aria-labelledby="first-pick-title">
-        <div>
-          <p class="eyebrow">An easy place to start</p>
-          <h2 id="first-pick-title">Try a round of Just One</h2>
-          <p>Give one-word clues, then see if your team thinks alike. It’s a gentle way into the collection.</p>
-        </div>
-        <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
-      </section>
-
       <div v-if="isError" class="page-hint collection-feedback action-status action-status--error" role="alert">We couldn’t load play history. Your search and filters are still here. <UButton type="button" variant="outline" color="neutral" @click="retry">Try again</UButton></div>
 
       <div ref="gridRef" class="editorial-grid">
@@ -83,6 +74,10 @@
         <p>Try a shorter title or clear your filters to browse all the games.</p>
         <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Show all games</UButton>
       </div>
+      <section v-if="!search.trim() && !selectedCategories.length && !unplayedOnly && displayedGames.length" class="collection-first-pick fade-up" aria-labelledby="first-pick-title">
+        <div><p class="eyebrow">An easy place to start</p><h2 id="first-pick-title">Try a round of Just One</h2><p>Give one-word clues, then see if your team thinks alike. It’s a gentle way into the collection.</p></div>
+        <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
+      </section>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>
     <UModal :open="Boolean(selectedGame)" :title="selectedGame?.name || 'Game details'" description="Board game details" :close="false" scrollable :ui="{ overlay: 'bg-[rgba(74,68,63,0.65)] !p-0 flex items-end justify-center sm:!p-10 sm:items-center', content: '!w-full sm:!w-[95vw] !max-w-[900px] !max-h-none !overflow-visible !border-0 !bg-transparent !shadow-none !ring-0 !p-0' }" @update:open="onModalOpenChange">
       <template #content>

@@ -6,11 +6,11 @@
         <p>Board games, riichi mahjong and Clocktower. Find your table.</p>
         <div class="hero-actions">
           <NuxtLink v-if="nextGathering" class="text-link" to="#next-gathering" no-prefetch>See the next gathering <span aria-hidden="true">↓</span></NuxtLink>
-          <NuxtLink v-else class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+          <NuxtLink v-else-if="gatheringStatus !== 'loading'" class="hero-gatherings-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
           <a class="text-link" href="#first-visit">What to expect <span aria-hidden="true">↓</span></a>
         </div>
       </div>
-      <section class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
+      <section id="next-gathering" class="next-gathering" :class="{ 'next-gathering-loading': gatheringStatus === 'loading' }" aria-label="Next gathering" :aria-busy="gatheringStatus === 'loading'">
         <template v-if="nextGathering">
           <time class="next-gathering-date" :datetime="nextGathering.date" aria-label="Gathering date">
             <strong>{{ nextGatheringDateStamp.day }}</strong>
@@ -40,7 +40,6 @@
           <p v-else-if="gatheringStatus === 'unavailable'">We couldn’t load the calendar just now.</p>
           <p v-else>We haven’t announced the next gathering yet. Have a question? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>.</p>
           <UButton v-if="gatheringStatus === 'unavailable'" type="button" class="action-status-action" variant="outline" color="neutral" @click="loadNextGathering">Try again</UButton>
-          <NuxtLink class="text-link" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
         </div>
       </section>
       <figure class="hero-artwork">

@@ -218,6 +218,11 @@ const scriptNames = Object.keys(scriptPresets)
 const busy = computed(() => saving.value || uploading.value)
 const isDirty = computed(() => JSON.stringify(cleanSession(draft.value)) !== JSON.stringify(baseline.value))
 onBeforeRouteLeave(() => !busy.value && confirmDiscard())
+function guardSignOut(event) {
+  if (busy.value || !confirmDiscard()) event.preventDefault()
+}
+onMounted(() => window.addEventListener('saujana-admin-before-signout', guardSignOut))
+onBeforeUnmount(() => window.removeEventListener('saujana-admin-before-signout', guardSignOut))
 
 let draftSaveTimer
 let restoringDraft = false
@@ -593,6 +598,10 @@ async function save(published = baseline.value.published) {
     })
     return
   }
+
+  if (published && !window.confirm(baseline.value.published
+    ? 'Update the public recap with these changes? Review the preview before continuing.'
+    : 'Publish this gathering to the public recap? Review the preview before continuing.')) return
 
   saving.value = true
   try {

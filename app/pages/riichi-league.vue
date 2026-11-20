@@ -37,7 +37,8 @@
         <span class="league-field-label">Find a player</span>
         <UInput class="league-control" v-model="standingQuery" type="search" aria-label="Search standings" placeholder="Search standings" autocomplete="off" />
       </label>
-      <p v-if="!filteredStandings.length" role="status">No players match “{{ standingQuery }}”.</p>
+      <div v-if="!standings.length" class="league-empty-standings" role="status"><h3>No results recorded yet</h3><p>Standings will appear after the first table results are saved. You can still choose a week below to check the schedule.</p><UButton v-if="entryWeek" class="league-button league-button-primary" type="button" @click="goToEntry">Add this week’s results</UButton><a v-else class="league-button" href="#weeks-heading">View weekly schedule</a></div>
+      <p v-if="standingQuery && !filteredStandings.length" role="status">No players match “{{ standingQuery }}”.</p>
       <div class="standings-table-wrap">
         <table class="standings-table">
           <thead>
@@ -145,7 +146,7 @@
           <div>
             <span class="status-pill" :class="`status-${selectedWeek.status}`">{{ humanize(selectedWeek.status) }}</span>
             <h3>Week {{ selectedWeek.weekNumber }}</h3>
-            <p>{{ formatDate(selectedWeek.date, true) }}</p>
+            <p><time :datetime="selectedWeek.date">{{ formatDate(selectedWeek.date, true) }}</time><span> · {{ selectedWeek.tables.length ? `${selectedWeek.tables.length} ${selectedWeek.tables.length === 1 ? 'table' : 'tables'} recorded` : canManageResults ? 'Results can be entered now' : isScoreEntryClosed ? 'Result entry is closed' : 'Scheduled' }}</span></p>
           </div>
           <dl>
             <div>
@@ -342,6 +343,7 @@ const filteredStandings = computed(() => standings.value.filter(player => player
 const mobileStandings = computed(() => showAllStandings.value || standingQuery.value ? filteredStandings.value : filteredStandings.value.slice(0, 10))
 const entryWeek = computed(() => selectedWeeks.value.find(week => week.date <= currentKualaLumpurDate.value && addCalendarDays(week.date, 3) >= currentKualaLumpurDate.value))
 async function goToEntry() {
+  if (!entryWeek.value) return
   selectedWeekId.value = entryWeek.value.id
   await nextTick()
   document.getElementById('score-entry-heading')?.focus()
@@ -855,6 +857,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.league-empty-standings{display:grid;justify-items:start;gap:7px;padding:18px;margin:16px 0;border:1px solid var(--line);border-radius:9px;background:var(--surface-soft)}.league-empty-standings h3,.league-empty-standings p{margin:0}.league-empty-standings h3{color:var(--matcha-leaf);font:400 1.3rem var(--font-display)}.league-empty-standings p{color:var(--muted);font-size:.88rem;line-height:1.55}
 .league-page {
   width: min(100% - 24px, 1060px);
   padding: 0 0 36px;

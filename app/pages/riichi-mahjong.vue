@@ -5,10 +5,10 @@
       <p class="stats-container">You draw a tile. Does it bring your hand closer to winning, or is it one to discard? In four-player riichi and three-player sanma, the fun is spotting which tiles fit.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
       <nav class="quick-destinations" aria-label="Riichi Mahjong pages">
+        <NuxtLink to="/riichi-rules/" no-prefetch>Riichi Rules</NuxtLink>
         <NuxtLink to="/riichi-calculator/" no-prefetch>Riichi Calculator</NuxtLink>
         <NuxtLink to="/riichi-league/" no-prefetch>Riichi League</NuxtLink>
         <NuxtLink to="/riichi-open/" no-prefetch>Riichi Open I results</NuxtLink>
-        <NuxtLink to="/riichi-rules/" no-prefetch>Riichi Rules</NuxtLink>
       </nav>
     </header>
 

@@ -19,7 +19,7 @@
 
       <div class="birthday-card-body">
         <div v-if="isSubmitted" class="birthday-success action-status action-status--success" role="status">
-          <h2>Thanks, {{ submittedName }}. We’ve saved your birthday.</h2>
+          <h2 ref="confirmationHeading" tabindex="-1">Thanks, {{ submittedName }}. We’ve saved your birthday.</h2>
           <p>{{ allowPublicGreeting ? 'You’ve allowed a public birthday greeting.' : 'Only organisers can see your birthday.' }}</p>
           <UButton class="secondary-button" color="neutral" variant="outline" type="button" @click="resetForm">
             Add another birthday
@@ -108,6 +108,7 @@
 
 <script setup>
 const supabase = useSupabase()
+const confirmationHeading = ref(null)
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -177,6 +178,8 @@ async function submitBirthday() {
 
   submittedName.value = cleanName
   isSubmitted.value = true
+  await nextTick()
+  confirmationHeading.value?.focus({ preventScroll: true })
 }
 
 function resetForm() {

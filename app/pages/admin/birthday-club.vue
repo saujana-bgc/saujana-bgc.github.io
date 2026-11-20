@@ -16,6 +16,16 @@
         </section>
 
         <section v-else class="calendar-content" aria-label="Birthday calendar">
+          <section class="upcoming-agenda" aria-labelledby="upcoming-birthdays-heading">
+            <div class="agenda-heading"><div><p class="eyebrow">Next up</p><h2 id="upcoming-birthdays-heading">Upcoming birthdays</h2></div><span>{{ upcomingBirthdays.length }} {{ upcomingBirthdays.length === 1 ? 'birthday' : 'birthdays' }} this year</span></div>
+            <p v-if="isLoading" role="status">Loading birthdays…</p>
+            <p v-else-if="!upcomingBirthdays.length" class="agenda-empty">No upcoming birthdays this year.</p>
+            <ul v-else class="upcoming-birthday-list">
+              <li v-for="birthday in upcomingBirthdays" :key="birthday.id"><time :datetime="birthdayNextDate(birthday)">{{ birthdayDateLabel(birthday) }}</time><strong>{{ birthday.name }}</strong><span :class="birthday.allow_public_greeting ? 'public-wish' : 'private-wish'">{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</span></li>
+            </ul>
+          </section>
+          <details class="full-calendar">
+            <summary>Browse the full calendar</summary>
           <div class="calendar-toolbar fade-up">
             <div class="year-control" aria-label="Calendar year">
               <UButton type="button" aria-label="Previous year" @click="calendarYear--">&larr;</UButton>
@@ -81,21 +91,11 @@
             <ul><li v-for="birthday in leapDayBirthdays" :key="birthday.id"><strong>{{ birthday.name }}</strong><span>{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</span></li></ul>
           </section>
 
-          <section v-if="!isLoading" class="mobile-birthday-list" aria-label="Birthdays by date">
-            <h2>Birthdays by date</h2>
-            <p v-if="!birthdays.length">No birthdays have been added.</p>
-            <ul v-else>
-              <li v-for="birthday in mobileBirthdayList" :key="birthday.id">
-                <span class="birthday-date">{{ birthdayDateLabel(birthday) }}</span>
-                <div><strong>{{ birthday.name }}</strong><small>{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</small></div>
-              </li>
-            </ul>
-          </section>
-
           <div v-if="!isLoading" class="calendar-legend" aria-label="Greeting preference legend">
             <span><i class="legend-dot public-dot"></i> Public greeting allowed</span>
             <span><i class="legend-dot private-dot"></i> No public greeting</span>
           </div>
+          </details>
         </section>
     </div>
   </div>
@@ -129,13 +129,23 @@ const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 const publicGreetingCount = computed(() => birthdays.value.filter(birthday => birthday.allow_public_greeting).length)
 const isLeapCalendarYear = computed(() => calendarYear.value % 4 === 0 && (calendarYear.value % 100 !== 0 || calendarYear.value % 400 === 0))
 const leapDayBirthdays = computed(() => birthdays.value.filter(birthday => birthday.birth_month === 2 && birthday.birth_day === 29))
-const mobileBirthdayList = computed(() => birthdays.value
-  .filter(birthday => isLeapCalendarYear.value || birthday.birth_month !== 2 || birthday.birth_day !== 29)
-  .sort((a,b) => a.birth_month - b.birth_month || a.birth_day - b.birth_day || a.name.localeCompare(b.name)))
+const upcomingBirthdays = computed(() => birthdays.value
+  .map(birthday => ({ ...birthday, nextDate: nextBirthdayDate(birthday) }))
+  .sort((a,b) => a.nextDate - b.nextDate || a.name.localeCompare(b.name)))
 
 function birthdayDateLabel(birthday) {
   return new Date(2024, birthday.birth_month - 1, birthday.birth_day).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })
 }
+function nextBirthdayDate(birthday) {
+  let year = currentYear
+  let date = new Date(year,birthday.birth_month-1,birthday.birth_day,12)
+  while (date.getMonth() !== birthday.birth_month-1 || date.getDate() !== birthday.birth_day || date < now) {
+    year += 1
+    date = new Date(year,birthday.birth_month-1,birthday.birth_day,12)
+  }
+  return date
+}
+function birthdayNextDate(birthday) { return `${birthday.nextDate.getFullYear()}-${String(birthday.birth_month).padStart(2,'0')}-${String(birthday.birth_day).padStart(2,'0')}` }
 
 const birthdaysByDate = computed(() => {
   const groups = new Map()
@@ -633,6 +643,7 @@ onMounted(loadBirthdays)
 }
 
 .calendar-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.upcoming-agenda,.full-calendar{padding:18px;border:1px solid var(--line);border-radius:var(--radius-card);background:var(--white-pure)}.upcoming-agenda{margin-bottom:16px}.agenda-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:12px}.agenda-heading .eyebrow{margin:0 0 5px}.agenda-heading h2{margin:0;color:var(--matcha-leaf);font:400 1.45rem var(--font-display)}.agenda-heading>span,.agenda-empty{color:var(--muted);font-size:.82rem}.upcoming-birthday-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.upcoming-birthday-list li{display:grid;grid-template-columns:145px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:7px}.upcoming-birthday-list time{color:var(--matcha-leaf);font-variant-numeric:tabular-nums}.upcoming-birthday-list strong{overflow-wrap:anywhere}.upcoming-birthday-list span{font-size:.78rem}.full-calendar>summary{min-height:42px;display:flex;align-items:center;color:var(--matcha-leaf);font-weight:650;cursor:pointer}.full-calendar[open]>summary{margin-bottom:14px}.full-calendar .months-grid{margin-top:15px}
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 .public-dot { background: #719073; }
 .private-dot { background: #b77b87; }
@@ -724,11 +735,8 @@ onMounted(loadBirthdays)
 .leap-day-card li, .mobile-birthday-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; }
 .leap-day-card li span, .mobile-birthday-list small { color: var(--muted); font-size: .82rem; }
 @media (max-width: 767px) {
-  .months-grid { display: none; }
-  .mobile-birthday-list { display: block; margin-top: 18px; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--white-pure); }
-  .mobile-birthday-list li { justify-content: flex-start; }
-  .mobile-birthday-list .birthday-date { min-width: 105px; color: var(--matcha-leaf); font-weight: 700; }
-  .mobile-birthday-list li div { display: grid; gap: 2px; }
+  .months-grid { display: grid; grid-template-columns: minmax(0,1fr); }
 }
+@media(max-width:560px){.upcoming-birthday-list li{grid-template-columns:1fr auto}.upcoming-birthday-list time{grid-column:1/-1}.upcoming-birthday-list span{font-size:.7rem}.agenda-heading{align-items:flex-start;flex-direction:column}.upcoming-agenda,.full-calendar{padding:14px}}
 
 </style>
