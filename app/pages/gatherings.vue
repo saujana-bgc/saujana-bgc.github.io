@@ -1712,7 +1712,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 /* --- ATTENDEES TABLE --- */
 .attendees-table-wrap {
-    overflow-x: auto;
+    overflow: clip;
     border-radius: 16px;
     border: 1px solid rgba(201, 190, 239, 0.25);
 }
@@ -1748,8 +1748,8 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 .attendees-table td:nth-child(2) { width: 95px; }
 .attendees-table th:nth-child(3),
 .attendees-table td:nth-child(3) { width: 80px; }
-.attendees-table th:nth-child(6),
-.attendees-table td:nth-child(6) { width: 36px; }
+/* Leave room for the 44px remove button and 6px of padding on each side. */
+.attendees-table th:last-child { width: 56px; }
 
 .attendees-table thead tr {
     background: linear-gradient(135deg, var(--rose-dust), var(--lavender-mist));
@@ -1890,11 +1890,7 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .cell-number { text-align: right; }
 
-.td-delete {
-    width: 36px;
-    text-align: center;
-    padding: 4px 4px;
-}
+.td-delete { text-align: center; }
 
 .btn-delete {
     min-width: 44px;

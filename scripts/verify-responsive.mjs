@@ -91,7 +91,7 @@ if (routesToCheck.some(route => !routes.includes(route))) {
 let browser
 const failures = []
 
-async function checkGatheringAttendeeCards(browser) {
+async function checkGatheringAttendeeLayout(browser) {
   const eventFixtures = [
     { id: 'responsive-plain', name: 'Responsive fixture', date: '2099-11-22', time: '12:00', venue: 'Test venue', venue_url: null, description: 'Responsive layout fixture', flyer_path: null },
     { id: 'responsive-photo', name: 'Responsive photo fixture', date: '2099-11-23', time: '12:00', venue: 'Eleven at Saujana', venue_url: null, description: 'Responsive layout fixture', flyer_path: null },
@@ -119,7 +119,7 @@ async function checkGatheringAttendeeCards(browser) {
       return route.abort()
     })
 
-    for (const width of [320, 360, 390, 430, 767, 768]) {
+    for (const width of [320, 360, 390, 430, 767, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 })
       await page.goto(`${baseUrl}/gatherings/`, { waitUntil: 'load', timeout: 20000 })
 
@@ -127,6 +127,21 @@ async function checkGatheringAttendeeCards(browser) {
         const details = page.locator(`#gathering-${event.id} .attendee-list-details`)
         await details.locator('summary').click()
         await details.getByText('1 signed up', { exact: true }).waitFor()
+
+        if (width >= 768) {
+          const tableWrap = details.locator('.attendees-table-wrap')
+          const fits = await tableWrap.evaluate(wrapper => {
+            const button = wrapper.querySelector('.td-delete > button')
+            if (!button || wrapper.scrollWidth > wrapper.clientWidth) return false
+            const cellBounds = button.closest('td').getBoundingClientRect()
+            const buttonBounds = button.getBoundingClientRect()
+            return buttonBounds.width >= 44 && buttonBounds.left >= cellBounds.left && buttonBounds.right <= cellBounds.right
+          })
+          if (!await tableWrap.isVisible() || await details.locator('.attendees-cards').isVisible() || !fits) {
+            failures.push(`Gathering attendee table does not fit at ${width}px in ${event.id} fixture`)
+          }
+          continue
+        }
 
         const result = await details.evaluate(element => {
           const card = element.querySelector('.attendee-card')
@@ -145,11 +160,8 @@ async function checkGatheringAttendeeCards(browser) {
           }
         })
 
-        if (width <= 767 && (!result.isMobileCards || result.missingCard || !result.cardFitsList || !result.cardFitsEvent || !result.controlsFit)) {
+        if (!result.isMobileCards || result.missingCard || !result.cardFitsList || !result.cardFitsEvent || !result.controlsFit) {
           failures.push(`Gathering attendee card clips at ${width}px in ${event.id} fixture`)
-        }
-        if (width >= 768 && result.isMobileCards) {
-          failures.push(`Gathering attendee table does not replace mobile cards at ${width}px`)
         }
       }
     }
@@ -166,7 +178,7 @@ try {
   const browserType = process.env.RESPONSIVE_BROWSER === 'firefox' ? firefox : chromium
   browser = await browserType.launch({ headless: true })
 
-  if (routesToCheck.includes('/gatherings/')) await checkGatheringAttendeeCards(browser)
+  if (routesToCheck.includes('/gatherings/')) await checkGatheringAttendeeLayout(browser)
 
   for (const route of [...routesToCheck, ...(routesToCheck.length === routes.length ? ['/404.html', notFoundRoute] : [])]) {
     const page = await browser.newPage()
