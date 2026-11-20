@@ -28,8 +28,10 @@
         </div>
         <div class="editor-heading-actions">
           <UButton v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</UButton>
+          <UButton v-if="!draft.games.length" type="button" :disabled="busy" @click="loadSampleGame">Load a sample game</UButton>
         </div>
       </div>
+      <p v-if="sampleGameLoaded" class="message action-status" role="status">Sample loaded for preview. Save it only if you want to keep it.</p>
 
       <fieldset class="editor-fields" :disabled="busy">
         <section class="gathering-details">
@@ -203,6 +205,7 @@ const uploading = ref(false)
 const error = ref('')
 const notice = ref('')
 const draft = ref(emptySession())
+const sampleGameLoaded = ref(false)
 const baseline = ref(cleanSession(draft.value))
 const scriptPresets = {
   'Trouble Brewing': 'Washerwoman, Librarian, Investigator, Chef, Empath, Fortune Teller, Undertaker, Monk, Ravenkeeper, Virgin, Slayer, Soldier, Mayor, Butler, Drunk, Recluse, Saint, Poisoner, Spy, Scarlet Woman, Baron, Imp',
@@ -317,6 +320,36 @@ function addGame(options = {}) {
     const card = gameCards.value.at(-1)
     card?.scrollIntoView({ block: 'start' })
     card?.querySelector('select')?.focus({ preventScroll: true })
+  })
+}
+
+function loadSampleGame() {
+  if (draft.value.games.length) return
+  const game = {
+    id: crypto.randomUUID(),
+    script: 'Trouble Brewing',
+    script_characters: scriptPresets['Trouble Brewing'],
+    outcome: 'Good wins',
+    notes: '',
+    storyteller: 'Alex the Storyteller',
+    teaser: 'The Quiet Town',
+    recap: 'The town began with a confident accusation, but a late clue turned the vote around. Good won just before the final night.',
+    players: [
+      { ...newPlayer(), name: 'Avery', public_name: 'Avery', character: 'Washerwoman' },
+      { ...newPlayer(), name: 'Jordan', public_name: 'Jordan', character: 'Empath' },
+      { ...newPlayer(), name: 'Sam', public_name: 'Sam', character: 'Investigator', died: true },
+      { ...newPlayer(), name: 'Taylor', public_name: 'Taylor', character: 'Poisoner' },
+      { ...newPlayer(), name: 'Morgan', public_name: 'Morgan', character: 'Imp' },
+    ],
+    photos: [],
+  }
+  draft.value.venue = 'Sample gathering'
+  draft.value.games.push(game)
+  sampleGameLoaded.value = true
+  nextTick(() => {
+    const card = gameCards.value[0]
+    if (card) card.open = true
+    card?.scrollIntoView({ block: 'start' })
   })
 }
 
@@ -477,6 +510,7 @@ async function load() {
 
 function setDraft(session) {
   draft.value = cleanSession(session)
+  sampleGameLoaded.value = false
   baseline.value = cleanSession(session)
   activeGatheringId.value = String(activeGatherings.value.find(event => event.date === session.session_date && (!event.venue || !session.venue || event.venue === session.venue))?.id ?? '')
   notice.value = ''
