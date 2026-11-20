@@ -59,7 +59,7 @@
 
           <UButton type="button" class="pebble-container" :aria-label="`View ${game.name}`" @click="openModal(game, $event)">
             <img
-              :src="'/' + game.img"
+              :src="thumbnailPath(game.img)"
               :alt="game.name"
               width="400"
               height="400"
@@ -252,6 +252,7 @@ const virtualState = computed((previous) => {
 })
 
 const virtualGames = computed(() => displayedGames.value.slice(virtualState.value.start, virtualState.value.end))
+const thumbnailPath = imagePath => '/' + imagePath.replace('images/games/', 'images/games/thumbs/')
 const topSpacerHeight = computed(() => virtualState.value.firstRow * virtualRowHeight.value)
 const bottomSpacerHeight = computed(() => {
     const remainingRows = virtualState.value.totalRows - virtualState.value.firstRow - virtualState.value.renderedRows
