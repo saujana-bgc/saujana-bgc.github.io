@@ -76,6 +76,12 @@
             <p v-if="game.script && !scriptNames.includes(game.script)" class="script-hint">This game uses a previously saved script. You can keep it or switch to one of the listed scripts.</p>
             <p v-else-if="game.script" class="script-hint">{{ characters(game).length }} character suggestions loaded for {{ game.script }}.</p>
 
+            <details class="game-writing" :open="Boolean(game.teaser || game.recap)">
+              <summary>Write this game’s recap</summary>
+              <label>Recap title<input v-model="game.teaser" maxlength="240" placeholder="Optional short title"></label>
+              <label>Retelling<textarea v-model="game.recap" rows="4" maxlength="3000" placeholder="What happened in this game? You can finish this later on desktop."></textarea></label>
+            </details>
+
             <div class="section-heading">
               <h4>Players and characters <small>{{ game.players.length }} / 20 · at least 5 players</small></h4>
             </div>
@@ -102,11 +108,6 @@
               <div><UButton type="button" @click="toggleBulkRoster(game)">Cancel</UButton><UButton class="admin-primary" type="button" @click="addPastedPlayers(game)">Add names</UButton></div>
             </section>
 
-            <details class="game-writing" :open="Boolean(game.teaser || game.recap)">
-              <summary>Write this game’s recap</summary>
-              <label>Recap title<input v-model="game.teaser" maxlength="240" placeholder="Optional short title"></label>
-              <label>Retelling<textarea v-model="game.recap" rows="4" maxlength="3000" placeholder="What happened in this game? You can finish this later on desktop."></textarea></label>
-            </details>
             <details v-if="game.notes" class="legacy-writeup"><summary>Previous game note</summary><p>{{ game.notes }}</p></details>
             <details class="game-extras" :open="Boolean(game.photos?.length)">
               <summary>Photos <span v-if="game.photos?.length">{{ game.photos.length }}</span></summary>
@@ -145,11 +146,13 @@
               <p>{{ formatGatheringDate(draft.session_date) }}<template v-if="draft.venue"> · {{ draft.venue }}</template></p>
             </header>
             <template v-for="game in draft.games" :key="game.id">
-              <h4>{{ game.teaser || (draft.games.length === 1 ? draft.teaser : '') || game.script || 'Script not recorded' }}</h4>
+              <p v-if="game.teaser || (draft.games.length === 1 && draft.teaser)" class="preview-script">{{ game.script || 'Script not recorded' }}</p>
+              <h4>{{ game.teaser || (draft.games.length === 1 ? draft.teaser : '') || game.script || 'Game recap' }}</h4>
               <div class="preview-content">
                 <p v-if="game.outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
-                <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
                 <p v-if="game.recap || (draft.games.length === 1 && draft.recap)">{{ game.recap || draft.recap }}</p>
+                <p v-else class="preview-empty-story">No retelling published.</p>
+                <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
               </div>
               <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
                 <img v-for="photo in game.photos.filter(photo => photo.approved && photoSource(photo))" :key="photo.path" :src="photoSource(photo)" alt="Approved gathering photo">
@@ -814,6 +817,8 @@ button:disabled { opacity: .65; cursor: wait; }
 .preview-session h4 { margin: 16px 0 0; color: var(--matcha-leaf); }
 .preview-content { margin: 10px 0; padding: 12px; border: 1px solid #e3d6c6; border-radius: 7px; background: #f8f1e8; }
 .preview-content p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.preview-script { margin: 0; color: var(--muted); font-size: .82rem; }
+.preview-empty-story { color: var(--muted); font-style: italic; }
 .preview-photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 8px; }
 .preview-photos img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; }
 .saved-picker { margin-top: 16px; border: 1px solid var(--desk-rule); border-radius: 8px; background: var(--desk-paper); }

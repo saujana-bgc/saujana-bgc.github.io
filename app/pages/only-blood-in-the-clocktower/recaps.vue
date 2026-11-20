@@ -40,7 +40,7 @@
             <header class="game-recap-heading">
               <div class="game-title">
                 <span class="game-label">Game {{ number }}</span>
-                <p class="game-script-name">{{ game.script || 'Script not recorded' }}</p>
+                <p v-if="game.teaser" class="game-script-name">{{ game.script || 'Script not recorded' }}</p>
                 <h4 class="game-script" tabindex="-1">{{ game.teaser || game.script || 'Game ' + number }}</h4>
               </div>
               <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
@@ -51,6 +51,7 @@
                 <p v-for="(paragraph, index) in retellingParagraphs(game.recap)" :key="index">{{ paragraph }}</p>
               </div>
             </section>
+            <p v-else class="recap-unavailable">No retelling published.</p>
             <ol v-if="game.players?.length" class="grimoire" aria-label="Players and characters">
               <li v-for="(player, pIndex) in game.players" :key="pIndex" class="grimoire-seat" :class="{ 'is-dead': player.died }">
                 <img class="character-art" :src="characterIcon(player.character)" alt="" loading="lazy" decoding="async">
@@ -483,6 +484,8 @@ onMounted(() => {
 .game-title { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .game-label { color: var(--wine); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
 .game-script { margin: 0; font: 400 1.12rem/1.3 var(--font-display); }
+.game-script-name { margin: 0; color: var(--muted); font-size: .82rem; }
+.recap-unavailable { margin: 12px 0 0; color: var(--muted); font-size: .9rem; font-style: italic; }
 .outcome { margin: 0; padding: 4px 9px; border-radius: 5px; background: var(--lavender-mist); color: var(--matcha-leaf); font-size: .84rem; font-weight: 700; }
 .grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
 .grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; align-items: center; min-height: 88px; overflow: hidden; padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--white-pure); color: var(--clay-text); box-shadow: var(--shadow-card); }
