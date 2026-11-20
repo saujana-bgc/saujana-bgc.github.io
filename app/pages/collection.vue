@@ -88,7 +88,7 @@
       <template #content>
       <div v-if="selectedGame" class="modal-container">
         <div style="width: 40px; height: 5px; background: #e0e0e0; border-radius: 10px; margin: 15px auto 0; display: block;" class="mobile-handle"></div>
-        <UButton type="button" aria-label="Close game details" @click="closeModal" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.5rem; color: var(--matcha-leaf); cursor: pointer; line-height: 1;">&times;</UButton>
+        <UButton type="button" class="modal-close-button" aria-label="Close game details" @click="closeModal">&times;</UButton>
 
         <div class="modal-content">
           <div style="text-align: center;">
@@ -573,6 +573,23 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
     background: var(--white-pure); width: 100%; max-height: 90vh;
     border-radius: 40px 40px 0 0; overflow-y: auto; position: relative;
     box-shadow: 0 -10px 50px rgba(0,0,0,0.12); padding-bottom: 40px;
+}
+
+.modal-close-button {
+    position: sticky;
+    top: 8px;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 0 20px -44px auto;
+    padding: 0;
+    border: 0;
+    background: var(--white-pure);
+    color: var(--matcha-leaf);
+    font-size: 2rem;
+    line-height: 1;
 }
 
 .modal-content {

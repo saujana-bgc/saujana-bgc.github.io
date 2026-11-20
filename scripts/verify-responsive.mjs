@@ -207,6 +207,49 @@ async function checkMobileNavigation(browser) {
   }
 }
 
+async function checkMobilePageInteractions(browser) {
+  const page = await browser.newPage({ isMobile: true, hasTouch: true })
+
+  try {
+    await page.setViewportSize({ width: 320, height: 568 })
+    await page.goto(`${baseUrl}/collection/`, { waitUntil: 'load', timeout: 20000 })
+    await page.getByRole('searchbox').waitFor({ state: 'visible' })
+    await page.getByRole('searchbox').fill('Just One')
+    const gameButton = page.getByRole('button', { name: 'View Just One', exact: true })
+    await gameButton.waitFor({ state: 'visible' })
+    await gameButton.tap()
+    const sheet = page.locator('.modal-container')
+    const closeButton = page.getByRole('button', { name: 'Close game details' })
+    await sheet.evaluate(element => { element.scrollTop = element.scrollHeight })
+    await closeButton.waitFor({ state: 'visible' })
+    const closeBounds = await closeButton.evaluate(element => {
+      const bounds = element.getBoundingClientRect()
+      return { top: bounds.top, bottom: bounds.bottom, viewportHeight: innerHeight }
+    })
+    if (closeBounds.top < 0 || closeBounds.bottom > closeBounds.viewportHeight) {
+      failures.push('Collection close button is hidden while scrolling game details on a phone')
+    }
+    await closeButton.tap()
+    await sheet.waitFor({ state: 'hidden' })
+
+    await page.goto(`${baseUrl}/riichi-calculator/`, { waitUntil: 'load', timeout: 20000 })
+    const guideHeight = await page.locator('.tutorial-trigger').evaluate(element => element.getBoundingClientRect().height)
+    const firstTileTop = await page.locator('.tile-picker-button').first().evaluate(element => element.getBoundingClientRect().top)
+    if (guideHeight < 44) failures.push(`Calculator guide touch target is only ${Math.round(guideHeight)}px tall at 320×568px`)
+    if (firstTileTop > 700) failures.push(`Calculator first tile begins at ${Math.round(firstTileTop)}px at 320×568px`)
+
+    await page.getByRole('button', { name: /Han and fu/ }).tap()
+    await page.getByRole('button', { name: 'Set total to 5 han' }).tap()
+    await page.getByRole('button', { name: 'View breakdown' }).tap()
+    await page.locator('#score-breakdown').waitFor({ state: 'visible' })
+    if (await page.locator('.result-panel').isVisible()) {
+      failures.push('Calculator result panel covers the expanded score breakdown on a short phone')
+    }
+  } finally {
+    await page.close()
+  }
+}
+
 try {
   await new Promise((resolveListen, rejectListen) => {
     server.once('error', rejectListen)
@@ -217,6 +260,7 @@ try {
 
   if (routesToCheck.includes('/gatherings/')) await checkGatheringAttendeeLayout(browser)
   await checkMobileNavigation(browser)
+  await checkMobilePageInteractions(browser)
 
   for (const route of [...routesToCheck, ...(routesToCheck.length === routes.length ? ['/404.html', notFoundRoute] : [])]) {
     const page = await browser.newPage()

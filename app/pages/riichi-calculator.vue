@@ -1,5 +1,5 @@
 <template>
-  <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1) }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
+  <main class="calculator-page" :class="{ 'result-panel-visible': !keyboardOpen && resultReady && (entryMode !== 'tiles' || tileStep === 1), 'breakdown-visible': showBreakdown }" :style="{ '--mobile-result-panel-height': `${mobileResultPanelHeight}px` }">
     <header class="page-intro calculator-heading">
       <NuxtLink class="activity-parent-link" to="/riichi-mahjong/" no-prefetch>Riichi Mahjong</NuxtLink>
       <h1 class="hero-title">Riichi Calculator</h1>
@@ -1371,11 +1371,15 @@ onBeforeUnmount(() => {
 @media (max-width: 380px) and (max-height: 650px) {
   .calculator-page .calculator-heading { margin-bottom: 2px; }
   .calculator-heading .page-eyebrow { margin-bottom: 6px; }
-  .calculator-heading > .calculator-description { margin-top: 2px; }
-  .tutorial-trigger { min-height: 36px; margin-top: 4px; padding-block: 5px; }
+  .calculator-heading > .calculator-description { display: none; }
+  .tutorial-trigger { min-height: 44px; margin-top: 4px; padding-block: 5px; }
   .calculator-layout { gap: 8px; }
   .entry-mode button { min-height: 48px; }
   .calc-section { padding: 12px; }
+}
+@media (max-width: 760px) {
+  .calculator-page.breakdown-visible.result-panel-visible { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+  .calculator-page.breakdown-visible .result-panel { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .choice-button { transition: none; }
