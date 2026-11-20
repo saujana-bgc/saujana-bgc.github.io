@@ -2050,7 +2050,7 @@ onBeforeUnmount(() => {
 .table-title { gap: 12px; }
 .table-metadata { gap: 4px 12px; }
 .table-metadata span { font-size: .75rem; opacity: .85; }
-@media (max-width: 760px) {
+@media (max-width: 940px) {
   .season-card, .content-card, .rules-card { padding: 20px 16px; }
   .season-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .season-stats > div { padding: 12px 8px; }

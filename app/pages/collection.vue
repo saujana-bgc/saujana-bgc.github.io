@@ -731,6 +731,7 @@ main:has(.collection-search) > .sort-controls { width: min(100% - 40px, 1160px);
   .editorial-grid { padding-top: 10px; }
   .pebble-container { margin-block: 8px; }
   .collection-search-input :deep(.collection-search-field) { min-height: 48px; }
+  .collection-search-input :deep(.collection-search-field) { font-size: 16px; }
   .collection-sort-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .collection-category-options { gap: 6px; flex-wrap: wrap; padding: 2px 0 8px; }
   .collection-category-options .category-btn { flex: 0 1 auto; }

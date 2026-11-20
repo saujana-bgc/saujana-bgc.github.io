@@ -338,7 +338,7 @@ button:disabled { cursor: not-allowed; }
   .page-content :is(button, input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select) {
     min-block-size: 44px;
   }
-  .page-content textarea { min-block-size: 96px; }
+  .page-content textarea { min-block-size: 44px; }
   .page-content summary { min-block-size: 44px; }
   .page-content :is(.context-link, .activity-parent-link) { min-block-size: 44px; }
 }

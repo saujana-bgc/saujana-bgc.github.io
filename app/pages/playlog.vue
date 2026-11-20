@@ -455,6 +455,9 @@ onUnmounted(() => {
     border-color: var(--matcha-leaf);
     box-shadow: 0 0 0 3px rgba(107, 122, 104, 0.1);
 }
+@media (max-width: 600px) {
+  .search-input :deep(.search-field) { font-size: 16px; }
+}
 
 .session-card {
     background: var(--white-pure);

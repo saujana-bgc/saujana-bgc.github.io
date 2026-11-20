@@ -2056,6 +2056,9 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
 
 .card-value-input:focus { background: rgba(255,255,255,0.75); }
 .card-value-input.card-area { resize: none; overflow: hidden; line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .attendee-card .card-value-input.card-area { min-height: 44px; height: 44px; font-size: 16px; }
+}
 
 /* --- DELETE MODAL --- */
 .modal-overlay {

@@ -4,6 +4,10 @@
       <h1 class="hero-title">Board Games</h1>
       <p class="stats-container">From quick party games to thoughtful strategy, choose a table that suits you. We’ll help you find a game and learn as you play.</p>
       <NuxtLink class="activity-primary" to="/gatherings/" no-prefetch>Find a gathering <span aria-hidden="true">→</span></NuxtLink>
+      <nav class="quick-destinations" aria-label="Board game pages">
+        <NuxtLink to="/collection/" no-prefetch>Browse the collection</NuxtLink>
+        <NuxtLink to="/playlog/" no-prefetch>Play history</NuxtLink>
+      </nav>
     </header>
 
     <section class="activity-content" aria-labelledby="first-game-title">
@@ -34,7 +38,7 @@
 .activity-page .stats-container { max-width: 580px; }
 .activity-content { margin: 18px auto 34px; }
 .quick-destinations { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 18px; margin: 14px auto 0; }
-.quick-destinations a { display: inline-flex; min-height: 40px; align-items: center; gap: 7px; color: var(--matcha-leaf); font-size: .88rem; font-weight: 650; text-underline-offset: 4px; }
+.quick-destinations a { display: inline-flex; min-height: 44px; align-items: center; gap: 7px; color: var(--matcha-leaf); font-size: .88rem; font-weight: 650; text-underline-offset: 4px; }
 .activity-copy h2 { margin: 0 0 12px; color: var(--matcha-leaf); font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.2 var(--font-display); }
 .activity-copy p:not(.page-eyebrow) { max-width: 560px; color: var(--muted); line-height: 1.75; }
 .activity-copy .page-eyebrow { justify-content: flex-start; margin-bottom: 12px; }
