@@ -11,9 +11,9 @@
     :root { color-scheme: light; --paper: #f7f5ef; --surface: #fffefa; --green: #354c3e; --ink: #393d35; --muted: #666c60; --line: #dedcd2; --gold: #8a6a3e; --display: 'Playfair Display', Georgia, serif; }
     * { box-sizing: border-box; }
     body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: clamp(16px, 4vw, 40px); background: var(--paper); color: var(--ink); font: 1rem/1.6 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
-    main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; width: min(100%, 960px); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 8px 30px rgba(44, 55, 40, .06); }
+    main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; width: min(100%, 960px); overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #fdfef8; box-shadow: 0 8px 30px rgba(44, 55, 40, .06); }
     .content { grid-column: 1; grid-row: 1; padding: clamp(28px, 5vw, 56px); }
-    .illustration { grid-column: 2; grid-row: 1; display: block; width: 100%; height: auto; }
+    .illustration { grid-column: 2; grid-row: 1; align-self: end; display: block; width: 100%; height: auto; }
     a { color: var(--green); text-underline-offset: .2em; }
     .brand { margin: 0 0 20px; color: var(--green); font: 1.1rem var(--display); }
     h1 { max-width: 12ch; margin: 0; color: var(--green); font: 400 clamp(2.3rem, 5vw, 3.6rem)/1.13 var(--display); letter-spacing: -.035em; }
@@ -28,7 +28,7 @@
       body { padding: 16px; }
       main { grid-template-columns: minmax(0, 1fr); }
       .content { grid-column: 1; grid-row: 1; padding: clamp(26px, 8vw, 40px); }
-      .illustration { grid-column: 1; grid-row: 2; }
+      .illustration { grid-column: 1; grid-row: 2; justify-self: center; width: min(100%, 520px); }
     }
   </style>
 </head>
