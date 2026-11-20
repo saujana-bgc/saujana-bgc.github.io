@@ -8,7 +8,7 @@ const outputDirectory = resolve('.output/public')
 const host = '127.0.0.1'
 const port = Number(process.env.RESPONSIVE_PREVIEW_PORT ?? 4174)
 const baseUrl = `http://${host}:${port}`
-const defaultWidths = [320, 390, 512, 720, 768, 1024, 1440]
+const defaultWidths = [320, 360, 390, 430, 512, 720, 768, 1024, 1440]
 const widths = process.env.RESPONSIVE_WIDTHS
   ? process.env.RESPONSIVE_WIDTHS.split(',').map(Number)
   : defaultWidths
@@ -172,7 +172,7 @@ try {
     const page = await browser.newPage()
     try {
       for (const width of widths) {
-        await page.setViewportSize({ width, height: 900 })
+        await page.setViewportSize({ width, height: width === 320 ? 568 : 900 })
         const response = await page.goto(`${baseUrl}${route}`, { waitUntil: 'load', timeout: 20000 })
         const expectsNotFound = route === notFoundRoute
         if (expectsNotFound ? response?.status() !== 404 : !response?.ok()) {
