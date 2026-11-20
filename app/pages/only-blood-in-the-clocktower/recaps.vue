@@ -14,8 +14,6 @@
         <label v-if="archiveScripts.length > 1">Script<USelect class="archive-select" :model-value="selectedScript" :items="[{ label: 'All scripts', value: 'all' }, ...archiveScripts.map(script => ({ label: script, value: script }))]" @update:model-value="setSelectedScript" /></label>
         <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
       </div>
-      <p v-if="shareNotice" class="archive-state share-notice" role="status">{{ shareNotice }}</p>
-      <label v-if="shareUrl" class="share-fallback">Copy this recap link<input ref="shareFallbackInput" :value="shareUrl" readonly @focus="$event.target.select()"></label>
       <p v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="filter-count" role="status">{{ filteredSessions.length }} of {{ recapSessions.length }} gatherings match these filters</p>
       <p v-if="error" class="archive-state action-status action-status--error" role="alert">{{ error }} <UButton class="archive-button" type="button" @click="loadArchive">Try again</UButton></p>
       <p v-else-if="loading" class="archive-state action-status action-status--pending" role="status">Loading recaps…</p>
@@ -32,6 +30,8 @@
           <div class="session-heading">
             <p class="session-kicker"><span v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</span><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
             <div class="session-title-row"><h3 tabindex="-1">{{ session.venue || 'Saujana gathering' }}</h3><UButton class="archive-button" type="button" @click="copyRecapLink(session.id)">Share gathering</UButton></div>
+            <p v-if="shareNotice && shareTarget === shareTargetId(session.id)" class="share-notice" role="status">{{ shareNotice }}</p>
+            <label v-if="shareUrl && shareTarget === shareTargetId(session.id)" class="share-fallback">Copy this recap link<input :value="shareUrl" readonly @focus="$event.target.select()"></label>
             <p class="metadata"><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
           <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="coverPhoto(session).alt || 'Table photo from ' + formatDate(session.session_date)" loading="lazy">
@@ -43,6 +43,8 @@
                 <span class="game-label">Game {{ number }}</span>
                 <p v-if="game.teaser" class="game-script-name">{{ game.script || 'Script not recorded' }}</p>
                 <div class="game-share-title"><h4 class="game-script" tabindex="-1">{{ game.teaser || game.script || 'Game ' + number }}</h4><UButton v-if="game.id" class="archive-button" type="button" @click="copyRecapLink(session.id, game.id)">Share game</UButton></div>
+                <p v-if="shareNotice && shareTarget === shareTargetId(session.id, game.id)" class="share-notice" role="status">{{ shareNotice }}</p>
+                <label v-if="shareUrl && shareTarget === shareTargetId(session.id, game.id)" class="share-fallback">Copy this recap link<input :value="shareUrl" readonly @focus="$event.target.select()"></label>
               </div>
               <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
             </header>
@@ -104,6 +106,7 @@
 <style scoped>
 .session-title-row,.game-share-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.session-title-row h3,.game-share-title h4{min-width:0}.game-share-title{align-items:center}.session-title-row :deep(button),.game-share-title :deep(button){flex:none;min-height:40px;font-size:.76rem}.session-title-row{margin-bottom:4px}
 .share-fallback { display: grid; gap: 5px; margin: 0 0 12px; color: var(--soft-ink); font-size: .875rem; }
+.share-notice { margin: 8px 0; color: var(--soft-ink); font-size: .875rem; }
 .share-fallback input { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: inherit; }
 @media (max-width: 560px) { .game-share-title { align-items: flex-start; flex-direction: column; gap: 8px; } .game-share-title :deep(button) { align-self: flex-start; } }
 </style>
@@ -124,7 +127,7 @@ const selectedScript = ref('all')
 const currentPage = ref(1)
 const shareNotice = ref('')
 const shareUrl = ref('')
-const shareFallbackInput = ref(null)
+const shareTarget = ref('')
 const PAGE_SIZE = 3
 const loading = ref(true)
 const error = ref('')
@@ -212,6 +215,7 @@ async function copyRecapLink(sessionId, gameId = null) {
   const url = new URL('/only-blood-in-the-clocktower/recaps/', window.location.origin)
   url.searchParams.set(gameId ? 'game' : 'session', String(gameId ?? sessionId))
   shareUrl.value = ''
+  shareTarget.value = shareTargetId(sessionId, gameId)
   try {
     await navigator.clipboard.writeText(url.href)
     shareNotice.value = gameId ? 'Game link copied.' : 'Gathering link copied.'
@@ -219,10 +223,11 @@ async function copyRecapLink(sessionId, gameId = null) {
     shareNotice.value = 'Copying isn’t available in this browser.'
     shareUrl.value = url.href
     await nextTick()
-    shareFallbackInput.value?.focus()
-    shareFallbackInput.value?.select()
+    document.querySelector('.share-fallback input')?.focus()
+    document.querySelector('.share-fallback input')?.select()
   }
 }
+function shareTargetId(sessionId, gameId = null) { return `${sessionId}:${gameId ?? 'session'}` }
 
 async function focusSharedTarget() {
   const sharedGameId = typeof route.query.game === 'string'

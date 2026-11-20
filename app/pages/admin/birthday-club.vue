@@ -21,7 +21,7 @@
             <p v-if="isLoading" role="status">Loading birthdays…</p>
             <p v-else-if="!upcomingBirthdays.length" class="agenda-empty">No upcoming birthdays this year.</p>
             <ul v-else class="upcoming-birthday-list">
-              <li v-for="birthday in upcomingBirthdays" :key="birthday.id"><time :datetime="birthdayNextDate(birthday)">{{ birthdayDateLabel(birthday) }}<span v-if="birthday.nextDate.getFullYear() !== currentYear"> {{ birthday.nextDate.getFullYear() }}</span></time><strong>{{ birthday.name }}</strong><span :class="birthday.allow_public_greeting ? 'public-wish' : 'private-wish'">{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</span></li>
+              <li v-for="birthday in upcomingBirthdays" :key="birthday.id"><time :datetime="birthdayNextDate(birthday)">{{ birthdayDateLabel(birthday) }}<template v-if="birthday.nextDate.getFullYear() !== currentYear"> {{ birthday.nextDate.getFullYear() }}</template></time><strong>{{ birthday.name }}</strong><span :class="birthday.allow_public_greeting ? 'public-wish' : 'private-wish'">{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</span></li>
             </ul>
           </section>
           <details class="full-calendar">
@@ -738,6 +738,6 @@ onMounted(loadBirthdays)
 @media (max-width: 767px) {
   .months-grid { display: grid; grid-template-columns: minmax(0,1fr); }
 }
-@media(max-width:560px){.upcoming-birthday-list li{grid-template-columns:1fr auto}.upcoming-birthday-list time{grid-column:1/-1}.upcoming-birthday-list span{font-size:.7rem}.agenda-heading{align-items:flex-start;flex-direction:column}.upcoming-agenda,.full-calendar{padding:14px}}
+@media(max-width:560px){.upcoming-birthday-list li{grid-template-columns:minmax(0,1fr);align-items:start}.upcoming-birthday-list time{grid-column:auto}.upcoming-birthday-list span{font-size:.78rem;justify-self:start}.agenda-heading{align-items:flex-start;flex-direction:column}.upcoming-agenda,.full-calendar{padding:14px}}
 
 </style>

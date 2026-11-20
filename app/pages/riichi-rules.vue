@@ -12,6 +12,15 @@
       </nav>
     </header>
 
+    <details id="rules-contents" ref="mobileToc" class="toc-mobile">
+      <summary>Jump to section</summary>
+      <div class="rules-shortcuts" aria-label="Key sections">
+        <a href="#four-player-rules" @click="closeMobileToc">Four players</a>
+        <a href="#three-player-rules-sanma" @click="closeMobileToc">Three-player rules</a>
+        <a href="#riichi-open-tournament-rules" @click="closeMobileToc">Riichi Open rules</a>
+      </div>
+      <nav aria-label="Rules contents"><a v-for="section in sections" :key="section.id" :class="{ 'toc-topic': section.depth === 1, 'toc-subsection': section.depth === 3 }" :href="`#${section.id}`" @click="closeMobileToc">{{ section.title }}</a></nav>
+    </details>
     <section class="table-summaries" aria-label="Riichi formats at a glance">
       <article class="table-summary" aria-labelledby="four-player-title">
         <h2 id="four-player-title">Four players</h2>
@@ -33,22 +42,13 @@
       </article>
     </section>
 
-    <div v-if="sections.length" id="rules-contents" class="rules-layout">
+    <div v-if="sections.length" class="rules-layout">
       <aside class="toc-desktop" aria-label="Rules contents">
         <p>In this guide</p>
         <nav>
           <a v-for="section in sections" :key="section.id" :class="{ 'toc-topic': section.depth === 1, 'toc-subsection': section.depth === 3 }" :href="`#${section.id}`">{{ section.title }}</a>
         </nav>
       </aside>
-      <details ref="mobileToc" class="toc-mobile">
-        <summary>Jump to section</summary>
-        <div class="rules-shortcuts" aria-label="Key sections">
-          <a href="#four-player-rules" @click="closeMobileToc">Four players</a>
-          <a href="#three-player-rules-sanma" @click="closeMobileToc">Three-player rules</a>
-          <a href="#riichi-open-tournament-rules" @click="closeMobileToc">Riichi Open rules</a>
-        </div>
-        <nav aria-label="Rules contents"><a v-for="section in sections" :key="section.id" :class="{ 'toc-topic': section.depth === 1, 'toc-subsection': section.depth === 3 }" :href="`#${section.id}`" @click="closeMobileToc">{{ section.title }}</a></nav>
-      </details>
       <article v-if="html" class="rules-content" v-html="html"></article>
       <p v-else-if="error" class="rules-state" role="status">{{ error }}</p>
       <p v-else class="rules-state" role="status">Loading Riichi Rules…</p>
@@ -113,6 +113,19 @@ const html = computed(() => {
 function closeMobileToc() {
   mobileToc.value.open = false
 }
+function returnToContents(event) {
+  if (!window.matchMedia('(max-width: 800px)').matches) return
+  event.preventDefault()
+  mobileToc.value.open = true
+  mobileToc.value.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  mobileToc.value.querySelector('summary')?.focus({ preventScroll: true })
+}
+function handleBackToContents(event) {
+  if (!event.target.closest('.back-to-contents')) return
+  returnToContents(event)
+}
+onMounted(() => document.addEventListener('click', handleBackToContents))
+onBeforeUnmount(() => document.removeEventListener('click', handleBackToContents))
 </script>
 
 <style>

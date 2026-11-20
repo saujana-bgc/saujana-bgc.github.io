@@ -53,6 +53,7 @@
               type="button"
               :aria-pressed="hoverImage.key === game.key && hoverImage.visible"
               :class="{ 'game-pill-match': matchingGames && game.name.toLocaleLowerCase().includes(matchingGames) }"
+              :ref="el => setGameButtonRef(game.key, el)"
               @click="toggleGameImage($event, game)"
             >{{ game.name }}</UButton>
           </div>
@@ -327,6 +328,11 @@ const goToPage = (p) => {
         resultsStart.value?.focus({ preventScroll: true })
     })
 }
+const gameButtonRefs = new Map()
+function setGameButtonRef(key, element) {
+    if (element) gameButtonRefs.set(key, element)
+    else gameButtonRefs.delete(key)
+}
 
 function showGameImageAt(x, y, gameName, showPlayers = true, key = gameName) {
     const cardWidth = Math.min(190, window.innerWidth - 28)
@@ -392,7 +398,11 @@ function showGameImageFromPointer(e, gameName, showPlayers = true) {
     if (showPlayers) setHoverPlayers(gameName)
 }
 
-function hideGameImage() { hoverImage.visible = false }
+function hideGameImage() {
+    const key = hoverImage.key
+    hoverImage.visible = false
+    nextTick(() => gameButtonRefs.get(key)?.focus({ preventScroll: true }))
+}
 
 function toggleGameImage(e, game) {
     const gameName = getGameName(game)

@@ -27,7 +27,7 @@
           </div>
         </div>
         <div class="editor-heading-actions">
-          <UButton type="button" class="review-save" :disabled="busy" @click="saveRow?.scrollIntoView({ block: 'center', behavior: scrollBehavior() })">Review and save ↓</UButton>
+          <UButton type="button" class="review-save" :disabled="busy" @click="reviewSave">Review and save ↓</UButton>
           <UButton v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</UButton>
           <UButton v-if="!draft.games.length" type="button" :disabled="busy" @click="loadSampleGame">Load a sample game</UButton>
         </div>
@@ -202,6 +202,10 @@ const savedPicker = ref(null)
 const editorTitle = ref(null)
 const editorForm = ref(null)
 const saveRow = ref(null)
+function reviewSave() {
+  saveRow.value?.scrollIntoView({ block: 'center', behavior: scrollBehavior() })
+  saveRow.value?.querySelector('button:not(:disabled)')?.focus({ preventScroll: true })
+}
 const bulkRosterText = ref({})
 const bulkRosterOpen = ref({})
 const saving = ref(false)
