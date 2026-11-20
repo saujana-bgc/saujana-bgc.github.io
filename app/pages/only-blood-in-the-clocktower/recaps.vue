@@ -15,6 +15,7 @@
         <UButton v-if="selectedYear !== 'all' || selectedScript !== 'all'" class="archive-button" type="button" @click="clearArchiveFilters">Clear filters</UButton>
       </div>
       <p v-if="shareNotice" class="archive-state share-notice" role="status">{{ shareNotice }}</p>
+      <label v-if="shareUrl" class="share-fallback">Copy this recap link<input ref="shareFallbackInput" :value="shareUrl" readonly @focus="$event.target.select()"></label>
       <p v-if="!loading && !error && recapSessions.length && (archiveYears.length > 1 || archiveScripts.length > 1)" class="filter-count" role="status">{{ filteredSessions.length }} of {{ recapSessions.length }} gatherings match these filters</p>
       <p v-if="error" class="archive-state action-status action-status--error" role="alert">{{ error }} <UButton class="archive-button" type="button" @click="loadArchive">Try again</UButton></p>
       <p v-else-if="loading" class="archive-state action-status action-status--pending" role="status">Loading recaps…</p>
@@ -102,6 +103,9 @@
 
 <style scoped>
 .session-title-row,.game-share-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.session-title-row h3,.game-share-title h4{min-width:0}.game-share-title{align-items:center}.session-title-row :deep(button),.game-share-title :deep(button){flex:none;min-height:40px;font-size:.76rem}.session-title-row{margin-bottom:4px}
+.share-fallback { display: grid; gap: 5px; margin: 0 0 12px; color: var(--soft-ink); font-size: .875rem; }
+.share-fallback input { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: inherit; }
+@media (max-width: 560px) { .game-share-title { align-items: flex-start; flex-direction: column; gap: 8px; } .game-share-title :deep(button) { align-self: flex-start; } }
 </style>
 
 <script setup>
@@ -119,6 +123,8 @@ const selectedYear = ref('all')
 const selectedScript = ref('all')
 const currentPage = ref(1)
 const shareNotice = ref('')
+const shareUrl = ref('')
+const shareFallbackInput = ref(null)
 const PAGE_SIZE = 3
 const loading = ref(true)
 const error = ref('')
@@ -205,11 +211,16 @@ async function changePage(page) {
 async function copyRecapLink(sessionId, gameId = null) {
   const url = new URL('/only-blood-in-the-clocktower/recaps/', window.location.origin)
   url.searchParams.set(gameId ? 'game' : 'session', String(gameId ?? sessionId))
+  shareUrl.value = ''
   try {
     await navigator.clipboard.writeText(url.href)
     shareNotice.value = gameId ? 'Game link copied.' : 'Gathering link copied.'
   } catch {
-    shareNotice.value = 'Copying isn’t available in this browser. Open this recap and copy its address.'
+    shareNotice.value = 'Copying isn’t available in this browser.'
+    shareUrl.value = url.href
+    await nextTick()
+    shareFallbackInput.value?.focus()
+    shareFallbackInput.value?.select()
   }
 }
 

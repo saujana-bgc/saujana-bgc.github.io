@@ -39,8 +39,8 @@
             <p>{{ signupSuccess[event.id] }}</p>
             <p>Can’t find us? <a href="https://wa.me/saujanabgc" target="_blank" rel="noopener noreferrer">Message Saujana on WhatsApp</a>.</p>
           </div>
-          <UButton v-if="canEditEvent(event)" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
           <span class="signup-minimum-note">RM10 minimum spend per person, paid at the counter after ordering. Ask for Saujana BGC when you arrive.</span>
+          <UButton v-if="canEditEvent(event)" :id="`signup-trigger-${event.id}`" type="button" class="btn-add" @click="addRow(event.id)">{{ signupSuccess[event.id] ? 'Add another name' : 'Sign up' }}</UButton>
           <span v-if="!signupSuccess[event.id]" class="signup-welcome-note">Coming on your own? We’ll help you find a table. Read <NuxtLink to="/#respect-at-table" no-prefetch>Respect at the table</NuxtLink>.</span>
         </div>
 

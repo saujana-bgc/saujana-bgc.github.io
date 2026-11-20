@@ -40,6 +40,11 @@
         </div>
       </details>
 
+      <section v-if="!search.trim() && !selectedCategories.length && !unplayedOnly && displayedGames.length" class="collection-first-pick fade-up" aria-labelledby="first-pick-title">
+        <div><p class="eyebrow">An easy place to start</p><h2 id="first-pick-title">Try a round of Just One</h2><p>Give one-word clues, then see if your team thinks alike. It’s a gentle way into the collection.</p></div>
+        <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
+      </section>
+
       <div v-if="isError" class="page-hint collection-feedback action-status action-status--error" role="alert">We couldn’t load play history. Your search and filters are still here. <UButton type="button" variant="outline" color="neutral" @click="retry">Try again</UButton></div>
 
       <div ref="gridRef" class="editorial-grid">
@@ -74,10 +79,6 @@
         <p>Try a shorter title or clear your filters to browse all the games.</p>
         <UButton type="button" class="sort-btn" @click="search = ''; currentSort = 'name'; unplayedOnly = false; resetCategories()">Show all games</UButton>
       </div>
-      <section v-if="!search.trim() && !selectedCategories.length && !unplayedOnly && displayedGames.length" class="collection-first-pick fade-up" aria-labelledby="first-pick-title">
-        <div><p class="eyebrow">An easy place to start</p><h2 id="first-pick-title">Try a round of Just One</h2><p>Give one-word clues, then see if your team thinks alike. It’s a gentle way into the collection.</p></div>
-        <UButton type="button" class="sort-btn" @click="openModal(gamesWithStats.find(game => game.name === 'Just One'))">See Just One</UButton>
-      </section>
       <p class="collection-updated">Shelf updated {{ lastTended }}</p>
     <UModal :open="Boolean(selectedGame)" :title="selectedGame?.name || 'Game details'" description="Board game details" :close="false" scrollable :ui="{ overlay: 'bg-[rgba(74,68,63,0.65)] !p-0 flex items-end justify-center sm:!p-10 sm:items-center', content: '!w-full sm:!w-[95vw] !max-w-[900px] !max-h-none !overflow-visible !border-0 !bg-transparent !shadow-none !ring-0 !p-0' }" @update:open="onModalOpenChange">
       <template #content>
@@ -688,11 +689,8 @@ watch([search, currentSort, selectedCategories, unplayedOnly], () => {
 /* Keep keyboard and visual order aligned on the collection page. */
 main:has(.collection-search) { gap: 10px; }
 main:has(.collection-search) > .collection-search { margin-bottom: 0; }
-main:has(.collection-search) > .collection-first-pick { order: 2; width: min(100% - 40px, 1160px); }
-main:has(.collection-search) > .collection-search { order: 0; }
-main:has(.collection-search) > .sort-controls { order: 1; }
-main:has(.collection-search) > .editorial-grid { order: 3; }
-main:has(.collection-search) > .collection-updated { order: 4; width: min(100% - 40px, 1160px); }
+main:has(.collection-search) > .collection-first-pick { width: min(100% - 40px, 1160px); }
+main:has(.collection-search) > .collection-updated { width: min(100% - 40px, 1160px); }
 main:has(.collection-search) > .sort-controls { width: min(100% - 40px, 1160px); max-width: 1160px; margin: 0 auto 8px; }
 .collection-search { flex-direction: column; align-items: stretch; gap: 7px; }
 .collection-feedback { width: min(1160px, calc(100% - 40px)); margin: 0 auto 8px; }

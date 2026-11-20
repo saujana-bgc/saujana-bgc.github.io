@@ -27,6 +27,7 @@
           </div>
         </div>
         <div class="editor-heading-actions">
+          <UButton type="button" class="review-save" :disabled="busy" @click="saveRow?.scrollIntoView({ block: 'center', behavior: scrollBehavior() })">Review and save ↓</UButton>
           <UButton v-if="!draft.games.length" type="button" class="start-game" :disabled="busy" @click="addGame()">Start with a game ↓</UButton>
           <UButton v-if="!draft.games.length" type="button" :disabled="busy" @click="loadSampleGame">Load a sample game</UButton>
         </div>
@@ -163,7 +164,7 @@
         </details>
       </fieldset>
 
-      <div class="save-row">
+      <div ref="saveRow" class="save-row">
         <template v-if="baseline.published">
           <UButton class="admin-primary" type="button" :disabled="busy" @click="save(true)">{{ saving ? 'Saving gathering…' : uploading ? 'Uploading photo…' : 'Update public gathering' }}</UButton>
           <UButton type="button" :disabled="busy" @click="unpublish">Unpublish</UButton>
@@ -200,6 +201,7 @@ const gameCards = ref([])
 const savedPicker = ref(null)
 const editorTitle = ref(null)
 const editorForm = ref(null)
+const saveRow = ref(null)
 const bulkRosterText = ref({})
 const bulkRosterOpen = ref({})
 const saving = ref(false)

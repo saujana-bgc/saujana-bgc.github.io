@@ -17,11 +17,11 @@
 
         <section v-else class="calendar-content" aria-label="Birthday calendar">
           <section class="upcoming-agenda" aria-labelledby="upcoming-birthdays-heading">
-            <div class="agenda-heading"><div><p class="eyebrow">Next up</p><h2 id="upcoming-birthdays-heading">Upcoming birthdays</h2></div><span>{{ upcomingBirthdays.length }} {{ upcomingBirthdays.length === 1 ? 'birthday' : 'birthdays' }} this year</span></div>
+            <div class="agenda-heading"><div><p class="eyebrow">Next up</p><h2 id="upcoming-birthdays-heading">Upcoming birthdays</h2></div><span>{{ upcomingBirthdays.length }} {{ upcomingBirthdays.length === 1 ? 'birthday' : 'birthdays' }} coming up</span></div>
             <p v-if="isLoading" role="status">Loading birthdays…</p>
             <p v-else-if="!upcomingBirthdays.length" class="agenda-empty">No upcoming birthdays this year.</p>
             <ul v-else class="upcoming-birthday-list">
-              <li v-for="birthday in upcomingBirthdays" :key="birthday.id"><time :datetime="birthdayNextDate(birthday)">{{ birthdayDateLabel(birthday) }}</time><strong>{{ birthday.name }}</strong><span :class="birthday.allow_public_greeting ? 'public-wish' : 'private-wish'">{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</span></li>
+              <li v-for="birthday in upcomingBirthdays" :key="birthday.id"><time :datetime="birthdayNextDate(birthday)">{{ birthdayDateLabel(birthday) }}<span v-if="birthday.nextDate.getFullYear() !== currentYear"> {{ birthday.nextDate.getFullYear() }}</span></time><strong>{{ birthday.name }}</strong><span :class="birthday.allow_public_greeting ? 'public-wish' : 'private-wish'">{{ birthday.allow_public_greeting ? 'Public greeting allowed' : 'No public greeting' }}</span></li>
             </ul>
           </section>
           <details class="full-calendar">

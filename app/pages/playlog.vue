@@ -57,12 +57,12 @@
             >{{ game.name }}</UButton>
           </div>
           <section v-if="hoverImage.visible && session.games.some(game => game.key === hoverImage.key)" class="game-hover-card" aria-label="Selected game details">
+            <UButton type="button" class="page-btn game-details-close" @click="hideGameImage">Close details</UButton>
             <img :src="hoverImage.src" :alt="hoverImage.name" width="150" height="130" decoding="async">
             <div v-if="hoverImage.showPlayers && hoverImage.players.length" class="game-hover-name">PLAYERS</div>
             <div v-if="hoverImage.showPlayers && hoverImage.players.length" class="game-hover-players" aria-label="Players">
               <span v-for="player in hoverImage.players" :key="player" class="game-hover-player">{{ player }}</span>
             </div>
-            <UButton type="button" class="page-btn" @click="hideGameImage">Close details</UButton>
           </section>
           <UButton
             v-if="matchingGames && session.games.some(game => !game.name.toLocaleLowerCase().includes(matchingGames))"
@@ -734,6 +734,7 @@ onUnmounted(() => {
     border-radius: 10px;
     display: block;
 }
+.game-details-close { display: flex; min-height: 42px; margin: 0 0 8px auto; }
 
 .game-hover-name {
     font-size: 0.6rem;
