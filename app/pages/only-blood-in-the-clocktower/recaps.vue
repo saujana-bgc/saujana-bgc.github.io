@@ -30,24 +30,17 @@
         <div class="session-masthead">
           <div class="session-heading">
             <p class="session-kicker"><span v-if="session.id === featured?.id" class="eyebrow latest-label">Latest recap</span><time :datetime="session.session_date">{{ formatDate(session.session_date) }}</time></p>
-            <h3 tabindex="-1">{{ session.teaser || session.venue || 'Saujana gathering' }}</h3>
-            <p class="metadata"><template v-if="session.teaser && session.venue">{{ session.venue }} · </template><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
+            <h3 tabindex="-1">{{ session.venue || 'Saujana gathering' }}</h3>
+            <p class="metadata"><template v-if="selectedScript !== 'all'">{{ visibleGames(session).length }} of {{ session.games?.length || 0 }} games</template><template v-else>{{ session.games?.length || 0 }} game{{ session.games?.length === 1 ? '' : 's' }}</template></p>
           </div>
           <img v-if="session.id === featured?.id && coverPhoto(session)" class="session-cover" :src="photoUrls[coverPhoto(session).path]" :alt="coverPhoto(session).alt || 'Table photo from ' + formatDate(session.session_date)" loading="lazy">
         </div>
-        <section v-if="session.recap" class="recap-story" aria-label="Retelling">
-          <h4>Retelling</h4>
-          <div class="recap-prose">
-            <p v-for="(paragraph, index) in retellingParagraphs(session.recap)" :key="index">{{ paragraph }}</p>
-          </div>
-        </section>
-
         <div v-if="session.games?.length" class="game-grid">
           <article v-for="{ game, number } in visibleGames(session)" :id="game.id ? 'game-' + game.id : undefined" :key="game.id || number" class="game-recap">
             <header class="game-recap-heading">
               <div class="game-title">
                 <span class="game-label">Game {{ number }}</span>
-                <h4 class="game-script" tabindex="-1">{{ game.script || 'Script not recorded' }}</h4>
+                <h4 class="game-script" tabindex="-1">{{ game.teaser || game.script || 'Script not recorded' }}</h4>
               </div>
               <p v-if="game.outcome" class="outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
             </header>
@@ -63,7 +56,13 @@
                 </div>
               </li>
             </ol>
-            <p v-if="game.notes" class="story-text">{{ game.notes }}</p>
+            <section v-if="game.recap" class="recap-story" aria-label="Game retelling">
+              <h5>Retelling</h5>
+              <div class="recap-prose">
+                <p v-for="(paragraph, index) in retellingParagraphs(game.recap)" :key="index">{{ paragraph }}</p>
+              </div>
+            </section>
+            <p v-if="game.storyteller" class="game-storyteller">Storyteller · {{ game.storyteller }}</p>
           </article>
         </div>
 
@@ -151,7 +150,7 @@ function formatDate(value) {
 }
 
 function hasResults(session) {
-  return Boolean(session.recap || session.games?.length)
+  return Boolean(session.games?.length)
 }
 
 function sessionPhotos(session) {

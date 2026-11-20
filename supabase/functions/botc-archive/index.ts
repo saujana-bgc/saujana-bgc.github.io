@@ -19,15 +19,15 @@ Deno.serve(async (request) => {
         venue: session.venue,
         signup_url: session.signup_url,
         first_timer_note: session.first_timer_note,
-        teaser: session.teaser,
-        recap: session.recap,
         games: (Array.isArray(session.games) ? session.games : []).map((rawGame: unknown) => {
           const game = object(rawGame)
           return {
             id: game.id,
             script: game.script,
+            teaser: game.teaser,
+            recap: game.recap,
+            storyteller: game.storyteller,
             outcome: game.outcome,
-            notes: game.notes,
             photos: (Array.isArray(game.photos) ? game.photos : []).filter((photo: Record<string, unknown>) => photo.approved === true).map((photo: Record<string, unknown>) => ({ path: photo.path, cover: photo.cover === true, approved: true })),
             players: (Array.isArray(game.players) ? game.players : []).map((rawPlayer: unknown, index: number) => {
               const player = object(rawPlayer)
@@ -73,7 +73,10 @@ Deno.serve(async (request) => {
       const id = typeof session.id === 'string' ? session.id : crypto.randomUUID()
       const games = Array.isArray(session.games) ? session.games : []
       if (typeof session.session_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(session.session_date)) return reply(request, 400, { error: 'Choose a valid gathering date.' })
-      if (session.published === true && games.some((game: Record<string, unknown>) => !String(game.script ?? '').trim() || !Array.isArray(game.players) || !game.players.length || game.players.some((player: Record<string, unknown>) => !String(player.name ?? '').trim()) || !String(game.outcome ?? '').trim())) return reply(request, 400, { error: 'Give every player a name and add a script, roster and outcome to each game before publishing.' })
+      if (session.published === true && games.some((rawGame: unknown) => {
+        const game = object(rawGame)
+        return !String(game.script ?? '').trim() || !String(game.storyteller ?? '').trim() || !Array.isArray(game.players) || game.players.length < 5 || game.players.length > 20 || game.players.some((rawPlayer: unknown) => !String(object(rawPlayer).name ?? '').trim()) || !String(game.outcome ?? '').trim()
+      })) return reply(request, 400, { error: 'Each game needs a script, a named storyteller, 5–20 named players, and an outcome before publishing.' })
       const people = [...new Set(games.flatMap((game: Record<string, unknown>) => Array.isArray(game.players) ? game.players.map((player: Record<string, unknown>) => String(player.name ?? '').trim()).filter(Boolean) : []))]
       for (const name of people) {
         const { error } = await db.from('botc_players').upsert({ private_name: name }, { onConflict: 'private_name', ignoreDuplicates: true })

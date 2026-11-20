@@ -50,7 +50,7 @@
           <summary class="game-summary">
             <span class="game-number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
             <span class="game-summary-copy"><small>Game {{ index + 1 }}</small><strong>{{ game.script || 'Choose a script' }}</strong></span>
-            <span class="game-count">{{ game.players.length }} {{ game.players.length === 1 ? 'player' : 'players' }}</span>
+            <span class="game-count">{{ game.players.length }} / 20 players</span>
           </summary>
           <div class="game-content">
             <div class="game-heading">
@@ -68,12 +68,13 @@
                   <option v-for="script in scriptNames" :key="script" :value="script">{{ script }}</option>
                 </select>
               </label>
+              <label>Storyteller<UInputMenu v-model="game.storyteller" :items="playerNames" mode="autocomplete" open-on-focus placeholder="Choose or enter a name" /></label>
             </div>
             <p v-if="game.script && !scriptNames.includes(game.script)" class="script-hint">This game uses a previously saved script. You can keep it or switch to one of the listed scripts.</p>
             <p v-else-if="game.script" class="script-hint">{{ characters(game).length }} character suggestions loaded for {{ game.script }}.</p>
 
             <div class="section-heading">
-              <h4>Players and characters <small>{{ game.players.length }} {{ game.players.length === 1 ? 'player' : 'players' }}</small></h4>
+              <h4>Players and characters <small>{{ game.players.length }} / 20 · at least 5 players</small></h4>
             </div>
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <span class="seat-number" aria-label="Seat">{{ String(playerIndex + 1).padStart(2, '0') }}</span>
@@ -86,7 +87,7 @@
             </div>
             <p v-if="!game.players.length" class="empty-note">No players added to this game yet.</p>
             <div class="roster-actions">
-              <UButton v-if="game.players.length" type="button" class="add-player-next" @click="addPlayer(game)">Add next player +</UButton>
+              <UButton v-if="game.players.length" type="button" class="add-player-next" :disabled="game.players.length >= 20" @click="addPlayer(game)">Add next player +</UButton>
               <UButton v-else type="button" @click="addPlayer(game)">Add player</UButton>
               <UButton type="button" @click="toggleBulkRoster(game)">{{ bulkRosterOpen[game.id] ? 'Close paste' : 'Paste names' }}</UButton>
             </div>
@@ -106,9 +107,13 @@
               </div>
             </fieldset>
 
-            <details class="game-extras" :open="Boolean(game.notes || game.photos?.length)">
-              <summary>Notes and photos <span v-if="game.photos?.length">{{ game.photos.length }} photos</span></summary>
-              <label>Game notes<textarea v-model="game.notes" rows="2"></textarea></label>
+            <details class="game-writing" :open="Boolean(game.teaser || game.recap)">
+              <summary>Write this game’s recap</summary>
+              <label>Recap title<input v-model="game.teaser" maxlength="240" placeholder="Optional short title"></label>
+              <label>Retelling<textarea v-model="game.recap" rows="4" maxlength="3000" placeholder="What happened in this game? You can finish this later on desktop."></textarea></label>
+            </details>
+            <details class="game-extras" :open="Boolean(game.photos?.length)">
+              <summary>Photos <span v-if="game.photos?.length">{{ game.photos.length }}</span></summary>
               <label>Photos<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple @change="uploadPhotos($event,game)"></label>
               <div v-if="game.photos?.length" class="photo-list">
                 <article v-for="photo in game.photos" :key="photo.path" class="photo-row">
@@ -129,9 +134,8 @@
         </div>
 
         <section class="story admin-card">
-          <h3>Gathering recap</h3>
-          <label>Recap title<input v-model="draft.teaser" maxlength="240" placeholder="Give this gathering a title"></label>
-          <label>Retelling<textarea v-model="draft.recap" rows="4" maxlength="3000" placeholder="What did the town believe? What changed? What did everyone talk about?"></textarea></label>
+          <h3>Games in this gathering</h3>
+          <p class="empty-note">Each game has its own retelling. Save the draft on your phone and finish the stories later.</p>
         </section>
 
         <details class="visitor-preview admin-card">
@@ -140,25 +144,21 @@
           <article class="preview-session">
             <header class="preview-masthead">
               <p class="eyebrow">From the storyteller’s desk</p>
-              <h3>{{ draft.teaser || 'A night in Ravenswood Bluff' }}</h3>
+              <h3>{{ draft.venue || 'A night in Ravenswood Bluff' }}</h3>
               <p>{{ formatGatheringDate(draft.session_date) }}<template v-if="draft.venue"> · {{ draft.venue }}</template></p>
             </header>
-            <section v-if="draft.recap" class="preview-content" aria-label="Retelling">
-              <p class="eyebrow">Retelling</p>
-              <p>{{ draft.recap }}</p>
-            </section>
             <template v-for="game in draft.games" :key="game.id">
               <h4>{{ game.script || 'Script not recorded' }}</h4>
               <div class="preview-content">
                 <p v-if="game.outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
                 <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
-                <p v-if="game.notes">{{ game.notes }}</p>
+                <p v-if="game.recap">{{ game.recap }}</p>
               </div>
               <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
                 <img v-for="photo in game.photos.filter(photo => photo.approved && photoSource(photo))" :key="photo.path" :src="photoSource(photo)" alt="Approved gathering photo">
               </div>
             </template>
-            <p v-if="!draft.games.length && !draft.recap" class="empty-note">Add a game or write a retelling to preview the recap.</p>
+            <p v-if="!draft.games.length" class="empty-note">Add a game to preview the recap.</p>
           </article>
         </details>
       </fieldset>
@@ -282,6 +282,9 @@ function cleanSession(session) {
     script: game.script || '',
     script_characters: game.script_characters || '',
     outcome: game.outcome || '',
+    storyteller: game.storyteller || '',
+    teaser: game.teaser || '',
+    recap: game.recap || '',
     notes: game.notes || '',
     players: (game.players || []).map(player => ({
       name: player.name || '', public_name: player.public_name || '',
@@ -306,7 +309,7 @@ function addGame(options = {}) {
     id: crypto.randomUUID(),
     script,
     script_characters: scriptPresets[script],
-    outcome: '', notes: '',
+    outcome: '', notes: '', storyteller: '', teaser: '', recap: '',
     players: previousGame
       ? previousGame.players.map(player => ({ ...newPlayer(), name: player.name, public_name: player.public_name }))
       : [],
@@ -322,6 +325,7 @@ function addGame(options = {}) {
 }
 
 function addPlayer(game) {
+  if (game.players.length >= 20) return
   game.players.push(newPlayer())
   nextTick(() => {
     const card = gameCards.value.find(item => item?.dataset.gameId === game.id)
@@ -347,8 +351,10 @@ function addPastedPlayers(game) {
     .map(line => line.split('\t')[0].trim())
     .filter(Boolean)
   if (!names.length) return
+  const remainingSeats = Math.max(0, 20 - game.players.length)
+  if (!remainingSeats) return
   const firstNewPlayerIndex = game.players.length
-  game.players.push(...names.map(name => ({ ...newPlayer(), name })))
+  game.players.push(...names.slice(0, remainingSeats).map(name => ({ ...newPlayer(), name })))
   bulkRosterText.value = { ...bulkRosterText.value, [game.id]: '' }
   bulkRosterOpen.value = { ...bulkRosterOpen.value, [game.id]: false }
   nextTick(() => {
@@ -528,20 +534,22 @@ async function save(published = baseline.value.published) {
   notice.value = ''
   if (!editorForm.value.reportValidity()) return
   if (published && draft.value.games.some(game =>
-    !game.script.trim() || !game.players.length || game.players.some(player => !player.name.trim()) || !game.outcome,
+    !game.script.trim() || game.players.length < 5 || game.players.length > 20 || !game.storyteller.trim() || game.players.some(player => !player.name.trim()) || !game.outcome,
   )) {
     gameCards.value.forEach(card => { if (card) card.open = true })
-    error.value = 'Before publishing, give every player a name and add a script and outcome to each game.'
+    error.value = 'Each game needs a script, a named storyteller, 5–20 named players, and an outcome before publishing.'
     nextTick(() => {
       const firstIncomplete = draft.value.games.findIndex(game =>
-        !game.script.trim() || !game.players.length || game.players.some(player => !player.name.trim()) || !game.outcome,
+        !game.script.trim() || game.players.length < 5 || game.players.length > 20 || !game.storyteller.trim() || game.players.some(player => !player.name.trim()) || !game.outcome,
       )
       const card = gameCards.value[firstIncomplete]
       const game = draft.value.games[firstIncomplete]
       const missingPlayerIndex = game.players.findIndex(player => !player.name.trim())
       const field = !game.script.trim()
         ? card?.querySelector('.fields select')
-        : !game.players.length
+        : !game.storyteller.trim()
+          ? card?.querySelector('.game-basics input')
+          : game.players.length < 5
           ? card?.querySelector('.roster-actions > button')
           : missingPlayerIndex >= 0
             ? card?.querySelectorAll('input[data-player-name]')[missingPlayerIndex]
