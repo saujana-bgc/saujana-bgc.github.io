@@ -19,13 +19,17 @@ Deno.serve(async (request) => {
         venue: session.venue,
         signup_url: session.signup_url,
         first_timer_note: session.first_timer_note,
-        games: (Array.isArray(session.games) ? session.games : []).map((rawGame: unknown) => {
+        games: (Array.isArray(session.games) ? session.games : []).map((rawGame: unknown, gameIndex: number, sourceGames: unknown[]) => {
           const game = object(rawGame)
+          // Older single-game gatherings stored their recap on the gathering itself.
+          // Surface it on that game so the public archive stays game-based without
+          // guessing which game a multi-game gathering's story belongs to.
+          const legacySingleGameRecap = sourceGames.length === 1 && gameIndex === 0
           return {
             id: game.id,
             script: game.script,
-            teaser: game.teaser,
-            recap: game.recap,
+            teaser: typeof game.teaser === 'string' && game.teaser.trim() ? game.teaser : legacySingleGameRecap ? session.teaser : game.teaser,
+            recap: typeof game.recap === 'string' && game.recap.trim() ? game.recap : legacySingleGameRecap ? session.recap : game.recap,
             outcome: game.outcome,
             photos: (Array.isArray(game.photos) ? game.photos : []).filter((photo: Record<string, unknown>) => photo.approved === true).map((photo: Record<string, unknown>) => ({ path: photo.path, cover: photo.cover === true, approved: true })),
             players: (Array.isArray(game.players) ? game.players : []).map((rawPlayer: unknown, index: number) => {

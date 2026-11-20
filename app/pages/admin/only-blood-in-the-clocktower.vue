@@ -82,7 +82,7 @@
             <div v-for="(player,playerIndex) in game.players" :key="playerIndex" class="player-card">
               <span class="seat-number" aria-label="Seat">{{ String(playerIndex + 1).padStart(2, '0') }}</span>
               <label class="player-name-field">Player name<UInputMenu v-model="player.name" class="player-name-menu w-full" data-player-name placeholder="Choose or enter a name" :items="playerNames" mode="autocomplete" open-on-focus /></label>
-              <details class="player-extras"><summary>More</summary>
+              <details class="player-extras"><summary>Player details</summary>
                 <label class="public-player-name-field">Public nickname <input v-model="player.public_name" maxlength="80" placeholder="Optional · hidden if blank"></label>
                 <label>Character<select v-model="player.character" class="character-select" data-character-field @keydown.alt.n.prevent="focusNextCharacter(game, playerIndex)"><option value="">Choose a character</option><optgroup v-for="group in characterGroups(game)" :key="group.name" :label="group.name"><option v-for="character in group.characters" :key="character" :value="character">{{ character }}</option></optgroup></select></label>
                 <label class="check-label death-check"><input v-model="player.died" type="checkbox"> Died during the game</label>
@@ -145,12 +145,11 @@
               <p>{{ formatGatheringDate(draft.session_date) }}<template v-if="draft.venue"> · {{ draft.venue }}</template></p>
             </header>
             <template v-for="game in draft.games" :key="game.id">
-              <h4>{{ game.teaser || game.script || 'Script not recorded' }}</h4>
+              <h4>{{ game.teaser || (draft.games.length === 1 ? draft.teaser : '') || game.script || 'Script not recorded' }}</h4>
               <div class="preview-content">
                 <p v-if="game.outcome">{{ game.outcome === 'No result' ? 'No winner' : game.outcome }}</p>
                 <ul v-if="game.players.length"><li v-for="(player, playerIndex) in game.players" :key="playerIndex">{{ player.public_name.trim() || 'Player ' + (playerIndex + 1) }}<template v-if="player.character"> · {{ player.character }}</template><template v-if="player.died"> · Died</template></li></ul>
-                <p v-if="game.teaser"><strong>{{ game.teaser }}</strong></p>
-                <p v-if="game.recap">{{ game.recap }}</p>
+                <p v-if="game.recap || (draft.games.length === 1 && draft.recap)">{{ game.recap || draft.recap }}</p>
               </div>
               <div v-if="game.photos.some(photo => photo.approved && photoSource(photo))" class="preview-photos">
                 <img v-for="photo in game.photos.filter(photo => photo.approved && photoSource(photo))" :key="photo.path" :src="photoSource(photo)" alt="Approved gathering photo">
@@ -848,7 +847,7 @@ button:disabled { opacity: .65; cursor: wait; }
 .section-heading h4 small { margin-left: 5px; color: var(--muted); font: .75rem var(--font-body); }
 .roster-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .game-extras { padding: 0 12px; border: 1px solid var(--desk-rule); border-radius: 7px; background: #f9f3ec; }
-.player-extras { grid-column: 2 / -1; }
+.player-card > .player-extras { grid-column: 2 / 4; }
 .player-extras > summary, .legacy-writeup > summary { min-height: 40px; padding: 9px 0; cursor: pointer; color: var(--matcha-leaf); font-size: .82rem; font-weight: 650; }
 .player-extras[open] { display: grid; grid-column: 1 / -1; gap: 8px; }
 .player-extras[open] > label { grid-column: 1 / -1; }
@@ -862,7 +861,7 @@ button:disabled { opacity: .65; cursor: wait; }
 .bulk-roster-panel > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .bulk-roster-panel .admin-primary { border: 0; }
 .bulk-roster-panel textarea { min-height: 96px; resize: vertical; }
-.player-card { display: grid; grid-template-columns: 28px minmax(150px, .95fr) minmax(170px, 1.1fr) auto auto; gap: 10px 14px; align-items: end; padding: 12px 14px; border: 1px solid var(--desk-rule); border-radius: 9px; background: var(--surface-soft); }
+.player-card { display: grid; grid-template-columns: 28px minmax(150px, 1fr) minmax(100px, auto) auto; gap: 10px 14px; align-items: end; padding: 12px 14px; border: 1px solid var(--desk-rule); border-radius: 9px; background: var(--surface-soft); }
 .player-card:focus-within { border-color: #b48977; }
 .seat-number { display: grid; place-items: center; align-self: center; width: 26px; height: 26px; border: 1px solid #d8c4af; border-radius: 50%; color: var(--matcha-leaf); font-size: .68rem; font-weight: 750; }
 .player-card > label:not(.check-label) { font-size: .8rem; }
@@ -898,13 +897,14 @@ button:disabled { opacity: .65; cursor: wait; }
   .saved-venue { grid-column: 1 / -1; }
   .game-heading, .editor-heading { align-items: flex-start; flex-wrap: wrap; }
   .editor-heading-actions { width: 100%; justify-content: flex-start; }
-  .player-card { grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
-  .player-card > .player-name-field { grid-column: 2 / -1; }
-  .player-card > .public-player-name-field { grid-column: 2 / -1; }
+  .player-card { grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; }
+  .player-card > .player-name-field { grid-column: 2 / -1; grid-row: 1; }
   .player-card > label:not(.check-label):not(.player-name-field) { grid-column: 2 / -1; }
   .player-card > .seat-number { grid-column: 1; grid-row: 1; }
-  .player-card > .death-check { grid-column: 2 / 4; }
-  .player-card > .remove-player { grid-column: 3; }
+  .player-card > .player-extras { grid-column: 2; grid-row: 2; }
+  .player-card > .player-extras[open] { grid-column: 1 / -1; grid-row: auto; }
+  .player-card > .death-check { grid-column: 2 / -1; }
+  .player-card > .remove-player { grid-column: 3; grid-row: 2; }
   .player-card .check-label { min-height: 38px; }
   .remove-player { justify-self: end; }
   .photo-row label { flex: 1 1 150px; }

@@ -426,7 +426,7 @@ onMounted(() => {
 .script-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
 .script-tags li { padding: 4px 9px; border: 1px solid var(--rule); border-radius: 5px; color: var(--wine); font-size: .75rem; overflow-wrap: anywhere; }
 .recap-story { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 18px; padding: 16px 0; border-block: 1px solid var(--rule); }
-.recap-story h4 { margin: 0; color: var(--wine); font: 400 1.2rem/1.4 var(--font-display); }
+.recap-story h5 { margin: 0; color: var(--wine); font: 400 1.2rem/1.4 var(--font-display); }
 .recap-prose, .story-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 .recap-prose { max-width: 106ch; font-size: 1.02rem; line-height: 1.65; }
 .recap-prose p { margin: 0; }
