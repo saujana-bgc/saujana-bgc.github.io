@@ -2036,8 +2036,8 @@ onBeforeUnmount(() => {
   }
 }
 /* Comfortable touch targets and shortcuts shared across screen sizes. */
-.league-shortcuts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
-.league-shortcuts-placeholder { min-height: 68px; margin-top: 22px; }
+.league-shortcuts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
+.league-shortcuts-placeholder { min-height: 58px; margin-top: 12px; }
 .league-shortcuts a, .league-shortcuts button, .standings-toggle { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 8px 16px; border: 1px solid #9ba995; border-radius: 999px; background: #fffdf9; color: #41513d; font: inherit; font-size: .9rem; text-decoration: none; cursor: pointer; }
 .league-shortcuts button { background: var(--matcha-leaf); color: white; }
 #standings-heading, #weeks-heading, #score-entry { scroll-margin-top: 90px; }

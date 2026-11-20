@@ -922,7 +922,8 @@ button:disabled { opacity: .65; cursor: wait; }
   .player-card .check-label { min-height: 38px; }
   .remove-player { justify-self: end; }
   .photo-row label { flex: 1 1 150px; }
-  .save-row { position: sticky; bottom: max(8px, env(safe-area-inset-bottom)); width: 100%; }
+  /* Keep the action bar in document flow on phones so it never covers editor fields. */
+  .save-row { position: static; width: 100%; margin-top: 18px; }
 }
 @media(max-width:420px) {
   .game-summary { gap: 6px; }

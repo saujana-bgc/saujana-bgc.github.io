@@ -513,6 +513,11 @@ function scrollToHash(){const id=route.hash.slice(1);if(id)document.getElementBy
 </style>
 
 <style scoped>
+/* This workflow panel uses white text; keep its heading out of the global dark-heading palette. */
+.event-workflow h2 { color: #fffdf7; }
+</style>
+
+<style scoped>
 .save-hint{margin:-6px 0 12px;color:var(--muted);font-size:.8rem}.inline-save-state{font-size:.72rem;color:var(--muted);white-space:nowrap}.save-saving{color:#8a6225}.save-error,.save-error button{color:#913f45}.retry-save{padding:0;border:0;background:none;font:inherit;text-decoration:underline;cursor:pointer}.save-progress{position:sticky;top:10px;z-index:5}.table-editor h4 small{white-space:nowrap}.admin-table.roster-table{min-width:0}
 @media(max-width:720px){.admin-table-wrap:has(.roster-table){overflow:visible;padding:10px}.admin-table.roster-table,.roster-table tbody{display:block;width:100%}.roster-table thead{display:none}.roster-table tr{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:15px;border-bottom:1px solid var(--line)}.roster-table td{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:3px;border:0;min-width:0}.roster-table td:first-child{grid-column:1/-1}.roster-table td::before{content:attr(data-label);font-size:.7rem;color:var(--muted);flex:0 0 auto}.roster-table td:first-child input{width:min(100%,260px);min-width:0}.roster-table td input[type=checkbox]{width:20px;height:20px;margin:0}.roster-table td:last-child{grid-column:1/-1;justify-content:flex-start}.round-tables{grid-template-columns:1fr}}
 .roster-table td:has(input[type=checkbox]) { cursor: pointer; }

@@ -75,7 +75,7 @@
                   v-model="birthDay"
                   :items="availableDays"
                   name="birth_day"
-                  placeholder="Choose day"
+                  placeholder="Day"
                   :disabled="!birthMonth"
                   :aria-invalid="Boolean(errors.day)"
                   :aria-describedby="errors.day ? 'birth-day-error' : undefined"

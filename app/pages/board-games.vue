@@ -34,7 +34,9 @@
 .activity-page .stats-container { max-width: 580px; }
 .activity-content { margin: 18px auto 34px; }
 .quick-destinations { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 18px; margin: 14px auto 0; }
-.quick-destinations a { display: inline-flex; min-height: 44px; align-items: center; gap: 7px; color: var(--matcha-leaf); font-size: .88rem; font-weight: 650; text-underline-offset: 4px; }
+.quick-destinations a { display: inline-flex; min-height: 44px; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--white-pure); color: var(--matcha-leaf); font-size: .88rem; font-weight: 650; text-decoration: none; }
+.quick-destinations a:hover { background: var(--surface-soft); }
+.quick-destinations a:focus-visible { outline: 2px solid var(--gold-leaf); outline-offset: 2px; }
 .activity-copy h2 { margin: 0 0 12px; color: var(--matcha-leaf); font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.2 var(--font-display); }
 .activity-copy p:not(.page-eyebrow) { max-width: 560px; color: var(--muted); line-height: 1.75; }
 .activity-copy .page-eyebrow { justify-content: flex-start; margin-bottom: 12px; }

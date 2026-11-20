@@ -121,17 +121,20 @@ onMounted(loadVisitors)
 
 .results ul {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  column-gap: 22px;
+  row-gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .results li {
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 8px 2px;
+  border-bottom: 1px solid var(--line);
   color: var(--matcha-leaf);
   overflow-wrap: anywhere;
 }

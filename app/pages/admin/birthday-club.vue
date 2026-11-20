@@ -628,8 +628,9 @@ onMounted(loadBirthdays)
   text-transform: uppercase;
 }
 
-.public-wish { color: #557657; }
-.private-wish { color: #9a6670; }
+.public-wish, .private-wish { display: inline-flex; align-items: center; min-height: 28px; padding: 3px 8px; border-radius: 999px; font-size: .875rem; font-weight: 650; }
+.public-wish { background: #e7efe5; color: #35583b; }
+.private-wish { background: #f2e9e6; color: #70463f; }
 
 .calendar-legend {
   display: flex;

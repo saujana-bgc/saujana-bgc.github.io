@@ -385,7 +385,6 @@ onMounted(() => {
 .outcome { margin: 0; padding: 4px 9px; border-radius: 5px; background: var(--lavender-mist); color: var(--matcha-leaf); font-size: .84rem; font-weight: 700; }
 .grimoire { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
 .grimoire-seat { position: relative; isolation: isolate; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; align-items: center; min-height: 88px; overflow: hidden; padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--white-pure); color: var(--clay-text); box-shadow: var(--shadow-card); }
-.grimoire-seat::after { position: absolute; z-index: -1; inset: 5px; border: 1px solid var(--line); border-radius: 5px; content: ''; pointer-events: none; }
 .grimoire-seat.is-dead { background: var(--rose-dust); }
 .character-art { display: block; width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(44, 55, 40, .18)); }
 .seat-copy { display: grid; gap: 4px; min-width: 0; }

@@ -835,11 +835,13 @@ function meldLabel(type) { return meldTypes.find(option => option.id === type)?.
   .tile-entry-section { scroll-margin-top: 88px; }
   .tile-indicators { scroll-margin-top: 88px; }
   .tile-entry-section > .section-heading { margin-bottom: 7px; }
+  .tile-entry-section > .section-heading p { margin-top: 3px; }
   .tile-entry-count { gap: 4px; margin-bottom: 6px; }
   .tile-entry-empty { padding: 8px 6px; }
   .tile-entry-count .mobile-new-hand { display: inline-flex; }
   .tile-hand-entry { min-height: 112px; align-content: start; }
   .tile-hand-entry.tile-hand-empty { min-height: 64px; }
+  .tile-entry-empty { margin-block: 3px; }
   .tile-hand-readonly .entered-tile { min-height: 46px; }
   .tile-hand-readonly .entered-tile img { width: 28px; height: 37px; margin-inline: auto; }
   .tile-picker-grid { padding: 6px; border: 1px solid var(--line); border-radius: 9px; background: rgb(255 255 255 / 97%); }
