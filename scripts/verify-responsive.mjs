@@ -12,6 +12,11 @@ const defaultWidths = [320, 360, 390, 430, 512, 720, 768, 1024, 1440]
 const widths = process.env.RESPONSIVE_WIDTHS
   ? process.env.RESPONSIVE_WIDTHS.split(',').map(Number)
   : defaultWidths
+const viewports = [
+  ...widths.map(width => ({ width, height: width === 320 ? 568 : 900 })),
+  { width: 568, height: 320 },
+  { width: 844, height: 390 },
+]
 const notFoundRoute = '/responsive-audit-missing-route/'
 
 async function collectGeneratedRoutes(directory = outputDirectory) {
@@ -170,6 +175,38 @@ async function checkGatheringAttendeeLayout(browser) {
   }
 }
 
+async function checkMobileNavigation(browser) {
+  const page = await browser.newPage({ isMobile: true, hasTouch: true })
+
+  try {
+    for (const viewport of [{ width: 320, height: 568 }, { width: 568, height: 320 }]) {
+      await page.setViewportSize(viewport)
+      await page.goto(`${baseUrl}/`, { waitUntil: 'load', timeout: 20000 })
+      await page.getByRole('button', { name: 'Menu' }).click()
+      const navigation = page.getByRole('navigation', { name: 'Explore Saujana' })
+      await navigation.waitFor({ state: 'visible' })
+      await page.waitForTimeout(350)
+      const result = await navigation.evaluate(element => {
+        const bounds = element.getBoundingClientRect()
+        const links = [...element.querySelectorAll('a')]
+        const drawerBody = element.parentElement
+        return {
+          fitsViewport: bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.top <= innerHeight,
+          drawerScrolls: getComputedStyle(drawerBody).overflowY === 'auto' && drawerBody.scrollHeight > drawerBody.clientHeight,
+          linksHaveTouchTargets: links.every(link => link.getBoundingClientRect().height >= 44),
+          linkCount: links.length,
+        }
+      })
+      if (!result.fitsViewport || !result.drawerScrolls || !result.linksHaveTouchTargets || !result.linkCount) {
+        failures.push(`Mobile navigation does not fit or has small links at ${viewport.width}×${viewport.height}px`)
+      }
+      await page.getByRole('button', { name: 'Close' }).click()
+    }
+  } finally {
+    await page.close()
+  }
+}
+
 try {
   await new Promise((resolveListen, rejectListen) => {
     server.once('error', rejectListen)
@@ -179,16 +216,17 @@ try {
   browser = await browserType.launch({ headless: true })
 
   if (routesToCheck.includes('/gatherings/')) await checkGatheringAttendeeLayout(browser)
+  await checkMobileNavigation(browser)
 
   for (const route of [...routesToCheck, ...(routesToCheck.length === routes.length ? ['/404.html', notFoundRoute] : [])]) {
     const page = await browser.newPage()
     try {
-      for (const width of widths) {
-        await page.setViewportSize({ width, height: width === 320 ? 568 : 900 })
+      for (const viewport of viewports) {
+        await page.setViewportSize(viewport)
         const response = await page.goto(`${baseUrl}${route}`, { waitUntil: 'load', timeout: 20000 })
         const expectsNotFound = route === notFoundRoute
         if (expectsNotFound ? response?.status() !== 404 : !response?.ok()) {
-          failures.push(`${route} at ${width}px returned HTTP ${response?.status() ?? 'no response'}`)
+          failures.push(`${route} at ${viewport.width}×${viewport.height}px returned HTTP ${response?.status() ?? 'no response'}`)
           continue
         }
 
@@ -211,7 +249,7 @@ try {
             respectText.textContent = originalText
           }
           return {
-            viewport: innerWidth,
+            viewport: { width: innerWidth, height: innerHeight },
             documentWidth: root.scrollWidth,
             bodyWidth: body.scrollWidth,
             fixtureOverflow,
@@ -220,12 +258,12 @@ try {
           }
         })
 
-        if (result.documentWidth > width + 1 || result.bodyWidth > width + 1) {
-          failures.push(`${route} at ${width}px overflows horizontally (document ${result.documentWidth}px, body ${result.bodyWidth}px)`)
+        if (result.documentWidth > viewport.width + 1 || result.bodyWidth > viewport.width + 1) {
+          failures.push(`${route} at ${viewport.width}×${viewport.height}px overflows horizontally (document ${result.documentWidth}px, body ${result.bodyWidth}px)`)
         }
 
         if (route === '/' && result.fixtureOverflow) {
-          failures.push(`Home respect note overflows with the long copy fixture at ${width}px`)
+          failures.push(`Home respect note overflows with the long copy fixture at ${viewport.width}×${viewport.height}px`)
         }
 
         if (expectsNotFound && !await page.getByRole('heading', { name: 'We couldn’t find that page.' }).count()) {
@@ -233,7 +271,7 @@ try {
         }
 
         if (route === '/' && result.respectTextWidth !== null && result.respectTextWidth < result.respectParentWidth - 2) {
-          failures.push(`Home respect note uses ${result.respectTextWidth}px of ${result.respectParentWidth}px available at ${width}px`)
+          failures.push(`Home respect note uses ${result.respectTextWidth}px of ${result.respectParentWidth}px available at ${viewport.width}×${viewport.height}px`)
         }
       }
     } finally {
@@ -245,7 +283,7 @@ try {
     throw new Error(`Responsive layout checks failed:\n- ${failures.join('\n- ')}`)
   }
 
-  console.log(`${browserType.name()} responsive layout passed: ${routesToCheck.length} generated routes${routesToCheck.length === routes.length ? ', the custom 404, and its missing-route fallback' : ''} at ${widths.join(', ')} CSS px.`)
+  console.log(`${browserType.name()} responsive layout passed: ${routesToCheck.length} generated routes${routesToCheck.length === routes.length ? ', the custom 404, and its missing-route fallback' : ''} at ${viewports.map(({ width, height }) => `${width}×${height}`).join(', ')} CSS px.`)
 } finally {
   await browser?.close()
   await new Promise(resolveClose => server.close(resolveClose))
