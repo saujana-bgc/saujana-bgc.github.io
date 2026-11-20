@@ -333,6 +333,14 @@ button:disabled { cursor: not-allowed; }
 }
 @media (max-width: 600px) {
   .activity-links { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Keep common controls comfortable to tap across every page on phones. */
+  .page-content :is(button, input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select) {
+    min-block-size: 44px;
+  }
+  .page-content textarea { min-block-size: 96px; }
+  .page-content summary { min-block-size: 44px; }
+  .page-content :is(.context-link, .activity-parent-link) { min-block-size: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
