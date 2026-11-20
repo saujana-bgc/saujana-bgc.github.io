@@ -12,7 +12,7 @@ const adminPage = compileScript(parse(adminPageSource).descriptor, { id: 'riichi
 function page(callAdmin: (action: string, payload: any) => Promise<any>) {
   const dependencies = {
     ref, reactive, computed, scoreFourPlayerTable,
-    definePageMeta() {}, useHead() {}, useRoute: () => ({ hash: '' }),
+    definePageMeta() {}, useHead() {}, useRoute: () => ({ hash: '' }), useRouter: () => ({ replace: async () => {} }),
     onMounted() {}, onBeforeUnmount() {}, onBeforeRouteLeave() {}, watch() {}, nextTick: async () => {},
     useRiichiOpen: () => ({ callAdmin, callPublic: async () => ({}) }),
   }

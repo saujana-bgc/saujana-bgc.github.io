@@ -1378,6 +1378,26 @@ onBeforeUnmount(() => {
   .entry-mode button { min-height: 48px; }
   .calc-section { padding: 12px; }
 }
+@media (max-width: 760px) and (max-height: 450px) {
+  .calculator-page .calculator-heading { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 3px 12px; margin-bottom: 4px; }
+  .calculator-heading .activity-parent-link, .calculator-heading .calculator-description { display: none; }
+  .calculator-heading .hero-title { margin: 0; font-size: 1.65rem; }
+  .tutorial-trigger { grid-column: 2; grid-row: 1; min-height: 40px; margin: 0; }
+  .calculator-layout { gap: 6px; }
+  .calculator-form { gap: 6px; }
+  .calc-section { padding: 8px 10px; }
+  .calculator-page.result-panel-visible .result-panel { position: static; max-height: none; }
+  .calculator-page.result-panel-visible .result-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 6px 10px; }
+  .result-heading-row { flex: 0 0 auto; gap: 8px; margin: 0; }
+  .result-amount { display: flex; align-items: baseline; gap: 8px; margin: 0; padding: 0; border: 0; }
+  .result-amount > strong { font-size: 1.05rem; }
+  .payment-list, .score-summary, .result-empty, .copy-fallback { display: none; }
+  .calculator-page.breakdown-visible.result-panel-visible .result-panel { display: block; }
+  .calculator-page.breakdown-visible.result-panel-visible .result-inner { display: block; padding: 6px 10px; }
+  .calculator-page.breakdown-visible.result-panel-visible .result-heading-row { display: none; }
+  .calculator-page.breakdown-visible.result-panel-visible .payment-list,
+  .calculator-page.breakdown-visible.result-panel-visible .score-summary { display: block; }
+}
 @media (max-width: 760px) {
   .calculator-page.breakdown-visible.result-panel-visible { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
   .calculator-page.breakdown-visible .result-panel { display: none; }
