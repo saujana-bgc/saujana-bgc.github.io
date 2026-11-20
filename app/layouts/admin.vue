@@ -6,8 +6,10 @@
         <label>Username<UInput v-model="username" class="admin-login-input" autocomplete="username" required /></label>
         <label>Password<UInput v-model="password" class="admin-login-input" type="password" autocomplete="current-password" required /></label>
         <label class="remember"><UCheckbox v-model="remember" /> Remember me on this device</label>
+        <p class="admin-help remember-help">Keep your organiser session on this device after you close the browser.</p>
         <p v-if="isRestoring" class="admin-help" role="status">Checking for a saved session. You can sign in here if needed.</p>
         <p v-if="error" class="admin-error action-status action-status--error" role="alert">{{ error }}</p>
+        <UButton v-if="restoreFailed" class="admin-primary" type="button" :disabled="busy" @click="retryRestore">{{ busy ? 'Checking session…' : 'Retry session check' }}</UButton>
         <UButton class="admin-primary" type="submit" :disabled="busy">{{ busy ? 'Signing in…' : 'Sign in' }}</UButton>
         <p class="admin-help">Use your organiser username and password.</p>
       </form>
@@ -62,6 +64,7 @@ const remember = ref(false)
 const mfaCode = ref('')
 const error = ref('')
 const busy = ref(false)
+const restoreFailed = ref(false)
 const mfaCodeInput = ref(null)
 const adminPage = ref(null)
 let restoreWatchdog
@@ -76,9 +79,25 @@ onMounted(async () => {
     auth.cancelRestore()
     error.value = 'Session check timed out. Sign in with your admin username and password.'
   }, 12000)
-  try { await auth.restoreSession() } catch { error.value = 'We couldn’t check your saved session. Sign in again.' }
+  try { await auth.restoreSession() } catch {
+    restoreFailed.value = true
+    error.value = 'We couldn’t reach the session service. Your saved session is still here. Try again when you’re connected.'
+  }
   finally { clearTimeout(restoreWatchdog) }
 })
+
+async function retryRestore() {
+  busy.value = true
+  error.value = ''
+  try {
+    await auth.restoreSession()
+    restoreFailed.value = false
+    if (auth.isAuthenticated.value) await finishLogin()
+  } catch {
+    restoreFailed.value = true
+    error.value = 'The session service is still unavailable. Your saved session is still here. Try again shortly.'
+  } finally { busy.value = false }
+}
 
 async function submitLogin() {
   busy.value = true
@@ -149,7 +168,7 @@ async function signOut() {
 .admin-login-intro h1,.admin-page h1{font:400 clamp(2.5rem,6vw,4.3rem)/1.05 var(--font-display);color:var(--matcha-leaf);margin:0}.admin-login-intro h1 em{color:var(--gold-leaf)}
 .admin-login-intro>p:last-child{max-width:420px;color:var(--muted);line-height:1.7}
 .admin-login-card{background:var(--white-pure);border:1px solid var(--line);border-top:3px solid var(--gold-leaf);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:30px;display:grid;gap:17px;max-width:450px;margin:auto}
-.admin-login-card label{display:grid;gap:7px;font-size:.85rem}.admin-login-card input:not([type=checkbox]){padding:12px;border:1px solid var(--line);border-radius:7px;font:inherit}.admin-login-card input:focus{outline:2px solid #8a6a3e55;border-color:var(--gold-leaf)}.admin-login-card .remember{display:flex;align-items:center;gap:9px;color:var(--muted)}
+.admin-login-card label{display:grid;gap:7px;font-size:.85rem}.admin-login-card input:not([type=checkbox]){padding:12px;border:1px solid var(--line);border-radius:7px;font:inherit}.admin-login-card input:focus{outline:2px solid #8a6a3e55;border-color:var(--gold-leaf)}.admin-login-card .remember{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft);color:var(--clay-text);font-size:.95rem;font-weight:600;cursor:pointer}.remember [role=checkbox]{flex:0 0 24px;width:24px;height:24px;border:2px solid #526a50;border-radius:5px;background:#fff;color:#fff;box-shadow:inset 0 0 0 1px #fff}.remember [role=checkbox][aria-checked=true]{border-color:#354c3e;background:#354c3e;color:white}.remember [role=checkbox][aria-checked=true] [data-slot=icon]{color:#fff}.remember [role=checkbox]:focus-visible{outline:3px solid #a8894f;outline-offset:3px}.remember-help{margin-top:-13px;padding-left:3px}
 .admin-primary,.admin-action{border:0;border-radius:6px;background:var(--matcha-leaf);color:white;padding:12px 17px;font:inherit;font-weight:650;cursor:pointer}.admin-primary:disabled{opacity:.6;cursor:wait}.admin-help,.admin-error{margin:0;color:var(--muted);font-size:.86rem;line-height:1.55}.admin-error{color:#913f45}
 .admin-topbar{display:flex;justify-content:space-between;align-items:center;padding:0 0 18px;border-bottom:1px solid var(--line)}.admin-brand{display:inline-flex;align-items:center;gap:12px;color:var(--matcha-leaf);text-decoration:none;font:1.35rem var(--font-display)}.admin-brand-mark{flex:0 0 auto}.admin-brand-copy{display:block}.admin-brand-copy small{display:block;margin-top:4px;font: .57rem 'Segoe UI',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.admin-login-intro>.admin-brand{margin-bottom:34px}.admin-topbar>div{display:flex;align-items:center;gap:16px}.admin-public-link,.admin-signout{color:var(--matcha-leaf);font:inherit}.admin-signout{border:1px solid var(--line);background:var(--white-pure);padding:8px 14px;border-radius:6px;cursor:pointer}
 .admin-nav{display:flex;gap:7px;overflow:auto;padding:14px 0;border-bottom:1px solid var(--line)}.admin-nav a{flex:0 0 auto;text-decoration:none;color:var(--muted);padding:8px 10px;border-radius:5px;font-size:.82rem}.admin-nav a:hover,.admin-nav a.active{color:var(--matcha-leaf);background:var(--surface-soft)}.admin-page{padding-top:var(--page-top-inset)}.admin-page h1{font-size:clamp(2rem,4vw,3.3rem)}.admin-page .eyebrow,.admin-login-intro .eyebrow{color:var(--gold-leaf);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px}

@@ -97,3 +97,22 @@ test('a saved password-only session is cleared and never restored as admin', asy
   assert.equal(auth.isAuthenticated.value, false)
   assert.equal(localStorage.getItem('saujana_admin_session'), null)
 })
+
+test('a temporary session check failure keeps a remembered session available to retry', async () => {
+  const localStorage = storage()
+  const savedSession = { ...credentials('aal2'), expires_at: Math.floor(Date.now() / 1000) + 3600 }
+  localStorage.setItem('saujana_admin_session', JSON.stringify(savedSession))
+  let failOnce = true
+  const { auth } = loadAuth(() => {
+    if (failOnce) return new Response(null, { status: 503 })
+    return Response.json(admin)
+  }, localStorage)
+
+  await assert.rejects(auth.restoreSession(), /Session service unavailable/)
+  assert.equal(localStorage.getItem('saujana_admin_session'), JSON.stringify(savedSession))
+  assert.equal(auth.isAuthenticated.value, false)
+
+  failOnce = false
+  assert.equal(await auth.restoreSession(), true)
+  assert.equal(auth.isAuthenticated.value, true)
+})

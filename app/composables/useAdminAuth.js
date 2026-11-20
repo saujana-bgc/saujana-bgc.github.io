@@ -87,6 +87,7 @@ export function useAdminAuth() {
     const response = await authRequest('user', {
       headers: { Authorization: `Bearer ${candidate.access_token}` },
     })
+    if (response.status === 429 || response.status >= 500) throw new Error('Session service unavailable.')
     if (!response.ok) return false
     const user = await response.json()
     return user.app_metadata?.role === REQUIRED_ROLE
@@ -228,6 +229,7 @@ export function useAdminAuth() {
         })
         if (revision !== authRevision) return isAuthenticated.value
         if (!response.ok) {
+          if (response.status === 429 || response.status >= 500) throw new Error('Session service unavailable.')
           clearStoredSessions()
           return false
         }
@@ -243,6 +245,7 @@ export function useAdminAuth() {
         })
         if (revision !== authRevision) return isAuthenticated.value
         if (!response.ok) {
+          if (response.status === 429 || response.status >= 500) throw new Error('Session service unavailable.')
           clearStoredSessions()
           return false
         }
