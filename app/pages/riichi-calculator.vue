@@ -1281,7 +1281,7 @@ onBeforeUnmount(() => {
   .calculator-page .calculator-heading { margin: 0 auto 10px; padding-top: 0; }
   .calculator-heading .page-eyebrow { margin-bottom: 10px; }
   .calculator-heading .hero-title { font-size: clamp(1.65rem, 7vw, 2.25rem); line-height: 1.1; }
-  .calculator-heading > .calculator-description { margin-top: 4px; font-size: .76rem; line-height: 1.4; }
+  .calculator-heading > .calculator-description { margin-top: 4px; font-size: .875rem; line-height: 1.5; }
   .tutorial-trigger { margin-top: 8px; }
   .calculator-layout.tile-entry-active { margin-top: 0; }
   .calculator-layout { display: flex; flex-direction: column; gap: 12px; }
@@ -1316,7 +1316,7 @@ onBeforeUnmount(() => {
   .entry-mode small { font-size: .72rem; line-height: 1.35; }
   .player-count-row { margin-block: 2px 7px; }
   .calculator-form > .checkbox-row { margin-block: 4px 7px; }
-  .player-count-row .choice-button { min-height: 40px; padding: 6px 8px; font-size: .68rem; }
+  .player-count-row .choice-button { min-height: 44px; padding: 6px 8px; font-size: .875rem; }
   .field-hint, .group-count, .group-row-main > small, .group-option-grid button > span:not(.group-tile-samples), .group-yaku-choice { font-size: .76rem; }
   .calc-section { padding: 15px; }
   .choice-row { gap: 7px; }

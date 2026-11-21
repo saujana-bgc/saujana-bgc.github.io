@@ -91,10 +91,10 @@
           <h2 id="season-heading">{{ selectedSeason.name }}</h2>
           <p>{{ formatDate(selectedSeason.startDate, true) }} – {{ formatDate(selectedSeason.endDate, true) }}</p>
         </div>
-        <div class="prize-card">
+        <div v-if="selectedSeason.prize?.title || selectedSeason.prize?.description" class="prize-card">
           <span>Season prize</span>
-          <strong>{{ selectedSeason.prize.title }}</strong>
-          <small>{{ selectedSeason.prize.description }}</small>
+          <strong v-if="selectedSeason.prize?.title">{{ selectedSeason.prize.title }}</strong>
+          <small v-if="selectedSeason.prize?.description">{{ selectedSeason.prize.description }}</small>
         </div>
       </div>
 

@@ -74,7 +74,7 @@
           >{{ expandedSessionGames.has(session.date) ? 'Show matching games only' : `Show all ${session.games.length} games from this gathering` }}</UButton>
         </section>
 
-        <div v-if="filteredSessions.length === 0" class="loading-state">
+        <div v-if="filteredSessions.length === 0" class="loading-state empty-playlog action-status action-status--pending">
           <p>{{ search.trim() ? `No gatherings include “${search.trim()}”. Try another game title.` : 'No plays logged just yet. Take a look through the collection and see what you might like to try.' }}</p>
           <NuxtLink class="context-link" to="/collection/" no-prefetch>Browse the collection <span aria-hidden="true">→</span></NuxtLink>
         </div>
@@ -817,11 +817,15 @@ onUnmounted(() => {
 
 /* Boutique surfaces and readable controls. */
 
+.search-wrap { width: min(960px, calc(100% - 40px)); }
 .search-wrap, .session-card { max-width: 960px; }
 .search-input { min-height: 50px; border-radius: 8px; border-color: var(--line); }
 .session-card { border: 1px solid var(--line); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
 .session-card:hover { transform: none; box-shadow: var(--shadow-card); }
 .loading-state.action-status { margin: 16px auto; opacity: 1; font-size: .9rem; letter-spacing: 0; text-align: left; text-transform: none; }
+.empty-playlog { width: min(960px, calc(100% - 40px)); padding: 16px; font-size: .95rem; line-height: 1.55; letter-spacing: 0; opacity: 1; text-align: left; text-transform: none; }
+.empty-playlog p { margin: 0; }
+.empty-playlog .context-link { margin-top: 8px; }
 .stat-tile { background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; box-shadow: none; padding: 20px 16px; }
 .stat-label { font-size: .7rem; letter-spacing: .02em; text-transform: none; opacity: 1; color: var(--muted); }
 .session-date { font-style: normal; font-size: 1.5rem; }

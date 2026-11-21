@@ -9,7 +9,7 @@
       <li v-for="(phase, index) in phases" :key="phase.key" :class="{ current: phaseIndex === index, done: phaseIndex > index }" :aria-current="phaseIndex === index ? 'step' : undefined"><span>{{ phaseIndex > index ? '✓' : index + 1 }}</span><strong>{{ phase.label }}</strong><small>{{ phaseIndex > index ? 'Complete' : phaseIndex === index ? (event?.stage === 'completed' ? 'Complete' : 'Current stage') : 'Up next' }}</small></li>
     </ol>
 
-    <p v-if="error" class="results-notice" role="status">{{ snapshot ? 'Showing the last available update. ' : '' }}{{ error }}</p>
+    <p v-if="error && snapshot" class="results-notice" role="status">Showing the last available update. {{ error }}</p>
     <section v-if="loading" class="results-card empty-results" aria-live="polite"><span class="empty-tile" aria-hidden="true">一</span><h2>Loading standings…</h2></section>
     <template v-else-if="snapshot">
       <section v-if="event?.stage === 'completed' && snapshot.final?.length" class="results-card champion-card">

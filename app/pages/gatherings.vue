@@ -531,7 +531,7 @@ const currentEvents = computed(() => {
 function switchTab(tab) {
     activeTab.value = tab
     presentPage.value = 1
-    loadEventsForTab(tab).catch(() => showToast('We couldn’t load the gatherings. Please refresh and try again.'))
+    loadEventsForTab(tab)
     resizeAllAreas()
 }
 
@@ -1083,7 +1083,7 @@ onMounted(async () => {
             }
         }
     } catch {
-        showToast('We couldn’t load the gatherings. Please refresh and try again.')
+        // The calendar view displays its own retry message beside the events.
     }
 })
 
@@ -2129,6 +2129,11 @@ watch(attendeesByEvent, resizeAllAreas, { deep: true, flush: 'post' })
     flex-direction: column;
     gap: 8px;
     pointer-events: none;
+}
+
+@media (max-width: 767px) {
+    .toast-container { top: 94px; right: 12px; left: 12px; align-items: flex-end; }
+    .toast { max-width: 100%; text-align: left; }
 }
 
 .toast {
