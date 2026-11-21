@@ -181,6 +181,8 @@
 </template>
 
 <script setup>
+import { travellerCharacters } from '~/utils/clocktowerCharacters'
+
 definePageMeta({ layout: 'admin' })
 useHead({ title: 'Clocktower Organiser | Saujana BGC', meta: [{ name: 'robots', content: 'noindex, nofollow, noarchive' }] })
 
@@ -409,7 +411,8 @@ function addPastedPlayers(game) {
 
 function characters(game) {
   const source = scriptNames.includes(game.script) ? scriptPresets[game.script] : game.script_characters
-  return (source || '').split(',').map(value => value.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b))
+  const scriptCharacters = (source || '').split(',').map(value => value.trim()).filter(Boolean)
+  return [...new Set([...scriptCharacters, ...travellerCharacters])].sort((a, b) => a.localeCompare(b))
 }
 
 function characterGroups(game) {
@@ -420,6 +423,7 @@ function characterGroups(game) {
     { name: 'Evil · Demons', characters: [] },
     { name: 'Team unknown', characters: [] },
   ]
+  const travellers = { name: 'Travellers', characters: [] }
   const script = game.script
   const roleSets = {
     'Trouble Brewing': [
@@ -443,9 +447,14 @@ function characterGroups(game) {
   }
   const roles = roleSets[script]
   for (const character of characters(game)) {
+    if (travellerCharacters.has(character)) {
+      travellers.characters.push(character)
+      continue
+    }
     const teamIndex = roles?.findIndex(team => team.includes(character)) ?? -1
     groups[character === 'Evil Twin' ? 0 : teamIndex < 0 ? 4 : teamIndex].characters.push(character)
   }
+  groups.push(travellers)
   return groups.filter(group => group.characters.length)
 }
 
@@ -479,7 +488,7 @@ function applyScript(game, event) {
   const previousScript = game.script
   const nextScript = event.target.value
   if (!scriptNames.includes(nextScript)) return
-  const availableCharacters = new Set(scriptPresets[nextScript].split(',').map(value => value.trim()).filter(Boolean))
+  const availableCharacters = new Set(characters({ script: nextScript }))
   const affectedCount = game.players.filter(player => player.character && !availableCharacters.has(player.character)).length
   const change = previousScript ? `Switch from ${previousScript} to ${nextScript}` : `Use ${nextScript}`
   if (affectedCount && !window.confirm(`${change}? This will clear ${affectedCount} assigned ${affectedCount === 1 ? 'character' : 'characters'} that aren’t in the new script.`)) {

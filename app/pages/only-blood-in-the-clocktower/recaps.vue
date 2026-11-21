@@ -113,6 +113,8 @@
 </style>
 
 <script setup>
+import { travellerCharacters } from '~/utils/clocktowerCharacters'
+
 const config = useRuntimeConfig()
 const route = useRoute()
 
@@ -185,6 +187,7 @@ function visibleGames(session) {
 }
 
 function characterIcon(character) {
+  if (travellerCharacters.has(character)) return '/images/clocktower/characters/custom-174.avif'
   const file = (character || 'custom').toLowerCase().replace(/[^a-z0-9]/g, '')
   return `/images/clocktower/characters/${file}-174.avif`
 }
